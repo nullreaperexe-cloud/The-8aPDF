@@ -55,7 +55,7 @@ h1,h2,h3{letter-spacing:-.018em!important}
 }
 .navlink:hover,.navlink.active{color:var(--blue)!important}
 .navlink.active:after{background:var(--blue)!important;height:1px!important;width:32px!important}
-.nav-actions{align-items:center}
+.nav-actions{align-items:center;margin-left:auto}
 .icon-btn{background:transparent!important;border:1px solid var(--line)!important;color:var(--blue)!important}
 .icon-btn:hover{border-color:var(--blue)!important;background:var(--surface2)!important}
 .notification-dot.enabled:after{background:#ba803b!important}
@@ -241,6 +241,7 @@ html[data-theme="dark"] .card-actions .btn-primary{
 .timetable-close{height:37px;width:37px;flex:0 0 auto;font-size:23px;
   border:1px solid var(--line);background:var(--surface2);color:var(--text);cursor:pointer}
 .timetable-image-wrap{overflow:auto;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding:12px;background:var(--bg)}
+#timetableImage[hidden],#timetableImageError[hidden]{display:none!important}
 #timetableImage{display:block;width:auto;max-width:100%;max-height:calc(96dvh - 175px);height:auto;object-fit:contain;
   border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.14)}
 .timetable-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
@@ -255,7 +256,8 @@ html[data-theme="dark"] .card-actions .btn-primary{
   .header .nav{min-height:60px!important}
   .nav .brand{font-size:1.52rem!important}.brand svg{width:30px!important;height:30px!important}
   .royal-timetable-action{padding:8px 9px;font-size:.66rem}
-  .nav-actions{gap:4px!important}.nav-actions .icon-btn{width:35px;height:35px}
+  .nav-actions{gap:4px!important}
+  .nav-actions .royal-timetable-action{display:none!important}.nav-actions .icon-btn{width:35px;height:35px}
   .hero{min-height:0!important;padding:154px 0 54px!important;align-items:flex-start!important}
   .hero::before{right:-38%;top:20%;width:70vw;height:50%;opacity:.20}
   .hero-inner{text-align:left!important;padding:0!important}
