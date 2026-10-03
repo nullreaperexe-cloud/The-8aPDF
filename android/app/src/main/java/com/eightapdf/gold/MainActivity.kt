@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
         return try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))); true } catch (_: Exception) { false }
     }
 
-    override fun onNewIntent(intent: Intent?) { super.onNewIntent(intent); intent?.getStringExtra("destination")?.let { destination -> if (destination != "home") web.evaluateJavascript("window.location.hash=${JSONObject.quote(destination)}", null) } }
+    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); intent?.getStringExtra("destination")?.let { destination -> if (destination != "home") web.evaluateJavascript("window.location.hash=${JSONObject.quote(destination)}", null) } }
     override fun onBackPressed() { if (web.canGoBack()) web.goBack() else super.onBackPressed() }
 }
 
