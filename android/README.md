@@ -23,3 +23,5 @@ The GitHub Actions workflow builds `app-debug.apk` on pushes affecting `android/
 The app loads `https://8apdf.vercel.app/?android=1`, keeps the website UI unchanged, opens external PDF links in the browser, routes downloads to Android DownloadManager, and supplies a native share fallback. The website's redundant web notification modal is suppressed only inside the Android WebView.
 
 Do not commit signing keys, Firebase service-account credentials, or user secrets. A release build needs a separately managed signing configuration.
+
+Build workflow is located at `.github/workflows/build-android.yml` so GitHub Actions can discover it.
