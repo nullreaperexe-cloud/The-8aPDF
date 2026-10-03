@@ -1,9 +1,13 @@
 /* Theme-aware timetable feature. No changes to the original 8aPDF theme or app logic. */
 (() => {
   const images = Object.freeze({
-    light:'https://www.image2url.com/r2/default/images/1790851808988-668582f7-207b-4bf9-9d94-64ca7f2d1fcd.png',
-    dark:'https://www.image2url.com/r2/default/images/1790851961495-55f0d325-d659-415d-9c59-152b0d79b5bb.png'
+    light:'https://www.image2url.com/r2/default/images/1791028856977-b85d72c3-a9e6-4b73-a344-1ec7a20a04fe.png',
+    dark:'https://www.image2url.com/r2/default/images/1791028831646-7028a7af-b905-4790-a776-4fb43399cb79.png'
   });
+
+  function preloadTimetables() {
+      Object.values(images).forEach(url => { const image = new Image(); image.decoding = 'async'; image.fetchPriority = 'high'; image.src = url; });
+    }
 
   function setupTimetable() {
     const dialog = document.getElementById('timetableOverlay');
@@ -13,6 +17,7 @@
     const error = document.getElementById('timetableImageError');
     const close = document.getElementById('timetableCloseBtn');
     if(!dialog || !img || !direct || !label || !error || !close) return;
+    preloadTimetables();
 
     let previousFocus = null;
     const currentTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
@@ -24,6 +29,8 @@
       if(img.getAttribute('src') !== url) {
         error.hidden = true;
         img.hidden = false;
+        img.decoding = 'async';
+        img.fetchPriority = 'high';
         img.src = url;
       }
     }
