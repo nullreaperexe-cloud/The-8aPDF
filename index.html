@@ -1,20 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" data-glass="on" data-fluid="on" data-theme="dark" data-tone="dark" data-density="comfortable" data-layout="grid" data-motion="on">
+
+<html data-density="comfortable" data-fluid="on" data-glass="on" data-layout="grid" data-motion="on" data-onboard="complete" data-theme="pure-black" data-tone="dark" lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101010">
-<meta name="description" content="8aPDF — your complete study material vault. Your school PDFs, announcements and timetable in one place.">
-<title>8aPDF | Study Material Vault</title>
-<script>
-// A fresh page load ALWAYS begins with the welcome experience.
-// Only first-time visitors need to enter their name or choose notifications.
-try {
-  const n=localStorage.getItem('eightapdf_user_name_v2') || localStorage.getItem('eightapdf_user_name');
-  document.documentElement.dataset.introVisit = n && n.trim() && n.trim() !== 'Student' ? 'returning' : 'first';
-} catch { document.documentElement.dataset.introVisit='first'; }
-document.documentElement.dataset.onboard='needed';
-</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#101010" name="theme-color"/>
+<meta content="8aPDF — your complete study material vault. Your school PDFs, announcements and timetable in one place." name="description"/>
+<title>8aPDF | Ultra Black Adaptive Glow Preview</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
 :root{color-scheme:dark;--bg:#111111;--bg-alt:#171717;--surface:#202020;--surface-high:#282828;--surface-soft:#242424;--surface-glass:rgba(38,38,38,.92);--text:#f5f5f5;--text-soft:#d2d2d2;--muted:#989898;--line:rgba(255,255,255,.115);--line-bold:rgba(255,255,255,.22);--button:#ededed;--button-text:#171717;--pill:#303030;--hover:#383838;--shadow:0 18px 55px rgba(0,0,0,.16);--hero-glow:rgba(255,255,255,.065);--radius:13px;--content-width:1430px;--duration:240ms;--scale:1;--card-pad:19px;--card-gap:13px;--ease:cubic-bezier(.18,.72,.22,1)}
 html[data-theme="pure-black"]{--bg:#000;--bg-alt:#060606;--surface:#101010;--surface-high:#161616;--surface-soft:#141414;--surface-glass:rgba(18,18,18,.96);--text:#fff;--text-soft:#e1e1e1;--muted:#929292;--line:rgba(255,255,255,.15);--line-bold:rgba(255,255,255,.29);--pill:#171717;--hover:#242424;--hero-glow:rgba(255,255,255,.04)}
@@ -170,125 +165,813 @@ html[data-onboard="needed"] body{overflow:hidden}
 html[data-motion="off"] .intro-step,html[data-motion="off"] .intro-progress span{animation:none!important}
 
 </style>
+<style id="classic-visual-upgrade">/* THE 8aPDF CLASSIC EDITION — editorial lime + transparent iOS-inspired surfaces. */
+html[data-theme="signature-lime"]{color-scheme:light;
+--bg:#f1f2df;--bg-alt:#e8edd8;--surface:#f8f9ea;--surface-high:#f6fae3;--surface-soft:#e8efd9;
+--surface-glass:rgba(247,250,230,.77);--text:#182218;--text-soft:#354238;--muted:#657264;
+--line:rgba(25,40,21,.13);--line-bold:rgba(25,40,21,.28);--button:#b7ff2a;--button-text:#17210f;
+--pill:#e8edda;--hover:#dfe9cd;--shadow:0 18px 52px rgba(22,38,18,.10);--hero-glow:rgba(182,255,38,.23);}
+html[data-theme="signature-lime"] body{background:radial-gradient(circle at 14% 1%,rgba(255,255,255,.85),transparent 36%),radial-gradient(circle at 88% 14%,rgba(170,223,102,.12),transparent 32%),var(--bg)}
+/* Maintain original expressive typography, now matched with fluid glass from the approved modern version. */
+.hero{padding-top:78px;padding-bottom:58px}
+.hero-inner{max-width:1180px}
+.hero h1{max-width:1100px;font-family:inherit;font-size:clamp(3.2rem,8.3vw,7.5rem);font-weight:780;line-height:.95;letter-spacing:-.078em;margin:21px auto 24px}
+.classic-title-main,.classic-title-accent{display:block}
+.classic-title-accent{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;letter-spacing:-.07em}
+.hero p{font-size:clamp(.97rem,1.3vw,1.11rem);max-width:640px;line-height:1.72}
+.eyebrow-pill{font-weight:800;letter-spacing:.14em;font-size:.69rem;text-transform:uppercase}
+.top-nav{border-radius:23px;min-height:72px;height:auto;padding:9px 19px;box-shadow:var(--shadow)}
+.brand{font:800 1.15rem 'Space Grotesk',system-ui,sans-serif;letter-spacing:-.055em}
+.brand svg{height:27px;width:27px}
+.big-search{min-height:70px;max-width:850px;border-radius:22px;box-shadow:0 14px 40px rgba(11,23,8,.10);margin-top:35px;transition:transform .65s cubic-bezier(.16,1,.3,1),box-shadow .65s cubic-bezier(.16,1,.3,1),background .4s ease}
+.big-search:focus-within{transform:translateY(-4px);box-shadow:0 22px 70px rgba(11,23,8,.16)}
+.feature-strip{margin-top:34px}
+.feature,.widget,.pdf-card,.notice-card{border-radius:25px;box-shadow:var(--shadow);transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s cubic-bezier(.16,1,.3,1),border-color .35s ease,background .35s ease}
+.feature:hover{transform:translateY(-5px) scale(1.012)}
+.pdf-card{border:1px solid var(--line);min-height:286px;overflow:hidden;transform:translateZ(0);animation:classicCardReveal .7s cubic-bezier(.16,1,.3,1) both}
+.pdf-card:nth-child(2){animation-delay:.045s}.pdf-card:nth-child(3){animation-delay:.09s}.pdf-card:nth-child(4){animation-delay:.13s}.pdf-card:nth-child(5){animation-delay:.17s}.pdf-card:nth-child(6){animation-delay:.21s}
+@keyframes classicCardReveal{from{opacity:0;transform:translateY(19px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes classicHeroReveal{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.hero h1{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) both}
+.hero p{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) .07s both}
+.big-search{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) .12s both}
+.pdf-card:hover{transform:translateY(-6px) scale(1.005);box-shadow:0 27px 72px rgba(22,35,24,.16)}
+.action.primary,.solid,.search-submit{background:var(--button);color:var(--button-text);border:1px solid transparent;box-shadow:0 9px 26px color-mix(in srgb,var(--button) 22%,transparent)}
+.action,.chip,.round-btn,.theme-item{transition:transform .3s cubic-bezier(.16,1,.3,1),background .3s ease,box-shadow .3s ease,border-color .3s ease}
+.action:hover,.chip:hover,.round-btn:hover{transform:translateY(-2px)}
+.action:active,.chip:active,.round-btn:active{transform:scale(.965)}
+/* Readability stays crisp at 100% glass intensity. */
+html[data-glass="on"] .pdf-card h3,html[data-glass="on"] .hero h1{filter:none;text-shadow:none}
+html[data-theme="signature-lime"] :is(.pdf-card,.feature,.widget,.top-nav,.big-search,.notice-card,.settings,.dialog){border-color:rgba(30,48,22,.13)}
+/* Fast interactions even on compact phones. */
+@media(max-width:740px){.hero{padding-top:58px;padding-bottom:34px}.hero h1{font-size:clamp(2.8rem,12.4vw,4.6rem);line-height:.97}.top-nav{border-radius:19px;min-height:60px}.pdf-card:hover,.feature:hover{transform:none}.feature-strip{margin-top:23px}}
+@media(prefers-reduced-motion:reduce){.pdf-card,.hero h1,.hero p,.big-search{animation:none!important}.pdf-card:hover,.feature:hover{transform:none!important}}
+
+/* PRESERVED VERBATIM FROM THE UPLOADED ORIGINAL: .welcome-screen, .name-modal and animations */
+    .welcome-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.22), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.18), transparent 32rem),
+        rgba(248, 250, 252, 0.96);
+      backdrop-filter: blur(22px) saturate(170%);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.55s var(--ease), visibility 0.55s var(--ease);
+    }
+
+    html[data-theme="dark"] .welcome-screen {
+      background:
+        radial-gradient(circle at top left, rgba(129, 140, 248, 0.22), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.16), transparent 32rem),
+        rgba(2, 6, 23, 0.96);
+    }
+
+    .welcome-screen.show {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .welcome-content {
+      width: min(100%, 720px);
+      text-align: center;
+      transform: translateY(18px) scale(0.98);
+      opacity: 0;
+      transition: transform 0.65s var(--ease), opacity 0.65s var(--ease);
+    }
+
+    .welcome-screen.show .welcome-content {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .welcome-logo {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 22px 55px rgba(79, 70, 229, 0.32);
+      animation: softPulse 1.8s var(--ease) infinite;
+    }
+
+    @keyframes softPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.04);
+      }
+    }
+
+    .welcome-title {
+      font-size: clamp(2.1rem, 7vw, 4.2rem);
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+
+    .welcome-subtitle {
+      max-width: 520px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.75;
+      font-weight: 500;
+    }
+
+    .name-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 6000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top center, rgba(79, 70, 229, 0.20), transparent 32rem),
+        rgba(248, 250, 252, 0.96);
+      backdrop-filter: blur(22px) saturate(170%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
+    }
+
+    html[data-theme="dark"] .name-modal {
+      background:
+        radial-gradient(circle at top center, rgba(129, 140, 248, 0.20), transparent 32rem),
+        rgba(2, 6, 23, 0.96);
+    }
+
+    .name-modal.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .name-card {
+      width: min(100%, 460px);
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(20px) scale(0.98);
+      opacity: 0;
+      transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+    }
+
+    .name-modal.show .name-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .name-card h2 {
+      font-size: 1.75rem;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .name-card p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .name-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .name-input {
+      width: 100%;
+      min-height: 56px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 12px 14px;
+      background: var(--card);
+      color: var(--text);
+      outline: none;
+      font-weight: 600;
+      transition: border-color 0.32s var(--ease), box-shadow 0.32s var(--ease), transform 0.32s var(--ease);
+    }
+
+    .name-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+      transform: translateY(-1px);
+    }
+
+
+.welcome-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.22), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.18), transparent 32rem),
+        rgba(248, 250, 252, 0.96);
+      backdrop-filter: blur(22px) saturate(170%);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.55s var(--ease), visibility 0.55s var(--ease);
+    }
+html[data-theme="dark"] .welcome-screen {
+      background:
+        radial-gradient(circle at top left, rgba(129, 140, 248, 0.22), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.16), transparent 32rem),
+        rgba(2, 6, 23, 0.96);
+    }
+.welcome-screen.show {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+.welcome-content {
+      width: min(100%, 720px);
+      text-align: center;
+      transform: translateY(18px) scale(0.98);
+      opacity: 0;
+      transition: transform 0.65s var(--ease), opacity 0.65s var(--ease);
+    }
+.welcome-screen.show .welcome-content {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+.welcome-logo {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 22px 55px rgba(79, 70, 229, 0.32);
+      animation: softPulse 1.8s var(--ease) infinite;
+    }
+.welcome-title {
+      font-size: clamp(2.1rem, 7vw, 4.2rem);
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+.welcome-subtitle {
+      max-width: 520px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.75;
+      font-weight: 500;
+    }
+.name-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 6000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top center, rgba(79, 70, 229, 0.20), transparent 32rem),
+        rgba(248, 250, 252, 0.96);
+      backdrop-filter: blur(22px) saturate(170%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
+    }
+html[data-theme="dark"] .name-modal {
+      background:
+        radial-gradient(circle at top center, rgba(129, 140, 248, 0.20), transparent 32rem),
+        rgba(2, 6, 23, 0.96);
+    }
+.name-modal.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+.name-card {
+      width: min(100%, 460px);
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(20px) scale(0.98);
+      opacity: 0;
+      transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+    }
+.name-modal.show .name-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+.name-card h2 {
+      font-size: 1.75rem;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+.name-card p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+.name-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+.name-input {
+      width: 100%;
+      min-height: 56px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 12px 14px;
+      background: var(--card);
+      color: var(--text);
+      outline: none;
+      font-weight: 600;
+      transition: border-color 0.32s var(--ease), box-shadow 0.32s var(--ease), transform 0.32s var(--ease);
+    }
+.name-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+      transform: translateY(-1px);
+    }
+.welcome-screen,
+    .name-modal {
+      background: rgba(243, 240, 230, 0.97);
+      backdrop-filter: blur(18px);
+    }
+html[data-theme="dark"] .welcome-screen,
+    html[data-theme="dark"] .name-modal {
+      background: rgba(23, 27, 23, 0.97);
+    }
+.welcome-logo {
+      width: 66px;
+      height: 66px;
+      border: 1px solid #171b17;
+      border-radius: 7px;
+      background: var(--primary);
+      color: #171b17;
+      box-shadow: 5px 5px 0 #171b17;
+    }
+.name-card {
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: var(--card);
+      box-shadow: 8px 8px 0 var(--primary);
+    }
+.name-card h2 {
+      font-size: 1.8rem;
+      letter-spacing: -0.055em;
+    }
+.name-card p {
+      color: var(--muted);
+    }
+.name-input {
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: transparent;
+      color: var(--text);
+    }
+.name-input:focus {
+      border-color: var(--text);
+      box-shadow: 4px 4px 0 var(--primary);
+    }
+html[data-theme="light"] .welcome-screen,
+    html[data-theme="light"] .name-modal {
+      background: rgba(243, 240, 230, 0.97);
+    }
+html[data-theme="light"] .welcome-logo {
+      border-color: var(--text);
+      color: var(--text);
+      box-shadow: 5px 5px 0 var(--text);
+    }
+html[data-theme="light"] .name-card {
+      border-color: rgba(27, 32, 27, 0.24);
+      background: var(--card);
+      color: var(--text);
+    }
+html[data-theme="light"] .name-input {
+      border-color: rgba(27, 32, 27, 0.28);
+      color: var(--text);
+    }
+.welcome-screen, .name-modal { will-change: opacity; }
+
+#welcomeScreen{z-index:10001}
+#nameModal{z-index:10002}
+body.locked{overflow:hidden}
+
+#nameModal.show,#welcomeScreen.show{pointer-events:auto}
+</style><style id="liquid-refined-experience">/* 8aPDF ULTRA BLACK / THEME-SYNCED WELCOME + POINTER-RESPONSIVE LIQUID SURFACES */
+/* Original .welcome-screen.show and .welcome-content entrance animations are deliberately preserved. */
+#welcomeScreen,
+#nameModal {
+  --welcome-ink: var(--text);
+  --welcome-muted: var(--muted);
+  color: var(--welcome-ink);
+  background:
+    radial-gradient(ellipse 48% 52% at 16% 19%,color-mix(in srgb,var(--text) 7%,transparent),transparent 82%),
+    radial-gradient(ellipse 58% 45% at 84% 77%,color-mix(in srgb,var(--text) 5%,transparent),transparent 82%),
+    linear-gradient(132deg,color-mix(in srgb,var(--surface-high) 28%,transparent),transparent 42%,color-mix(in srgb,var(--surface-high) 29%,transparent)),
+    color-mix(in srgb,var(--bg) 89%,transparent) !important;
+  backdrop-filter:blur(var(--liquid-blur,46px)) saturate(var(--liquid-saturation,190%));
+  -webkit-backdrop-filter:blur(var(--liquid-blur,46px)) saturate(var(--liquid-saturation,190%));
+  isolation:isolate;
+}
+#welcomeScreen::before,
+#welcomeScreen::after {
+  content:""; position:absolute; z-index:-1; pointer-events:none;
+  border-radius:50%;filter:blur(4px);
+  will-change:transform;
+}
+#welcomeScreen::before{
+  width:min(64vw,900px);height:min(45vw,490px);left:-21%;top:-25%;
+  border:1px solid color-mix(in srgb,var(--text) 17%,transparent);
+  box-shadow:inset 0 2px 23px color-mix(in srgb,var(--text) 7%,transparent),
+    0 0 60px color-mix(in srgb,var(--text) 3%,transparent);
+  background:radial-gradient(ellipse at 67% 60%,color-mix(in srgb,var(--text) 5%,transparent),transparent 70%);
+  animation:welcomeLiquidFloat 9s ease-in-out infinite alternate;
+}
+#welcomeScreen::after{
+  width:min(62vw,760px);height:min(39vw,440px);right:-14%;bottom:-28%;
+  border:1px solid color-mix(in srgb,var(--text) 12%,transparent);
+  box-shadow:inset 2px 7px 36px color-mix(in srgb,var(--text) 5%,transparent);
+  background:radial-gradient(ellipse at 25% 22%,color-mix(in srgb,var(--text) 4%,transparent),transparent 70%);
+  animation:welcomeLiquidFloat 12s ease-in-out infinite alternate-reverse;
+}
+@keyframes welcomeLiquidFloat{
+  0%{transform:translate3d(-12px,10px,0) rotate(-4deg)}
+  100%{transform:translate3d(17px,-12px,0) rotate(6deg)}
+}
+#welcomeScreen .welcome-logo {display:none !important}
+#welcomeScreen .welcome-content {width:min(94vw,1260px);padding:10px 16px 28px;position:relative;z-index:1}
+#welcomeScreen .welcome-title {
+  font-family:'Space Grotesk','Arial',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:clamp(2.8rem,6.2vw,5.3rem);
+  font-weight:700;
+  line-height:1.09;
+  letter-spacing:-.061em;
+  color:var(--text) !important;
+  margin:0;
+  text-align:center;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+  text-shadow:0 2px 24px color-mix(in srgb,var(--bg) 48%,transparent);
+}
+#welcomeScreen .welcome-subtitle {
+  font-family:'Space Grotesk','Arial',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  margin:26px auto 0;max-width:700px;
+  color:var(--text-soft) !important;
+  font-size:clamp(.96rem,1.45vw,1.38rem);
+  font-weight:500;line-height:1.55;
+  letter-spacing:-.018em;
+  text-align:center;
+}
+#nameModal .name-card {
+  background:color-mix(in srgb,var(--surface-high) 76%,transparent) !important;
+  border:1px solid var(--line-bold) !important;
+  color:var(--text) !important;
+  box-shadow:0 32px 120px color-mix(in srgb,var(--bg) 74%,transparent),inset 0 1px 0 color-mix(in srgb,var(--text) 11%,transparent);
+  backdrop-filter:blur(var(--liquid-blur,46px));
+  -webkit-backdrop-filter:blur(var(--liquid-blur,46px));
+  border-radius:28px;
+}
+#nameModal .name-card h2{color:var(--text);font-family:'Space Grotesk',ui-sans-serif,Arial,sans-serif}
+#nameModal .name-card p{color:var(--text-soft)}
+#nameModal .name-input {background:var(--surface-soft);color:var(--text);border-color:var(--line-bold);box-shadow:none}
+#nameModal .name-input:focus {border-color:var(--text);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 11%,transparent)}
+#nameModal .btn-primary{background:var(--button);color:var(--button-text);border-color:var(--line-bold)}
+/* Fluid silver-glass ambience that follows the mouse, without images or layout reflows. */
+.hero {isolation:isolate;--hero-fluid-x:50%;--hero-fluid-y:43%;--hero-drift-x:0px;--hero-drift-y:0px;}
+.hero .hero-inner{position:relative;z-index:2}
+.hero-liquid-layer {position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.99}
+.hero-liquid-layer::before {
+  content:"";position:absolute;inset:-11% -12%;pointer-events:none;
+  background:radial-gradient(ellipse 38% 37% at var(--hero-fluid-x) var(--hero-fluid-y),color-mix(in srgb,var(--text) 9%,transparent) 0%,color-mix(in srgb,var(--text) 3%,transparent) 34%,transparent 75%);
+  opacity:var(--hero-fluid-opacity,.7);
+  transition:opacity .6s ease;
+}
+.hero-liquid-orb {
+  position:absolute;width:clamp(340px,47vw,660px);height:clamp(235px,33vw,470px);
+  top:7%;left:50%;border-radius:48% 52% 45% 55%;
+  transform:translate3d(calc(-50% + var(--hero-drift-x)),var(--hero-drift-y),0) rotate(-10deg);
+  background:linear-gradient(128deg,color-mix(in srgb,var(--text) 3.8%,transparent),transparent 33%,color-mix(in srgb,var(--text) 6%,transparent) 64%,transparent 95%);
+  border:1px solid color-mix(in srgb,var(--text) 10%,transparent);
+  box-shadow:inset 3px 7px 27px color-mix(in srgb,var(--text) 5%,transparent),inset -7px -5px 27px color-mix(in srgb,var(--bg) 24%,transparent);
+  filter:blur(1px);opacity:.48;
+}
+.hero-liquid-wave {
+  position:absolute;width:88%;height:48%;left:6%;top:9%;border-radius:50%;
+  transform:translate3d(calc(var(--hero-drift-x) * -.25),calc(var(--hero-drift-y) * -.2),0);
+  border-top:1px solid color-mix(in srgb,var(--text) 8%,transparent);
+  filter:blur(2px);opacity:.65;
+}
+.hero h1{position:relative;z-index:3}
+.hero .classic-title-accent {position:relative}
+.hero .classic-title-accent::after {
+ content:"";position:absolute;pointer-events:none;z-index:-1;
+ inset:4% 12% 3%;border-radius:50%;
+ background:radial-gradient(ellipse at var(--hero-fluid-x) 48%,color-mix(in srgb,var(--text) 6%,transparent),transparent 70%);
+ filter:blur(21px);opacity:.5;
+}
+html[data-glass="off"] .hero-liquid-layer {opacity:0;visibility:hidden}
+html[data-fluid="off"] .hero-liquid-orb {transition:transform .7s ease}
+@media(max-width:750px){
+ #welcomeScreen .welcome-content{padding:12px 12px}
+ #welcomeScreen .welcome-title {font-size:clamp(2.15rem,9vw,4.1rem);line-height:1.12;letter-spacing:-.06em}
+ #welcomeScreen .welcome-subtitle{font-size:clamp(.95rem,3.8vw,1.07rem);margin-top:18px}
+ .hero-liquid-orb{width:360px;height:300px;left:50%;opacity:.32}
+ .hero-liquid-layer::before{background:radial-gradient(ellipse 70% 46% at 50% 32%,color-mix(in srgb,var(--text) 6%,transparent),transparent 80%)}
+}
+@media(prefers-reduced-motion:reduce){
+ #welcomeScreen::before,#welcomeScreen::after{animation:none!important}
+ .hero-liquid-layer,.hero-liquid-orb,.hero-liquid-wave{transition:none!important;animation:none!important}
+}
+html[data-motion="off"] #welcomeScreen::before,
+html[data-motion="off"] #welcomeScreen::after{animation:none!important}
+</style><meta content="8aPDF Classic Edition – your school study materials, announcements, timetable and advanced customizable Liquid Glass." name="description"/><style id="adaptive-glow-customization">
+/* Desktop headline remains an elegant single line above the italic Vault subtitle. */
+@media(min-width:1100px){.hero h1{font-size:clamp(4.2rem,7vw,6.25rem);max-width:1320px}.hero .classic-title-main{white-space:nowrap}}
+/* Reactive glow update: zero blobs, no ellipse borders. CSS gradients only. */
+.hero::before,.hero:before,.hero .classic-title-accent::after{display:none!important;content:none!important}
+.hero-liquid-layer,.hero-liquid-orb,.hero-liquid-wave{display:none!important}
+html{--glow-x:50%;--glow-y:39%;--glow-opacity:.55;--glow-size:600px;--glow-ink:var(--text);--user-radius:24px;--ui-font:'Space Grotesk',system-ui,sans-serif;--glow-animation-multiplier:1}
+body{font-family:var(--ui-font)}
+/* A translucent, feather-edged luminous atmosphere; visible through any active theme. */
+#siteAmbientGlow{position:fixed;inset:0;z-index:55;pointer-events:none;user-select:none;
+ background:radial-gradient(circle var(--glow-size) at var(--glow-x) var(--glow-y),
+ color-mix(in srgb,var(--glow-ink) 16%,transparent) 0%,
+ color-mix(in srgb,var(--glow-ink) 8%,transparent) 21%,
+ color-mix(in srgb,var(--glow-ink) 2%,transparent) 47%,transparent 76%);
+ opacity:calc(var(--glow-opacity) * .64);
+ mix-blend-mode:screen;
+ contain:paint;transition:opacity .27s ease;
+}
+html[data-tone="light"] #siteAmbientGlow{mix-blend-mode:multiply;opacity:calc(var(--glow-opacity) * .45)}
+html[data-glow="off"] #siteAmbientGlow{display:none!important}
+/* Support adjustable rounding throughout the primary UI, while avoiding form pills. */
+:is(.feature,.pdf-card,.notice-card,.widget,.settings,.dialog,.command-card,.top-nav,.big-search){border-radius:var(--user-radius)!important}
+html[data-font-choice="system"]{--ui-font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
+html[data-font-choice="editorial"]{--ui-font:Georgia,'Times New Roman',serif}
+html[data-font-choice="modern"]{--ui-font:'Space Grotesk',system-ui,sans-serif}
+html[data-hide-actions="on"] .feature-strip{display:none!important}
+html[data-hide-suggestions="on"] .suggestions{display:none!important}
+html[data-sticky-nav="off"] .top-shell{position:relative!important;top:auto!important}
+/* Selected filters must always be legible irrespective of frosted surfaces. */
+html[data-glass="on"] .chip.active,
+html[data-glass="on"] .chip[data-subject].active,
+html[data-glass="off"] .chip.active,
+html[data-glass="off"] .chip[data-subject].active{
+ color:var(--button-text)!important;
+ background:var(--button)!important;
+ background-color:var(--button)!important;
+ border-color:var(--button)!important;
+ font-weight:750;
+ -webkit-text-fill-color:var(--button-text)!important;
+}
+html[data-glass="on"] .chip:not(.active){color:var(--text)!important;-webkit-text-fill-color:var(--text)!important}
+/* Ensure the default Light theme stays neutral black-and-white. Colored themes remain opt-in only. */
+html[data-theme="light"]{--bg:#fafafa;--bg-alt:#f4f4f4;--surface:#fff;--surface-high:#f7f7f7;--surface-soft:#f3f3f3;--surface-glass:rgba(255,255,255,.92);--text:#141414;--text-soft:#343434;--muted:#616161;--line:rgba(0,0,0,.14);--line-bold:rgba(0,0,0,.26);--button:#161616;--button-text:#fff;--pill:#f4f4f4;--hover:#ededed;--shadow:0 14px 38px rgba(0,0,0,.07);--hero-glow:rgba(0,0,0,.04)}
+html[data-theme="pure-black"]{--bg:#000;--bg-alt:#030303;--surface:#111;--surface-high:#151515;--surface-soft:#161616;--surface-glass:rgba(16,16,16,.92);--text:#fff;--text-soft:#dedede;--muted:#aaa;--line:rgba(255,255,255,.16);--line-bold:rgba(255,255,255,.30);--button:#f2f2f2;--button-text:#080808;--pill:#161616;--hover:#252525}
+/* Neutralize any old light/lime hardcoded UI descendants. */
+html[data-theme="light"] :is(.brand,.hero h1,.pdf-card,.chip,.eyebrow-pill,.settings,.setting-row){color:var(--text)}
+html[data-theme="light"] :is(.nav-link.active,.search-submit,.solid,.action.primary){color:var(--button-text)!important}
+html[data-theme="light"] :is(.nav-link.active,.search-submit,.solid,.action.primary){background:var(--button)!important}
+/* Let existing original welcome screen animations remain untouched; only its dynamic theme tokens remain active. */
+#siteAmbientGlow{backface-visibility:hidden}
+#settingsPanel input[type=range]{width:100%;cursor:pointer;accent-color:var(--text);margin:7px 0 13px}
+#settingsPanel #glowIntensity,#settingsPanel #glowSize,#settingsPanel #glowSpeed,
+#settingsPanel #cornerRadius,#settingsPanel #animationSpeed{height:8px;accent-color:var(--text)}
+.glow-color-mode{max-width:145px;background:var(--surface-soft);border:1px solid var(--line-bold);color:var(--text);border-radius:8px;padding:8px 5px;font-size:.7rem}
+.glow-custom-color{display:none;align-items:center;justify-content:space-between;gap:8px;color:var(--text-soft);font-size:.72rem;padding:10px 0}
+.glow-custom-color.visible{display:flex}
+.glow-custom-color input{height:32px;max-width:60px;border:1px solid var(--line);background:transparent;padding:0;cursor:pointer}
+#glowSettingsGroup .setting-row,#advancedPersonalization .setting-row{margin-top:7px}
+@media(max-width:750px){#siteAmbientGlow{opacity:calc(var(--glow-opacity) * .32)}}
+@media(prefers-reduced-motion:reduce){#siteAmbientGlow{transition:none!important}}
+</style><style id="8apdf-experience-style">
+/* 8aPDF Experience Hub — does not override the original welcome screen. */
+.experience-hub{padding:22px 0 32px;scroll-margin-top:115px}
+.experience-heading{display:flex;justify-content:space-between;align-items:end;gap:22px;margin:3px 0 20px}
+.experience-heading h2{font-size:clamp(1.45rem,3vw,2.35rem);letter-spacing:-.055em;line-height:1.12;margin:7px 0}
+.experience-heading p{font-size:.84rem;color:var(--muted);margin:0;max-width:620px}
+.experience-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.experience-tile{min-width:0;position:relative;padding:20px 21px;border-radius:var(--card-roundness,24px);border:1px solid var(--line);background:var(--surface);box-shadow:0 12px 35px rgba(0,0,0,.10);transition:transform .38s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s;overflow:hidden}
+.experience-tile:hover{transform:translateY(-3px);border-color:var(--line-bold);box-shadow:0 16px 40px rgba(0,0,0,.16)}
+.experience-kicker{display:block;font-size:.62rem;letter-spacing:.14em;font-weight:750;color:var(--muted);text-transform:uppercase}
+.experience-large{display:block;font-size:clamp(1.65rem,2.6vw,2.15rem);letter-spacing:-.06em;font-weight:750;line-height:1.2;margin:15px 0 5px;color:var(--text)}
+.experience-doc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:15px 0 5px;font-size:1.05rem;line-height:1.35;min-height:2.75rem;color:var(--text)}
+.experience-tile p{font-size:.72rem;color:var(--muted);line-height:1.5;margin:7px 0 0}
+.experience-link{background:transparent;border:0;padding:0;color:var(--text);font-size:.75rem;font-weight:750;margin-top:15px;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.experience-link:hover{color:var(--text-soft)}
+.experience-button{border:1px solid var(--button);background:var(--button);color:var(--button-text);padding:13px 18px;border-radius:14px;font-weight:750;cursor:pointer;white-space:nowrap;transition:transform .2s,opacity .2s}
+.experience-button:hover{transform:translateY(-2px)}.experience-button:active,.experience-outline:active{transform:scale(.975)}
+.experience-progress{height:7px;border-radius:20px;background:var(--surface-soft);overflow:hidden;margin:12px 0 9px}
+.experience-progress span{display:block;height:100%;width:0;background:var(--text);border-radius:20px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.experience-overlay{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:none;place-items:center;padding:16px}
+.experience-overlay.open{display:grid}.experience-dialog{position:relative;width:min(510px,100%);max-height:calc(100dvh - 35px);overflow-y:auto;background:var(--surface);color:var(--text);border:1px solid var(--line-bold);border-radius:30px;padding:24px;box-shadow:0 26px 100px rgba(0,0,0,.4)}
+.experience-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.experience-dialog-head h2{font-size:1.6rem;letter-spacing:-.05em;margin:4px 0 0}
+.experience-close{border:1px solid var(--line-bold);border-radius:50%;width:35px;height:35px;background:var(--surface-soft);color:var(--text);font-size:1.4rem;cursor:pointer}
+.focus-modes{display:flex;gap:6px;padding:5px;background:var(--surface-soft);border-radius:14px;margin:22px 0}
+.focus-modes button{background:transparent;color:var(--muted);border:0;border-radius:10px;flex:1;padding:11px 4px;font-size:.74rem;font-weight:700;cursor:pointer}
+.focus-modes .selected{background:var(--button);color:var(--button-text)}
+.focus-time-ring{width:min(260px,80vw);height:min(260px,80vw);border:1px solid var(--line-bold);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:14px auto 24px;background:radial-gradient(circle at 50% 38%,var(--surface-high),var(--surface));box-shadow:inset 0 0 0 13px var(--surface-soft),0 16px 40px rgba(0,0,0,.14)}
+.focus-clock{font-variant-numeric:tabular-nums;font-size:clamp(3rem,10vw,4.2rem);font-weight:730;letter-spacing:-.08em;line-height:1.06}.focus-time-ring>span{font-size:.73rem;color:var(--muted);margin-top:12px}
+.focus-actions{display:grid;grid-template-columns:1.2fr .7fr .8fr;gap:8px}.experience-outline{border:1px solid var(--line-bold);border-radius:13px;background:var(--surface-soft);color:var(--text);cursor:pointer;padding:12px 10px;font-weight:700;font-size:.73rem}
+.focus-info{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.72rem;margin:20px 0 12px}.focus-tools{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--line)}
+.experience-setting-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+#studyExperienceSettings .setting-row small{display:block;color:var(--muted);font-size:.65rem;margin-top:3px;max-width:210px}
+@media(max-width:950px){.experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:590px){.experience-hub{padding:18px 0}.experience-heading{display:block}.experience-heading .experience-button{margin-top:15px;width:100%}.experience-grid{grid-template-columns:1fr;gap:10px}.experience-tile{padding:19px}.experience-dialog{border-radius:22px;padding:20px}.focus-actions{grid-template-columns:1fr 1fr}.focus-actions .experience-button{grid-column:1/-1}.focus-tools{gap:13px}}
+@media(prefers-reduced-motion:reduce){.experience-tile,.experience-progress span{transition:none!important}}
+</style>
 </head>
-<body>
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-<symbol id="i-book" viewBox="0 0 24 24"><path d="M12 7c-3-2-6-2.5-10-1.5v14c4-1 7-.5 10 1.5 3-2 6-2.5 10-1.5v-14C18 4.5 15 5 12 7Zm0 0v14"/></symbol>
-<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2.5h8l5 5V21H6zM14 2.5v5h5M9 12h7M9 16h7"/></symbol>
-<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></symbol>
-<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
-<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-4-4 4 4 4-4M4 19v2h16v-2"/></symbol>
-<symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="m7 11 9-5M7 13l9 5"/></symbol>
-<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
-<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 8 3 9H3c0-1 3-2 3-9Zm4 12h4"/></symbol>
-<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.4A9.5 9.5 0 0 1 11.6 3 9.5 9.5 0 1 0 21 12.4Z"/></symbol>
-<symbol id="i-settings" viewBox="0 0 24 24"><path d="M10 2h4l.7 2.5 2 1 2.3-1.1 2.6 3-1.5 2.1.5 2.4 2.1 1.6-1.2 3.9-2.6-.1-1.7 1.8-.1 2.7-4.1.7-1-2.5-2.4-.6-2.3 1.3-2.8-2.9 1.3-2.4-.8-2.3-2.2-1.5 1.2-3.8 2.7.1 1.7-1.5L10 2Z"/><circle cx="12" cy="12" r="3"/></symbol>
-<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v5m10-5v5M3 10h18"/></symbol>
-<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M5 3h14v18l-7-5-7 5V3Z"/></symbol>
-<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M20 16a4.4 4.4 0 0 0-2.5-8.1A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7.5 18H20"/><path d="M12 18V11m-3 3 3-3 3 3"/></symbol>
-<symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 10 12-5v14L3 14v-4Zm12-5 5-2v18l-5-2M5 15l2 6h4l-3-5"/></symbol>
-<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
-<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
-<symbol id="i-x" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
-<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></symbol>
-<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
-<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
-<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+<body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
+<div class="welcome-content">
+<h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
+<p class="welcome-subtitle">Opening your PDF study library...</p>
+</div>
+</section><section aria-hidden="true" aria-labelledby="nameModalTitle" class="name-modal" id="nameModal">
+<form class="name-card" id="nameForm">
+<h2 id="nameModalTitle">What should we call you?</h2>
+<p>Enter your name once. Next time, 8aPDF will welcome you automatically.</p>
+<div class="name-form">
+<input autocomplete="name" class="name-input" id="nameInput" maxlength="32" placeholder="Write your name" required="" type="text"/>
+<button class="btn btn-primary" type="submit">Continue</button>
+</div>
+</form>
+</section>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-book" viewbox="0 0 24 24"><path d="M12 7c-3-2-6-2.5-10-1.5v14c4-1 7-.5 10 1.5 3-2 6-2.5 10-1.5v-14C18 4.5 15 5 12 7Zm0 0v14"></path></symbol>
+<symbol id="i-file" viewbox="0 0 24 24"><path d="M6 2.5h8l5 5V21H6zM14 2.5v5h5M9 12h7M9 16h7"></path></symbol>
+<symbol id="i-search" viewbox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"></circle><path d="m16 16 5 5"></path></symbol>
+<symbol id="i-arrow" viewbox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"></path></symbol>
+<symbol id="i-download" viewbox="0 0 24 24"><path d="M12 3v13m-4-4 4 4 4-4M4 19v2h16v-2"></path></symbol>
+<symbol id="i-share" viewbox="0 0 24 24"><circle cx="18" cy="5" r="2"></circle><circle cx="5" cy="12" r="2"></circle><circle cx="18" cy="19" r="2"></circle><path d="m7 11 9-5M7 13l9 5"></path></symbol>
+<symbol id="i-eye" viewbox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></symbol>
+<symbol id="i-bell" viewbox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 8 3 9H3c0-1 3-2 3-9Zm4 12h4"></path></symbol>
+<symbol id="i-moon" viewbox="0 0 24 24"><path d="M21 12.4A9.5 9.5 0 0 1 11.6 3 9.5 9.5 0 1 0 21 12.4Z"></path></symbol>
+<symbol id="i-settings" viewbox="0 0 24 24"><path d="M10 2h4l.7 2.5 2 1 2.3-1.1 2.6 3-1.5 2.1.5 2.4 2.1 1.6-1.2 3.9-2.6-.1-1.7 1.8-.1 2.7-4.1.7-1-2.5-2.4-.6-2.3 1.3-2.8-2.9 1.3-2.4-.8-2.3-2.2-1.5 1.2-3.8 2.7.1 1.7-1.5L10 2Z"></path><circle cx="12" cy="12" r="3"></circle></symbol>
+<symbol id="i-calendar" viewbox="0 0 24 24"><rect height="16" rx="2" width="18" x="3" y="5"></rect><path d="M7 3v5m10-5v5M3 10h18"></path></symbol>
+<symbol id="i-bookmark" viewbox="0 0 24 24"><path d="M5 3h14v18l-7-5-7 5V3Z"></path></symbol>
+<symbol id="i-cloud" viewbox="0 0 24 24"><path d="M20 16a4.4 4.4 0 0 0-2.5-8.1A6 6 0 0 0 6 9.5 4.3 4.3 0 0 0 7.5 18H20"></path><path d="M12 18V11m-3 3 3-3 3 3"></path></symbol>
+<symbol id="i-megaphone" viewbox="0 0 24 24"><path d="m3 10 12-5v14L3 14v-4Zm12-5 5-2v18l-5-2M5 15l2 6h4l-3-5"></path></symbol>
+<symbol id="i-clock" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6l4 2"></path></symbol>
+<symbol id="i-plus" viewbox="0 0 24 24"><path d="M12 4v16M4 12h16"></path></symbol>
+<symbol id="i-x" viewbox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"></path></symbol>
+<symbol id="i-list" viewbox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"></path></symbol>
+<symbol id="i-grid" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect></symbol>
+<symbol id="i-menu" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></symbol>
+<symbol id="i-check" viewbox="0 0 24 24"><path d="m5 12 5 5L20 7"></path></symbol>
 </svg>
 <div class="preview-ribbon" id="previewRibbon">Preview data shown because live Firestore hasn't connected. Document links require live data.</div>
 <header class="top-shell shell" id="home"><div class="top-nav">
-<a class="brand" href="#home" aria-label="8aPDF home"><svg><use href="#i-book"/></svg><span>8aPDF</span></a>
-<nav class="nav-links" aria-label="Primary navigation"><button class="nav-link active" data-go="home">Home</button><button class="nav-link" data-go="library">Study Material</button><button class="nav-link" data-go="announcements">Announcements</button><button class="nav-link" data-go="timetable">Timetable</button></nav>
-<div class="nav-right"><button class="top-search" id="topSearch" aria-label="Open smart search"><span style="display:flex;align-items:center;gap:8px"><svg><use href="#i-search"/></svg>Search anything...</span><kbd>⌘ K</kbd></button><button class="round-btn" id="notificationsBtn" title="Notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg></button><button class="round-btn" id="themeShortcut" title="Switch dark and light" aria-label="Toggle light and dark"><svg><use href="#i-moon"/></svg></button><button class="round-btn" id="settingsBtn" title="Customize experience" aria-label="Open settings"><svg><use href="#i-settings"/></svg></button><button class="avatar" id="profileBtn" title="Your profile" aria-label="Edit profile">S</button><button class="round-btn menu-toggle" id="menuBtn" title="Menu" aria-label="Open menu"><svg><use href="#i-menu"/></svg></button></div>
+<a aria-label="8aPDF home" class="brand" href="#home"><svg fill="none" height="23" viewbox="0 0 24 24" width="23">
+<path d="M6.5 3.8h8.1L19 8.2v11a1 1 0 0 1-1 1H6.5A1.5 1.5 0 0 1 5 18.7V5.3a1.5 1.5 0 0 1 1.5-1.5Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.9"></path>
+<path d="M14.5 4v4.4h4.3" stroke="currentColor" stroke-linejoin="round" stroke-width="1.9"></path>
+<path d="M8.4 12.4h7.2M8.4 15.8h4.8" stroke="currentColor" stroke-linecap="round" stroke-width="1.9"></path>
+</svg><span>8aPDF</span></a>
+<nav aria-label="Primary navigation" class="nav-links"><button class="nav-link active" data-go="home">Home</button><button class="nav-link" data-go="library">Study Material</button><button class="nav-link" data-go="announcements">Announcements</button><button class="nav-link" data-go="timetable">Timetable</button></nav>
+<div class="nav-right"><button aria-label="Open smart search" class="top-search" id="topSearch"><span style="display:flex;align-items:center;gap:8px"><svg><use href="#i-search"></use></svg>Search anything...</span><kbd>⌘ K</kbd></button><button aria-label="Notifications" class="round-btn" id="notificationsBtn" title="Notifications"><svg><use href="#i-bell"></use></svg></button><button aria-label="Toggle light and dark" class="round-btn" id="themeShortcut" title="Switch dark and light"><svg><use href="#i-moon"></use></svg></button><button aria-label="Open settings" class="round-btn" id="settingsBtn" title="Customize experience"><svg><use href="#i-settings"></use></svg></button><button aria-label="Edit profile" class="avatar" id="profileBtn" title="Your profile">S</button><button aria-label="Open menu" class="round-btn menu-toggle" id="menuBtn" title="Menu"><svg><use href="#i-menu"></use></svg></button></div>
 </div></header>
 <main>
-<section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill"><svg><use href="#i-book"/></svg>WELCOME TO 8aPDF</span><h1>Your Complete Study<br>Material Vault</h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"> all in one place. Simple. Organized. Always Updated.</p>
-<form id="searchForm" class="big-search" role="search"><svg><use href="#i-search"/></svg><input type="search" id="searchInput" aria-label="Search study materials" autocomplete="off" placeholder="Search for PDFs, topics, subjects or announcements..."><span class="shortcut">⌘ K</span><button class="search-submit" type="submit" aria-label="Search"><svg><use href="#i-arrow"/></svg></button></form>
+<section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1><span class="classic-title-main">Your Complete Study</span> <em class="classic-title-accent">Material Vault</em></h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p>
+<form class="big-search" id="searchForm" role="search"><svg><use href="#i-search"></use></svg><input aria-label="Search study materials" autocomplete="off" id="searchInput" placeholder="Search for PDFs, topics, subjects or announcements..." type="search"/><span class="shortcut">⌘ K</span><button aria-label="Search" class="search-submit" type="submit"><svg><use href="#i-arrow"></use></svg></button></form>
 <div class="suggestions"><span>Popular searches:</span><button class="chip" data-search="English">English</button><button class="chip" data-search="Mathematics">Mathematics</button><button class="chip" data-search="Hindi">Hindi</button><button class="chip" data-search="Computer">Computer</button><button class="chip" data-search="Circular">Circulars</button></div>
 <div class="feature-strip">
-<button class="feature" data-go="library"><span class="feature-icon"><svg><use href="#i-file"/></svg></span><b>PDF Library</b><small>Browse school study materials</small></button>
-<button class="feature" data-go="latest"><span class="feature-icon"><svg><use href="#i-cloud"/></svg></span><b>Latest Uploads</b><small>Recently added PDFs</small></button>
-<button class="feature" data-go="announcements"><span class="feature-icon"><svg><use href="#i-megaphone"/></svg></span><b>Announcements</b><small>Stay updated always</small></button>
-<button class="feature" data-go="timetable"><span class="feature-icon"><svg><use href="#i-calendar"/></svg></span><b>Timetable</b><small>Plan your study</small></button>
-<button class="feature" data-go="saved"><span class="feature-icon"><svg><use href="#i-bookmark"/></svg></span><b>Saved Items</b><small>Your bookmarks</small></button>
-<button class="feature" data-go="search"><span class="feature-icon"><svg><use href="#i-search"/></svg></span><b>Smart Search</b><small>Find materials faster</small></button>
+<button class="feature" data-go="library"><span class="feature-icon"><svg><use href="#i-file"></use></svg></span><b>PDF Library</b><small>Browse school study materials</small></button>
+<button class="feature" data-go="latest"><span class="feature-icon"><svg><use href="#i-cloud"></use></svg></span><b>Latest Uploads</b><small>Recently added PDFs</small></button>
+<button class="feature" data-go="announcements"><span class="feature-icon"><svg><use href="#i-megaphone"></use></svg></span><b>Announcements</b><small>Stay updated always</small></button>
+<button class="feature" data-go="timetable"><span class="feature-icon"><svg><use href="#i-calendar"></use></svg></span><b>Timetable</b><small>Plan your study</small></button>
+<button class="feature" data-go="saved"><span class="feature-icon"><svg><use href="#i-bookmark"></use></svg></span><b>Saved Items</b><small>Your bookmarks</small></button>
+<button class="feature" data-go="search"><span class="feature-icon"><svg><use href="#i-search"></use></svg></span><b>Smart Search</b><small>Find materials faster</small></button>
 </div></div></section>
+
+<section class="experience-hub shell" id="experienceHub" aria-label="Study experience hub">
+ <div class="experience-heading"><div><span class="heading-kicker">YOUR PERSONAL STUDY SPACE</span><h2>Study smarter, stay in flow.</h2><p>Focus sessions, daily goals and quick access to your materials. Saved only on this device.</p></div><button type="button" class="experience-button experience-main-action" id="openFocusStudio">⏱ Open Focus Studio</button></div>
+ <div class="experience-grid">
+  <article class="experience-tile"><span class="experience-kicker">FOCUS TIMER</span><strong id="expTimerLabel" class="experience-large">25:00</strong><p id="expTimerCaption">Ready for a focused session</p><button type="button" class="experience-link" id="quickFocusStart">Start focusing ↗</button></article>
+  <article class="experience-tile"><span class="experience-kicker">TODAY'S GOAL</span><strong id="expGoalLabel" class="experience-large">0 / 60m</strong><div class="experience-progress"><span id="expGoalFill"></span></div><p id="expGoalCaption">Every session counts.</p></article>
+  <article class="experience-tile"><span class="experience-kicker">CONSISTENCY</span><strong id="expStreakLabel" class="experience-large">0 days</strong><p id="expStreakCaption">Build a study streak, one day at a time.</p><button type="button" class="experience-link" id="studyHistoryButton">Your study history ↗</button></article>
+  <article class="experience-tile"><span class="experience-kicker">PICK UP WHERE YOU LEFT OFF</span><strong class="experience-doc" id="expRecentLabel">No PDFs opened yet</strong><p id="expRecentCaption">Your most recent reading</p><button type="button" class="experience-link" id="expRecentOpen">Open recent PDF ↗</button></article>
+  <article class="experience-tile"><span class="experience-kicker">REVISION SHUFFLE</span><strong class="experience-doc" id="expRandomLabel">Choose something to revise</strong><p id="expRandomCaption">A useful random pick from your real PDF library</p><button type="button" class="experience-link" id="expRandomPick">Surprise me ↗</button></article>
+  <article class="experience-tile"><span class="experience-kicker">SUBJECT EXPLORER</span><strong id="expSubjectLabel" class="experience-large">—</strong><p>Explore school materials by subject</p><button type="button" class="experience-link" id="expSubjectsOpen">View subject breakdown ↗</button></article>
+ </div>
+</section>
+<div class="experience-overlay" id="focusOverlay" role="dialog" aria-modal="true" aria-label="Focus Studio" aria-hidden="true">
+ <div class="experience-dialog">
+  <div class="experience-dialog-head"><div><span class="experience-kicker">8aPDF · STUDY EXPERIENCE</span><h2>Focus Studio</h2></div><button type="button" class="experience-close" id="closeFocusStudio" aria-label="Close focus studio">×</button></div>
+  <div class="focus-modes" role="group" aria-label="Timer mode"><button type="button" class="selected" data-focus-mode="work">Focus</button><button type="button" data-focus-mode="short">Short Break</button><button type="button" data-focus-mode="long">Long Break</button></div>
+  <div class="focus-time-ring"><div class="focus-clock" id="focusClock" role="timer" aria-live="off">25:00</div><span id="focusStatus">Ready when you are</span></div>
+  <div class="focus-actions"><button class="experience-button" type="button" id="focusToggle">Start Focus</button><button class="experience-outline" type="button" id="focusReset">Reset</button><button class="experience-outline" type="button" id="focusSkip">Next mode</button></div>
+  <div class="focus-info"><span id="focusSessionCount">0 sessions today</span><span id="focusGoalInfo">Goal: 60 minutes</span></div>
+  <div class="focus-tools"><button type="button" class="experience-link" id="focusHistory">Study history</button><button type="button" class="experience-link" id="focusFullscreen">Distraction-free view</button><button type="button" class="experience-link" id="focusHelp">Keyboard shortcuts</button></div>
+ </div>
+</div>
 <section class="section" id="library"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">EXPLORE STUDY MATERIAL</div><h2>Browse Our PDF Library</h2><p>Find notes, worksheets, previous year papers, practical files and more.</p></div><span class="count-text" id="pdfCount">Connecting to live PDFs…</span></div>
-<div class="filters" id="subjectFilters" aria-label="Subject filters"><button class="chip active" data-subject="All Subjects">All Subjects</button></div>
-<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><select class="sort-select" id="sortSelect" aria-label="Sort PDFs"><option value="default">Original Order</option><option value="new">Latest First</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div class="mini-tabs" aria-label="Change view"><button id="gridBtn" class="active" title="Grid view" aria-label="Grid view"><svg><use href="#i-grid"/></svg></button><button id="listBtn" title="List view" aria-label="List view"><svg><use href="#i-list"/></svg></button></div></div>
-<div class="pdf-grid" id="pdfGrid" aria-live="polite"></div><div class="view-more" id="moreWrap"><button class="solid" id="morePdf">Load More PDFs ↓</button></div>
+<div aria-label="Subject filters" class="filters" id="subjectFilters"><button class="chip active" data-subject="All Subjects">All Subjects</button></div>
+<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="default">Original Order</option><option value="new">Latest First</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
+<div aria-live="polite" class="pdf-grid" id="pdfGrid"></div><div class="view-more" id="moreWrap"><button class="solid" id="morePdf">Load More PDFs ↓</button></div>
 </div></section>
-<section class="section" id="announcements" style="display:none"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">LATEST SCHOOL UPDATES</div><h2>Announcements & Notices</h2><p>Stay informed about circulars, events, homework and school notices.</p></div><span class="count-text" id="announcementCount">Loading…</span></div><div class="filters" id="announcementFilters"></div><div class="notice-grid" id="announcementGrid"></div><div class="view-more" id="moreAnnouncementsWrap" style="display:none"><button class="solid" id="moreAnnouncements">Load More Announcements ↓</button></div></div></section>
+<section class="section" id="announcements" style="display:none"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">LATEST SCHOOL UPDATES</div><h2>Announcements &amp; Notices</h2><p>Stay informed about circulars, events, homework and school notices.</p></div><span class="count-text" id="announcementCount">Loading…</span></div><div class="filters" id="announcementFilters"></div><div class="notice-grid" id="announcementGrid"></div><div class="view-more" id="moreAnnouncementsWrap" style="display:none"><button class="solid" id="moreAnnouncements">Load More Announcements ↓</button></div></div></section>
 <section class="shell widgets" id="dashboardWidgets">
-<div class="widget"><div class="widget-header"><svg><use href="#i-calendar"/></svg><strong>Class Timetable</strong><select id="daySelect" class="timetable-day-select" aria-label="Choose current school cycle day"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"/></svg><strong>Latest Announcements</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-file"/></svg><strong>Recent PDFs</strong><button data-go="latest">View All</button></div><div id="recentWidget"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-book"/></svg><strong>Quick Notes</strong><button id="clearCompleted" title="Clear checked tasks">Clear done</button></div><form id="noteForm" class="notes-form"><input id="newNote" aria-label="Add a new study task" placeholder="Write a quick study note..."><button type="submit" aria-label="Add note"><svg><use href="#i-plus"/></svg></button></form><div id="notesList"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-calendar"></use></svg><strong>Class Timetable</strong><select aria-label="Choose current school cycle day" class="timetable-day-select" id="daySelect"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"></use></svg><strong>Latest Announcements</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-file"></use></svg><strong>Recent PDFs</strong><button data-go="latest">View All</button></div><div id="recentWidget"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-book"></use></svg><strong>Quick Notes</strong><button id="clearCompleted" title="Clear checked tasks">Clear done</button></div><form class="notes-form" id="noteForm"><input aria-label="Add a new study task" id="newNote" placeholder="Write a quick study note..."/><button aria-label="Add note" type="submit"><svg><use href="#i-plus"></use></svg></button></form><div id="notesList"></div></div>
 </section>
 </main>
-<footer class="footer" id="about"><div class="shell"><div class="footer-grid"><div><a class="brand" href="#home"><svg><use href="#i-book"/></svg>8aPDF</a><p>Your trusted source for school study materials, circulars and important announcements.</p></div><div><h4>Quick Links</h4><a class="footer-link" href="#home">Home</a><a class="footer-link" href="#library">Study Material</a><a class="footer-link" href="#announcements" data-go="announcements">Announcements</a><a class="footer-link" href="#" data-go="timetable">Timetable</a><a class="footer-link" href="#about">About</a></div><div><h4>Help & Support</h4><a class="footer-link" href="#library">How to Download</a><a class="footer-link" href="#" id="supportLink">Report an Issue</a><a class="footer-link" href="#about">About 8aPDF</a><a class="footer-link" href="#" data-go="settings">Appearance Settings</a></div><div><h4>Stay Updated</h4><p>Turn on notifications for newly added PDFs while the website is open.</p><button class="solid" id="footerBell">Notification Settings</button></div></div><div class="footer-bottom"><span>© <span id="year"></span> 8aPDF. All rights reserved.</span><span>Made for Students · Full-Site Themes Preview</span></div></div></footer>
+<footer class="footer" id="about"><div class="shell"><div class="footer-grid"><div><a class="brand" href="#home"><svg><use href="#i-book"></use></svg>8aPDF</a><p>Your trusted source for school study materials, circulars and important announcements.</p></div><div><h4>Quick Links</h4><a class="footer-link" href="#home">Home</a><a class="footer-link" href="#library">Study Material</a><a class="footer-link" data-go="announcements" href="#announcements">Announcements</a><a class="footer-link" data-go="timetable" href="#">Timetable</a><a class="footer-link" href="#about">About</a></div><div><h4>Help &amp; Support</h4><a class="footer-link" href="#library">How to Download</a><a class="footer-link" href="#" id="supportLink">Report an Issue</a><a class="footer-link" href="#about">About 8aPDF</a><a class="footer-link" data-go="settings" href="#">Appearance Settings</a></div><div><h4>Stay Updated</h4><p>Turn on notifications for newly added PDFs while the website is open.</p><button class="solid" id="footerBell">Notification Settings</button></div></div><div class="footer-bottom"><span>© <span id="year"></span> 8aPDF. All rights reserved.</span><span>Made for Students · Full-Site Themes Preview</span></div></div></footer>
 <div class="drawer-mask" id="drawerMask"></div>
-<aside class="settings" id="settingsPanel" aria-label="Customize Experience" aria-hidden="true"><div class="setting-heading"><strong><svg><use href="#i-settings"/></svg>Customize Experience</strong><button class="round-btn" id="closeSettings" aria-label="Close settings"><svg><use href="#i-x"/></svg></button></div><div class="setting-body">
-
+<aside aria-hidden="true" aria-label="Customize Experience" class="settings" id="settingsPanel"><div class="setting-heading"><strong><svg><use href="#i-settings"></use></svg>Customize Experience</strong><button aria-label="Close settings" class="round-btn" id="closeSettings"><svg><use href="#i-x"></use></svg></button></div><div class="setting-body">
 <div class="setting-group" id="liquidGlassGroup">
- <div class="palette-title"><span class="setting-label">Liquid Glass Experience</span><span class="palette-count">NEW · iOS-inspired</span></div>
- <p class="setting-explainer">Live depth, luminous glass edges and silky interface transitions across the entire website.</p>
- <label class="setting-row"><span><strong style="font-size:.78rem">Liquid Glass</strong><small style="display:block;color:var(--muted);font-size:.66rem">Turn frosted materials on or off</small></span><input class="toggle" type="checkbox" id="liquidToggle" checked></label>
- <div class="liquid-preset" id="liquidPresets"><button type="button" data-glass-preset="28">Subtle</button><button type="button" data-glass-preset="65" class="active">Balanced</button><button type="button" data-glass-preset="100">Ultra</button></div>
- <label class="liquid-range-line" for="liquidRange"><span>Glass Intensity</span><strong id="liquidValue">68%</strong></label>
- <input id="liquidRange" type="range" min="0" max="100" step="1" value="68" aria-label="Liquid glass intensity">
- <label class="setting-row"><span>Fluid Animations</span><input class="toggle" type="checkbox" id="fluidToggle" checked></label>
- <div class="liquid-preview"><strong>Liquid Glass · Live Preview</strong><small>Every theme · Every card · Every page</small></div>
- <p class="liquid-tip">Tip: on slower devices choose Subtle or turn animations off. Accessibility Reduce Motion always takes priority.</p>
+<div class="palette-title"><span class="setting-label">Liquid Glass Experience</span><span class="palette-count">NEW · iOS-inspired</span></div>
+<p class="setting-explainer">Live depth, luminous glass edges and silky interface transitions across the entire website.</p>
+<label class="setting-row"><span><strong style="font-size:.78rem">Liquid Glass</strong><small style="display:block;color:var(--muted);font-size:.66rem">Turn frosted materials on or off</small></span><input checked="" class="toggle" id="liquidToggle" type="checkbox"/></label>
+<div class="liquid-preset" id="liquidPresets"><button data-glass-preset="28" type="button">Subtle</button><button data-glass-preset="65" type="button">Balanced</button><button class="active" data-glass-preset="100" type="button">Ultra</button></div>
+<label class="liquid-range-line" for="liquidRange"><span>Glass Intensity</span><strong id="liquidValue">100%</strong></label>
+<input aria-label="Liquid glass intensity" id="liquidRange" max="100" min="0" step="1" type="range" value="100"/>
+<label class="setting-row"><span>Fluid Animations</span><input checked="" class="toggle" id="fluidToggle" type="checkbox"/></label>
+<div class="liquid-preview"><strong>Liquid Glass · Live Preview</strong><small>Every theme · Every card · Every page</small></div>
+<p class="liquid-tip">Tip: on slower devices choose Subtle or turn animations off. Accessibility Reduce Motion always takes priority.</p>
+</div><div class="setting-group" id="glowSettingsGroup">
+<div class="palette-title"><span class="setting-label">Adaptive Ambient Glow</span><span class="palette-count">NEW · INTERACTIVE</span></div>
+<p class="setting-explainer">A clean, soft-edged light instead of the old floating blob. Follows the cursor, responds to scrolling and gently drifts when idle.</p>
+<label class="setting-row"><span><strong style="font-size:.78rem">Ambient Glow</strong><small style="display:block;color:var(--muted);font-size:.67rem">Enable or completely hide the spotlight</small></span><input checked="" class="toggle" id="glowToggle" type="checkbox"/></label>
+<div class="liquid-preset" id="glowPresets"><button data-glow-preset="25" type="button">Whisper</button><button data-glow-preset="55" type="button">Balanced</button><button class="active" data-glow-preset="100" type="button">Radiant</button></div>
+<label class="liquid-range-line" for="glowIntensity"><span>Glow Intensity</span><strong id="glowIntensityValue">100%</strong></label><input aria-label="Glow intensity" id="glowIntensity" max="100" min="0" step="1" type="range" value="100"/>
+<label class="liquid-range-line" for="glowSize"><span>Glow Spread</span><strong id="glowSizeValue">840px</strong></label><input aria-label="Glow spread" id="glowSize" max="1100" min="260" step="20" type="range" value="840"/>
+<label class="liquid-range-line" for="glowSpeed"><span>Idle Drift Speed</span><strong id="glowSpeedValue">Fast</strong></label><input aria-label="Glow movement speed" id="glowSpeed" max="100" min="10" step="10" type="range" value="100"/>
+<label class="setting-row"><span>Follow Cursor</span><input checked="" class="toggle" id="glowCursorToggle" type="checkbox"/></label>
+<label class="setting-row"><span>React to Scrolling</span><input checked="" class="toggle" id="glowScrollToggle" type="checkbox"/></label>
+<label class="setting-row"><span>Automatic Idle Drift</span><input checked="" class="toggle" id="glowIdleToggle" type="checkbox"/></label>
+<div class="setting-row"><span>Glow Color</span><select aria-label="Glow color" class="glow-color-mode" id="glowColorMode"><option value="theme">Match Website</option><option value="custom">Custom Color</option></select></div>
+<label class="glow-custom-color" for="glowCustomColor" id="glowCustomColorWrap">Custom Glow Color <input id="glowCustomColor" type="color" value="#e9e9e9"/></label>
 </div>
 <div class="setting-group palette-section"><div class="palette-title"><span class="setting-label">Whole-Site Color Themes</span><span class="palette-count" id="themeCount">78 choices</span></div>
 <p class="setting-explainer">One tap recolors every section: background, navigation, cards, PDF buttons, timetable, dialogs and footer.</p>
 <div class="palette-filters" id="paletteFilters"><button class="active" data-palette-filter="all">All</button><button data-palette-filter="mono">Mono</button><button data-palette-filter="dark">Dark</button><button data-palette-filter="light">Light</button></div>
-<input class="palette-search" type="search" id="paletteSearch" placeholder="Find a color (e.g. emerald, pink, navy...)" aria-label="Search appearance themes">
-<div class="theme-grid palette-grid" id="themeGrid" aria-label="Choose a full website color theme"></div>
-<div class="palette-current">Active theme: <strong id="selectedThemeName">Dark</strong></div>
+<input aria-label="Search appearance themes" class="palette-search" id="paletteSearch" placeholder="Find a color (e.g. emerald, pink, navy...)" type="search"/>
+<div aria-label="Choose a full website color theme" class="theme-grid palette-grid" id="themeGrid"></div>
+<div class="palette-current">Active theme: <strong id="selectedThemeName">Pure Black</strong></div>
 </div>
 <div class="setting-group custom-palette"><span class="setting-label">Create Your Own Color</span><p class="setting-explainer">Any color you choose becomes a complete website theme, not just a button accent.</p>
-<div class="custom-palette-row"><label class="custom-color-label" for="customColor">Choose a color <input id="customColor" type="color" value="#7364cf"></label><label class="custom-mode-label" for="customMode">Appearance <select id="customMode"><option value="dark">Dark</option><option value="light">Light</option></select></label></div>
-<label class="custom-strength" for="customStrength">Color richness <span id="strengthValue">65%</span><input id="customStrength" type="range" min="15" max="100" value="65"></label>
+<div class="custom-palette-row"><label class="custom-color-label" for="customColor">Choose a color <input id="customColor" type="color" value="#7364cf"/></label><label class="custom-mode-label" for="customMode">Appearance <select id="customMode"><option value="dark">Dark</option><option value="light">Light</option></select></label></div>
+<label class="custom-strength" for="customStrength">Color richness <span id="strengthValue">65%</span><input id="customStrength" max="100" min="15" type="range" value="65"/></label>
 <button class="custom-apply" id="applyCustomTheme">Apply Custom Theme to Everything ↗</button>
 </div>
-<div class="setting-group"><span class="setting-label">Display & Layout</span><label class="setting-row"><span>Compact Mode</span><input class="toggle" type="checkbox" id="compactToggle"></label><label class="setting-row"><span>Sidebar Layout</span><input class="toggle" type="checkbox" id="sidebarToggle"></label><div class="setting-row"><span>Card View</span><div class="segmented" style="padding:2px;margin-right:5px"><button data-card-choice="grid" class="active" title="Cards"><svg style="width:15px;height:15px"><use href="#i-grid"/></svg></button><button data-card-choice="list" title="List"><svg style="width:15px;height:15px"><use href="#i-list"/></svg></button></div></div><label class="setting-row"><span>Reading Mode</span><input class="toggle" type="checkbox" id="readingToggle"></label></div>
-<div class="setting-group"><span class="setting-label">Accessibility & Motion</span><label class="setting-row"><span>Reduce Motion</span><input class="toggle" type="checkbox" id="motionToggle"></label><label class="setting-row"><span>Larger Text</span><input class="toggle" type="checkbox" id="largeTextToggle"></label><label class="setting-row"><span>High Contrast</span><input class="toggle" type="checkbox" id="contrastToggle"></label></div>
-<div class="setting-group"><span class="setting-label">Content Density</span><div class="segmented" id="densityGroup"><button data-density-choice="comfortable" class="active">Comfortable</button><button data-density-choice="compact">Compact</button><button data-density-choice="spacious">Spacious</button></div></div>
-<div class="setting-group"><span class="setting-label">Font Size</span><div class="font-row"><span>A</span><input type="range" id="fontRange" min="90" max="120" value="100" step="5" aria-label="Font size"><span style="font-size:1.08rem">A</span></div></div>
-<div class="setting-foot"><button class="solid" id="resetSettings">Reset Default</button><button class="solid" id="saveSettings" style="background:var(--button);color:var(--button-text)">Done</button></div>
-</div></aside>
-<div class="sheet" id="modal" role="dialog" aria-modal="true" aria-hidden="true"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button class="round-btn" id="modalClose" aria-label="Close dialog"><svg><use href="#i-x"/></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
-<div class="command" id="command" role="dialog" aria-modal="true" aria-label="Quick search"><div class="command-card"><input id="commandInput" placeholder="Search PDFs, subjects or actions..." aria-label="Command search"><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
-<div class="toast-area" id="toastArea" aria-live="polite"></div>
-<div id="introFlow" role="dialog" aria-modal="true" aria-hidden="false" aria-label="Welcome to 8aPDF">
- <div class="intro-shell">
-  <div class="intro-brand"><span class="intro-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8.5 2.7 5.5 2.8 2.7 4.1v14c3-.9 6.4-.6 9.3 1.5 2.9-2.1 6.3-2.4 9.3-1.5v-14c-2.8-1.3-5.8-1.4-9.3.9Zm0 0v14.6" stroke-width="1.55" stroke-linejoin="round"/></svg></span> 8aPDF</div>
-  <section class="intro-step active" data-intro-step="name" aria-label="Enter your name">
-   <p class="intro-index">01 / 03 &nbsp; · &nbsp; Make it yours</p>
-   <h1 class="intro-title">A smarter way<br>to study.</h1>
-   <p class="intro-desc">Welcome to your personal study vault. Before we begin, what should we call you?</p>
-   <form id="introNameForm"><label for="introName" style="display:block;text-align:left;font-size:.74rem;color:var(--muted);margin:0 0 8px">YOUR NAME</label><input class="intro-field" id="introName" name="name" autocomplete="given-name" autocapitalize="words" maxlength="40" placeholder="Enter your name" required><div id="introError" class="intro-error" aria-live="polite"></div><button class="intro-main-btn" type="submit">Continue &nbsp; →</button></form>
-  </section>
-  <section class="intro-step" data-intro-step="welcome" aria-label="Personalized welcome">
-   <p class="intro-index" id="introWelcomeLabel">02 / 03 &nbsp; · &nbsp; Just for you</p>
-   <h1 class="intro-title intro-greeting" id="introGreeting">Welcome.</h1>
-   <p class="intro-desc">Your study vault is ready. Every PDF, timetable and important school update — beautifully organized in one place.</p>
-   <div class="intro-progress" aria-hidden="true"><span></span></div>
-  </section>
-  <section class="intro-step" data-intro-step="notifications" aria-label="Notification preferences">
-   <p class="intro-index">03 / 03 &nbsp; · &nbsp; You're in control</p>
-   <div class="intro-bell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div>
-   <h1 class="intro-title">Stay one step<br>ahead.</h1>
-   <p class="intro-desc">Choose whether to receive alerts for newly added PDFs while 8aPDF is open. You can also skip this and decide later.</p>
-   <button class="intro-main-btn" id="introAllow" type="button">Enable Notifications &nbsp; →</button>
-   <button class="intro-skip" id="introSkip" type="button">Not now — take me to 8aPDF</button>
-  </section>
-  <div class="intro-footer"><span>Simple. Organized. Always updated.</span><div class="intro-dots"><span class="current"></span><span></span><span></span></div></div>
- </div>
+<div class="setting-group"><span class="setting-label">Display &amp; Layout</span><label class="setting-row"><span>Compact Mode</span><input class="toggle" id="compactToggle" type="checkbox"/></label><label class="setting-row"><span>Sidebar Layout</span><input class="toggle" id="sidebarToggle" type="checkbox"/></label><div class="setting-row"><span>Card View</span><div class="segmented" style="padding:2px;margin-right:5px"><button class="active" data-card-choice="grid" title="Cards"><svg style="width:15px;height:15px"><use href="#i-grid"></use></svg></button><button data-card-choice="list" title="List"><svg style="width:15px;height:15px"><use href="#i-list"></use></svg></button></div></div><label class="setting-row"><span>Reading Mode</span><input class="toggle" id="readingToggle" type="checkbox"/></label></div><div class="setting-group" id="advancedPersonalization">
+<span class="setting-label">Fine-Tune the Interface</span><p class="setting-explainer">These change the actual website layout and animations—not just the settings preview.</p>
+<label class="liquid-range-line" for="cornerRadius"><span>Card Roundness</span><strong id="cornerRadiusValue">24px</strong></label><input id="cornerRadius" max="36" min="8" step="2" type="range" value="24"/>
+<label class="liquid-range-line" for="animationSpeed"><span>Animation Speed</span><strong id="animationSpeedValue">Balanced</strong></label><input id="animationSpeed" max="3" min="1" step="1" type="range" value="2"/>
+<div class="setting-row"><span>Typography Style</span><select aria-label="Font style" class="glow-color-mode" id="fontChoice"><option value="modern">Modern</option><option value="system">System</option><option value="editorial">Editorial</option></select></div>
+<label class="setting-row"><span>Show Quick Actions</span><input checked="" class="toggle" id="showActionsToggle" type="checkbox"/></label>
+<label class="setting-row"><span>Show Search Suggestions</span><input checked="" class="toggle" id="showSuggestionsToggle" type="checkbox"/></label>
+<label class="setting-row"><span>Sticky Navigation</span><input checked="" class="toggle" id="stickyNavToggle" type="checkbox"/></label>
 </div>
 
+<div class="setting-group" id="studyExperienceSettings"><div class="palette-title"><span class="setting-label">Study Experience</span><span class="palette-count">NEW · PRODUCTIVITY</span></div>
+<p class="setting-explainer">Real tools for focus, revision and daily progress. Your activity stays on this device.</p>
+<label class="setting-row"><span>Show Study Hub<small>Personal dashboard with progress and revision tools</small></span><input id="experienceShowHub" class="toggle" type="checkbox" checked></label>
+<label class="setting-row"><span>Auto-start Breaks<small>Switch to a rest break after each completed focus</small></span><input id="experienceAutoBreak" class="toggle" type="checkbox"></label>
+<label class="setting-row"><span>Focus Completion Sound<small>Play a subtle chime when a timer finishes</small></span><input id="experienceSound" class="toggle" type="checkbox"></label>
+<label class="setting-row"><span>Keyboard Study Shortcuts<small>F Focus · G Study Hub · ? Shortcut guide</small></span><input id="experienceShortcuts" class="toggle" type="checkbox" checked></label>
+<label class="liquid-range-line" for="experienceFocusDuration"><span>Focus Duration</span><strong id="experienceFocusDurationValue">25 min</strong></label><input id="experienceFocusDuration" type="range" min="10" max="60" step="5" value="25">
+<label class="liquid-range-line" for="experienceGoalDuration"><span>Daily Study Goal</span><strong id="experienceGoalDurationValue">60 min</strong></label><input id="experienceGoalDuration" type="range" min="15" max="180" step="15" value="60">
+<div class="experience-setting-actions"><button id="experienceExport" type="button" class="experience-outline">Export Activity</button><button id="experienceClear" type="button" class="experience-outline">Clear Study History</button></div>
+<p class="liquid-tip">Your timer, goal, streak and recent activity are private browser data. Clearing browser storage clears them too.</p>
+</div>
+<div class="setting-group"><span class="setting-label">Accessibility &amp; Motion</span><label class="setting-row"><span>Reduce Motion</span><input class="toggle" id="motionToggle" type="checkbox"/></label><label class="setting-row"><span>Larger Text</span><input class="toggle" id="largeTextToggle" type="checkbox"/></label><label class="setting-row"><span>High Contrast</span><input class="toggle" id="contrastToggle" type="checkbox"/></label></div>
+<div class="setting-group"><span class="setting-label">Content Density</span><div class="segmented" id="densityGroup"><button class="active" data-density-choice="comfortable">Comfortable</button><button data-density-choice="compact">Compact</button><button data-density-choice="spacious">Spacious</button></div></div>
+<div class="setting-group"><span class="setting-label">Font Size</span><div class="font-row"><span>A</span><input aria-label="Font size" id="fontRange" max="120" min="90" step="5" type="range" value="100"/><span style="font-size:1.08rem">A</span></div></div>
+<div class="setting-foot"><button class="solid" id="resetSettings">Reset Default</button><button class="solid" id="saveSettings" style="background:var(--button);color:var(--button-text)">Done</button></div>
+</div></aside>
+<div aria-hidden="true" aria-modal="true" class="sheet" id="modal" role="dialog"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button aria-label="Close dialog" class="round-btn" id="modalClose"><svg><use href="#i-x"></use></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
+<div aria-label="Quick search" aria-modal="true" class="command" id="command" role="dialog"><div class="command-card"><input aria-label="Command search" id="commandInput" placeholder="Search PDFs, subjects or actions..."/><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
+<div aria-live="polite" class="toast-area" id="toastArea"></div>
 <script>
 // Production 8aPDF interface. Appearance settings, selected timetable day and personal notes stay on this device.
 (()=>{
@@ -302,23 +985,7 @@ const fmtDate=v=>{try{let d=v?.toDate?v.toDate():new Date(v);return !isNaN(d)?d.
 const today=new Date();$('#year').textContent=today.getFullYear();
 // The offline placeholders below are based on the website screenshot provided in this chat,
 // and are never passed off as a fresh Firestore sync. Real document URLs only come from Firebase.
-const previewDocuments=[
-['HINDI','पाठ सब लोगों के विचारों के प्रश्न उत्तर की पीडीएफ को संलग्न किया गया है।','पाठ की पीडीएफ में प्रश्न उत्तर की पीडीएफ को संलग्न किया गया है।','2026-10-08'],
-['PUNJABI','ਪਾਠ - ਮਾਂ ਦਾ ਵਿਸ਼ਾਲ ਦਿਲ','ਪਾਠ - ਮਾਂ ਦਾ ਵਿਸ਼ਾਲ ਦਿਲ','2026-10-08'],
-['COMPUTER','Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 5. Write Programs from the given PDF in','Read chapter 5 - Decorate the Term 2 in Computer Notebook','2026-10-08'],
-['ENGLISH','Question answers of chapter 15 were completed (PDF attached)','Question answers of chapter 15 were completed','2026-10-07'],
-['SCIENCE','notes of chapter 3','notes of chapter 3','2026-10-06'],
-['COMPUTER','Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 3. Write Programs from the given PDF in','Read chapter 5 - Decorate the Term 2 in Computer Notebook','2026-10-06'],
-['HINDI','कक्षा पुनरावृत्ति पीडीएफ संलग्न की गई है। पाठ 7 का वाचन करें','कक्षा पुनरावृत्ति पीडीएफ संलग्न की गई है।','2026-10-06'],
-['PUNJABI','ਪਾਠ 10 ਮਾਂ ਪੜ੍ਹਾਈ ਲਈ','ਪਾਠ 10 ਮਾਂ ਪੜ੍ਹਾਈ ਲਈ','2026-10-06'],
-['CIRCULAR','Regarding Punctual Arrival','Regarding Punctual Arrival','2026-10-06'],
-['ENGLISH','Exercises of Prepositions were completed today. (PDF attached)','Exercises of Prepositions were completed today','2026-10-05'],
-['HINDI','Bring your Hindi test notebook for ch-6 tomorrow (6.10.26)','Bring your Hindi test notebook for ch-6 tomorrow','2026-10-05'],
-['SOCIAL SCIENCE','Geography - find the attached PDF of the Q/Ans of Ch 1 - as done in the class. Note - Notebook submission will be on','Geography chapter 1 Questions and Answers','2026-10-05'],
-['ART','NO BAG DAY (Classes III to VIII)','NO BAG DAY (Classes III to VIII)','2026-10-03'],
-['PUNJABI','ਵਿਦਿਆ ਅਤੇ ਕਲਾ','Punjabi classroom material','2026-10-03'],
-['ENGLISH','Explanation of literature chapter 15 was given through PPT (attached)','Explanation of literature chapter 15','2026-10-03']
-].map((d,i)=>({id:'preview-'+i,subject:d[0],title:d[1],description:d[2],createdAt:d[3],pdfUrl:'',order:i,placeholder:true,tags:[]}));
+const previewDocuments=[{"id": "archived-0", "subject": "Hindi", "title": "पाठ मत बांधो कविता के प्रश्न उत्तर की पीडीएफ को संलग्न किया गया है।", "description": "पाठ मत बांधो कविता के प्रश्न उत्तर की पीडीएफ को संलग्न किया गया है।", "createdAt": "Oct 8, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/59bc32da221747bd853a3deea5e4f609.pdf", "order": 0}, {"id": "archived-1", "subject": "Punjabi", "title": "ਪਾਠ - ਮਾਂ ਦਾ ਸਾਰ ਲਿਖਵਾਇਆ ਗਿਆ।", "description": "ਪਾਠ - ਮਾਂ ਦਾ ਸਾਰ ਲਿਖਵਾਇਆ ਗਿਆ।", "createdAt": "Oct 8, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/18338abc46ab4f2682a454668d82d4eb.pdf", "order": 1}, {"id": "archived-2", "subject": "Computer", "title": "Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 5. Write Programs from the given PDF in", "description": "Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 5. Write Programs from the given PDF in", "createdAt": "Oct 8, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/c30018ded7334d1a9cb854fa8bc77169.pdf", "order": 2}, {"id": "archived-3", "subject": "English", "title": "Question answers of chapter 15 were completed (PDF attached)", "description": "Question answers of chapter 15 were completed (PDF attached)", "createdAt": "Oct 7, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/4bacf78a7b3b448d84930a043e5f5527.pdf", "order": 3}, {"id": "archived-4", "subject": "Science", "title": "notes of chapter 3", "description": "notes of chapter 3", "createdAt": "Oct 6, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/8e668c7338b64686aab8c0c66765fb01.pdf", "order": 4}, {"id": "archived-5", "subject": "Computer", "title": "Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 3. Write Programs from the given PDF in", "description": "Read chapter 5 - Decorate the Term 2 in Computer Notebook and bring on day 3. Write Programs from the given PDF in", "createdAt": "Oct 6, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/f61ae28ad4e74704b3bf7e5fee224840.pdf", "order": 5}, {"id": "archived-6", "subject": "Hindi", "title": "कक्षा पुनरावृत्ति पीडीएफ संलग्न की गई हैं। पाठ 7 का वाचन करें", "description": "कक्षा पुनरावृत्ति पीडीएफ संलग्न की गई हैं। पाठ 7 का वाचन करें", "createdAt": "Oct 6, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/5def79600911436d83dca42207f0931c.pdf", "order": 6}, {"id": "archived-7", "subject": "Punjabi", "title": "ਪਾਠ 10 ਮਾ ਪੜ੍ਹਾਇਆ ਗਿਆ।", "description": "ਪਾਠ 10 ਮਾ ਪੜ੍ਹਾਇਆ ਗਿਆ।", "createdAt": "Oct 6, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/a685ea1470684702979b6d10f16b2e5a.pdf", "order": 7}, {"id": "archived-8", "subject": "Circular", "title": "– Regarding Punctual Arrival", "description": "– Regarding Punctual Arrival", "createdAt": "Oct 6, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/27035faf909d43c9adace8a7b10bc25c.pdf", "order": 8}, {"id": "archived-9", "subject": "English", "title": "Exercises of Prepositions were completed today. (PDF attached)", "description": "Exercises of Prepositions were completed today. (PDF attached)", "createdAt": "Oct 5, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/f6d49a3eaaa444fb85e4971a438b8ddf.pdf", "order": 9}, {"id": "archived-10", "subject": "Hindi", "title": "Bring your Hindi test notebook for ch-6 tomorrow (6.10.26)", "description": "Bring your Hindi test notebook for ch-6 tomorrow (6.10.26)", "createdAt": "Oct 5, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/50740d87d9184e938215d41bcca4a7f8.pdf", "order": 10}, {"id": "archived-11", "subject": "Social Science", "title": "Geography - find the attached PDF of the Q/Ans of Ch 1 - as done in the class. Note - Notebook submission will be on", "description": "Geography - find the attached PDF of the Q/Ans of Ch 1 - as done in the class. Note - Notebook submission will be on", "createdAt": "Oct 5, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/da8a69ed461143809500c777241daa30.pdf", "order": 11}, {"id": "archived-12", "subject": "Art", "title": "NO BAG DAY (Classes III to VIII)", "description": "NO BAG DAY (Classes III to VIII)", "createdAt": "Oct 3, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/fa3a1eae04f541d4abfd9092f73f08ea.pdf", "order": 12}, {"id": "archived-13", "subject": "Punjabi", "title": "ਕਿਰਿਆ ਅਤੇ ਕਾਲ ਦੀਆਂ ਕਿਸਮਾਂ ਕਰਵਾਈਆਂ ਗਈਆਂ।", "description": "ਕਿਰਿਆ ਅਤੇ ਕਾਲ ਦੀਆਂ ਕਿਸਮਾਂ ਕਰਵਾਈਆਂ ਗਈਆਂ।", "createdAt": "Oct 3, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/82440f0611b24ac5afaba823400c8ba7.pdf", "order": 13}, {"id": "archived-14", "subject": "English", "title": "Explanation of literature chapter 15 was given through PPT (attached)", "description": "Explanation of literature chapter 15 was given through PPT (attached)", "createdAt": "Oct 3, 2026", "pdfUrl": "https://edusecure.org/ManavMangal88/StudentInfo/Homework/97e170d4ce5b40da916a0de5dfc87276.pdf", "order": 14}];
 // Exact transcription of user's updated Class Timetable image (Day 1–Day 6, P0–P8).
 // No weekday or period-clock assumption: the source only specifies a rotating Day number.
 const timetable=[
@@ -335,9 +1002,16 @@ $('#daySelect').value=String(selectedSchoolDay);
 $('#daySelect').onchange=e=>{selectedSchoolDay=Number(e.target.value);store.set('8apdf_selected_school_day_v1',selectedSchoolDay);renderTimetable()};
 const cats=['All','Tests','Exams','Homework','Assignments','Projects','Important','Events','Holidays','Timetable','Results','Activities','Competitions','General'];
 const existingUserName=()=>{try{return localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'Student'}catch{return 'Student'}};
-const state={materials:location.protocol==='file:'?previewDocuments:[],live:false,error:false,filter:'All Subjects',query:'',sort:'default',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
-const defaults={theme:'dark',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65,glass:true,glassIntensity:68,glassMotion:true};
-let settings={...defaults,...store.get('8apdf_monochrome_settings_v1',{})};
+const previewMode=location.protocol==='file:'||location.protocol==='about:';
+const state={materials:previewMode?previewDocuments:[],live:false,error:false,filter:'All Subjects',query:'',sort:'default',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
+const defaults={theme:'pure-black',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65,glass:true,glassIntensity:100,glassMotion:true,glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glowCustomColor:'#e9e9e9',cornerRadius:24,animationSpeed:2,fontChoice:'modern',showActions:true,showSuggestions:true,stickyNav:true};
+let settings={...defaults,...store.get('8apdf_classic_glass_settings_v2',{})};
+// One-time upgrade: match the approved Radiant default on this device without discarding other preferences.
+if(!store.get('8apdf_radiant_default_migrated_v1',false)){
+ Object.assign(settings,{glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glass:true,glassIntensity:100,glassMotion:true});
+ store.set('8apdf_classic_glass_settings_v2',settings);
+ store.set('8apdf_radiant_default_migrated_v1',true);
+}
 // 36 colour families x dark/light + 6 monochrome = 78 built-in themes, plus unlimited custom colors.
 const monoThemes=[['dark','Dark'],['pure-black','Pure Black'],['graphite','Graphite'],['light','Light'],['paper','Paper'],['silver','Silver']].map(([id,name])=>({id,name,type:'mono',tone:['light','paper','silver'].includes(id)?'light':'dark'}));
 const colorFamilies=[
@@ -353,7 +1027,8 @@ const colorThemes=colorFamilies.flatMap(([name,hue,sat],i)=>[
  {id:'color-dark-'+i,name:name+' Dark',type:'dark',tone:'dark',hue,sat},
  {id:'color-light-'+i,name:name+' Light',type:'light',tone:'light',hue,sat}
 ]);
-const allThemes=[...monoThemes,...colorThemes];
+const signatureTheme={id:'signature-lime',name:'Classic Lime Glass',type:'signature',tone:'light'};
+const allThemes=[...monoThemes,signatureTheme,...colorThemes];
 const paletteVars=['--bg','--bg-alt','--surface','--surface-high','--surface-soft','--surface-glass','--text','--text-soft','--muted','--line','--line-bold','--button','--button-text','--pill','--hover','--shadow','--hero-glow'];
 function hexHSL(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;let mx=Math.max(r,g,b),mn=Math.min(r,g,b),delta=mx-mn,h=0,s=0,l=(mx+mn)/2;if(delta){s=delta/(1-Math.abs(2*l-1));switch(mx){case r:h=((g-b)/delta)%6;break;case g:h=(b-r)/delta+2;break;default:h=(r-g)/delta+4;}h=(h*60+360)%360;}return {hue:Math.round(h),sat:Math.round(s*100)}}
 function paletteFor(t){
@@ -373,14 +1048,14 @@ function paletteFor(t){
 }
 function selectedTheme(){if(settings.theme==='custom'){let hsl=hexHSL(settings.customColor||defaults.customColor);return {id:'custom',name:'Custom '+(settings.customMode==='light'?'Light':'Dark'),type:'custom',tone:settings.customMode==='light'?'light':'dark',...hsl,strength:settings.customStrength||65}}return allThemes.find(t=>t.id===settings.theme)||monoThemes[0]}
 function applySitePalette(){let t=selectedTheme(),root=document.documentElement;root.dataset.theme=t.id;root.dataset.tone=t.tone;root.style.colorScheme=t.tone;
- if(t.type==='mono'){paletteVars.forEach(v=>root.style.removeProperty(v))}else{let v=paletteFor(t);paletteVars.forEach(k=>root.style.setProperty(k,v[k]))}
+ if(t.type==='mono' || t.type==='signature'){paletteVars.forEach(v=>root.style.removeProperty(v))}else{let v=paletteFor(t);paletteVars.forEach(k=>root.style.setProperty(k,v[k]))}
  document.querySelector('meta[name="theme-color"]').content=getComputedStyle(root).getPropertyValue('--bg').trim()||'#111111';
  $('#selectedThemeName').textContent=t.name;
 }
 let activePaletteFilter='all';
 function renderPalette(){const query=$('#paletteSearch').value.toLowerCase().trim();let themes=allThemes.filter(t=>(activePaletteFilter==='all'||t.type===activePaletteFilter)&&(!query||t.name.toLowerCase().includes(query)));
  $('#themeCount').textContent=allThemes.length+' presets';
- $('#themeGrid').innerHTML=themes.length?themes.map(t=>{let swatch=t.type==='mono'?({dark:'#202020','pure-black':'#000000',graphite:'#505050',light:'#f4f4f4',paper:'#e3e3e3',silver:'#bbbbbb'}[t.id]):`hsl(${t.hue} ${t.sat}% ${t.tone==='dark'?'33%':'78%'})`;return `<button class="theme-item ${settings.theme===t.id?'active':''}" data-theme-choice="${t.id}" aria-pressed="${settings.theme===t.id}" title="Apply ${safe(t.name)} to the entire website"><span class="theme-circle" style="background:${swatch}"></span>${safe(t.name)}</button>`}).join(''):'<p class="setting-explainer">No matching themes.</p>';
+ $('#themeGrid').innerHTML=themes.length?themes.map(t=>{let swatch=t.type==='mono'?({'signature-lime':'#b7ff2a',dark:'#202020','pure-black':'#000000',graphite:'#505050',light:'#f4f4f4',paper:'#e3e3e3',silver:'#bbbbbb'}[t.id]):`hsl(${t.hue} ${t.sat}% ${t.tone==='dark'?'33%':'78%'})`;return `<button class="theme-item ${settings.theme===t.id?'active':''}" data-theme-choice="${t.id}" aria-pressed="${settings.theme===t.id}" title="Apply ${safe(t.name)} to the entire website"><span class="theme-circle" style="background:${swatch}"></span>${safe(t.name)}</button>`}).join(''):'<p class="setting-explainer">No matching themes.</p>';
  $$('#paletteFilters [data-palette-filter]').forEach(b=>b.classList.toggle('active',b.dataset.paletteFilter===activePaletteFilter));
 }
 $('#paletteFilters').onclick=e=>{let b=e.target.closest('[data-palette-filter]');if(b){activePaletteFilter=b.dataset.paletteFilter;renderPalette()}};
@@ -396,7 +1071,7 @@ function scrollToSection(sel){const e=$(sel);if(e)e.scrollIntoView({behavior:set
 
 function setLiquidExperience(){
  const root=document.documentElement;
- const v=Math.min(100,Math.max(0,Number(settings.glassIntensity ?? 68)));
+ const v=Math.min(100,Math.max(0,Number(settings.glassIntensity ?? 100)));
  const reduced=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  root.dataset.glass=settings.glass?'on':'off';
  root.dataset.fluid=settings.glass && settings.glassMotion && !reduced ? 'on':'off';
@@ -420,9 +1095,52 @@ $('#liquidRange').addEventListener('input',e=>{settings.glassIntensity=Number(e.
 $('#liquidPresets').addEventListener('click',e=>{const b=e.target.closest('[data-glass-preset]');if(!b)return;settings.glass=true;settings.glassIntensity=Number(b.dataset.glassPreset);setSettings()});
 window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change',()=>setLiquidExperience());
 
+
+function setPersonalization(){
+ const root=document.documentElement;
+ settings.glowIntensity=Math.max(0,Math.min(100,Number(settings.glowIntensity??55)));
+ settings.glowSize=Math.max(260,Math.min(1100,Number(settings.glowSize??600)));
+ settings.glowSpeed=Math.max(10,Math.min(100,Number(settings.glowSpeed??40)));
+ root.dataset.glow=settings.glow?'on':'off';
+ root.dataset.fontChoice=settings.fontChoice||'modern';
+ root.dataset.hideActions=settings.showActions?'off':'on';
+ root.dataset.hideSuggestions=settings.showSuggestions?'off':'on';
+ root.dataset.stickyNav=settings.stickyNav?'on':'off';
+ root.style.setProperty('--glow-opacity',String(settings.glowIntensity/100));
+ root.style.setProperty('--glow-size',settings.glowSize+'px');
+ root.style.setProperty('--glow-ink',settings.glowColorMode==='custom'?settings.glowCustomColor:'var(--text)');
+ root.style.setProperty('--user-radius',settings.cornerRadius+'px');
+ root.style.setProperty('--duration',({1:160,2:240,3:420}[settings.animationSpeed]||240)+'ms');
+ root.style.setProperty('--fluid-speed',({1:240,2:440,3:650}[settings.animationSpeed]||440)+'ms');
+ $('#glowToggle').checked=!!settings.glow;
+ for(const [id,val] of [['glowIntensity',settings.glowIntensity],['glowSize',settings.glowSize],['glowSpeed',settings.glowSpeed],['cornerRadius',settings.cornerRadius],['animationSpeed',settings.animationSpeed]])$('#'+id).value=String(val);
+ $('#glowIntensityValue').textContent=settings.glowIntensity+'%';
+ $('#glowSizeValue').textContent=settings.glowSize+'px';
+ $('#glowSpeedValue').textContent=settings.glowSpeed<=30?'Slow':settings.glowSpeed>=70?'Fast':'Normal';
+ $('#cornerRadiusValue').textContent=settings.cornerRadius+'px';
+ $('#animationSpeedValue').textContent=({1:'Snappy',2:'Balanced',3:'Relaxed'}[settings.animationSpeed]||'Balanced');
+ $('#glowCursorToggle').checked=!!settings.glowCursor;
+ $('#glowScrollToggle').checked=!!settings.glowScroll;
+ $('#glowIdleToggle').checked=!!settings.glowIdle;
+ $('#glowColorMode').value=settings.glowColorMode;
+ $('#glowCustomColor').value=settings.glowCustomColor;
+ $('#glowCustomColorWrap').classList.toggle('visible',settings.glowColorMode==='custom');
+ $('#fontChoice').value=settings.fontChoice;
+ for(const [id,k] of [['showActionsToggle','showActions'],['showSuggestionsToggle','showSuggestions'],['stickyNavToggle','stickyNav']])$('#'+id).checked=!!settings[k];
+ $$('#glowPresets [data-glow-preset]').forEach(b=>b.classList.toggle('active',Math.abs(settings.glowIntensity-Number(b.dataset.glowPreset))<7));
+ for(const id of ['glowIntensity','glowSize','glowSpeed','glowCursorToggle','glowScrollToggle','glowIdleToggle','glowColorMode','glowCustomColor'])$('#'+id).disabled=!settings.glow;
+}
+$('#glowToggle').onchange=e=>{settings.glow=e.target.checked;setSettings();document.dispatchEvent(new Event('8apdf:glow-change'))};
+for(const [id,k] of [['glowIntensity','glowIntensity'],['glowSize','glowSize'],['glowSpeed','glowSpeed'],['cornerRadius','cornerRadius'],['animationSpeed','animationSpeed']])$('#'+id).oninput=e=>{settings[k]=Number(e.target.value);setSettings()};
+for(const [id,k] of [['glowCursorToggle','glowCursor'],['glowScrollToggle','glowScroll'],['glowIdleToggle','glowIdle'],['showActionsToggle','showActions'],['showSuggestionsToggle','showSuggestions'],['stickyNavToggle','stickyNav']])$('#'+id).onchange=e=>{settings[k]=e.target.checked;setSettings()};
+$('#glowColorMode').onchange=e=>{settings.glowColorMode=e.target.value;setSettings()};
+$('#glowCustomColor').oninput=e=>{settings.glowCustomColor=e.target.value;setSettings()};
+$('#fontChoice').onchange=e=>{settings.fontChoice=e.target.value;setSettings()};
+$('#glowPresets').onclick=e=>{const btn=e.target.closest('[data-glow-preset]');if(!btn)return;settings.glow=true;settings.glowIntensity=Number(btn.dataset.glowPreset);setSettings();document.dispatchEvent(new Event('8apdf:glow-change'))};
+
 function setSettings(){
- applySitePalette();setLiquidExperience();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
- renderPalette();$$('[data-density-choice]').forEach(el=>el.classList.toggle('active',el.dataset.densityChoice===settings.density));$$('[data-card-choice]').forEach(el=>el.classList.toggle('active',el.dataset.cardChoice===settings.layout));$('#compactToggle').checked=settings.density==='compact';$('#sidebarToggle').checked=settings.sidebar;$('#readingToggle').checked=settings.reading;$('#motionToggle').checked=settings.motion;$('#largeTextToggle').checked=settings.large;$('#contrastToggle').checked=settings.contrast;$('#fontRange').value=settings.fontSize;$('#gridBtn').classList.toggle('active',settings.layout==='grid');$('#listBtn').classList.toggle('active',settings.layout==='list');$('#customColor').value=settings.customColor;$('#customMode').value=settings.customMode;$('#customStrength').value=settings.customStrength;$('#strengthValue').textContent=settings.customStrength+'%';store.set('8apdf_monochrome_settings_v1',settings)
+ applySitePalette();setLiquidExperience();setPersonalization();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
+ renderPalette();$$('[data-density-choice]').forEach(el=>el.classList.toggle('active',el.dataset.densityChoice===settings.density));$$('[data-card-choice]').forEach(el=>el.classList.toggle('active',el.dataset.cardChoice===settings.layout));$('#compactToggle').checked=settings.density==='compact';$('#sidebarToggle').checked=settings.sidebar;$('#readingToggle').checked=settings.reading;$('#motionToggle').checked=settings.motion;$('#largeTextToggle').checked=settings.large;$('#contrastToggle').checked=settings.contrast;$('#fontRange').value=settings.fontSize;$('#gridBtn').classList.toggle('active',settings.layout==='grid');$('#listBtn').classList.toggle('active',settings.layout==='list');$('#customColor').value=settings.customColor;$('#customMode').value=settings.customMode;$('#customStrength').value=settings.customStrength;$('#strengthValue').textContent=settings.customStrength+'%';store.set('8apdf_classic_glass_settings_v2',settings)
 }
 setSettings();$('#profileBtn').textContent=state.name[0].toUpperCase();
 function openSettings(){closeCommand();$('#settingsPanel').classList.add('open');$('#settingsPanel').setAttribute('aria-hidden','false');$('#drawerMask').classList.add('open')}
@@ -430,7 +1148,7 @@ function closeSettings(){ $('#settingsPanel').classList.remove('open');$('#setti
 $('#settingsBtn').onclick=openSettings;$('#closeSettings').onclick=closeSettings;$('#saveSettings').onclick=()=>{closeSettings();toast('Appearance saved on this device')};$('#drawerMask').onclick=closeSettings;$('#resetSettings').onclick=()=>{settings={...defaults};setSettings();toast('Default appearance restored')};
 $$('[data-density-choice]').forEach(b=>b.onclick=()=>{settings.density=b.dataset.densityChoice;setSettings()});$$('[data-card-choice]').forEach(b=>b.onclick=()=>{settings.layout=b.dataset.cardChoice;setSettings()});
 for(const [id,key] of [['sidebarToggle','sidebar'],['readingToggle','reading'],['motionToggle','motion'],['largeTextToggle','large'],['contrastToggle','contrast']])$('#'+id).onchange=e=>{settings[key]=e.target.checked;setSettings()};
-$('#compactToggle').onchange=e=>{settings.density=e.target.checked?'compact':'comfortable';setSettings()};$('#fontRange').oninput=e=>{settings.fontSize=+e.target.value;setSettings()};$('#themeShortcut').onclick=()=>{settings.theme=selectedTheme().tone==='light'?'dark':'light';setSettings()};
+$('#compactToggle').onchange=e=>{settings.density=e.target.checked?'compact':'comfortable';setSettings()};$('#fontRange').oninput=e=>{settings.fontSize=+e.target.value;setSettings()};$('#themeShortcut').onclick=()=>{settings.theme=selectedTheme().tone==='light'?'pure-black':'light';setSettings()};
 function closeModal(){$('#modal').classList.remove('open');$('#modal').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll')}
 function showModal(title,html,actions=''){$('#modalTitle').textContent=title;$('#modalContent').innerHTML=html;$('#modalActions').innerHTML=actions;$('#modal').classList.add('open');$('#modal').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll')}
 $('#modalClose').onclick=closeModal;$('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))closeModal()});
@@ -450,10 +1168,10 @@ function sortedDocs(){let a=state.materials.filter(x=>(state.filter==='All Subje
 function dateMs(v){try{return v?.toDate?.().getTime()||new Date(v).getTime()||0}catch{return 0}}
 function card(x){const saved=state.saved.includes(x.id);return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(x.title)}">${safe(x.title)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button></div></article>`}
 function renderSubjectFilters(){const subs=['All Subjects',...new Set(state.materials.map(x=>x.subject).filter(Boolean))].sort((a,b)=>a==='All Subjects'?-1:b==='All Subjects'?1:a.localeCompare(b));$('#subjectFilters').innerHTML=subs.map(s=>`<button class="chip ${s===state.filter?'active':''}" data-subject="${safe(s)}">${safe(s)}</button>`).join('')}
-function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No materials found. Try another subject or search.</div>';$('#pdfCount').textContent=state.live?`${state.materials.length} PDFs Available`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' matches':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
+function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No materials found. Try another subject or search.</div>';$('#pdfCount').textContent=state.live?`${state.materials.length} PDFs Available`:previewMode?`${state.materials.length} archived PDFs · Preview`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' matches':previewMode?'Local HTML preview · Real PDFs sync on the hosted website':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
 function normalizeDoc(d){return{id:String(d.id),title:String(d.title||'Untitled Material'),subject:String(d.subject||'Other'),description:String(d.description||''),pdfUrl:String(d.pdf_url||''),className:String(d.class_name||''),chapter:String(d.chapter||''),language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],order:Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,createdAt:d.created_at||null}}
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
-function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent()}
+function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
 async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Firestore data is required.');return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='https://8apdf.vercel.app/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
 $('#subjectFilters').onclick=e=>{let b=e.target.closest('[data-subject]');if(!b)return;state.filter=b.dataset.subject;state.visible=12;renderMaterials()};$('#morePdf').onclick=()=>{state.visible+=12;renderMaterials()};$('#sortSelect').onchange=e=>{state.sort=e.target.value;renderMaterials()};
 function setLayout(l){settings.layout=l;setSettings()}$('#gridBtn').onclick=()=>setLayout('grid');$('#listBtn').onclick=()=>setLayout('list');
@@ -493,70 +1211,113 @@ $('#menuBtn').onclick=()=>showModal('Navigate 8aPDF',`<div style="display:grid;g
 $('#modalContent').onclick=e=>{let b=e.target.closest('[data-menu-go]');if(b){closeModal();nav(b.dataset.menuGo)}};
 $('#supportLink').addEventListener('click',e=>{e.preventDefault();toast('Support email is not configured in the current repository. Please use the existing site contact method.')} );
 
-// EVERY page load: show a premium welcome. First visits also ask for a name and optional notifications.
-// Returning visitors keep their name and see a short personalized welcome before entering.
-const intro=$('#introFlow');
-let introTimer;
-function showIntroStep(which){
- $$('#introFlow [data-intro-step]').forEach(el=>el.classList.toggle('active',el.dataset.introStep===which));
- const n={name:0,welcome:1,notifications:2}[which];
- $$('#introFlow .intro-dots span').forEach((d,i)=>d.classList.toggle('current',i===n));
+// Original SITEGRAB welcome screen retained: same markup, timing, typography, and transitions.
+// Every fresh open shows a personalized welcome. New visitors enter their name once.
+const originalWelcome=$('#welcomeScreen'), originalNameModal=$('#nameModal');
+let welcomeTimer;
+function closeOriginalWelcome(){
+  originalWelcome.classList.remove('show');originalWelcome.setAttribute('aria-hidden','true');
+  document.body.classList.remove('locked');
+  clearTimeout(welcomeTimer);
 }
-function finishIntro(){
- clearTimeout(introTimer);
- document.documentElement.dataset.onboard='complete';
- intro.setAttribute('aria-hidden','true');
- if(document.activeElement?.closest('#introFlow'))document.activeElement.blur();
- $('#settingsBtn').focus({preventScroll:true});
+function offerNotificationAfterWelcome(){
+  try {
+    const seen=localStorage.getItem('8apdf-classic-notification-choice');
+    if(seen || !('Notification' in window) || Notification.permission!=='default')return;
+    localStorage.setItem('8apdf-classic-notification-choice','1');
+  }catch{return}
+  showModal('Stay updated with 8aPDF',
+    '<p>Get an alert when a new PDF is added while 8aPDF is open. This is completely optional.</p>',
+    '<button class="solid" id="classicNotifyAllow">Allow Notifications</button><button class="action" id="classicNotifySkip">Not Now</button>');
+  $('#classicNotifyAllow').onclick=async()=>{closeModal();await askNotification()};
+  $('#classicNotifySkip').onclick=closeModal;
 }
-$('#introNameForm').onsubmit=e=>{
- e.preventDefault();
- const name=$('#introName').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,40);
- if(!name){$('#introError').textContent='Please enter your name to continue.';$('#introName').focus();return}
- $('#introError').textContent='';
- state.name=name;
- try{localStorage.setItem('eightapdf_user_name_v2',name);localStorage.setItem('eightapdf_user_name',name)}catch{}
- $('#profileBtn').textContent=name.charAt(0).toUpperCase();
- $('#introGreeting').textContent='Welcome, '+name+'.';
- showIntroStep('welcome');
- const reduced=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- introTimer=setTimeout(()=>{showIntroStep('notifications');$('#introAllow').focus({preventScroll:true})},reduced?550:2300);
-};
-$('#introSkip').onclick=finishIntro;
-$('#introAllow').onclick=async()=>{
- const button=$('#introAllow');button.disabled=true;
- let result='unsupported';
- try{
-  if('Notification' in window && window.isSecureContext){
-   result=Notification.permission==='default' ? await Notification.requestPermission() : Notification.permission;
-  }
- }catch{result='unsupported'}
- finishIntro();
- if(result==='granted')toast('Notifications enabled. New PDF alerts work while 8aPDF is open.');
- else if(result==='denied')toast('Notifications blocked in browser settings. You can change this later.');
- else toast('You can enable notifications any time from the bell icon.');
- button.disabled=false;
-};
-// The overlay is visible from <head>, before the dashboard paints: no welcome flash or missed splash.
-if(document.documentElement.dataset.introVisit==='returning'){
-  const savedName=existingUserName().replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,40);
-  if(savedName && savedName!=='Student'){
-    $('#introGreeting').textContent='Welcome back, '+savedName+'.';
-    $('#introWelcomeLabel').textContent='8aPDF  ·  Good to see you again';
-    showIntroStep('welcome');
-    intro.setAttribute('aria-hidden','false');
-    const reduceMotion=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    introTimer=setTimeout(finishIntro,reduceMotion?950:2400);
-  } else {
-    showIntroStep('name');
-    setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
-  }
-} else {
-  showIntroStep('name');
-  setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
+function originalShowWelcome(name,notifyAfter=false){
+  $('#welcomeTitle').textContent='Welcome, '+name;
+  document.body.classList.add('locked');
+  originalWelcome.classList.add('show');originalWelcome.setAttribute('aria-hidden','false');
+  clearTimeout(welcomeTimer);
+  welcomeTimer=setTimeout(()=>{closeOriginalWelcome();if(notifyAfter)offerNotificationAfterWelcome()},2350);
 }
+function openOriginalName(){
+  document.body.classList.add('locked');
+  originalNameModal.classList.add('show');originalNameModal.setAttribute('aria-hidden','false');
+  setTimeout(()=>$('#nameInput').focus({preventScroll:true}),200);
+}
+$('#nameForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('#nameInput').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,32);
+  if(!name){toast('Please enter your name');$('#nameInput').focus();return}
+  state.name=name;
+  try{localStorage.setItem('eightapdf_user_name_v2',name);localStorage.setItem('eightapdf_user_name',name)}catch{}
+  $('#profileBtn').textContent=name.charAt(0).toUpperCase();
+  originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
+  originalShowWelcome(name,true);
+});
+// Same welcome animation on every reload and every new website open.
+const previousName=existingUserName().trim();
+if(previousName && previousName!=='Student')originalShowWelcome(previousName);
+else openOriginalName();
 
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
+window.__8apdfStudyBridge={
+ documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,createdAt:fmtDate(x.createdAt)})),
+ recents:()=>[...state.recent],bookmarks:()=>[...state.saved],
+ openDocument:(id)=>{const x=state.materials.find(x=>x.id===id);if(x)pdfAction(x,'preview')},
+ navigate:nav,subject:(subject)=>{state.filter=subject;state.query='';$('#searchInput').value='';showLibrary();renderMaterials();scrollToSection('#library')},
+ schoolDay:()=>selectedSchoolDay,
+ notify:(message)=>toast(message),
+ isLive:()=>state.live
+};
+
+// Feathered ambient glow: pointer, scrolling, and idle drift; no image or visible blob geometry.
+(function adaptiveAmbientGlow(){
+ const root=document.documentElement;
+ let x=.5,y=.40,targetX=.5,targetY=.4,lastPointer=0,lastScroll=scrollY,lastScrollTime=performance.now(),scrollEnergy=0;
+ let lastFrame=0,raf=0;
+ const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+ const reduced=()=>settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(fine) document.addEventListener('pointermove',e=>{
+  if(!settings.glow||!settings.glowCursor)return;
+  targetX=Math.min(.99,Math.max(.01,e.clientX/Math.max(1,innerWidth)));
+  targetY=Math.min(.99,Math.max(.01,e.clientY/Math.max(1,innerHeight)));
+  lastPointer=performance.now();
+ },{passive:true});
+ window.addEventListener('scroll',()=>{
+  if(!settings.glow||!settings.glowScroll)return;
+  const now=performance.now();const delta=scrollY-lastScroll;
+  scrollEnergy=Math.max(-.23,Math.min(.23,scrollEnergy+delta/Math.max(400,innerHeight)*.22));
+  lastScroll=scrollY;lastScrollTime=now;
+ },{passive:true});
+ function step(now){
+  raf=0;
+  if(document.hidden||!settings.glow)return;
+  if(now-lastFrame<(innerWidth<650?90:36)){raf=requestAnimationFrame(step);return}
+  lastFrame=now;
+  if(!reduced()){
+   const idle=!fine||!settings.glowCursor||(now-lastPointer>1800);
+   if(settings.glowIdle&&idle){
+    const rate=(.20+settings.glowSpeed*.016)*.00027;
+    targetX=.5+Math.sin(now*rate)*.24+Math.cos(now*rate*.47)*.09;
+    targetY=.41+Math.cos(now*rate*.83)*.20;
+   }
+   if(settings.glowScroll){
+    scrollEnergy*=.88;
+    if(now-lastScrollTime<1150){targetY=Math.max(.12,Math.min(.87,targetY+scrollEnergy*.04));targetX=Math.max(.1,Math.min(.9,targetX+scrollEnergy*.025))}
+   }
+   const follow=.045+settings.glowSpeed*.0019;
+   x+=(targetX-x)*follow;y+=(targetY-y)*follow;
+  }
+  root.style.setProperty('--glow-x',(x*100).toFixed(2)+'%');
+  root.style.setProperty('--glow-y',(y*100).toFixed(2)+'%');
+  raf=requestAnimationFrame(step);
+ }
+ function restart(){if(raf)cancelAnimationFrame(raf);raf=0;if(settings.glow&&!document.hidden)raf=requestAnimationFrame(step)}
+ document.addEventListener('visibilitychange',restart);
+ document.addEventListener('8apdf:glow-change',restart);
+ restart();
+})();
+
 // Settings open on explicit request, never over first-time onboarding.
 // Pointer highlights are visual-only and throttled to one frame, with a touch/motion-safe fallback.
 if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
@@ -575,12 +1336,118 @@ async function connectLive(){try{
 const [{initializeApp},{getFirestore,collection,onSnapshot,getDocs,query,where,orderBy,limit}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js')]);
 const cfg={apiKey:'AIzaSyATxKki6gkNWic_CnoGbZnOZjAUj1lbKGI',authDomain:'academyvault-5d1eb.firebaseapp.com',projectId:'academyvault-5d1eb',storageBucket:'academyvault-5d1eb.firebasestorage.app',messagingSenderId:'933297255268',appId:'1:933297255268:web:51b4b015ed4df21ed64071',measurementId:'G-CE6QNNW4RD'};
 const db=getFirestore(initializeApp(cfg));
-onSnapshot(collection(db,'study_materials'),snap=>{state.live=true;state.error=false;state.materials=snap.docs.map(d=>normalizeDoc({id:d.id,...d.data()})).sort((a,b)=>(a.order-b.order)||(dateMs(b.createdAt)-dateMs(a.createdAt)));$('#previewRibbon').classList.remove('show');renderMaterials()},err=>{console.warn('8aPDF study_materials could not load:',err);showOffline()});
+onSnapshot(collection(db,'study_materials'),snap=>{state.live=true;state.error=false;state.materials=snap.docs.map(d=>normalizeDoc({id:d.id,...d.data()})).sort((a,b)=>(a.order-b.order)||(dateMs(b.createdAt)-dateMs(a.createdAt)));$('#previewRibbon').classList.remove('show');renderMaterials();document.dispatchEvent(new Event('8apdf:library-updated'))},err=>{console.warn('8aPDF study_materials could not load:',err);showOffline()});
 try{let snap=await getDocs(query(collection(db,'announcements'),where('published','==',true),orderBy('createdAt','desc')));state.announcements=snap.docs.map(d=>({id:d.id,...d.data()}));state.annReady=true;renderAnnouncements()}
 catch(err){console.warn('Indexed announcements query unavailable, trying read fallback:',err);try{let snap=await getDocs(collection(db,'announcements'));state.announcements=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.published===true).sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));state.annReady=true;renderAnnouncements()}catch(e){console.warn('Announcement fetch error:',e);state.annReady=true;renderAnnouncements()}}
 }catch(e){console.warn('8aPDF Firebase SDK unavailable in offline preview:',e);showOffline();state.annReady=true;renderAnnouncements()}}
-function showOffline(){if(!state.live){if(location.protocol==='file:')$('#previewRibbon').classList.add('show');else state.error=true;renderMaterials()}}
+function showOffline(){if(!state.live){if(previewMode)$('#previewRibbon').classList.add('show');else state.error=true;renderMaterials()}}
 setTimeout(()=>{if(!state.live)showOffline()},4200);connectLive();
+})();
+</script>
+
+<script id="8apdf-experience-script">
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],bridge=()=>window.__8apdfStudyBridge;
+const K='8apdf_experience_hub_v1';
+const defaults={showHub:true,autoBreak:false,sound:false,shortcuts:true,focusMinutes:25,goalMinutes:60};
+const get=(key,fall)=>{try{const v=localStorage.getItem(key);return v===null?fall:JSON.parse(v)}catch{return fall}};
+const save=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
+const config={...defaults,...get(K,{})};
+const records=Array.isArray(get('8apdf_completed_sessions_v1',[]))?get('8apdf_completed_sessions_v1',[]):[];
+const modes={work:'Focus',short:'Short Break',long:'Long Break'};
+let mode='work',remaining=config.focusMinutes*60,running=false,deadline=0,ticker=0;
+const timerStored=get('8apdf_focus_timer_v1',null);
+if(timerStored&&modes[timerStored.mode]){
+ mode=timerStored.mode;running=!!timerStored.running;
+ remaining=running?Math.max(0,Math.ceil((Number(timerStored.deadline)-Date.now())/1000)):Math.max(0,Number(timerStored.remaining)||0);
+ deadline=Number(timerStored.deadline)||0;
+}
+let soundContext=null;
+const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const todayMinutes=()=>records.filter(r=>r.date===todayKey()&&r.mode==='work').reduce((sum,r)=>sum+Number(r.minutes||0),0);
+const todaySessions=()=>records.filter(r=>r.date===todayKey()&&r.mode==='work').length;
+function streak(){const dates=new Set(records.filter(r=>r.mode==='work').map(r=>r.date));let d=new Date(),count=0;
+ if(!dates.has(todayKey()))d.setDate(d.getDate()-1);
+ for(let i=0;i<366;i++){const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(!dates.has(key))break;count++;d.setDate(d.getDate()-1)}return count;
+}
+const mmss=secs=>`${String(Math.floor(secs/60)).padStart(2,'0')}:${String(Math.floor(secs%60)).padStart(2,'0')}`;
+const duration=()=>mode==='work'?config.focusMinutes*60:mode==='short'?5*60:15*60;
+function persistTimer(){save('8apdf_focus_timer_v1',{mode,remaining,running,deadline})}
+function ping(){if(!config.sound)return;try{soundContext=soundContext||new (window.AudioContext||window.webkitAudioContext)();soundContext.resume?.();const o=soundContext.createOscillator(),g=soundContext.createGain();o.type='sine';o.frequency.value=660;g.gain.setValueAtTime(.0001,soundContext.currentTime);g.gain.exponentialRampToValueAtTime(.06,soundContext.currentTime+.04);g.gain.exponentialRampToValueAtTime(.0001,soundContext.currentTime+.37);o.connect(g);g.connect(soundContext.destination);o.start();o.stop(soundContext.currentTime+.38)}catch{}}
+function completed(){running=false;remaining=0;
+ if(mode==='work'){
+  records.push({date:todayKey(),minutes:config.focusMinutes,mode:'work',completedAt:new Date().toISOString()});if(records.length>500)records.splice(0,records.length-500);save('8apdf_completed_sessions_v1',records);
+  if(config.autoBreak){mode=todaySessions()%4===0?'long':'short';remaining=duration();}else remaining=duration();
+ }else{mode='work';remaining=duration()}
+ ping();persistTimer();refresh();showMessage('Session complete! Your study progress has been saved.');
+}
+function refresh(){if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));if(remaining===0)completed()}
+ $('#focusClock').textContent=mmss(remaining);$('#expTimerLabel').textContent=mmss(remaining);
+ const status=running?'Session in progress':mode==='work'?'Ready for deep work':'Take a mindful break';
+ $('#focusStatus').textContent=status;$('#expTimerCaption').textContent=running?`${modes[mode]} · in progress`:status;
+ $('#focusToggle').textContent=running?'Pause':'Start '+modes[mode];
+ $('#quickFocusStart').textContent=running?'Continue timer ↗':'Start focusing ↗';
+ $('#focusSessionCount').textContent=`${todaySessions()} session${todaySessions()===1?'':'s'} today`;
+ const used=todayMinutes();$('#expGoalLabel').textContent=`${used} / ${config.goalMinutes}m`;
+ $('#expGoalFill').style.width=`${Math.min(100,Math.round(used/config.goalMinutes*100))}%`;
+ $('#expGoalCaption').textContent=used>=config.goalMinutes?'Daily goal reached ✨':`${Math.max(0,config.goalMinutes-used)} minutes until your goal`;
+ const run=streak();$('#expStreakLabel').textContent=`${run} day${run===1?'':'s'}`;
+ $('#expStreakCaption').textContent=run?'Keep your momentum going.':'Complete a focus session to begin.';
+ $('#focusGoalInfo').textContent=`Goal: ${config.goalMinutes} minutes`;
+ $$('[data-focus-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.focusMode===mode));
+ document.title=running?`${mmss(remaining)} · Focus · 8aPDF`:'8aPDF | Study Material Vault';
+}
+function timerTick(){if(running){refresh();persistTimer()}}
+function setMode(next){if(!modes[next])return;mode=next;running=false;remaining=duration();persistTimer();refresh()}
+function toggleTimer(){if(running){remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));running=false}
+ else{if(remaining<=0)remaining=duration();running=true;deadline=Date.now()+remaining*1000;if(config.sound){try{soundContext=soundContext||new (window.AudioContext||window.webkitAudioContext)();soundContext.resume?.()}catch{}}}
+ persistTimer();refresh();
+}
+function openFocus(){const o=$('#focusOverlay');o.classList.add('open');o.setAttribute('aria-hidden','false');$('#closeFocusStudio').focus();refresh()}
+function closeFocus(){const o=$('#focusOverlay');o.classList.remove('open');o.setAttribute('aria-hidden','true')}
+function showMessage(m){const n=document.createElement('div');n.textContent=m;n.style.cssText='position:fixed;bottom:18px;right:18px;z-index:9999;padding:12px 16px;border-radius:12px;background:var(--button);color:var(--button-text);font-weight:700;box-shadow:0 10px 30px #0007';document.body.append(n);setTimeout(()=>n.remove(),3500)}
+const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function docs(){return bridge()?.documents()||[]}
+function renderLibraryExtras(){const all=docs();const index=new Map(all.map(x=>[x.id,x]));const recent=(bridge()?.recents()||[]).map(id=>index.get(id)).filter(Boolean)[0];
+ $('#expRecentLabel').textContent=recent?.title||'No PDFs opened yet';$('#expRecentCaption').textContent=recent?recent.subject:'Your most recent reading';$('#expRecentOpen').disabled=!recent;
+ const subjects=new Set(all.map(x=>x.subject).filter(Boolean));$('#expSubjectLabel').textContent=subjects.size?String(subjects.size):'—';
+}
+let selectedRandomId='';
+function pickRevision(){const all=docs();if(!all.length){showMessage('School PDF library is still connecting.');return}const options=all.filter(x=>x.id!==selectedRandomId);const pool=options.length?options:all;const pick=pool[Math.floor(Math.random()*pool.length)];selectedRandomId=pick.id;$('#expRandomLabel').textContent=pick.title;$('#expRandomCaption').textContent=pick.subject+' · Click to preview';$('#expRandomPick').textContent='Open revision PDF ↗';}
+function subjectBreakdown(){const counts={};for(const x of docs())counts[x.subject]=(counts[x.subject]||0)+1;const keys=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);if(!keys.length){showMessage('PDFs are still loading.');return}
+ showSimpleDialog('Explore Subjects',keys.map(k=>`<button class="experience-outline" data-exp-subject="${safe(k)}" style="display:flex;justify-content:space-between;align-items:center;text-align:left;width:100%;margin:7px 0"><span>${safe(k)}</span><strong>${counts[k]} PDFs →</strong></button>`).join(''));
+}
+function showSimpleDialog(title,html){const overlay=$('#focusOverlay');openFocus();$('#focusHistoryContent')?.remove();let b=document.createElement('div');b.id='focusHistoryContent';b.innerHTML=`<h3 style="margin:22px 0 10px;font-size:1.15rem">${safe(title)}</h3>`+html+'<button class="experience-outline" id="expCloseDetails" type="button" style="width:100%;margin-top:12px">Back to timer</button>';$('#focusOverlay .experience-dialog').append(b);$('#focusOverlay .focus-modes').style.display='none';$('#focusOverlay .focus-time-ring').style.display='none';$('#focusOverlay .focus-actions').style.display='none';$('#focusOverlay .focus-info').style.display='none';$('#focusOverlay .focus-tools').style.display='none';$('#expCloseDetails').onclick=restoreFocus;}
+function restoreFocus(){document.querySelector('#focusHistoryContent')?.remove();for(const x of $$('#focusOverlay .focus-modes,#focusOverlay .focus-time-ring,#focusOverlay .focus-actions,#focusOverlay .focus-info,#focusOverlay .focus-tools'))x.style.display='';refresh()}
+function historyView(){const keys=[...new Set(records.map(r=>r.date))].sort().reverse().slice(0,28);const list=keys.length?keys.map(d=>{const a=records.filter(r=>r.date===d&&r.mode==='work');const total=a.reduce((s,r)=>s+Number(r.minutes||0),0);return `<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><span>${safe(d)}</span><strong>${total} min · ${a.length} sessions</strong></div>`}).join(''):'<p style="color:var(--muted)">Finish a focus session to start your real study history.</p>';
+ showSimpleDialog('Study History',`<p style="color:var(--muted);font-size:.8rem">Completed focus sessions only · stored privately on this browser.</p>`+list);
+}
+function shortcutsView(){showSimpleDialog('Keyboard Shortcuts','<p style="color:var(--muted)">Ctrl/⌘ + K — Search PDFs</p><p>F — Open Focus Studio</p><p>G — Jump to Study Hub</p><p>R — Random revision PDF</p><p>? — View these shortcuts</p><p>Esc — Close a panel</p>')}
+function exportActivity(){const content={exportedAt:new Date().toISOString(),sessions:records,preferences:config,recentPdfIds:bridge()?.recents()||[],bookmarkedPdfIds:bridge()?.bookmarks()||[]};const url=URL.createObjectURL(new Blob([JSON.stringify(content,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='8apdf-study-activity.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+function connectSettings(){const map={experienceShowHub:'showHub',experienceAutoBreak:'autoBreak',experienceSound:'sound',experienceShortcuts:'shortcuts'};
+ for(const [id,k] of Object.entries(map)){const el=$('#'+id);el.checked=!!config[k];el.addEventListener('change',()=>{config[k]=el.checked;settingsChanged()})}
+ $('#experienceFocusDuration').value=config.focusMinutes;$('#experienceGoalDuration').value=config.goalMinutes;$('#experienceFocusDurationValue').textContent=config.focusMinutes+' min';$('#experienceGoalDurationValue').textContent=config.goalMinutes+' min';
+ $('#experienceFocusDuration').addEventListener('input',e=>{config.focusMinutes=Number(e.target.value);if(mode==='work'&&!running){remaining=config.focusMinutes*60;persistTimer()}settingsChanged()});
+ $('#experienceGoalDuration').addEventListener('input',e=>{config.goalMinutes=Number(e.target.value);settingsChanged()});
+ $('#experienceExport').onclick=exportActivity;
+ $('#experienceClear').onclick=()=>{if(!confirm('Clear your completed Focus Studio session history? This cannot be undone.'))return;records.splice(0);save('8apdf_completed_sessions_v1',records);refresh();showMessage('Study session history cleared. Bookmarks are preserved.')};
+}
+function settingsChanged(){save(K,config);$('#experienceHub').hidden=!config.showHub;$('#experienceFocusDurationValue').textContent=config.focusMinutes+' min';$('#experienceGoalDurationValue').textContent=config.goalMinutes+' min';refresh()}
+function setup(){connectSettings();settingsChanged();renderLibraryExtras();refresh();
+ $('#openFocusStudio').onclick=openFocus;$('#quickFocusStart').onclick=openFocus;$('#closeFocusStudio').onclick=()=>{restoreFocus();closeFocus()};$('#focusOverlay').addEventListener('click',e=>{if(e.target===$('#focusOverlay')){restoreFocus();closeFocus()}const b=e.target.closest('[data-exp-subject]');if(b){restoreFocus();closeFocus();bridge()?.subject(b.dataset.expSubject)}});
+ $('#focusToggle').onclick=toggleTimer;$('#focusReset').onclick=()=>setMode(mode);$('#focusSkip').onclick=()=>setMode(mode==='work'?'short':'work');$$('[data-focus-mode]').forEach(el=>el.onclick=()=>setMode(el.dataset.focusMode));
+ $('#focusHistory').onclick=historyView;$('#studyHistoryButton').onclick=historyView;$('#focusHelp').onclick=shortcutsView;$('#focusFullscreen').onclick=()=>{const el=$('#focusOverlay .experience-dialog');if(document.fullscreenElement)document.exitFullscreen?.();else el.requestFullscreen?.().catch(()=>showMessage('Fullscreen not supported by this browser'))};
+ $('#expSubjectsOpen').onclick=subjectBreakdown;$('#expRandomPick').onclick=()=>{if(!selectedRandomId){pickRevision()}else{bridge()?.openDocument(selectedRandomId);selectedRandomId='';$('#expRandomPick').textContent='Surprise me ↗'}};
+ $('#expRecentOpen').onclick=()=>{const id=(bridge()?.recents()||[])[0];if(id)bridge()?.openDocument(id)};
+ document.addEventListener('8apdf:library-updated',renderLibraryExtras);document.addEventListener('8apdf:document-opened',renderLibraryExtras);
+ document.addEventListener('click',e=>{if(e.target.closest('[data-bookmark]'))requestAnimationFrame(renderLibraryExtras)});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#focusOverlay').classList.contains('open')){restoreFocus();closeFocus();return}if(!config.shortcuts||e.ctrlKey||e.altKey||e.metaKey||e.target.closest('input,textarea,select,[contenteditable]'))return;
+ const k=e.key.toLowerCase();if(k==='f'){e.preventDefault();openFocus()}if(k==='g'){e.preventDefault();$('#experienceHub').scrollIntoView({behavior:'smooth',block:'center'})}if(k==='r'){e.preventDefault();pickRevision();$('#experienceHub').scrollIntoView({behavior:'smooth'})}if(e.key==='?'){e.preventDefault();shortcutsView()}});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+ window.addEventListener('beforeunload',persistTimer);
+ ticker=setInterval(timerTick,1000); if(running)refresh();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
 })();
 </script>
 </body>
