@@ -23,7 +23,7 @@
     },
     {
       "source": "/tasks",
-      "destination": "/tasks.html"
+      "destination": "/index.html"
     },
     {
       "source": "/classic",
@@ -39,7 +39,7 @@
     },
     {
       "source": "/Tasks.html",
-      "destination": "/tasks.html"
+      "destination": "/index.html"
     },
     {
       "source": "/Settings.html",

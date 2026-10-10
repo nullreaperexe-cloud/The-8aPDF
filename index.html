@@ -1321,6 +1321,39 @@ html[data-ui-mode="studio"] .pdf-card {
   #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-feed{padding-bottom:12px!important}
 }
 </style>
+
+<style id="8apdf-sidebar-subjects-premium">
+html[data-ui-mode="studio"] #subjectFilters,
+html[data-ui-mode="studio"] .hero .suggestions{display:none!important}
+html[data-ui-mode="studio"] #studioSubjects{display:flex;flex-direction:column;gap:3px}
+html[data-ui-mode="studio"] #studioSubjects .studio-side-link{width:100%;padding-block:10px}
+html[data-ui-mode="studio"] .studio-subject-group{min-height:0}
+html[data-ui-mode="studio"] #dashboardWidgets{padding:12px 0 15px}
+html[data-ui-mode="studio"] #newSchoolPlanner{margin:14px auto 34px}
+html[data-ui-mode="studio"] .planner-go{background:var(--surface-high);color:var(--text);cursor:pointer;font:inherit;border:1px solid var(--line);border-radius:10px;padding:7px 11px}
+html[data-ui-mode="studio"] .planner-go:hover{background:var(--hover)}
+html[data-ui-mode="studio"] .studio-sidebar{scrollbar-width:none!important;overflow-x:hidden!important}
+html[data-ui-mode="studio"] .studio-sidebar::-webkit-scrollbar,
+html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
+@media(max-width:720px){html[data-ui-mode="studio"] #dashboardWidgets{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-ui-mode="studio"] #newSchoolPlanner{grid-template-columns:1fr}}
+@media(max-width:510px){html[data-ui-mode="studio"] #dashboardWidgets{grid-template-columns:1fr;gap:14px}}
+</style>
+
+<style id="8apdf-full-todo-premium">
+#modal:has(#fullTaskCenter) .dialog{width:min(780px,calc(100vw - 24px));max-height:min(90dvh,900px);overflow-y:auto;border-radius:var(--user-radius,24px);padding:clamp(17px,3vw,29px)}
+#fullTaskCenter .planner-modal-intro{font-size:.83rem;color:var(--muted);padding:10px 0 22px}
+#fullTaskCenter h3{font-size:1.12rem;letter-spacing:-.04em;padding:15px 0 10px}
+#fullTaskCenter h3 small{font-size:.75rem;color:var(--muted)}
+#fullTaskCenter .planner-delete{border:1px solid var(--line);background:var(--surface-high);color:var(--text);border-radius:10px;min-width:35px;min-height:35px}
+#plannerAddTask{display:flex;gap:10px;margin:10px 0 18px}
+#plannerAddTask input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:11px 12px;color:var(--text);font:inherit}
+@media(max-width:520px){#plannerAddTask{flex-wrap:wrap}#plannerAddTask .solid{min-height:44px}}
+</style>
+<style id="8apdf-pdf-utility-premium">
+.pdf-card .pdf-summary-utility{border:0;background:transparent;color:var(--muted);font-size:.69rem;padding:9px 8px 1px;text-align:center;cursor:pointer;transition:color .22s ease}
+.pdf-card .pdf-summary-utility:hover{color:var(--text)}
+#zipExport{white-space:nowrap}
+</style>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1379,18 +1412,19 @@ html[data-ui-mode="studio"] .pdf-card {
     <button type="button" data-go="announcements" class="studio-side-link" aria-label="Announcements"><svg><use href="#i-megaphone"/></svg><span>Teacher Messages</span></button>
     <button type="button" data-go="saved" class="studio-side-link" aria-label="Saved PDFs"><svg><use href="#i-bookmark"/></svg><span>Saved PDFs</span></button>
   </div>
+  <div class="studio-nav-group studio-subject-group"><span class="studio-nav-caption">SUBJECTS</span><div class="studio-subject-list" id="studioSubjects" aria-label="Filter PDFs by subject"></div></div>
   <div class="studio-nav-group studio-nav-secondary"><span class="studio-nav-caption">YOUR TOOLS</span>
     <button type="button" data-go="timetable" class="studio-side-link" aria-label="Timetable"><svg><use href="#i-calendar"/></svg><span>Timetable</span></button>
     <button type="button" id="studioFocusLink" class="studio-side-link" aria-label="Focus Studio"><svg><use href="#i-clock"/></svg><span>Focus Studio</span></button>
     <button type="button" id="studioShortLinksLink" class="studio-side-link" aria-label="My Short Links"><svg><use href="#i-share"/></svg><span>My Short Links</span></button>
-<a href="/tasks" class="studio-side-link" aria-label="Automatic school To-Do"><svg><use href="#i-bookmark"/></svg><span>Auto To-Do</span></a>
-    <a href="/pdf.html" class="studio-side-link" aria-label="Advanced PDF Tools"><svg><use href="#i-file"/></svg><span>PDF Tools & ZIP</span></a>
+<button type="button" data-go="tasks" class="studio-side-link" aria-label="Automatic school To-Do"><svg><use href="#i-bookmark"/></svg><span>Auto To-Do</span></button>
+    <button type="button" data-go="zip" class="studio-side-link" aria-label="Export PDF ZIP"><svg><use href="#i-download"/></svg><span>Download PDFs as ZIP</span></button>
     <button type="button" id="studioAssistantLink" class="studio-side-link" aria-label="Ask 8aPDF AI"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3c4.9 0 8.5 3.4 8.5 7.8 0 4.6-3.8 8.3-8.5 8.3-1.1 0-2.2-.1-3.2-.5L4 21l.8-5.5A8 8 0 0 1 3.5 11C3.5 6.5 7.1 3 12 3Z"/><path d="M8.5 10.8h7m-7 3h4.4"/></svg><span>AI PDF Finder</span><kbd>FAST</kbd></button>
   </div>
   <div class="studio-side-end">
     <button type="button" id="studioSidebarSearch" class="studio-side-link" aria-label="Search PDFs"><svg><use href="#i-search"/></svg><span>Search Library</span><kbd>⌘ K</kbd></button>
     <button type="button" data-go="settings" class="studio-side-link" aria-label="Customize site"><svg><use href="#i-settings"/></svg><span>Customize</span></button>
-    <a href="/tasks" class="studio-side-link"><svg><use href="#i-bookmark"/></svg><span>My Tasks</span></a>
+    <button type="button" data-go="tasks" class="studio-side-link"><svg><use href="#i-bookmark"/></svg><span>My Tasks</span></button>
     <button type="button" data-go="about" class="studio-side-link" aria-label="About 8aPDF and automation"><svg><use href="#i-book"/></svg><span>About 8aPDF</span></button>
     <div class="studio-side-caption">Your study space, without the clutter.</div>
   </div>
@@ -1403,7 +1437,7 @@ html[data-ui-mode="studio"] .pdf-card {
   <button type="button" id="studioMobileMore" class="studio-mobile-item"><svg><use href="#i-menu"/></svg><span>More</span></button>
 </nav>
 <div class="studio-more-panel" id="studioMorePanel" hidden><div class="studio-more-title">Quick navigation <button type="button" id="studioCloseMore" aria-label="Close quick navigation">×</button></div>
-  <button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
+  <button type="button" data-go="tasks">Study To-Do</button><button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
 </div>
 <main>
 <section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1><span class="classic-title-main">Your Complete Study</span> <em class="classic-title-accent">Material Vault</em></h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p>
@@ -1439,23 +1473,23 @@ html[data-ui-mode="studio"] .pdf-card {
   <div class="focus-tools"><button type="button" class="experience-link" id="focusHistory">Study history</button><button type="button" class="experience-link" id="focusFullscreen">Distraction-free view</button><button type="button" class="experience-link" id="focusHelp">Keyboard shortcuts</button></div>
  </div>
 </div>
+<section class="shell widgets" id="dashboardWidgets">
+<div class="widget"><div class="widget-header"><svg><use href="#i-calendar"></use></svg><strong>Class Timetable</strong><select aria-label="Choose current school cycle day" class="timetable-day-select" id="daySelect"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"></use></svg><strong>Latest Teacher Messages</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-file"></use></svg><strong>Latest PDFs</strong><button data-go="latest">View All</button></div><div id="recentWidget"></div></div>
+<div class="widget"><div class="widget-header"><svg><use href="#i-book"></use></svg><strong>Quick Notes</strong><button id="clearCompleted" title="Clear checked tasks">Clear done</button></div><form class="notes-form" id="noteForm"><input aria-label="Add a new study task" id="newNote" placeholder="Write a quick study note..."/><button aria-label="Add note" type="submit"><svg><use href="#i-plus"></use></svg></button></form><div id="notesList"></div></div>
+</section>
+<section class="shell widgets" id="newSchoolPlanner" aria-label="Automatic study planner"><div class="widget"><div class="widget-header"><svg><use href="#i-calendar"/></svg><strong>Today's &amp; Tomorrow's Work</strong><button type="button" class="planner-go" data-go="tasks">All Tasks ↗</button></div><div id="smartDue" class="planner-list"><div class="load-state">Checking teacher messages…</div></div></div><div class="widget"><div class="widget-header"><svg><use href="#i-bookmark"/></svg><strong>Auto To-Do</strong><button type="button" class="planner-go" data-go="tasks">View all ↗</button></div><div id="smartTasks" class="planner-list"><div class="load-state">Loading teacher instructions…</div></div></div></section>
 <section class="section" id="library"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">EXPLORE STUDY MATERIAL</div><h2>Browse Our PDF Library</h2><p>Find notes, worksheets, previous year papers, practical files and more.</p></div><span class="count-text" id="pdfCount">Connecting to live PDFs…</span></div>
 <div class="school-term-toolbar" id="schoolTermBar" aria-label="Filter PDFs by school term">
   <div class="school-term-title"><span class="school-term-kicker">YOUR MATERIALS</span><strong>Term</strong><span id="termContext">From 29 Sep 2026</span></div>
   <div class="school-term-segment" role="group" aria-label="School term"><button data-school-term="term1" type="button" aria-pressed="false">Term 1</button><button data-school-term="term2" type="button" aria-pressed="true">Term 2</button><button data-school-term="undated" type="button" aria-pressed="false" hidden>Undated</button></div>
 </div>
 <div aria-label="Subject filters" class="filters" id="subjectFilters"><button class="chip active" data-subject="All Subjects">All Subjects</button></div>
-<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="default">Original Order</option><option value="new">Latest First</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
+<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><button type="button" id="zipExport" class="solid" style="min-height:36px;padding:7px 12px;font-size:.72rem">↓ Download ZIP</button><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="default">Original Order</option><option value="new">Latest First</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
 <div aria-live="polite" class="pdf-grid" id="pdfGrid"></div><div class="view-more" id="moreWrap"><button class="solid" id="morePdf">Load More PDFs ↓</button></div>
 </div></section>
 <section class="section" id="announcements" style="display:none"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">LATEST SCHOOL UPDATES</div><h2>Teacher Messages &amp; Notices</h2><p>Stay informed about circulars, events, homework and school notices.</p></div><span class="count-text" id="announcementCount">Loading…</span></div><div class="filters" id="announcementFilters"></div><div class="notice-grid" id="announcementGrid"></div><div class="view-more" id="moreAnnouncementsWrap" style="display:none"><button class="solid" id="moreAnnouncements">Load More Announcements ↓</button></div></div></section>
-<section class="shell widgets" id="dashboardWidgets">
-<div class="widget"><div class="widget-header"><svg><use href="#i-calendar"></use></svg><strong>Class Timetable</strong><select aria-label="Choose current school cycle day" class="timetable-day-select" id="daySelect"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"></use></svg><strong>Latest Teacher Messages</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-file"></use></svg><strong>Recent PDFs</strong><button data-go="latest">View All</button></div><div id="recentWidget"></div></div>
-<div class="widget"><div class="widget-header"><svg><use href="#i-book"></use></svg><strong>Quick Notes</strong><button id="clearCompleted" title="Clear checked tasks">Clear done</button></div><form class="notes-form" id="noteForm"><input aria-label="Add a new study task" id="newNote" placeholder="Write a quick study note..."/><button aria-label="Add note" type="submit"><svg><use href="#i-plus"></use></svg></button></form><div id="notesList"></div></div>
-</section>
-<section class="shell widgets" id="newSchoolPlanner" aria-label="Automatic study planner"><div class="widget"><div class="widget-header"><svg><use href="#i-calendar"/></svg><strong>Today's &amp; Tomorrow's Work</strong><a href="/tasks" class="planner-go">All Tasks ↗</a></div><div id="smartDue" class="planner-list"><div class="load-state">Checking teacher messages…</div></div></div><div class="widget"><div class="widget-header"><svg><use href="#i-bookmark"/></svg><strong>Auto To-Do</strong><a href="/tasks" class="planner-go">View all ↗</a></div><div id="smartTasks" class="planner-list"><div class="load-state">Loading teacher instructions…</div></div></div></section>
 <section class="studio-preview-links shell" id="studioPreviewLinks" aria-label="My Short Links preview">
  <div class="section-heading"><div><div class="heading-kicker">PERSONAL SHORT LINKS</div><h2>My Short Links</h2><p>Your created links will appear here when hosted on 8aPDF. This downloaded HTML is a layout preview.</p></div></div>
  <div class="studio-placeholder"><span>🔗</span><div><strong>Your public short links, in one place.</strong><p>On the live website you'll be able to open, copy, share and delete links. A local HTML file cannot access your live Vercel database.</p></div><button type="button" id="studioLinksBack">Back to library</button></div>
@@ -1781,18 +1815,74 @@ $('#schoolTermBar').addEventListener('click',event=>{
  const newTerm=button.dataset.schoolTerm;if(!['term1','term2','undated'].includes(newTerm)||newTerm===state.term)return;
  state.term=newTerm;store.set('8apdf_term_choice_v2',state.term);state.visible=12;state.filter='All Subjects';renderMaterials();
 });
-function card(x){const saved=state.saved.includes(x.id);return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(x.title)}">${safe(x.title)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button></div></article>`}
-function renderSubjectFilters(){const subs=['All Subjects',...new Set(termDocuments().map(x=>x.subject).filter(Boolean))].sort((a,b)=>a==='All Subjects'?-1:b==='All Subjects'?1:a.localeCompare(b));$('#subjectFilters').innerHTML=subs.map(s=>`<button class="chip ${s===state.filter?'active':''}" data-subject="${safe(s)}">${safe(s)}</button>`).join('')}
+function card(x){const saved=state.saved.includes(x.id);return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(x.title)}">${safe(x.title)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button></div><button class="pdf-summary-utility" data-pdf="summary" data-id="${safe(x.id)}" type="button">✧ Summarize PDF</button></article>`}
+function renderSubjectFilters(){const subs=['All Subjects',...new Set(state.materials.map(x=>x.subject).filter(Boolean))].sort((a,b)=>a==='All Subjects'?-1:b==='All Subjects'?1:a.localeCompare(b));$('#subjectFilters').innerHTML=subs.map(v=>'<button class="chip '+(v===state.filter?'active':'')+'" data-subject="'+safe(v)+'">'+safe(v)+'</button>').join('');const sidebar=$('#studioSubjects');if(sidebar)sidebar.innerHTML=subs.map(v=>'<button type="button" class="studio-side-link '+(v===state.filter?'active':'')+'" data-sidebar-subject="'+safe(v)+'"><svg><use href="#i-file"/></svg><span>'+safe(v)+'</span></button>').join('');}
 function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);renderTermSwitch();$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No PDFs match '+termTitle()+' in this '+(state.live?'library':'local preview')+'. '+(state.live?'Try another subject or check Undated PDFs.':'The downloaded preview contains archived October samples; live PDFs sync when hosted.')+'</div>';$('#pdfCount').textContent=state.live?`${termDocuments().length} PDFs · ${termTitle()}`:previewMode?`${termDocuments().length} archived PDFs · ${termTitle()}`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' '+termTitle()+' matches':previewMode?'Local HTML preview · Real PDFs sync on the hosted website':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
 function normalizeDoc(d){return{id:String(d.id),title:String(d.title||'Untitled Material'),subject:String(d.subject||'Other'),description:String(d.description||''),pdfUrl:String(d.pdf_url||''),className:String(d.class_name||''),chapter:String(d.chapter||''),language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],order:Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,createdAt:d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null}}
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
-async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Firestore data is required.');return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='https://8apdf.vercel.app/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks(x);return;}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
-$('#subjectFilters').onclick=e=>{let b=e.target.closest('[data-subject]');if(!b)return;state.filter=b.dataset.subject;state.visible=12;renderMaterials()};$('#morePdf').onclick=()=>{state.visible+=12;renderMaterials()};$('#sortSelect').onchange=e=>{state.sort=e.target.value;renderMaterials()};
+async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Firestore data is required.');return}if(what==='summary'){await summarizePdf(x);return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='https://8apdf.vercel.app/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks(x);return;}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
+
+async function createPdfZip(){
+ const button=$('#zipExport'),original=button?.textContent||'Download ZIP';
+ const files=sortedDocs().filter(x=>validURL(x.pdfUrl)).slice(0,10);
+ if(!files.length){toast('No PDFs available to export for the selected term/subject.');return}
+ if(button){button.disabled=true;button.textContent='Preparing ZIP…'}
+ try{
+  const {default:JSZip}=await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+  const zip=new JSZip();let total=0,count=0;
+  for(const [i,x] of files.entries()){
+   if(button)button.textContent='ZIP '+(i+1)+'/'+files.length;
+   try{
+    const response=await fetch('/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename=file.pdf');
+    if(!response.ok)continue;
+    const buffer=await response.arrayBuffer();
+    if(buffer.byteLength>12000000||total+buffer.byteLength>45000000)continue;
+    const name=String(x.title||'School PDF').replace(/[\\/:*?"<>|]+/g,'-').slice(0,65);
+    zip.file(String(i+1).padStart(2,'0')+'-'+name+'.pdf',buffer);total+=buffer.byteLength;count++;
+   }catch(error){console.warn('8aPDF ZIP skipped a file:',error?.message)}
+  }
+  if(!count)throw Error('PDF download service returned no files');
+  const output=await zip.generateAsync({type:'blob'});
+  const url=URL.createObjectURL(output),anchor=document.createElement('a');
+  anchor.href=url;anchor.download='8aPDF-'+state.term+'-batch.zip';document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  toast(count+' PDF'+(count===1?'':'s')+' saved as ZIP');
+ }catch(error){console.warn('8aPDF ZIP:',error);toast('ZIP export unavailable. You can still download PDFs individually.')}
+ finally{if(button){button.disabled=false;button.textContent=original}}
+}
+window.__8apdfZipExport=createPdfZip;
+$('#zipExport')?.addEventListener('click',createPdfZip);
+async function summarizePdf(x){
+ showModal('PDF Highlights','<p>Reading the first pages of this PDF…</p>');
+ const root=$('#modalContent');
+ try{
+  const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+  const response=await fetch('/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename=summary.pdf');
+  if(!response.ok)throw new Error('PDF download unavailable');
+  const buffer=await response.arrayBuffer();if(buffer.byteLength>12000000)throw new Error('Large PDF');
+  const pdf=await pdfjs.getDocument({data:new Uint8Array(buffer)}).promise;
+  const sentences=[];
+  for(let index=1;index<=Math.min(3,pdf.numPages);index++){
+   const page=await pdf.getPage(index),items=await page.getTextContent();
+   const text=items.items.map(x=>x.str||'').join(' ').replace(/\s+/g,' ').trim();
+   sentences.push(...text.split(/(?<=[.!?])\s+/).filter(v=>v.length>45&&v.length<360));
+  }
+  if(!$('#modal').classList.contains('open')||root!==$('#modalContent'))return;
+  const highlighted=[...new Set(sentences)].slice(0,5);
+  root.innerHTML='<p style="font-size:.8rem;color:var(--muted)">Extracted highlights from the first '+Math.min(3,pdf.numPages)+' pages · Not AI-generated.</p>'+
+     (highlighted.length?'<ul>'+highlighted.map(v=>'<li style="margin:10px 0">'+safe(v)+'</li>').join('')+'</ul>':'<p>This document may be scanned. Text extraction found no readable sentences.</p>');
+ }catch(error){
+  if(root===$('#modalContent')&&$('#modal').classList.contains('open'))
+   root.innerHTML='<p>Automatic extraction unavailable for this PDF. Use Preview to read the original.</p><p>'+safe(x.description||'')+'</p>';
+ }
+}
+
+$('#subjectFilters').onclick=e=>{let b=e.target.closest('[data-subject]');if(!b)return;state.filter=b.dataset.subject;state.visible=12;renderMaterials()};document.addEventListener('click',e=>{const b=e.target.closest('[data-sidebar-subject]');if(!b)return;state.filter=b.dataset.sidebarSubject;state.visible=12;showLibrary();renderMaterials();scrollToSection('#library');$('#studioSidebarClose')?.click()});$('#morePdf').onclick=()=>{state.visible+=12;renderMaterials()};$('#sortSelect').onchange=e=>{state.sort=e.target.value;renderMaterials()};
 function setLayout(l){settings.layout=l;setSettings()}$('#gridBtn').onclick=()=>setLayout('grid');$('#listBtn').onclick=()=>setLayout('list');
 $('#searchInput').oninput=e=>{state.query=e.target.value.trim();state.visible=12;renderMaterials();if($('#announcements').style.display!=='none')renderAnnouncements()};$('#searchForm').onsubmit=e=>{e.preventDefault();showLibrary();scrollToSection('#library')};
 $$('[data-search]').forEach(el=>el.onclick=()=>{$('#searchInput').value=el.dataset.search;$('#searchInput').dispatchEvent(new Event('input'));showLibrary();scrollToSection('#library')});
-function renderRecent(){const recent=state.recent.map(id=>state.materials.find(x=>x.id===id)).filter(Boolean).filter(x=>termOfPdf(x)===state.term);const list=recent.length?recent:termDocuments().slice(0,4);$('#recentWidget').innerHTML=list.slice(0,4).map(x=>`<button class="list-row" data-openpdf="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(x.subject)} · ${safe(fmtDate(x.createdAt))}</span></span></button>`).join('')||'<div class="load-state">No recent PDFs yet.</div>'}
+function renderRecent(){const list=termDocuments().slice().sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt)).slice(0,4);$('#recentWidget').innerHTML=list.slice(0,4).map(x=>`<button class="list-row" data-openpdf="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(x.subject)} · ${safe(fmtDate(x.createdAt))}</span></span></button>`).join('')||'<div class="load-state">No recent PDFs yet.</div>'}
 $('#recentWidget').onclick=e=>{let b=e.target.closest('[data-openpdf]');if(!b)return;const x=state.materials.find(i=>i.id===b.dataset.openpdf);if(x)pdfAction(x,'preview')};
 function showLibrary(){ $('#library').style.display='';$('#announcements').style.display='none';$$('[data-go]').forEach(x=>{if(x.classList.contains('nav-link'))x.classList.toggle('active',x.dataset.go==='library')}) }
 function showAnnouncements(){ $('#announcements').style.display='';$('#library').style.display='none';renderAnnouncements();scrollToSection('#announcements');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='announcements')) }
@@ -1827,7 +1917,7 @@ function showAbout8aPDF(){
  if(document.documentElement.dataset.studioMobileMenu==='open'&&closeSidebar)closeSidebar.click();
  showModal('About 8aPDF',content);
 }
-function nav(go){closeSettings();if(go==='about'){showAbout8aPDF();return}if(go==='timetable'){showTimetable();return}if(go==='settings'){openSettings();return}if(go==='announcements'){showAnnouncements();return}if(go==='saved'){showLibrary();state.filter='All Subjects';state.query='';$('#searchInput').value='';state.visible=10000;const a=state.materials.filter(x=>state.saved.includes(x.id)&&termOfPdf(x)===state.term);$('#pdfGrid').innerHTML=a.length?a.map(card).join(''):'<div class="empty">No saved PDFs yet. Use the bookmark icon on a PDF card to save it.</div>';$('#libraryStatus').textContent='Saved PDFs · '+a.length;$('#moreWrap').style.display='none';scrollToSection('#library');return}if(go==='search'){openCommand();return}if(go==='latest'){state.filter='All Subjects';state.query='';$('#searchInput').value='';state.sort='new';$('#sortSelect').value='new';showLibrary();renderMaterials();scrollToSection('#library');return}if(go==='home'){showLibrary();scrollToSection('#home');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='home'));return}if(go==='library'){showLibrary();renderMaterials();scrollToSection('#library')}}
+function nav(go){closeSettings();if(go==='tasks'){window.__8apdfOpenTasks?.();return}if(go==='zip'){window.__8apdfZipExport?.();return}if(go==='about'){showAbout8aPDF();return}if(go==='timetable'){showTimetable();return}if(go==='settings'){openSettings();return}if(go==='announcements'){showAnnouncements();return}if(go==='saved'){showLibrary();state.filter='All Subjects';state.query='';$('#searchInput').value='';state.visible=10000;const a=state.materials.filter(x=>state.saved.includes(x.id)&&termOfPdf(x)===state.term);$('#pdfGrid').innerHTML=a.length?a.map(card).join(''):'<div class="empty">No saved PDFs yet. Use the bookmark icon on a PDF card to save it.</div>';$('#libraryStatus').textContent='Saved PDFs · '+a.length;$('#moreWrap').style.display='none';scrollToSection('#library');return}if(go==='search'){openCommand();return}if(go==='latest'){state.filter='All Subjects';state.query='';$('#searchInput').value='';state.sort='new';$('#sortSelect').value='new';showLibrary();renderMaterials();scrollToSection('#library');return}if(go==='home'){showLibrary();scrollToSection('#home');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='home'));return}if(go==='library'){showLibrary();renderMaterials();scrollToSection('#library')}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;e.preventDefault();nav(b.dataset.go)});
 // Live Firestore announcements: same published / createdAt fields as in the existing 8aPDF code.
 function aText(x){return [x.title,x.description,x.category,x.subject,x.message,x.fullMessage].join(' ').toLowerCase()}
@@ -2398,7 +2488,7 @@ if(panel&&body){
 (()=>{
   'use strict';
   const KEY='__8apdf_page_route_v1';
-  const ROUTES=new Set(['/','/pdfs','/announcements','/updates','/settings','/chatbot']);
+  const ROUTES=new Set(['/','/pdfs','/announcements','/updates','/settings','/chatbot','/tasks']);
   const homeTitle=document.title;
   const TITLES={
     '/':homeTitle,
@@ -2406,7 +2496,8 @@ if(panel&&body){
     '/updates':'Teacher Messages | 8aPDF',
     '/pdfs':'PDF Library | 8aPDF',
     '/settings':'Settings | 8aPDF',
-    '/chatbot':'AI PDF Finder | 8aPDF'
+    '/chatbot':'AI PDF Finder | 8aPDF',
+    '/tasks':'My Study To-Do | 8aPDF'
   };
   const page=()=>ROUTES.has(location.pathname.replace(/\/+$/,'')||'/')?(location.pathname.replace(/\/+$/,'')||'/'):'/';
   const byId=id=>document.getElementById(id);
@@ -2442,10 +2533,13 @@ if(panel&&body){
     try{
       if(path!=='/chatbot'&&visibleChat())quietClick('pdfAiClose');
       if(path!=='/settings'&&visibleSettings())quietClick('closeSettings');
+      if(path!=='/tasks'&&byId('fullTaskCenter'))quietClick('modalClose');
       if(path==='/chatbot'){
         if(!visibleChat())quietClick('studioAssistantLink');
       }else if(path==='/settings'){
         if(!visibleSettings())quietClick('settingsBtn');
+      }else if(path==='/tasks'){
+        requestAnimationFrame(()=>window.__8apdfOpenTasks?.());
       }else{
         const bridge=window.__8apdfStudyBridge;
         if(bridge?.navigate)bridge.navigate(path==='/announcements'||path==='/updates'?'announcements':path==='/pdfs'?'library':'home');
@@ -2462,7 +2556,7 @@ if(panel&&body){
     leavingOverlay=true;
     const route=page();
     const previous=history.state?.[KEY]?.previous;
-    if((route==='/chatbot'||route==='/settings')&&ROUTES.has(previous)&&previous!==route){
+    if((route==='/chatbot'||route==='/settings'||route==='/tasks')&&ROUTES.has(previous)&&previous!==route){
       history.back();
     }else{
       routeTo('/',true);
@@ -2482,6 +2576,7 @@ if(panel&&body){
       if(visibleChat())quietClick('pdfAiClose');
       routeTo('/settings');return;
     }
+    if(matches('#modalClose')&&page()==='/tasks'){leaveOverlay();return;}
     if(matches('#pdfAiClose,#pdfAiShade,#closeSettings,#settingsBack,#saveSettings,#drawerMask,#pdfAiBack')){
       if(page()==='/chatbot'||page()==='/settings')leaveOverlay();
       return;
@@ -2490,6 +2585,7 @@ if(panel&&body){
     if(nav){
       const dest=nav.getAttribute('data-go');
       if(dest==='announcements'){routeTo('/announcements');return;}
+      if(dest==='tasks'){routeTo('/tasks');return;}
       if(dest==='library'){routeTo('/pdfs');return;}
       if(['home','saved','latest'].includes(dest)){routeTo('/');return;}
     }
@@ -2731,6 +2827,68 @@ document.getElementById('newSchoolPlanner')?.addEventListener('change',e=>{
  try{localStorage.setItem('8a_auto_done_v1',JSON.stringify(current))}catch{}
  draw();
 });
+
+function personalTasks(){try{const x=JSON.parse(localStorage.getItem('8apdf_tasks_v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}}
+function paintTaskModal(){
+ const root=document.getElementById('fullTaskCenter');if(!root)return;
+ const automatic=buildTasks(),personal=personalTasks(),checked=done();
+ const row=(t,own)=>{
+   const id=String(t.id||'');
+   const complete=own?!!t.done:!!checked[id];
+   return '<label class="planner-task">'+
+      '<input type="checkbox" '+(own?'data-personal-todo="':'data-all-autotodo="')+safe(id)+'" '+(complete?'checked':'')+'>'+
+      '<span><strong style="'+(complete?'text-decoration:line-through;opacity:.62':'')+'">'+safe(own?t.text:t.text)+'</strong>'+
+      '<small>'+safe(own?'Your note':(t.due||'No deadline supplied')+' · '+t.subject)+'</small></span>'+
+      (own?'<button type="button" class="planner-delete" data-remove-personal="'+safe(id)+'" aria-label="Remove personal task">×</button>':'')+
+      '</label>';
+ };
+ root.innerHTML='<div class="planner-modal-intro">✔ Tick a task when it is done. Completion is saved on this device.</div>'+
+ '<h3>Teacher-assigned tasks <small>('+automatic.length+')</small></h3>'+
+ (automatic.length?automatic.map(x=>row(x,false)).join(''):'<div class="planner-empty">No actionable teacher instructions detected.</div>')+
+ '<h3>My own to-dos <small>('+personal.length+')</small></h3>'+
+ '<form id="plannerAddTask"><input required id="plannerNewText" maxlength="170" aria-label="New task" placeholder="e.g. Finish Science chapter 8" /><button type="submit" class="solid">Add task</button></form>'+
+ (personal.length?personal.map(x=>row(x,true)).join(''):'<div class="planner-empty">Add your first personal task above.</div>');
+}
+function openTaskCenter(){
+ const modal=document.getElementById('modal');if(!modal)return;
+ document.getElementById('modalTitle').textContent='My Study To-Do';
+ document.getElementById('modalContent').innerHTML='<div id="fullTaskCenter"></div>';
+ document.getElementById('modalActions').innerHTML='';
+ modal.classList.add('open');modal.setAttribute('aria-hidden','false');
+ document.body.classList.add('no-scroll');
+ paintTaskModal();
+}
+window.__8apdfOpenTasks=openTaskCenter;
+document.getElementById('modal')?.addEventListener('change',event=>{
+ if(!document.getElementById('fullTaskCenter'))return;
+ const input=event.target;
+ if(input.matches('[data-all-autotodo]')){
+   const status=done();status[input.dataset.allAutotodo]=input.checked;
+   try{localStorage.setItem('8a_auto_done_v1',JSON.stringify(status))}catch{}
+   draw();paintTaskModal();
+ }
+ if(input.matches('[data-personal-todo]')){
+   const existing=document.querySelector('#notesList input[data-task-check="'+input.dataset.personalTodo+'"]');
+   if(existing){existing.checked=input.checked;existing.dispatchEvent(new Event('change',{bubbles:true}))}
+   paintTaskModal();
+ }
+});
+document.getElementById('modal')?.addEventListener('click',event=>{
+ if(!document.getElementById('fullTaskCenter'))return;
+ const button=event.target.closest('[data-remove-personal]');
+ if(!button)return;
+ const original=document.querySelector('#notesList button[data-task-delete="'+button.dataset.removePersonal+'"]');
+ original?.click();paintTaskModal();
+});
+document.getElementById('modal')?.addEventListener('submit',event=>{
+ if(event.target.id!=='plannerAddTask')return;
+ event.preventDefault();
+ const field=document.getElementById('plannerNewText'),text=field?.value.trim();
+ if(!text)return;
+ const original=document.getElementById('newNote'),form=document.getElementById('noteForm');
+ if(original&&form){original.value=text;form.requestSubmit();paintTaskModal()}
+});
+
 draw();
 })();
 </script></body>
