@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/announcements",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/chatbot",
+      "destination": "/index.html"
+    },
+    {
       "source": "/:slug([a-zA-Z0-9-]{3,32})",
       "destination": "/api/redirect?slug=:slug"
     }
