@@ -1,7 +1,7 @@
 // Authenticated manual PDF upload. Never allow unlimited public uploads by default.
 // Required Vercel environment variables: PDF_UPLOAD_TOKEN, BLOB_READ_WRITE_TOKEN.
 import {put} from '@vercel/blob';
-import {randomBytes,timingSafeEqual} from 'node:crypto';
+import {randomBytes,timingSafeEqual,createHash} from 'node:crypto';
 export const config={api:{bodyParser:false}};
 const MAX=4*1024*1024;
 function send(res,status,obj){return res.status(status).setHeader('Cache-Control','no-store').json(obj)}
@@ -20,7 +20,8 @@ export default async function handler(req,res){
  const slug='p'+randomBytes(7).toString('hex');
  try{
   const blob=await put(`shared-pdfs/${slug}.pdf`,file,{access:'public',addRandomSuffix:false,allowOverwrite:false,contentType:'application/pdf',cacheControlMaxAge:31536000});
-  const record=JSON.stringify({version:2,slug,documentId:null,url:blob.url,title:name,ownerHash:'manual-file',createdAt:new Date().toISOString()});
+  const ownerKey=String(req.headers['x-owner-key']||'');const ownerHash=/^[a-f0-9]{64}$/.test(ownerKey)?createHash('sha256').update(ownerKey).digest('hex'):'manual-file';
+  const record=JSON.stringify({version:2,slug,documentId:null,url:blob.url,title:name,ownerHash,createdAt:new Date().toISOString()});
   await put(`short-links/v1/${slug}.json`,record,{access:'public',addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60});
   return send(res,201,{shortUrl:`/${slug}`,pdfUrl:blob.url,title:name});
  }catch(e){console.error('8aPDF upload error',String(e));return send(res,502,{error:'PDF hosting or short-link storage is unavailable. Check Vercel Blob storage connection.'})}
