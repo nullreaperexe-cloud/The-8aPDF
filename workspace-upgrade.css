@@ -89,3 +89,6 @@ html[data-ws-boost="on"] .pdf-card:hover,html[data-ws-boost="on"] .widget:hover{
 }
 @media(max-width:370px){html[data-ui-mode="studio"] .top-nav>.brand{font-size:.83rem!important} html[data-ui-mode="studio"] .top-nav .round-btn{width:32px!important} .ws-dialog .ws-cols{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.ws-dialog,.ws-overlay{animation:none!important}html[data-ui-mode="studio"] .pdf-summary-utility{transition:none!important}}
+
+html[data-ui-mode="studio"] #newSchoolPlanner:not(:has(>.widget:not(.ws-hidden-widget))){display:none!important}
+html[data-ui-mode="studio"] #dashboardWidgets:not(:has(>.widget:not(.ws-hidden-widget))){display:none!important}
