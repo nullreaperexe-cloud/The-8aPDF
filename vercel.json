@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "^/([a-zA-Z0-9-]{3,32})$", "destination": "/api/redirect?slug=$1" }
+    {
+      "source": "/:slug([a-zA-Z0-9-]{3,32})",
+      "destination": "/api/redirect?slug=:slug"
+    }
   ]
 }
