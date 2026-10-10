@@ -96,3 +96,11 @@ html[data-ui-mode="studio"] #dashboardWidgets:not(:has(>.widget:not(.ws-hidden-w
 html[data-ui-mode="studio"] .studio-nav-secondary [data-go="tasks"],
 html[data-ui-mode="studio"] .studio-nav-secondary [data-go="zip"],
 html[data-ui-mode="studio"] .studio-side-end [data-go="tasks"]{display:none!important}
+/* Mobile upload layout and centered home edit control */
+.ws-dialog .ws-file-field{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ws-dialog .ws-file-field label{display:block;white-space:normal;overflow-wrap:normal;font-size:.85rem;font-weight:650}
+.ws-dialog .ws-file-field label small{display:block;font-size:.7rem;font-weight:400;color:var(--muted);margin-top:3px}
+.ws-dialog .ws-file-field input[type=file]{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow:hidden}
+html[data-ui-mode="studio"] #workspaceHomeActions{justify-content:center!important;width:100%;margin:16px auto!important}
+html[data-ui-mode="studio"] #workspaceHomeActions .ws-quiet{min-width:175px;text-align:center}
+@media(max-width:600px){.ws-dialog .ws-file-field{gap:12px}.ws-dialog .ws-file-field input[type=file]{font-size:12px!important}}
