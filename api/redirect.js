@@ -18,7 +18,7 @@ export default async function handler(req,res) {
       return res.status(404).send('Invalid 8aPDF short link.');
     }
     res.setHeader('Location',u.toString());
-    res.setHeader('Cache-Control','public, max-age=60');
+    res.setHeader('Cache-Control','no-store, max-age=0');
     res.setHeader('X-Content-Type-Options','nosniff');
     return res.status(302).end();
   } catch(error) {
