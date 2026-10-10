@@ -2194,7 +2194,7 @@ if(panel&&body){
   const page=()=>ROUTES.has(location.pathname.replace(/\/+$/,'')||'/')?(location.pathname.replace(/\/+$/,'')||'/'):'/';
   const byId=id=>document.getElementById(id);
   let applying=false;
-  let lastClick=0;
+  let leavingOverlay=false;
 
   function quietClick(id){
     const el=byId(id);
@@ -2241,7 +2241,8 @@ if(panel&&body){
     }finally{applying=false}
   }
   function leaveOverlay(){
-    if(applying)return;
+    if(applying||leavingOverlay)return;
+    leavingOverlay=true;
     const route=page();
     const previous=history.state?.[KEY]?.previous;
     if((route==='/chatbot'||route==='/settings')&&ROUTES.has(previous)&&previous!==route){
@@ -2249,6 +2250,7 @@ if(panel&&body){
     }else{
       routeTo('/',true);
       showRoute('/');
+      queueMicrotask(()=>{leavingOverlay=false});
     }
   }
   document.addEventListener('click',event=>{
@@ -2283,7 +2285,7 @@ if(panel&&body){
       leaveOverlay();
     }
   });
-  window.addEventListener('popstate',()=>showRoute(page()));
+  window.addEventListener('popstate',()=>{leavingOverlay=false;showRoute(page())});
   const initial=page();
   if(!history.state?.[KEY])history.replaceState(preserveState(initial,null),'',location.href);
   setTitle(initial);
