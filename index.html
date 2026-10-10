@@ -1275,7 +1275,45 @@ html[data-ui-mode="studio"] .pdf-card {
     -webkit-appearance:none;
     appearance:none;
   }
-  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-welcome{display:none!important}
+  /* Keep the main heading visible while keyboard is open, but compact the artwork. */
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome:not([hidden]){
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:auto!important;
+    padding:6px 10px!important;
+    gap:6px!important;
+    width:100%;
+    min-height:0;
+    text-align:center;
+    animation:none!important;
+  }
+  /* Never resurrect the welcome above actual search results. */
+  #pdfAiLayer #pdfAiWelcome[hidden]{display:none!important}
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome .ai-welcome-logo{
+    width:44px!important;height:44px!important;
+    border-radius:13px!important;
+    margin:0 auto 7px!important;
+  }
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome .ai-welcome-kicker{
+    font-size:.59rem!important;letter-spacing:.1em!important;
+  }
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome h1{
+    font-size:clamp(1.4rem,6vw,1.9rem)!important;
+    line-height:1.17!important;
+    letter-spacing:-.045em!important;
+    max-width:100%;
+    margin:3px 0 0!important;
+    text-align:center!important;
+    text-wrap:balance;
+  }
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome>p,
+  #pdfAiLayer[data-ai-keyboard="open"] #pdfAiWelcome .pdf-ai-quick{display:none!important}
+  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-feed{
+    padding-top:10px!important;
+    padding-bottom:10px!important;
+  }
   #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-caption{display:none!important}
   #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-bottom {
     padding:8px 11px max(8px,env(safe-area-inset-bottom))!important;
