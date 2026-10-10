@@ -14,8 +14,16 @@ function json(res, code, payload) {
   res.setHeader('X-Content-Type-Options','nosniff');
   return res.status(code).json(payload);
 }
-function isBlobModeMismatch(error){const message=String(error?.message||'');return /\b(public|private)\b/i.test(message)&&/\b(access|store|mode|blob)\b/i.test(message)}
-async function existing(slug) { const pathname=`${ROOT}${slug}.json`;try{const item=await get(pathname,{access:'private'});if(item)return item}catch(error){if(!isBlobModeMismatch(error))throw error}try{return await get(pathname,{access:'public'})}catch(error){if(isBlobModeMismatch(error))return null;throw error} }
+function isConflict(error){return /already exists|BlobAlreadyExists|pathname is already|\b409\b/i.test(String(error?.name)+' '+String(error?.message))}
+function storageError(operation,error){const e=new Error('Blob '+operation+' unavailable');e.code='STORAGE_UNAVAILABLE';e.cause=error;return e}
+async function existing(slug){
+  const pathname=ROOT+slug+'.json';
+  try{return await get(pathname,{access:'private'})}
+  catch(firstError){
+    try{return await get(pathname,{access:'public'})}
+    catch(secondError){throw storageError('read',secondError)}
+  }
+}
 function ownerHash(value) {
   if (typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value)) return null;
   return createHash('sha256').update(value).digest('hex');
@@ -48,20 +56,40 @@ async function myLinks(hash) {
   return output.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
-async function findPublishedPdf(id) {
-  if (typeof id !== 'string' || !/^[\w-]{1,160}$/.test(id)) return null;
-  const endpoint = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/study_materials/${encodeURIComponent(id)}?key=${PUBLIC_FIREBASE_KEY}`;
-  const response = await fetch(endpoint, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(8000) });
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Firestore verification failed: ${response.status}`);
-  const data = await response.json();
-  const raw = data.fields?.pdf_url?.stringValue;
-  if (typeof raw !== 'string') return null;
+function trustedSchoolPdf(input) {
   try {
-    const target = new URL(raw);
-    if (target.protocol !== 'https:' || !target.hostname.includes('.') || target.username || target.password) return null;
-    return {url:target.toString(),title:String(data.fields?.title?.stringValue||'School PDF').slice(0,180)};
-  } catch { return null; }
+    const url=new URL(String(input||''));
+    return url.protocol==='https:' && url.hostname==='edusecure.org' &&
+      /^\/ManavMangal88\/StudentInfo\/Homework\/[a-f0-9]{32}\.pdf$/i.test(url.pathname) &&
+      !url.search && !url.hash && !url.username && !url.password ? url.toString() : null;
+  } catch { return null }
+}
+async function findPublishedPdf(id,originalUrl) {
+  if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id))return null;
+  const trusted=trustedSchoolPdf(originalUrl);
+  const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+PUBLIC_FIREBASE_KEY;
+  let response;
+  try {
+    response=await fetch(endpoint,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(trusted?3500:8000)});
+  }catch(error){
+    if(trusted)return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
+    const e=new Error('School library API unavailable');e.code='LIBRARY_UNAVAILABLE';e.cause=error;throw e;
+  }
+  if(response.status===404)return null;
+  if(!response.ok){
+    if((response.status===400||response.status===401||response.status===403||response.status===429||response.status>=500)&&trusted)
+      return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
+    const e=new Error('School library verification failed: '+response.status);e.code='LIBRARY_UNAVAILABLE';throw e;
+  }
+  const data=await response.json();
+  const raw=data.fields?.pdf_url?.stringValue;
+  if(typeof raw!=='string')return null;
+  try {
+    const url=new URL(raw);
+    if(url.protocol!=='https:'||!url.hostname.includes('.')||url.username||url.password)return null;
+    if(originalUrl&&new URL(String(originalUrl)).toString()!==url.toString())return null;
+    return {url:url.toString(),title:String(data.fields?.title?.stringValue||'School PDF').slice(0,180),verifiedBy:'firestore'};
+  } catch { return null }
 }
 
 export default async function handler(req, res) {
@@ -75,7 +103,7 @@ export default async function handler(req, res) {
     const hash=ownerHash(req.body?.ownerKey);
     if(!hash)return json(res,400,{error:'Missing link-manager ownership key.'});
     try{return json(res,200,{links:await myLinks(hash)});}
-    catch(e){console.error('8aPDF links list:',e);return json(res,503,{error:'Could not load your links right now.'});}
+    catch(e){console.error('8aPDF links list:',e);return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});}
   }
   const slug = normalize(req.method === 'GET' ? req.query.slug : req.body?.slug);
   if (!validSlug(slug)) return json(res,400,{error:'Use 3–32 characters: lowercase letters, numbers and single hyphens. Some names are reserved.'});
@@ -97,23 +125,31 @@ export default async function handler(req, res) {
     }
     if(action!=='create')return json(res,400,{error:'Unknown action.'});
     const docId = req.body?.documentId;
-    const verified = await findPublishedPdf(docId);
+    const verified = await findPublishedPdf(docId,req.body?.pdfUrl);
     if (!verified) return json(res,422,{error:'This PDF could not be verified in the live 8aPDF library.'});
     if (await existing(slug)) return json(res,409,{error:'This name is already used'});
     const record = JSON.stringify({version:2,slug,documentId:docId,url:verified.url,title:verified.title,ownerHash:hash,createdAt:new Date().toISOString()});
     try {
       const options={addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60};
-      try{await put(`${ROOT}${slug}.json`,record,{...options,access:'private'})}
-      catch(error){if(!isBlobModeMismatch(error))throw error;await put(`${ROOT}${slug}.json`,record,{...options,access:'public'})}
+      try{await put(ROOT+slug+'.json',record,{...options,access:'private'})}
+      catch(error){
+        if(isConflict(error))throw error;
+        try{await put(ROOT+slug+'.json',record,{...options,access:'public'})}
+        catch(second){
+          if(isConflict(second))throw second;
+          throw storageError('write',second);
+        }
+      }
     } catch (error) {
-      if (/already exists|BlobAlreadyExists|pathname is already/i.test(String(error?.name)+' '+String(error?.message))) {
+      if (isConflict(error)) {
         return json(res,409,{error:'This name is already used'});
       }
       throw error;
     }
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
-    console.error('8aPDF short-link API:',error?.message || error);
-    return json(res,503,{error:'Short-link service is temporarily unavailable. Please try again.'});
+    console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
+    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'Could not verify this PDF in the school library. Use Original PDF Link or retry later.'});
+    return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});
   }
 }

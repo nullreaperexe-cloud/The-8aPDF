@@ -129,7 +129,7 @@
     });
     button.addEventListener('click',async()=>{const slug=normalize(input.value);if(!available||slug!==checkedSlug)return;
       button.disabled=true;button.textContent='Creating…';setMessage('Saving your unique link…');
-      try{const r=await fetch('/api/short-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,documentId:current.id,ownerKey:ownerKey()})});const data=await r.json();if(!r.ok){setMessage(data.error||'Could not create your short link','bad');button.textContent='Create Short Link';button.disabled=!available;if(r.status===409){available=false;button.disabled=true;}return}
+      try{const r=await fetch('/api/short-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,documentId:current.id,pdfUrl:current.pdfUrl,ownerKey:ownerKey()})});const data=await r.json();if(!r.ok){setMessage(data.error||'Could not create your short link','bad');button.textContent='Create Short Link';button.disabled=!available;if(r.status===409){available=false;button.disabled=true;}return}
         created(data.shortUrl);loadLinks();
       }catch{setMessage('Connection failed. Check internet and retry.','bad');button.disabled=false;button.textContent='Create Short Link'}
     });
