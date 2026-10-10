@@ -3,5 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "dependencies": { "@vercel/blob": "^2.3.0" }
+  "dependencies": {
+    "@vercel/blob": "^2.3.0"
+  },
+  "scripts": {
+    "test": "node --check workspace-upgrade.js && node --check api/pdf-summarize.js && node --check api/upload-pdf.js && node --check short-links-ui.js && node tests/workspace.test.cjs"
+  }
 }

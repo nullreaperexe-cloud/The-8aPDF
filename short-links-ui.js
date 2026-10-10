@@ -111,9 +111,35 @@
     try{await navigator.clipboard.writeText(url);setMessage('Link copied to clipboard','good');return true}
     catch{window.prompt('Copy the PDF link:',url);return false}
   }
-  function choices(){setBody(`<p class="sl-sub">${esc(current.title)}</p><button type="button" class="sl-option" id="slOriginal"><span><strong>Original PDF Link</strong><small>Open your phone’s native share sheet, or copy the original PDF URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slCustom"><span><strong>Create Custom Short Link</strong><small>Choose your own name, like <b>8apdf.vercel.app/goku</b>.</small></span><span class="sl-arrow">→</span></button>`);
+  function choices(){setBody(`<p class="sl-sub">${esc(current.title)}</p><button type="button" class="sl-option" id="slOriginal"><span><strong>Original PDF Link</strong><small>Open your phone’s native share sheet, or copy the original PDF URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slSendActual"><span><strong>Send Entire PDF File</strong><small>Share the full downloadable PDF via your phone’s share sheet, not just its URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slCustom"><span><strong>Create Custom Short Link</strong><small>Choose your own name, like <b>8apdf.vercel.app/goku</b>.</small></span><span class="sl-arrow">→</span></button>`);
     body.querySelector('#slOriginal').addEventListener('click',()=>shareNative(current.pdfUrl,current.title));
     body.querySelector('#slCustom').addEventListener('click',nameForm);
+    body.querySelector('#slSendActual').addEventListener('click',sendEntirePdf);
+  }
+  async function sendEntirePdf(){
+    if(!current?.pdfUrl)return;
+    const item={...current};
+    setBody('<p class="sl-sub">Preparing the complete PDF file…</p><div class="sl-info" id="slAvailability" aria-live="polite">Downloading original PDF securely.</div><button type="button" class="sl-cta sl-outline" id="slBack">Back</button>');
+    body.querySelector('#slBack').onclick=choices;
+    try{
+      const url='/api/download?url='+encodeURIComponent(item.pdfUrl)+'&filename='+encodeURIComponent(item.title+'.pdf');
+      const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),20000);
+      let response;try{response=await fetch(url,{signal:ctrl.signal})}finally{clearTimeout(timeout)}
+      if(!response.ok)throw Error('PDF file could not be downloaded ('+response.status+').');
+      const pdfBlob=await response.blob();
+      if(!pdfBlob.size||pdfBlob.size>45*1024*1024)throw Error('PDF file too large for direct sharing (45 MB maximum).');
+      const file=new File([pdfBlob],(item.title||'8aPDF').replace(/[\\/:*?"<>|]/g,'-').slice(0,90)+'.pdf',{type:'application/pdf'});
+      if(navigator.canShare?.({files:[file]})&&navigator.share){
+        try{await navigator.share({files:[file],title:item.title,text:'Shared from 8aPDF'})}
+        catch(e){if(e.name!=='AbortError')throw e}
+        choices();return;
+      }
+      const objectURL=URL.createObjectURL(file),link=document.createElement('a');
+      link.href=objectURL;link.download=file.name;document.body.append(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectURL),20000);
+      setMessage('Your complete PDF was downloaded. Attach this file to WhatsApp or any app to send it.','good');
+      body.querySelector('#slBack').textContent='Back to sharing';
+    }catch(e){setMessage('Could not share full PDF: '+e.message,'bad')}
   }
   function nameForm(){available=false;checkedSlug='';setBody(`<p class="sl-sub">Choose a unique short name for <strong>${esc(current.title)}</strong>.</p><label class="sl-label" for="slSlug">Your custom link name</label><div class="sl-slugbox"><span class="sl-domain">8apdf.vercel.app/</span><input id="slSlug" class="sl-field" maxlength="32" placeholder="goku" autocomplete="off" autocapitalize="off" spellcheck="false"/></div><p id="slAvailability" class="sl-info" aria-live="polite">3–32 characters · letters, numbers and hyphens.</p><div class="sl-actions"><button type="button" class="sl-cta sl-outline" id="slBack">Back</button><button type="button" class="sl-cta" id="slCreate" disabled>Create Short Link</button></div><p class="sl-slow">Names are public and permanently reserved after creation. Links point only to PDFs in the school library.</p>`);
     const input=body.querySelector('#slSlug'),button=body.querySelector('#slCreate');
