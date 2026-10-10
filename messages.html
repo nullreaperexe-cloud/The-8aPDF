@@ -50,6 +50,46 @@ html[data-motion=off] .page,html[data-motion=off] .pdf-card,html[data-motion=off
 
 
 @media(max-width:760px){.topbar{display:flex;width:100%;max-width:100vw;min-width:0;overflow:hidden;gap:8px!important}.topbar>div:nth-child(2){flex:0 0 auto;max-width:79px;min-width:0}.topbar .global-search{flex:1 1 0;min-width:0!important;width:0!important;max-width:none!important;margin:0!important}.topbar-right{flex:0 0 34px;min-width:34px}.topbar .global-search input{width:100%;min-width:0;overflow:hidden}.topbar .global-search button{padding-inline:4px;flex-shrink:0}}
+</style>
+<style id="8apdf-premium-classic-pages">
+:root{--radius:26px;font-family:'Space Grotesk',Inter,system-ui,-apple-system,sans-serif}
+body{font-family:'Space Grotesk',Inter,system-ui,-apple-system,sans-serif;overflow-x:hidden;background:var(--bg)}
+html{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar,.sidebar::-webkit-scrollbar,.side-nav::-webkit-scrollbar,.sidebar *::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
+.sidebar,.side-nav{scrollbar-width:none!important;overflow-x:hidden!important}
+.sidebar{background:var(--bg);min-width:0}
+.sidebar .row,.sidebar .navcaption{min-width:0}
+.nav-item,.subject-item{flex-shrink:0;white-space:normal;line-height:1.3;border-radius:13px;transition:background .3s,color .3s,transform .35s cubic-bezier(.2,.8,.2,1)}
+.nav-item:hover,.subject-item:hover{transform:translateX(2px)}
+.nav-item>span,.subject-item>span{min-width:0}
+.side-foot{flex-shrink:0;overflow-wrap:anywhere}
+.topbar{max-width:100%;overflow:hidden;border-bottom:1px solid var(--border)}
+.page{max-width:100%;min-width:0}
+.panel,.pdf-card,.list-row,.day-card,.setting{border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 6px 22px rgba(0,0,0,.055)}
+.pdfs{gap:15px}
+.pdf-card,.list-row,.panel{transition:transform .53s cubic-bezier(.19,1,.22,1),box-shadow .53s cubic-bezier(.19,1,.22,1),border-color .36s ease}
+.pdf-card:hover,.list-row:hover{transform:translateY(-5px);box-shadow:0 16px 45px rgba(0,0,0,.23);border-color:color-mix(in srgb,var(--fg) 25%,var(--border))}
+.pdf-card{padding:20px;min-height:230px;gap:5px}
+.pdf-card h3{font-size:clamp(.92rem,1.18vw,1.04rem);line-height:1.46;letter-spacing:-.025em}
+.pdf-card p{line-height:1.65}
+.pdf-card .actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:auto}
+.pdf-card .actions .span2{grid-column:span 2}
+.btn{border-radius:11px;transition:background .2s,transform .28s cubic-bezier(.19,1,.22,1),box-shadow .3s}
+.btn:hover{transform:translateY(-1px)}
+.h1{font-weight:770;letter-spacing:-.063em}
+.eyebrow{letter-spacing:.12em}
+.headline h2{font-weight:740;letter-spacing:-.043em}
+input,select,textarea{min-width:0}
+@media(max-width:760px){
+ .topbar{width:100%!important;max-width:100vw!important;box-sizing:border-box;padding-inline:14px}
+ .sidebar{max-height:100dvh}
+ .page{width:calc(100% - 32px);padding-top:24px}
+ .panel{padding:18px}
+ .pdf-card{padding:21px;gap:9px}
+ .pdfs{gap:19px}
+ .btn{min-height:42px}
+ .bottom-nav{width:100%;max-width:100vw;box-sizing:border-box}
+}
+@media(prefers-reduced-motion:reduce){.pdf-card,.list-row,.panel,.btn{transition:none!important;transform:none!important}}
 </style></head><body><div class="scrim" id="scrim"></div><div class="app"><aside class="sidebar" id="sidebar"><div class="row"><a href="/" class="brand"><span class="brand-logo" aria-label="8aPDF icon"></span>8aPDF</a><button class="navicon drawer-close" id="closeSidebar" aria-label="Close sidebar">×</button></div><div class="navcaption">Workspace</div><nav class="side-nav" id="navItems"></nav><div class="navcaption">Subjects</div><nav class="side-nav" id="sidebarSubjects"><a class="subject-item" href="/pdf.html?subject=All%20Subjects"><span class="nav-icon">▦</span>All Subjects</a><a class="subject-item" href="/pdf.html?subject=English"><span class="nav-icon">▦</span>English</a><a class="subject-item" href="/pdf.html?subject=Mathematics"><span class="nav-icon">▦</span>Mathematics</a><a class="subject-item" href="/pdf.html?subject=Hindi"><span class="nav-icon">▦</span>Hindi</a><a class="subject-item" href="/pdf.html?subject=Computer"><span class="nav-icon">▦</span>Computer</a><a class="subject-item" href="/pdf.html?subject=Science"><span class="nav-icon">▦</span>Science</a><a class="subject-item" href="/pdf.html?subject=Social%20Science"><span class="nav-icon">▦</span>Social Science</a><a class="subject-item" href="/pdf.html?subject=Punjabi"><span class="nav-icon">▦</span>Punjabi</a><a class="subject-item" href="/pdf.html?subject=Art"><span class="nav-icon">▦</span>Art</a><a class="subject-item" href="/pdf.html?subject=Circular"><span class="nav-icon">▦</span>Circular</a></nav><div class="spacer"></div><div class="side-foot">School study workspace · <a href="/settings.html"><u>Customize in Settings</u></a></div></aside><div class="main"><header class="topbar"><button class="navicon" id="menuToggle" aria-label="Open menu">☰</button><div><div class="top-title">Teacher Messages</div><div class="top-sub">8aPDF · Study Workspace</div></div><form class="global-search" action="/pdf.html" method="get" role="search"><span aria-hidden="true">⌕</span><input type="search" name="q" placeholder="Search PDFs, subjects or chapters…" aria-label="Search study materials"><button type="submit" title="Search PDFs" aria-label="Search PDFs">↗</button></form><div class="topbar-right"><a href="/messages.html" class="btn small flat" aria-label="Teacher messages" title="Teacher messages">♧</a><a href="/settings.html" class="btn small flat desktop-only">⚙ Settings</a><a href="/chatbot" class="btn small primary"><span class="label-full">✦ Ask AI</span><span class="mobile-only">✦ AI</span></a></div></header><main class="page" id="content"><span class="eyebrow">FROM YOUR SCHOOL</span><h1 class="h1">Teacher updates</h1><p class="lead">Complete announcement text, attachments and dates as shared by the school. Nothing rewritten or invented.</p>
 <div class="formrow"><div class="search grow"><span>⌕</span><input id="messageSearch" type="search" placeholder="Find tests, submissions or messages…"></div><select class="select" id="messageCategory"><option value="all">All categories</option><option value="Tests">Tests</option><option value="Homework">Homework</option><option value="Important">Important</option></select></div><div class="row between"><span class="tiny" id="messageCount">Loading teacher messages…</span><a class="btn small" href="/tasks.html">My To-Do ↗</a></div><div class="list" id="messagesList" style="margin-top:15px"><div class="empty">Connecting…</div></div><div style="text-align:center;margin:20px"><button class="btn" id="messagesMore" hidden>Show more</button></div>
 <div class="panel" style="margin-top:26px"><strong>Official school app</strong><p class="muted mini">Teacher messages originate from the connected school announcements feed. For the full official MMSS88 app, including school features not mirrored here:</p><div class="btn-row"><a class="btn" href="https://play.google.com/store/apps/details?id=com.edusecure.sandeep.manavmangal88" target="_blank" rel="noopener noreferrer">Android app ↗</a><a class="btn" href="https://apps.apple.com/in/app/manav-mangal-smart-school-88/id6479216399" target="_blank" rel="noopener noreferrer">iPhone app ↗</a></div></div></main></div></div><nav class="bottom-nav" id="bottomNav" aria-label="Main navigation"></nav><script>const firebaseCfg={apiKey:'AIzaSyATxKki6gkNWic_CnoGbZnOZjAUj1lbKGI',authDomain:'academyvault-5d1eb.firebaseapp.com',projectId:'academyvault-5d1eb',storageBucket:'academyvault-5d1eb.firebasestorage.app',messagingSenderId:'933297255268',appId:'1:933297255268:web:51b4b015ed4df21ed64071'};
@@ -78,7 +118,7 @@ function shiftYmd(day,n){let d=new Date(day+'T12:00:00Z');d.setUTCDate(d.getUTCD
 function docTerm(d){let y=ymd(d.createdAt);return !y?'undated':y<='2026-09-28'?'term1':'term2'}
 function normalizeDoc(d){return{id:String(d.id),title:String(d.title||'Untitled PDF'),subject:String(d.subject||'Other'),description:String(d.description||''),pdfUrl:String(d.pdf_url||''),chapter:String(d.chapter||''),createdAt:d.created_at||d.createdAt||d.uploaded_at||null}}
 function normalizeMessage(d){return{id:String(d.id),title:String(d.title||'Teacher update'),message:String(d.message||d.fullMessage||d.description||''),category:String(d.category||'General'),subject:String(d.subject||''),createdAt:d.createdAt||null,messageDate:d.messageDate||null,eventDate:d.eventDate||null,published:d.published===true,attachmentUrl:String(d.attachmentUrl||''),hasAttachment:!!d.hasAttachment}}
-async function getCollection(name){const [{initializeApp,getApps},{getFirestore,collection,getDocs}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js')]);const app=getApps().length?getApps()[0]:initializeApp(firebaseCfg);const snap=await getDocs(collection(getFirestore(app),name));return snap.docs.map(x=>({id:x.id,...x.data()}))}
+async function getCollection(name){const [{initializeApp,getApps},{getFirestore,collection,getDocs,onSnapshot}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js')]);const app=getApps().length?getApps()[0]:initializeApp(firebaseCfg);const ref=collection(getFirestore(app),name);try{const snap=await getDocs(ref);return snap.docs.map(x=>({id:x.id,...x.data()}))}catch(firstError){console.warn('8aPDF retrying '+name+' as live snapshot:',firstError);return await new Promise((resolve,reject)=>{let stop=()=>{},settled=false;const timer=setTimeout(()=>{if(!settled){settled=true;stop();reject(firstError)}},9500);stop=onSnapshot(ref,snap=>{if(settled)return;settled=true;clearTimeout(timer);queueMicrotask(stop);resolve(snap.docs.map(x=>({id:x.id,...x.data()})))},error=>{if(settled)return;settled=true;clearTimeout(timer);reject(error)})})}}
 const CACHE='8a_cache_';async function loadData(kind){let cached=read(CACHE+kind,[]);try{const raw=await getCollection(kind==='pdfs'?'study_materials':'announcements');let mapped=kind==='pdfs'?raw.map(normalizeDoc):raw.map(normalizeMessage).filter(m=>m.published);mapped.sort((a,b)=>(parseDate(b.createdAt)?.getTime()||0)-(parseDate(a.createdAt)?.getTime()||0));write(CACHE+kind,mapped.slice(0,160));return mapped}catch(e){console.warn('8aPDF data connection',e);if(cached.length){toast('Showing recently saved data');return cached}throw e}}
 function hasPDF(d){return safeURL(d.pdfUrl)!=='#'}
 function pdfButtons(d){if(!hasPDF(d))return '<span class="tiny">PDF link not available</span>';return `<button class="btn small" data-pdf-action="preview" data-pdf-id="${escapeText(d.id)}">Preview ↗</button><button class="btn small primary" data-pdf-action="download" data-pdf-id="${escapeText(d.id)}">Download</button><button class="btn small" data-pdf-action="share" data-pdf-id="${escapeText(d.id)}">Share</button>`}

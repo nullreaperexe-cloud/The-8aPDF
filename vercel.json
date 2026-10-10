@@ -3,31 +3,47 @@
   "rewrites": [
     {
       "source": "/announcements",
-      "destination": "/messages.html"
+      "destination": "/index.html"
     },
     {
       "source": "/updates",
-      "destination": "/messages.html"
+      "destination": "/index.html"
     },
     {
       "source": "/pdfs",
-      "destination": "/pdf.html"
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/chatbot",
+      "destination": "/index.html"
     },
     {
       "source": "/tasks",
       "destination": "/tasks.html"
     },
     {
-      "source": "/settings",
-      "destination": "/settings.html"
-    },
-    {
-      "source": "/chatbot",
-      "destination": "/chatbot.html"
-    },
-    {
       "source": "/classic",
       "destination": "/classic.html"
+    },
+    {
+      "source": "/Pdf.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/Updates.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/Tasks.html",
+      "destination": "/tasks.html"
+    },
+    {
+      "source": "/Settings.html",
+      "destination": "/index.html"
     },
     {
       "source": "/:slug([a-zA-Z0-9-]{3,32})",
