@@ -14,7 +14,8 @@ function json(res, code, payload) {
   res.setHeader('X-Content-Type-Options','nosniff');
   return res.status(code).json(payload);
 }
-async function existing(slug) { return get(`${ROOT}${slug}.json`, { access: 'private' }); }
+function isBlobModeMismatch(error){const message=String(error?.message||'');return /\b(public|private)\b/i.test(message)&&/\b(access|store|mode|blob)\b/i.test(message)}
+async function existing(slug) { const pathname=`${ROOT}${slug}.json`;try{const item=await get(pathname,{access:'private'});if(item)return item}catch(error){if(!isBlobModeMismatch(error))throw error}try{return await get(pathname,{access:'public'})}catch(error){if(isBlobModeMismatch(error))return null;throw error} }
 function ownerHash(value) {
   if (typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value)) return null;
   return createHash('sha256').update(value).digest('hex');
@@ -101,10 +102,9 @@ export default async function handler(req, res) {
     if (await existing(slug)) return json(res,409,{error:'This name is already used'});
     const record = JSON.stringify({version:2,slug,documentId:docId,url:verified.url,title:verified.title,ownerHash:hash,createdAt:new Date().toISOString()});
     try {
-      await put(`${ROOT}${slug}.json`,record,{
-        access:'private', addRandomSuffix:false, allowOverwrite:false,
-        contentType:'application/json',cacheControlMaxAge:60
-      });
+      const options={addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60};
+      try{await put(`${ROOT}${slug}.json`,record,{...options,access:'private'})}
+      catch(error){if(!isBlobModeMismatch(error))throw error;await put(`${ROOT}${slug}.json`,record,{...options,access:'public'})}
     } catch (error) {
       if (/already exists|BlobAlreadyExists|pathname is already/i.test(String(error?.name)+' '+String(error?.message))) {
         return json(res,409,{error:'This name is already used'});
