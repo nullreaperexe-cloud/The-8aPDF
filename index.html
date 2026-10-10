@@ -1142,6 +1142,75 @@ html[data-ui-mode="studio"] .pdf-card {
 }
 @media(prefers-reduced-motion:reduce){.pdf-ai-pane,.pdf-ai-nav,#settingsPanel.settings{animation:none!important;transition:none!important}}
 </style>
+
+<style id="8apdf-mobile-welcome-parity">
+/* Mobile parity with the original desktop liquid-glass welcome. Desktop intentionally unchanged. */
+@media (max-width:750px) {
+  #welcomeScreen.welcome-screen {
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100dvh;
+    min-height:100svh;
+    display:grid;
+    place-items:center;
+    align-content:center;
+    justify-items:center;
+    box-sizing:border-box;
+    overflow:hidden;
+    padding:max(20px,env(safe-area-inset-top))
+            max(20px,env(safe-area-inset-right))
+            max(20px,env(safe-area-inset-bottom))
+            max(20px,env(safe-area-inset-left));
+  }
+  #welcomeScreen .welcome-content {
+    width:100%;
+    max-width:600px;
+    min-width:0;
+    margin:0 auto;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:clamp(15px,4vw,21px);
+    text-align:center;
+    justify-self:center;
+    align-self:center;
+  }
+  #welcomeScreen .welcome-title {
+    font-size:clamp(1.95rem,8.5vw,4.1rem);
+    line-height:1.105;
+    letter-spacing:-.059em;
+    max-width:100%;
+    margin:0;
+    text-align:center;
+    text-wrap:balance;
+    overflow-wrap:break-word;
+  }
+  #welcomeScreen .welcome-subtitle {
+    font-size:clamp(.89rem,3.55vw,1.08rem);
+    line-height:1.5;
+    max-width:min(100%,30rem);
+    margin:0;
+    text-align:center;
+    text-wrap:balance;
+  }
+  /* Desktop-size proportions in a phone viewport; otherwise the rings sit off-screen. */
+  #welcomeScreen::before {
+    width:clamp(410px,124vw,700px);
+    height:clamp(285px,45svh,440px);
+    left:-41%;
+    top:-13%;
+  }
+  #welcomeScreen::after {
+    width:clamp(390px,115vw,650px);
+    height:clamp(275px,43svh,440px);
+    right:-41%;
+    bottom:-14%;
+  }
+}
+</style>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
