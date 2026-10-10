@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-tone="dark" data-density="comfortable" data-layout="grid" data-motion="on">
+<html lang="en" data-glass="on" data-fluid="on" data-theme="dark" data-tone="dark" data-density="comfortable" data-layout="grid" data-motion="on">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101010">
 <meta name="description" content="8aPDF — your complete study material vault. Your school PDFs, announcements and timetable in one place.">
 <title>8aPDF | Study Material Vault</title>
+<script>
+try {
+  const n=localStorage.getItem('eightapdf_user_name_v2') || localStorage.getItem('eightapdf_user_name');
+  document.documentElement.dataset.onboard = n && n.trim() && n.trim() !== 'Student' ? 'complete' : 'needed';
+} catch { document.documentElement.dataset.onboard='needed'; }
+</script>
 <style>
 :root{color-scheme:dark;--bg:#111111;--bg-alt:#171717;--surface:#202020;--surface-high:#282828;--surface-soft:#242424;--surface-glass:rgba(38,38,38,.92);--text:#f5f5f5;--text-soft:#d2d2d2;--muted:#989898;--line:rgba(255,255,255,.115);--line-bold:rgba(255,255,255,.22);--button:#ededed;--button-text:#171717;--pill:#303030;--hover:#383838;--shadow:0 18px 55px rgba(0,0,0,.16);--hero-glow:rgba(255,255,255,.065);--radius:13px;--content-width:1430px;--duration:240ms;--scale:1;--card-pad:19px;--card-gap:13px;--ease:cubic-bezier(.18,.72,.22,1)}
 html[data-theme="pure-black"]{--bg:#000;--bg-alt:#060606;--surface:#101010;--surface-high:#161616;--surface-soft:#141414;--surface-glass:rgba(18,18,18,.96);--text:#fff;--text-soft:#e1e1e1;--muted:#929292;--line:rgba(255,255,255,.15);--line-bold:rgba(255,255,255,.29);--pill:#171717;--hover:#242424;--hero-glow:rgba(255,255,255,.04)}
@@ -53,6 +59,112 @@ html[data-tone="light"][data-contrast="high"]{--line:rgba(0,0,0,.36);--line-bold
 /* Main shells animate when whole-site tokens change. */
 .top-nav,.settings,.dialog,.command-card,.footer,.feature,.pdf-card,.notice-card,.widget,.big-search,.eyebrow-pill,.doc-tile,.action,.chip,.solid,.sheet .dialog,.list-row,.timetable-table td,.timetable-table th{transition:background-color var(--duration) var(--ease),color var(--duration) var(--ease),border-color var(--duration) var(--ease),box-shadow var(--duration) var(--ease),transform var(--duration) var(--ease)}
 @media(max-width:510px){.settings{width:min(385px,calc(100vw - 16px));right:8px}.theme-grid.palette-grid{max-height:238px}.timetable-day-select{max-width:67px}}
+
+
+/* 8aPDF LIQUID GLASS • premium layered optics without bitmaps or background images */
+:root{
+  --liquid-blur:38px;--liquid-saturation:177%;--liquid-solidity:68%;
+  --liquid-highlight:.34;--liquid-sheen:.17;--liquid-border:.25;
+  --fluid-ease:cubic-bezier(.22,1,.36,1);--fluid-speed:440ms;
+}
+html[data-glass="on"] body{
+  background:radial-gradient(ellipse 58vw 40vw at 45% -160px,var(--hero-glow),transparent 80%),var(--bg);
+}
+/* Token-based materials: changing the site palette continues to recolor every glass layer */
+html[data-glass="on"] :is(.top-nav,.feature,.pdf-card,.notice-card,.widget,.settings,.dialog,.command-card,.big-search,.chip,.theme-item,.timetable-table,.round-btn,.toast){
+  background-color:color-mix(in srgb,var(--surface) var(--liquid-solidity),transparent);
+  backdrop-filter:blur(var(--liquid-blur)) saturate(var(--liquid-saturation));
+  -webkit-backdrop-filter:blur(var(--liquid-blur)) saturate(var(--liquid-saturation));
+  border-color:color-mix(in srgb,var(--line-bold) 70%,transparent);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,var(--liquid-sheen)),
+             inset 0 -1px 0 rgba(255,255,255,.025),
+             0 12px 42px rgba(0,0,0,.12),0 2px 9px rgba(0,0,0,.075);
+  transition:background-color var(--fluid-speed) var(--fluid-ease),
+    transform var(--fluid-speed) var(--fluid-ease),
+    box-shadow var(--fluid-speed) var(--fluid-ease),
+    border-color var(--fluid-speed) var(--fluid-ease),
+    backdrop-filter var(--fluid-speed) var(--fluid-ease);
+}
+html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget,.top-nav,.big-search){position:relative;isolation:isolate;overflow:hidden}
+html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget,.top-nav,.big-search)::before{
+  content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse 125% 64% at var(--sheen-x,30%) -22%,
+   rgba(255,255,255,var(--liquid-highlight)),rgba(255,255,255,.035) 28%,transparent 64%);
+  opacity:.62;transition:opacity 340ms ease,background-position 650ms ease;
+}
+html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget,.top-nav,.big-search) > *{position:relative;z-index:1}
+html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget):hover{
+ transform:translate3d(0,-4px,0);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,var(--liquid-highlight)),
+ 0 23px 55px rgba(0,0,0,.20),0 3px 14px rgba(0,0,0,.08);
+ border-color:var(--line-bold);
+}
+html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget):hover::before{opacity:1}
+html[data-glass="on"] .top-nav{border-radius:21px;box-shadow:0 13px 55px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,var(--liquid-highlight))}
+html[data-glass="on"] :is(.settings,.dialog,.command-card){background-color:color-mix(in srgb,var(--surface) calc(var(--liquid-solidity) + 13%),transparent)}
+html[data-glass="on"] :is(.solid,.search-submit,.chip.active,.nav-link.active){
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 20px rgba(0,0,0,.12);
+}
+html[data-glass="on"] :is(button,.solid,.chip,.nav-link):active{transform:scale(.975)}
+html[data-glass="on"] .hero:before{animation:liquidAura 13s ease-in-out infinite alternate;filter:blur(41px)}
+@keyframes liquidAura{0%{transform:translateX(-53%) scale(.92)}100%{transform:translateX(-47%) scale(1.09)}}
+html[data-glass="on"] .hero h1{letter-spacing:-.065em;text-shadow:0 6px 35px rgba(0,0,0,.06)}
+html[data-glass="on"] .hero-inner{animation:liquidReveal 960ms var(--fluid-ease) both}
+@keyframes liquidReveal{from{opacity:0;transform:translate3d(0,15px,0);filter:blur(4px)}to{opacity:1;transform:none;filter:blur(0)}}
+html[data-fluid="off"]{--fluid-speed:0ms}
+html[data-fluid="off"] .hero:before,html[data-fluid="off"] .hero-inner{animation:none}
+html[data-motion="off"]{--fluid-speed:0ms}
+html[data-motion="off"] .hero:before,html[data-motion="off"] .hero-inner{animation:none}
+html[data-tone="light"][data-glass="on"] :is(.top-nav,.feature,.pdf-card,.notice-card,.widget,.settings,.dialog,.command-card,.big-search){
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 13px 32px rgba(0,0,0,.065),0 2px 7px rgba(0,0,0,.035);
+}
+@media(hover:none){html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget):hover{transform:none}}
+@media(prefers-reduced-motion:reduce){
+ html{--fluid-speed:0ms!important;scroll-behavior:auto!important}
+ html[data-glass="on"] .hero:before,html[data-glass="on"] .hero-inner{animation:none!important}
+ html[data-glass="on"] :is(.feature,.pdf-card,.notice-card,.widget):hover{transform:none!important}
+}
+.liquid-preset{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:10px 0}
+.liquid-preset button{color:var(--text-soft);background:var(--surface-soft);border:1px solid var(--line);border-radius:10px;padding:9px 4px;font-size:.69rem}
+.liquid-preset button.active{background:var(--button);color:var(--button-text);border-color:var(--button)}
+.liquid-range-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:.72rem;color:var(--text-soft)}
+.liquid-range-line strong{color:var(--text);font-variant-numeric:tabular-nums}
+#liquidRange{display:block;width:100%;margin:10px 0 13px;accent-color:var(--text);cursor:pointer}
+.liquid-preview{border-radius:14px;padding:17px 15px 16px;background:radial-gradient(circle at 35% 0%,rgba(255,255,255,.24),transparent 60%),color-mix(in srgb,var(--surface-high) 55%,transparent);border:1px solid var(--line-bold);box-shadow:inset 0 1px 1px rgba(255,255,255,.23),0 12px 25px rgba(0,0,0,.085);backdrop-filter:blur(var(--liquid-blur)) saturate(var(--liquid-saturation))}
+.liquid-preview strong{display:block;font-size:.78rem;letter-spacing:-.02em}.liquid-preview small{display:block;font-size:.68rem;color:var(--muted);margin-top:4px}
+.liquid-tip{font-size:.67rem;color:var(--muted);line-height:1.5}
+/* Onboarding: large, high-contrast serif and clean iOS-style glass, no imagery */
+#introFlow{display:none;position:fixed;inset:0;z-index:900;isolation:isolate;overflow:auto;overscroll-behavior:contain;background:var(--bg);color:var(--text);padding:24px}
+html[data-onboard="needed"] #introFlow{display:flex;align-items:center;justify-content:center}
+html[data-onboard="needed"] body{overflow:hidden}
+#introFlow::before{content:"";position:fixed;width:min(90vw,750px);height:500px;top:3%;left:50%;transform:translateX(-50%);z-index:-1;background:radial-gradient(ellipse at 50% 38%,var(--hero-glow) 0%,transparent 70%);filter:blur(55px);pointer-events:none}
+.intro-shell{width:min(100%,590px);margin:auto;position:relative;padding:clamp(24px,5vw,42px);border:1px solid var(--line-bold);border-radius:30px;background:color-mix(in srgb,var(--surface) 76%,transparent);backdrop-filter:blur(35px) saturate(165%);-webkit-backdrop-filter:blur(35px) saturate(165%);box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 36px 95px rgba(0,0,0,.24);text-align:center}
+.intro-brand{display:inline-flex;align-items:center;gap:10px;font-size:1.11rem;font-weight:800;letter-spacing:-.045em;margin-bottom:40px}
+.intro-brand-mark{display:grid;place-items:center;width:32px;height:32px;border-radius:11px;border:1px solid var(--line-bold);background:var(--surface-high)}
+.intro-brand-mark svg{width:20px;height:20px;stroke:currentColor;fill:none}
+.intro-step{display:none;animation:introUp 660ms cubic-bezier(.18,.9,.25,1) both}
+.intro-step.active{display:block}
+.intro-index{color:var(--muted);font-size:.73rem;font-weight:650;letter-spacing:.17em;text-transform:uppercase;margin:0 0 19px}
+.intro-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.65rem,7.5vw,4.9rem);font-weight:600;letter-spacing:-.074em;line-height:1.04;margin:0 0 17px;color:var(--text);text-wrap:balance}
+.intro-greeting{font-size:clamp(2.65rem,7vw,4.55rem)}
+.intro-desc{max-width:415px;margin:0 auto 31px;color:var(--text-soft);font-size:clamp(.88rem,2vw,.97rem);line-height:1.65;text-wrap:pretty}
+.intro-field{width:100%;height:59px;border:1px solid var(--line-bold);border-radius:15px;background:var(--surface-high);color:var(--text);padding:0 18px;font-size:1rem;font-weight:550;outline:none;box-shadow:inset 0 1px 1px rgba(255,255,255,.04);transition:border .3s,box-shadow .3s}
+.intro-field:focus{border-color:var(--text-soft);box-shadow:0 0 0 4px color-mix(in srgb,var(--text) 9%,transparent)}
+.intro-error{font-size:.76rem;color:var(--text);min-height:19px;margin:7px 0 0;text-align:left}
+.intro-main-btn{width:100%;min-height:55px;border:1px solid var(--line-bold);border-radius:15px;background:var(--button);color:var(--button-text);font-weight:760;font-size:.91rem;margin-top:13px;transition:transform 360ms cubic-bezier(.2,1.3,.35,1),filter .3s,box-shadow .3s;box-shadow:0 9px 27px rgba(0,0,0,.13)}
+.intro-main-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}.intro-main-btn:active{transform:scale(.975)}
+.intro-skip{display:block;margin:14px auto 0;padding:9px 16px;border:0;background:none;color:var(--muted);font-size:.86rem;font-weight:600}
+.intro-skip:hover{color:var(--text)}
+.intro-footer{display:flex;justify-content:space-between;gap:14px;align-items:center;border-top:1px solid var(--line);padding-top:22px;margin-top:38px;color:var(--muted);font-size:.72rem}
+.intro-dots{display:flex;gap:6px}.intro-dots span{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.38}.intro-dots span.current{background:var(--text);opacity:1;width:19px;border-radius:12px;transition:width 500ms}
+.intro-progress{width:100%;height:3px;border-radius:5px;background:var(--surface-high);overflow:hidden;margin:26px auto 0}.intro-progress span{display:block;height:100%;width:0;background:var(--text);border-radius:5px}
+.intro-step.active .intro-progress span{animation:introLoad 2.1s cubic-bezier(.15,.85,.45,1) forwards}
+@keyframes introLoad{to{width:100%}}@keyframes introUp{from{opacity:0;transform:translateY(18px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+.intro-bell{width:55px;height:55px;margin:0 auto 18px;display:grid;place-items:center;border-radius:19px;background:var(--surface-high);border:1px solid var(--line-bold);box-shadow:inset 0 1px 0 rgba(255,255,255,.17)}
+.intro-bell svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+@media(max-width:550px){#introFlow{padding:12px}.intro-shell{border-radius:25px;padding:29px 22px 23px}.intro-brand{margin-bottom:35px}.intro-title{font-size:clamp(2.65rem,11vw,4rem)}.intro-footer{margin-top:35px}}
+@media(prefers-reduced-motion:reduce){.intro-step,.intro-step.active,.intro-progress span{animation:none!important}.intro-progress span{width:100%}}
+html[data-motion="off"] .intro-step,html[data-motion="off"] .intro-progress span{animation:none!important}
 
 </style>
 </head>
@@ -114,6 +226,18 @@ html[data-tone="light"][data-contrast="high"]{--line:rgba(0,0,0,.36);--line-bold
 <footer class="footer" id="about"><div class="shell"><div class="footer-grid"><div><a class="brand" href="#home"><svg><use href="#i-book"/></svg>8aPDF</a><p>Your trusted source for school study materials, circulars and important announcements.</p></div><div><h4>Quick Links</h4><a class="footer-link" href="#home">Home</a><a class="footer-link" href="#library">Study Material</a><a class="footer-link" href="#announcements" data-go="announcements">Announcements</a><a class="footer-link" href="#" data-go="timetable">Timetable</a><a class="footer-link" href="#about">About</a></div><div><h4>Help & Support</h4><a class="footer-link" href="#library">How to Download</a><a class="footer-link" href="#" id="supportLink">Report an Issue</a><a class="footer-link" href="#about">About 8aPDF</a><a class="footer-link" href="#" data-go="settings">Appearance Settings</a></div><div><h4>Stay Updated</h4><p>Turn on notifications for newly added PDFs while the website is open.</p><button class="solid" id="footerBell">Notification Settings</button></div></div><div class="footer-bottom"><span>© <span id="year"></span> 8aPDF. All rights reserved.</span><span>Made for Students · Full-Site Themes Preview</span></div></div></footer>
 <div class="drawer-mask" id="drawerMask"></div>
 <aside class="settings" id="settingsPanel" aria-label="Customize Experience" aria-hidden="true"><div class="setting-heading"><strong><svg><use href="#i-settings"/></svg>Customize Experience</strong><button class="round-btn" id="closeSettings" aria-label="Close settings"><svg><use href="#i-x"/></svg></button></div><div class="setting-body">
+
+<div class="setting-group" id="liquidGlassGroup">
+ <div class="palette-title"><span class="setting-label">Liquid Glass Experience</span><span class="palette-count">NEW · iOS-inspired</span></div>
+ <p class="setting-explainer">Live depth, luminous glass edges and silky interface transitions across the entire website.</p>
+ <label class="setting-row"><span><strong style="font-size:.78rem">Liquid Glass</strong><small style="display:block;color:var(--muted);font-size:.66rem">Turn frosted materials on or off</small></span><input class="toggle" type="checkbox" id="liquidToggle" checked></label>
+ <div class="liquid-preset" id="liquidPresets"><button type="button" data-glass-preset="28">Subtle</button><button type="button" data-glass-preset="65" class="active">Balanced</button><button type="button" data-glass-preset="100">Ultra</button></div>
+ <label class="liquid-range-line" for="liquidRange"><span>Glass Intensity</span><strong id="liquidValue">68%</strong></label>
+ <input id="liquidRange" type="range" min="0" max="100" step="1" value="68" aria-label="Liquid glass intensity">
+ <label class="setting-row"><span>Fluid Animations</span><input class="toggle" type="checkbox" id="fluidToggle" checked></label>
+ <div class="liquid-preview"><strong>Liquid Glass · Live Preview</strong><small>Every theme · Every card · Every page</small></div>
+ <p class="liquid-tip">Tip: on slower devices choose Subtle or turn animations off. Accessibility Reduce Motion always takes priority.</p>
+</div>
 <div class="setting-group palette-section"><div class="palette-title"><span class="setting-label">Whole-Site Color Themes</span><span class="palette-count" id="themeCount">78 choices</span></div>
 <p class="setting-explainer">One tap recolors every section: background, navigation, cards, PDF buttons, timetable, dialogs and footer.</p>
 <div class="palette-filters" id="paletteFilters"><button class="active" data-palette-filter="all">All</button><button data-palette-filter="mono">Mono</button><button data-palette-filter="dark">Dark</button><button data-palette-filter="light">Light</button></div>
@@ -135,6 +259,33 @@ html[data-tone="light"][data-contrast="high"]{--line:rgba(0,0,0,.36);--line-bold
 <div class="sheet" id="modal" role="dialog" aria-modal="true" aria-hidden="true"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button class="round-btn" id="modalClose" aria-label="Close dialog"><svg><use href="#i-x"/></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
 <div class="command" id="command" role="dialog" aria-modal="true" aria-label="Quick search"><div class="command-card"><input id="commandInput" placeholder="Search PDFs, subjects or actions..." aria-label="Command search"><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
 <div class="toast-area" id="toastArea" aria-live="polite"></div>
+<div id="introFlow" role="dialog" aria-modal="true" aria-label="Welcome to 8aPDF">
+ <div class="intro-shell">
+  <div class="intro-brand"><span class="intro-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8.5 2.7 5.5 2.8 2.7 4.1v14c3-.9 6.4-.6 9.3 1.5 2.9-2.1 6.3-2.4 9.3-1.5v-14c-2.8-1.3-5.8-1.4-9.3.9Zm0 0v14.6" stroke-width="1.55" stroke-linejoin="round"/></svg></span> 8aPDF</div>
+  <section class="intro-step active" data-intro-step="name" aria-label="Enter your name">
+   <p class="intro-index">01 / 03 &nbsp; · &nbsp; Make it yours</p>
+   <h1 class="intro-title">A smarter way<br>to study.</h1>
+   <p class="intro-desc">Welcome to your personal study vault. Before we begin, what should we call you?</p>
+   <form id="introNameForm"><label for="introName" style="display:block;text-align:left;font-size:.74rem;color:var(--muted);margin:0 0 8px">YOUR NAME</label><input class="intro-field" id="introName" name="name" autocomplete="given-name" autocapitalize="words" maxlength="40" placeholder="Enter your name" required><div id="introError" class="intro-error" aria-live="polite"></div><button class="intro-main-btn" type="submit">Continue &nbsp; →</button></form>
+  </section>
+  <section class="intro-step" data-intro-step="welcome" aria-label="Personalized welcome">
+   <p class="intro-index">02 / 03 &nbsp; · &nbsp; Just for you</p>
+   <h1 class="intro-title intro-greeting" id="introGreeting">Welcome.</h1>
+   <p class="intro-desc">Your study vault is ready. Every PDF, timetable and important school update — beautifully organized in one place.</p>
+   <div class="intro-progress" aria-hidden="true"><span></span></div>
+  </section>
+  <section class="intro-step" data-intro-step="notifications" aria-label="Notification preferences">
+   <p class="intro-index">03 / 03 &nbsp; · &nbsp; You're in control</p>
+   <div class="intro-bell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></div>
+   <h1 class="intro-title">Stay one step<br>ahead.</h1>
+   <p class="intro-desc">Choose whether to receive alerts for newly added PDFs while 8aPDF is open. You can also skip this and decide later.</p>
+   <button class="intro-main-btn" id="introAllow" type="button">Enable Notifications &nbsp; →</button>
+   <button class="intro-skip" id="introSkip" type="button">Not now — take me to 8aPDF</button>
+  </section>
+  <div class="intro-footer"><span>Simple. Organized. Always updated.</span><div class="intro-dots"><span class="current"></span><span></span><span></span></div></div>
+ </div>
+</div>
+
 <script>
 // Production 8aPDF interface. Appearance settings, selected timetable day and personal notes stay on this device.
 (()=>{
@@ -182,7 +333,7 @@ $('#daySelect').onchange=e=>{selectedSchoolDay=Number(e.target.value);store.set(
 const cats=['All','Tests','Exams','Homework','Assignments','Projects','Important','Events','Holidays','Timetable','Results','Activities','Competitions','General'];
 const existingUserName=()=>{try{return localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'Student'}catch{return 'Student'}};
 const state={materials:location.protocol==='file:'?previewDocuments:[],live:false,error:false,filter:'All Subjects',query:'',sort:'default',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
-const defaults={theme:'dark',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65};
+const defaults={theme:'dark',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65,glass:true,glassIntensity:68,glassMotion:true};
 let settings={...defaults,...store.get('8apdf_monochrome_settings_v1',{})};
 // 36 colour families x dark/light + 6 monochrome = 78 built-in themes, plus unlimited custom colors.
 const monoThemes=[['dark','Dark'],['pure-black','Pure Black'],['graphite','Graphite'],['light','Light'],['paper','Paper'],['silver','Silver']].map(([id,name])=>({id,name,type:'mono',tone:['light','paper','silver'].includes(id)?'light':'dark'}));
@@ -239,8 +390,35 @@ $('#customStrength').oninput=e=>{settings.customStrength=Number(e.target.value);
 $('#applyCustomTheme').onclick=()=>{settings.theme='custom';setSettings();toast('Custom colors applied to the entire website')};
 function toast(message){let el=document.createElement('div');el.className='toast';el.textContent=message;$('#toastArea').append(el);setTimeout(()=>el.remove(),3600)}
 function scrollToSection(sel){const e=$(sel);if(e)e.scrollIntoView({behavior:settings.motion?'auto':'smooth',block:'start'})}
+
+function setLiquidExperience(){
+ const root=document.documentElement;
+ const v=Math.min(100,Math.max(0,Number(settings.glassIntensity ?? 68)));
+ const reduced=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ root.dataset.glass=settings.glass?'on':'off';
+ root.dataset.fluid=settings.glass && settings.glassMotion && !reduced ? 'on':'off';
+ root.style.setProperty('--liquid-blur',(10+Math.round(v*.37))+'px');
+ root.style.setProperty('--liquid-saturation',(112+Math.round(v*.95))+'%');
+ root.style.setProperty('--liquid-solidity',(91-Math.round(v*.45))+'%');
+ root.style.setProperty('--liquid-highlight',(v*.0047).toFixed(3));
+ root.style.setProperty('--liquid-sheen',(v*.0028).toFixed(3));
+ $('#liquidToggle').checked=!!settings.glass;
+ $('#liquidRange').value=v;
+ $('#liquidRange').disabled=!settings.glass;
+ $('#fluidToggle').checked=!!settings.glassMotion;
+ $('#fluidToggle').disabled=!settings.glass;
+ $('#liquidValue').textContent=v+'%';
+ $$('#liquidPresets [data-glass-preset]').forEach(b=>b.classList.toggle('active',Math.abs(v-Number(b.dataset.glassPreset))<7));
+ $('#liquidPresets').style.opacity=settings.glass?'1':'.52';
+}
+$('#liquidToggle').addEventListener('change',e=>{settings.glass=e.target.checked;setSettings()});
+$('#fluidToggle').addEventListener('change',e=>{settings.glassMotion=e.target.checked;setSettings()});
+$('#liquidRange').addEventListener('input',e=>{settings.glassIntensity=Number(e.target.value);setSettings()});
+$('#liquidPresets').addEventListener('click',e=>{const b=e.target.closest('[data-glass-preset]');if(!b)return;settings.glass=true;settings.glassIntensity=Number(b.dataset.glassPreset);setSettings()});
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change',()=>setLiquidExperience());
+
 function setSettings(){
- applySitePalette();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
+ applySitePalette();setLiquidExperience();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
  renderPalette();$$('[data-density-choice]').forEach(el=>el.classList.toggle('active',el.dataset.densityChoice===settings.density));$$('[data-card-choice]').forEach(el=>el.classList.toggle('active',el.dataset.cardChoice===settings.layout));$('#compactToggle').checked=settings.density==='compact';$('#sidebarToggle').checked=settings.sidebar;$('#readingToggle').checked=settings.reading;$('#motionToggle').checked=settings.motion;$('#largeTextToggle').checked=settings.large;$('#contrastToggle').checked=settings.contrast;$('#fontRange').value=settings.fontSize;$('#gridBtn').classList.toggle('active',settings.layout==='grid');$('#listBtn').classList.toggle('active',settings.layout==='list');$('#customColor').value=settings.customColor;$('#customMode').value=settings.customMode;$('#customStrength').value=settings.customStrength;$('#strengthValue').textContent=settings.customStrength+'%';store.set('8apdf_monochrome_settings_v1',settings)
 }
 setSettings();$('#profileBtn').textContent=state.name[0].toUpperCase();
@@ -311,11 +489,70 @@ document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLower
 $('#menuBtn').onclick=()=>showModal('Navigate 8aPDF',`<div style="display:grid;gap:8px"><button class="solid" data-menu-go="home">Home</button><button class="solid" data-menu-go="library">Study Material</button><button class="solid" data-menu-go="announcements">Announcements</button><button class="solid" data-menu-go="timetable">School Timetable</button><button class="solid" data-menu-go="settings">Customize Appearance</button></div>`);
 $('#modalContent').onclick=e=>{let b=e.target.closest('[data-menu-go]');if(b){closeModal();nav(b.dataset.menuGo)}};
 $('#supportLink').addEventListener('click',e=>{e.preventDefault();toast('Support email is not configured in the current repository. Please use the existing site contact method.')} );
+
+// First-use welcome: name -> personal greeting -> optional notification permission.
+// Existing visitors retain their saved names and skip the flow entirely.
+const intro=$('#introFlow');
+let introTimer;
+function showIntroStep(which){
+ $$('#introFlow [data-intro-step]').forEach(el=>el.classList.toggle('active',el.dataset.introStep===which));
+ const n={name:0,welcome:1,notifications:2}[which];
+ $$('#introFlow .intro-dots span').forEach((d,i)=>d.classList.toggle('current',i===n));
+}
+function finishIntro(){
+ clearTimeout(introTimer);
+ document.documentElement.dataset.onboard='complete';
+ intro.setAttribute('aria-hidden','true');
+ if(document.activeElement?.closest('#introFlow'))document.activeElement.blur();
+ $('#settingsBtn').focus({preventScroll:true});
+}
+$('#introNameForm').onsubmit=e=>{
+ e.preventDefault();
+ const name=$('#introName').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,40);
+ if(!name){$('#introError').textContent='Please enter your name to continue.';$('#introName').focus();return}
+ $('#introError').textContent='';
+ state.name=name;
+ try{localStorage.setItem('eightapdf_user_name_v2',name);localStorage.setItem('eightapdf_user_name',name)}catch{}
+ $('#profileBtn').textContent=name.charAt(0).toUpperCase();
+ $('#introGreeting').textContent='Welcome, '+name+'.';
+ showIntroStep('welcome');
+ const reduced=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ introTimer=setTimeout(()=>{showIntroStep('notifications');$('#introAllow').focus({preventScroll:true})},reduced?550:2300);
+};
+$('#introSkip').onclick=finishIntro;
+$('#introAllow').onclick=async()=>{
+ const button=$('#introAllow');button.disabled=true;
+ let result='unsupported';
+ try{
+  if('Notification' in window && window.isSecureContext){
+   result=Notification.permission==='default' ? await Notification.requestPermission() : Notification.permission;
+  }
+ }catch{result='unsupported'}
+ finishIntro();
+ if(result==='granted')toast('Notifications enabled. New PDF alerts work while 8aPDF is open.');
+ else if(result==='denied')toast('Notifications blocked in browser settings. You can change this later.');
+ else toast('You can enable notifications any time from the bell icon.');
+ button.disabled=false;
+};
+if(document.documentElement.dataset.onboard==='needed'){
+ showIntroStep('name');
+ setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
+} else {intro.setAttribute('aria-hidden','true')}
+
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
-// Show all appearance controls in the first desktop preview, just like the provided concept image.
-// If the user closes the drawer, it stays out of the way for the current session.
-let seenSettings=false;try{seenSettings=sessionStorage.getItem('8apdf_preview_settings_seen')==='1'}catch{}
-if(window.innerWidth>950&&!seenSettings){setTimeout(()=>{openSettings();try{sessionStorage.setItem('8apdf_preview_settings_seen','1')}catch{}},320)}
+// Settings open on explicit request, never over first-time onboarding.
+// Pointer highlights are visual-only and throttled to one frame, with a touch/motion-safe fallback.
+if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+ let target=null, x=0, pending=false;
+ document.addEventListener('pointermove',e=>{
+  if(document.documentElement.dataset.glass!=='on'||document.documentElement.dataset.fluid!=='on')return;
+  target=e.target.closest?.('.pdf-card,.feature,.widget,.top-nav,.big-search,.notice-card');
+  if(!target)return;
+  x=e.clientX-target.getBoundingClientRect().left;
+  if(!pending){pending=true;requestAnimationFrame(()=>{pending=false;if(target)target.style.setProperty('--sheen-x',x+'px')})}
+ },{passive:true});
+}
+
 // Real Firestore, using the exact Firebase public client configuration and field mappings in main/index.html.
 async function connectLive(){try{
 const [{initializeApp},{getFirestore,collection,onSnapshot,getDocs,query,where,orderBy,limit}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js')]);
