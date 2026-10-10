@@ -4,7 +4,7 @@
 <head>
 <script id="8apdf-ui-early">try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='false'?'closed':'open'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='open'}</script>
 <meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" name="viewport"/>
 <meta content="#000000" name="theme-color"/>
 <meta content="8aPDF — your complete study material vault. Your school PDFs, announcements and timetable in one place." name="description"/>
 <title>8aPDF — Studio Anime Edition Preview</title>
@@ -1242,6 +1242,47 @@ html[data-ui-mode="studio"] .pdf-card {
 @media(prefers-reduced-motion:reduce){.about-automation-button{transition:none}}
 </style>
 
+
+<style id="8apdf-mobile-ai-keyboard-repair">
+/* Only the AI Finder on phone sizes: fit it inside the real visible viewport when Gboard / Samsung keyboard opens. */
+@media(max-width:750px) {
+  #pdfAiLayer:not([hidden]) {
+    inset:auto 0 auto 0!important;
+    top:var(--ai-viewport-top,0px)!important;
+    bottom:auto!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    height:var(--ai-viewport-height,100dvh)!important;
+    max-height:var(--ai-viewport-height,100dvh)!important;
+    overflow:hidden!important;
+  }
+  #pdfAiLayer .pdf-ai-pane {
+    top:0!important;
+    bottom:auto!important;
+    width:100%!important;
+    height:var(--ai-viewport-height,100dvh)!important;
+    max-height:var(--ai-viewport-height,100dvh)!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  #pdfAiLayer .pdf-ai-main{min-height:0!important;max-height:100%!important;overflow:hidden!important}
+  #pdfAiLayer .pdf-ai-feed{min-height:0!important;overscroll-behavior:contain}
+  #pdfAiLayer .pdf-ai-bottom{flex-shrink:0!important;position:relative;z-index:2}
+  #pdfAiLayer .pdf-ai-compose textarea{
+    font-size:16px!important;
+    min-width:0;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-welcome{display:none!important}
+  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-caption{display:none!important}
+  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-bottom {
+    padding:8px 11px max(8px,env(safe-area-inset-bottom))!important;
+  }
+  #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-feed{padding-bottom:12px!important}
+}
+</style>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -2519,5 +2560,65 @@ html #schoolTermBar .school-term-segment button {
 }
 </style>
 
+
+<script id="8apdf-mobile-ai-viewport-controller">
+(()=>{
+  'use strict';
+  const layer=document.getElementById('pdfAiLayer');
+  const input=document.getElementById('pdfAiInput');
+  const composer=document.getElementById('pdfAiForm');
+  if(!layer||!input||!composer)return;
+  let baseline=0,frame=0;
+  const isMobile=()=>window.matchMedia('(max-width:750px)').matches;
+  const viewport=()=>window.visualViewport;
+  function synchronize(){
+    frame=0;
+    if(!isMobile()){
+      layer.style.removeProperty('--ai-viewport-height');
+      layer.style.removeProperty('--ai-viewport-top');
+      delete layer.dataset.aiKeyboard;
+      baseline=0;
+      return;
+    }
+    const vv=viewport();
+    const visibleHeight=vv?.height||window.innerHeight;
+    const visibleTop=vv?.offsetTop||0;
+    if(!Number.isFinite(visibleHeight)||visibleHeight<150)return;
+    const focused=document.activeElement===input;
+    if(!focused||!baseline)baseline=Math.max(baseline,visibleHeight);
+    const keyboardOpen=focused&&baseline-visibleHeight>95;
+    layer.style.setProperty('--ai-viewport-height',visibleHeight+'px');
+    layer.style.setProperty('--ai-viewport-top',visibleTop+'px');
+    layer.dataset.aiKeyboard=keyboardOpen?'open':'closed';
+    // The message log scrolls independently; the input stays anchored above the keyboard.
+  }
+  function queueSync(){
+    if(frame)return;
+    frame=requestAnimationFrame(synchronize);
+  }
+  const vv=viewport();
+  vv?.addEventListener('resize',queueSync,{passive:true});
+  vv?.addEventListener('scroll',queueSync,{passive:true});
+  window.addEventListener('resize',queueSync,{passive:true});
+  window.addEventListener('orientationchange',()=>{
+    baseline=0;
+    queueSync();
+    setTimeout(queueSync,300);
+  },{passive:true});
+  input.addEventListener('focus',()=>{
+    queueSync();
+    // Android IME changes size asynchronously across multiple animation frames.
+    [80,180,340,550].forEach(delay=>setTimeout(queueSync,delay));
+  });
+  input.addEventListener('blur',()=>{
+    queueSync();
+    setTimeout(queueSync,180);
+  });
+  // The route can be opened directly from /chatbot as well as via the sidebar.
+  document.getElementById('studioAssistantLink')?.addEventListener('click',queueSync);
+  document.getElementById('pdfAiClose')?.addEventListener('click',queueSync);
+  queueSync();
+})();
+</script>
 </body>
 </html>
