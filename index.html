@@ -7,10 +7,13 @@
 <meta name="description" content="8aPDF — your complete study material vault. Your school PDFs, announcements and timetable in one place.">
 <title>8aPDF | Study Material Vault</title>
 <script>
+// A fresh page load ALWAYS begins with the welcome experience.
+// Only first-time visitors need to enter their name or choose notifications.
 try {
   const n=localStorage.getItem('eightapdf_user_name_v2') || localStorage.getItem('eightapdf_user_name');
-  document.documentElement.dataset.onboard = n && n.trim() && n.trim() !== 'Student' ? 'complete' : 'needed';
-} catch { document.documentElement.dataset.onboard='needed'; }
+  document.documentElement.dataset.introVisit = n && n.trim() && n.trim() !== 'Student' ? 'returning' : 'first';
+} catch { document.documentElement.dataset.introVisit='first'; }
+document.documentElement.dataset.onboard='needed';
 </script>
 <style>
 :root{color-scheme:dark;--bg:#111111;--bg-alt:#171717;--surface:#202020;--surface-high:#282828;--surface-soft:#242424;--surface-glass:rgba(38,38,38,.92);--text:#f5f5f5;--text-soft:#d2d2d2;--muted:#989898;--line:rgba(255,255,255,.115);--line-bold:rgba(255,255,255,.22);--button:#ededed;--button-text:#171717;--pill:#303030;--hover:#383838;--shadow:0 18px 55px rgba(0,0,0,.16);--hero-glow:rgba(255,255,255,.065);--radius:13px;--content-width:1430px;--duration:240ms;--scale:1;--card-pad:19px;--card-gap:13px;--ease:cubic-bezier(.18,.72,.22,1)}
@@ -259,7 +262,7 @@ html[data-motion="off"] .intro-step,html[data-motion="off"] .intro-progress span
 <div class="sheet" id="modal" role="dialog" aria-modal="true" aria-hidden="true"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button class="round-btn" id="modalClose" aria-label="Close dialog"><svg><use href="#i-x"/></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
 <div class="command" id="command" role="dialog" aria-modal="true" aria-label="Quick search"><div class="command-card"><input id="commandInput" placeholder="Search PDFs, subjects or actions..." aria-label="Command search"><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
 <div class="toast-area" id="toastArea" aria-live="polite"></div>
-<div id="introFlow" role="dialog" aria-modal="true" aria-label="Welcome to 8aPDF">
+<div id="introFlow" role="dialog" aria-modal="true" aria-hidden="false" aria-label="Welcome to 8aPDF">
  <div class="intro-shell">
   <div class="intro-brand"><span class="intro-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8.5 2.7 5.5 2.8 2.7 4.1v14c3-.9 6.4-.6 9.3 1.5 2.9-2.1 6.3-2.4 9.3-1.5v-14c-2.8-1.3-5.8-1.4-9.3.9Zm0 0v14.6" stroke-width="1.55" stroke-linejoin="round"/></svg></span> 8aPDF</div>
   <section class="intro-step active" data-intro-step="name" aria-label="Enter your name">
@@ -269,7 +272,7 @@ html[data-motion="off"] .intro-step,html[data-motion="off"] .intro-progress span
    <form id="introNameForm"><label for="introName" style="display:block;text-align:left;font-size:.74rem;color:var(--muted);margin:0 0 8px">YOUR NAME</label><input class="intro-field" id="introName" name="name" autocomplete="given-name" autocapitalize="words" maxlength="40" placeholder="Enter your name" required><div id="introError" class="intro-error" aria-live="polite"></div><button class="intro-main-btn" type="submit">Continue &nbsp; →</button></form>
   </section>
   <section class="intro-step" data-intro-step="welcome" aria-label="Personalized welcome">
-   <p class="intro-index">02 / 03 &nbsp; · &nbsp; Just for you</p>
+   <p class="intro-index" id="introWelcomeLabel">02 / 03 &nbsp; · &nbsp; Just for you</p>
    <h1 class="intro-title intro-greeting" id="introGreeting">Welcome.</h1>
    <p class="intro-desc">Your study vault is ready. Every PDF, timetable and important school update — beautifully organized in one place.</p>
    <div class="intro-progress" aria-hidden="true"><span></span></div>
@@ -490,8 +493,8 @@ $('#menuBtn').onclick=()=>showModal('Navigate 8aPDF',`<div style="display:grid;g
 $('#modalContent').onclick=e=>{let b=e.target.closest('[data-menu-go]');if(b){closeModal();nav(b.dataset.menuGo)}};
 $('#supportLink').addEventListener('click',e=>{e.preventDefault();toast('Support email is not configured in the current repository. Please use the existing site contact method.')} );
 
-// First-use welcome: name -> personal greeting -> optional notification permission.
-// Existing visitors retain their saved names and skip the flow entirely.
+// EVERY page load: show a premium welcome. First visits also ask for a name and optional notifications.
+// Returning visitors keep their name and see a short personalized welcome before entering.
 const intro=$('#introFlow');
 let introTimer;
 function showIntroStep(which){
@@ -534,10 +537,24 @@ $('#introAllow').onclick=async()=>{
  else toast('You can enable notifications any time from the bell icon.');
  button.disabled=false;
 };
-if(document.documentElement.dataset.onboard==='needed'){
- showIntroStep('name');
- setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
-} else {intro.setAttribute('aria-hidden','true')}
+// The overlay is visible from <head>, before the dashboard paints: no welcome flash or missed splash.
+if(document.documentElement.dataset.introVisit==='returning'){
+  const savedName=existingUserName().replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,40);
+  if(savedName && savedName!=='Student'){
+    $('#introGreeting').textContent='Welcome back, '+savedName+'.';
+    $('#introWelcomeLabel').textContent='8aPDF  ·  Good to see you again';
+    showIntroStep('welcome');
+    intro.setAttribute('aria-hidden','false');
+    const reduceMotion=settings.motion||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    introTimer=setTimeout(finishIntro,reduceMotion?950:2400);
+  } else {
+    showIntroStep('name');
+    setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
+  }
+} else {
+  showIntroStep('name');
+  setTimeout(()=>$('#introName').focus({preventScroll:true}),200);
+}
 
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
 // Settings open on explicit request, never over first-time onboarding.
