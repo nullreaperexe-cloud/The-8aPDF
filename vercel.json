@@ -3,15 +3,31 @@
   "rewrites": [
     {
       "source": "/announcements",
-      "destination": "/index.html"
+      "destination": "/Updates.html"
+    },
+    {
+      "source": "/updates",
+      "destination": "/Updates.html"
+    },
+    {
+      "source": "/pdfs",
+      "destination": "/Pdf.html"
+    },
+    {
+      "source": "/tasks",
+      "destination": "/Tasks.html"
     },
     {
       "source": "/settings",
-      "destination": "/index.html"
+      "destination": "/Settings.html"
     },
     {
       "source": "/chatbot",
-      "destination": "/index.html"
+      "destination": "/classic.html"
+    },
+    {
+      "source": "/classic",
+      "destination": "/classic.html"
     },
     {
       "source": "/:slug([a-zA-Z0-9-]{3,32})",
