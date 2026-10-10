@@ -955,9 +955,9 @@ html[data-theme="light"] :is(.nav-link.active,.search-submit,.solid,.action.prim
 
 <div class="setting-group" id="studyExperienceSettings"><div class="palette-title"><span class="setting-label">Study Experience</span><span class="palette-count">NEW · PRODUCTIVITY</span></div>
 <p class="setting-explainer">Real tools for focus, revision and daily progress. Your activity stays on this device.</p>
-<label class="setting-row"><span>Show Study Hub<small>Personal dashboard with progress and revision tools</small></span><input id="experienceShowHub" class="toggle" type="checkbox" checked></label>
+<label class="setting-row"><span>Show Study Hub<small>Personal dashboard with progress and revision tools</small></span><input id="experienceShowHub" class="toggle" type="checkbox"></label>
 <label class="setting-row"><span>Auto-start Breaks<small>Switch to a rest break after each completed focus</small></span><input id="experienceAutoBreak" class="toggle" type="checkbox"></label>
-<label class="setting-row"><span>Focus Completion Sound<small>Play a subtle chime when a timer finishes</small></span><input id="experienceSound" class="toggle" type="checkbox"></label>
+<label class="setting-row"><span>Focus Completion Sound<small>Play a subtle chime when a timer finishes</small></span><input id="experienceSound" class="toggle" type="checkbox" checked></label>
 <label class="setting-row"><span>Keyboard Study Shortcuts<small>F Focus · G Study Hub · ? Shortcut guide</small></span><input id="experienceShortcuts" class="toggle" type="checkbox" checked></label>
 <label class="liquid-range-line" for="experienceFocusDuration"><span>Focus Duration</span><strong id="experienceFocusDurationValue">25 min</strong></label><input id="experienceFocusDuration" type="range" min="10" max="60" step="5" value="25">
 <label class="liquid-range-line" for="experienceGoalDuration"><span>Daily Study Goal</span><strong id="experienceGoalDurationValue">60 min</strong></label><input id="experienceGoalDuration" type="range" min="15" max="180" step="15" value="60">
@@ -1349,10 +1349,18 @@ setTimeout(()=>{if(!state.live)showOffline()},4200);connectLive();
 (()=>{'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],bridge=()=>window.__8apdfStudyBridge;
 const K='8apdf_experience_hub_v1';
-const defaults={showHub:true,autoBreak:false,sound:false,shortcuts:true,focusMinutes:25,goalMinutes:60};
+const defaults={showHub:false,autoBreak:false,sound:true,shortcuts:true,focusMinutes:25,goalMinutes:60};
 const get=(key,fall)=>{try{const v=localStorage.getItem(key);return v===null?fall:JSON.parse(v)}catch{return fall}};
 const save=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
 const config={...defaults,...get(K,{})};
+// One-time update: align previously stored first-release defaults with the requested default experience.
+// Future user changes remain fully customizable and persist normally.
+const defaultsRevisionKey='8apdf_study_defaults_20261010_v2';
+if(!get(defaultsRevisionKey,false)){
+  Object.assign(config,defaults);
+  save(K,config);
+  save(defaultsRevisionKey,true);
+}
 const records=Array.isArray(get('8apdf_completed_sessions_v1',[]))?get('8apdf_completed_sessions_v1',[]):[];
 const modes={work:'Focus',short:'Short Break',long:'Long Break'};
 let mode='work',remaining=config.focusMinutes*60,running=false,deadline=0,ticker=0;
