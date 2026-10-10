@@ -1211,6 +1211,37 @@ html[data-ui-mode="studio"] .pdf-card {
   }
 }
 </style>
+
+<style id="8apdf-about-automation-style">
+#modal:has(.about-8apdf) .dialog{
+ width:min(900px,calc(100vw - 26px));max-height:min(91dvh,920px);
+ border-radius:clamp(18px,2.2vw,30px);padding:clamp(19px,3vw,34px);
+ background:var(--surface);color:var(--text);
+ box-shadow:0 36px 120px rgba(0,0,0,.42)
+}
+#modal:has(.about-8apdf) .dialog-head{align-items:center;margin-bottom:20px}
+#modal:has(.about-8apdf) .dialog-head h2{font:750 clamp(1.4rem,2.3vw,1.85rem)/1.15 'Space Grotesk',sans-serif;letter-spacing:-.04em}
+.about-8apdf{color:var(--text);font-family:var(--ui-font,'Space Grotesk',sans-serif)}
+.about-eyebrow,.about-section-label{font-size:.68rem;letter-spacing:.105em;text-transform:uppercase;font-weight:790;color:var(--muted)}
+.about-hero{padding:20px clamp(14px,2.8vw,26px) 22px;border-radius:20px;background:var(--surface-high);border:1px solid var(--line)}
+.about-8apdf h3{font-size:clamp(1.28rem,2.4vw,2rem);letter-spacing:-.055em;line-height:1.17;margin:12px 0 11px;font-weight:750}
+.about-8apdf p{font-size:.82rem;line-height:1.7;color:var(--text-soft);margin:0}
+.about-section-label{margin:26px 0 13px}
+.about-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.about-feature{border:1px solid var(--line);border-radius:15px;padding:17px;background:var(--surface-glass);min-width:0}
+.about-feature strong{display:block;font-weight:730;font-size:.85rem;color:var(--text);margin:0 0 7px}
+.about-feature p{font-size:.75rem;line-height:1.65;color:var(--muted)}
+.about-automation{margin:22px 0 0;border:1px solid var(--line-bold);background:var(--surface-high);padding:clamp(17px,2.9vw,27px);border-radius:20px}
+.about-automation h3{font-size:clamp(1.2rem,2.1vw,1.65rem);margin:10px 0}
+.about-automation-actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:19px}
+.about-automation-button{display:inline-flex;justify-content:center;align-items:center;text-align:center;gap:8px;min-height:45px;border-radius:12px;padding:13px 18px;background:var(--button);color:var(--button-text)!important;text-decoration:none!important;font-size:.78rem;font-weight:760;transition:transform .24s ease,opacity .24s ease}
+.about-automation-button:hover{transform:translateY(-2px);opacity:.91}
+.about-automation-button:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.about-automation-actions span{font-size:.7rem;line-height:1.55;flex:1 1 230px;color:var(--muted)}
+@media(max-width:620px){#modal:has(.about-8apdf) .dialog{padding:19px;max-height:calc(100dvh - 22px)}.about-feature-grid{grid-template-columns:1fr}.about-feature{padding:15px}.about-automation-button{width:100%}}
+@media(prefers-reduced-motion:reduce){.about-automation-button{transition:none}}
+</style>
+
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1278,6 +1309,7 @@ html[data-ui-mode="studio"] .pdf-card {
   <div class="studio-side-end">
     <button type="button" id="studioSidebarSearch" class="studio-side-link" aria-label="Search PDFs"><svg><use href="#i-search"/></svg><span>Search Library</span><kbd>⌘ K</kbd></button>
     <button type="button" data-go="settings" class="studio-side-link" aria-label="Customize site"><svg><use href="#i-settings"/></svg><span>Customize</span></button>
+    <button type="button" data-go="about" class="studio-side-link" aria-label="About 8aPDF and automation"><svg><use href="#i-book"/></svg><span>About 8aPDF</span></button>
     <div class="studio-side-caption">Your study space, without the clutter.</div>
   </div>
 </aside>
@@ -1289,7 +1321,7 @@ html[data-ui-mode="studio"] .pdf-card {
   <button type="button" id="studioMobileMore" class="studio-mobile-item"><svg><use href="#i-menu"/></svg><span>More</span></button>
 </nav>
 <div class="studio-more-panel" id="studioMorePanel" hidden><div class="studio-more-title">Quick navigation <button type="button" id="studioCloseMore" aria-label="Close quick navigation">×</button></div>
-  <button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button>
+  <button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
 </div>
 <main>
 <section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1><span class="classic-title-main">Your Complete Study</span> <em class="classic-title-accent">Material Vault</em></h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p>
@@ -1346,7 +1378,7 @@ html[data-ui-mode="studio"] .pdf-card {
  <div class="studio-placeholder"><span>🔗</span><div><strong>Your public short links, in one place.</strong><p>On the live website you'll be able to open, copy, share and delete links. A local HTML file cannot access your live Vercel database.</p></div><button type="button" id="studioLinksBack">Back to library</button></div>
 </section>
 </main>
-<footer class="footer" id="about"><div class="shell"><div class="footer-grid"><div><a class="brand" href="#home"><span class="anime-logo-mark anime-footer-logo" aria-hidden="true"></span>8aPDF</a><p>Your trusted source for school study materials, circulars and important announcements.</p></div><div><h4>Quick Links</h4><a class="footer-link" href="#home">Home</a><a class="footer-link" href="#library">Study Material</a><a class="footer-link" data-go="announcements" href="#announcements">Announcements</a><a class="footer-link" data-go="timetable" href="#">Timetable</a><a class="footer-link" href="#about">About</a></div><div><h4>Help &amp; Support</h4><a class="footer-link" href="#library">How to Download</a><a class="footer-link" href="#" id="supportLink">Report an Issue</a><a class="footer-link" href="#about">About 8aPDF</a><a class="footer-link" data-go="settings" href="#">Appearance Settings</a></div><div><h4>Stay Updated</h4><p>Turn on notifications for newly added PDFs while the website is open.</p><button class="solid" id="footerBell">Notification Settings</button></div></div><div class="footer-bottom"><span>© <span id="year"></span> 8aPDF. All rights reserved.</span><span>Made for Students · Full-Site Themes Preview</span></div></div></footer>
+<footer class="footer" id="about"><div class="shell"><div class="footer-grid"><div><a class="brand" href="#home"><span class="anime-logo-mark anime-footer-logo" aria-hidden="true"></span>8aPDF</a><p>Your trusted source for school study materials, circulars and important announcements.</p></div><div><h4>Quick Links</h4><a class="footer-link" href="#home">Home</a><a class="footer-link" href="#library">Study Material</a><a class="footer-link" data-go="announcements" href="#announcements">Announcements</a><a class="footer-link" data-go="timetable" href="#">Timetable</a><a class="footer-link" data-go="about" href="#about">About</a></div><div><h4>Help &amp; Support</h4><a class="footer-link" href="#library">How to Download</a><a class="footer-link" href="#" id="supportLink">Report an Issue</a><a class="footer-link" data-go="about" href="#about">About 8aPDF</a><a class="footer-link" data-go="settings" href="#">Appearance Settings</a></div><div><h4>Stay Updated</h4><p>Turn on notifications for newly added PDFs while the website is open.</p><button class="solid" id="footerBell">Notification Settings</button></div></div><div class="footer-bottom"><span>© <span id="year"></span> 8aPDF. All rights reserved.</span><span>Made for Students · Full-Site Themes Preview</span></div></div></footer>
 <div class="drawer-mask" id="drawerMask"></div>
 <aside aria-hidden="true" aria-label="Customize Experience" class="settings" id="settingsPanel"><nav class="setting-nav" id="settingsNav" aria-label="Settings categories">
  <div class="setting-nav-brand"><span class="setting-nav-logo anime-logo-mark" aria-hidden="true"></span><span><strong>8aPDF</strong><small>Preferences</small></span></div>
@@ -1681,7 +1713,38 @@ function renderRecent(){const recent=state.recent.map(id=>state.materials.find(x
 $('#recentWidget').onclick=e=>{let b=e.target.closest('[data-openpdf]');if(!b)return;const x=state.materials.find(i=>i.id===b.dataset.openpdf);if(x)pdfAction(x,'preview')};
 function showLibrary(){ $('#library').style.display='';$('#announcements').style.display='none';$$('[data-go]').forEach(x=>{if(x.classList.contains('nav-link'))x.classList.toggle('active',x.dataset.go==='library')}) }
 function showAnnouncements(){ $('#announcements').style.display='';$('#library').style.display='none';renderAnnouncements();scrollToSection('#announcements');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='announcements')) }
-function nav(go){closeSettings();if(go==='timetable'){showTimetable();return}if(go==='settings'){openSettings();return}if(go==='announcements'){showAnnouncements();return}if(go==='saved'){showLibrary();state.filter='All Subjects';state.query='';$('#searchInput').value='';state.visible=10000;const a=state.materials.filter(x=>state.saved.includes(x.id)&&termOfPdf(x)===state.term);$('#pdfGrid').innerHTML=a.length?a.map(card).join(''):'<div class="empty">No saved PDFs yet. Use the bookmark icon on a PDF card to save it.</div>';$('#libraryStatus').textContent='Saved PDFs · '+a.length;$('#moreWrap').style.display='none';scrollToSection('#library');return}if(go==='search'){openCommand();return}if(go==='latest'){state.filter='All Subjects';state.query='';$('#searchInput').value='';state.sort='new';$('#sortSelect').value='new';showLibrary();renderMaterials();scrollToSection('#library');return}if(go==='home'){showLibrary();scrollToSection('#home');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='home'));return}if(go==='library'){showLibrary();renderMaterials();scrollToSection('#library')}}
+
+function showAbout8aPDF(){
+ const features=[
+ ['📚 PDF Study Library','Browse school materials by subject, search for topics, and filter by Term 1 or Term 2.'],
+ ['🔍 Fast Search','Find titles, subjects and chapters using the library search and shortcuts.'],
+ ['🤖 AI PDF Finder','Ask for school PDFs in a dedicated chat workspace; local matches work without a paid AI request. Optional Gemini assistance depends on server setup.'],
+ ['📄 Preview & Download','Open a PDF preview, download it, or share it directly from its study-material card.'],
+ ['🔗 Smart Share & Short Links','Choose the original PDF link or create a custom short URL. Your browser can manage its own newly created short links.'],
+ ['📢 School Announcements','See published school notices, updates, events and circulars in one place.'],
+ ['📅 School Timetable','View the six-day rotating timetable in a readable interactive table.'],
+ ['🔖 Bookmarks & Recent PDFs','Save useful materials and return to recently opened items on this device.'],
+ ['⏱ Focus Studio','Use focus sessions, revision tools and personal study goals with progress kept locally.'],
+ ['🎨 Personalize Your Workspace','Switch Studio/Classic layouts, dark/light palettes, Liquid Glass, typography and accessibility preferences.'],
+ ['🔔 Optional Notifications','Choose whether to allow website notifications when your browser supports them.']
+ ];
+ const cards=features.map(([title,desc])=>'<article class="about-feature"><strong>'+title+'</strong><p>'+desc+'</p></article>').join('');
+ const content='<div class="about-8apdf">'+
+ '<div class="about-hero"><span class="about-eyebrow">8aPDF · YOUR STUDY WORKSPACE</span>'+
+ '<h3>Everything you need to study, in one place.</h3>'+
+ '<p>Made for students: a searchable school library, announcements, a real timetable, flexible themes and helpful study tools.</p></div>'+
+ '<div class="about-section-label">WEBSITE FEATURES</div><div class="about-feature-grid">'+cards+'</div>'+
+ '<div class="about-automation"><span class="about-eyebrow">AUTOMATED SCHOOL UPDATES</span>'+
+ '<h3>Designed for round-the-clock monitoring.</h3>'+
+ '<p>Our EduSecure GitHub workflow is configured to check for updates approximately every 5 minutes while its worker runs, with an hourly backup schedule and automatic hand-off between worker runs. Actual availability depends on GitHub Actions and successful workflow runs.</p>'+
+ '<div class="about-automation-actions"><a class="about-automation-button" href="https://github.com/nullreaperexe-cloud/edusecure-pdf-sync/actions/workflows/sync.yml" target="_blank" rel="noopener noreferrer">↗ View Automation Runs on GitHub</a>'+
+ '<span>Public workflow history lets you inspect runs and their results. A configured schedule alone does not guarantee 100% uptime.</span></div></div>'+
+ '</div>';
+ const closeSidebar=document.getElementById('studioSidebarClose');
+ if(document.documentElement.dataset.studioMobileMenu==='open'&&closeSidebar)closeSidebar.click();
+ showModal('About 8aPDF',content);
+}
+function nav(go){closeSettings();if(go==='about'){showAbout8aPDF();return}if(go==='timetable'){showTimetable();return}if(go==='settings'){openSettings();return}if(go==='announcements'){showAnnouncements();return}if(go==='saved'){showLibrary();state.filter='All Subjects';state.query='';$('#searchInput').value='';state.visible=10000;const a=state.materials.filter(x=>state.saved.includes(x.id)&&termOfPdf(x)===state.term);$('#pdfGrid').innerHTML=a.length?a.map(card).join(''):'<div class="empty">No saved PDFs yet. Use the bookmark icon on a PDF card to save it.</div>';$('#libraryStatus').textContent='Saved PDFs · '+a.length;$('#moreWrap').style.display='none';scrollToSection('#library');return}if(go==='search'){openCommand();return}if(go==='latest'){state.filter='All Subjects';state.query='';$('#searchInput').value='';state.sort='new';$('#sortSelect').value='new';showLibrary();renderMaterials();scrollToSection('#library');return}if(go==='home'){showLibrary();scrollToSection('#home');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='home'));return}if(go==='library'){showLibrary();renderMaterials();scrollToSection('#library')}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;e.preventDefault();nav(b.dataset.go)});
 // Live Firestore announcements: same published / createdAt fields as in the existing 8aPDF code.
 function aText(x){return [x.title,x.description,x.category,x.subject,x.message,x.fullMessage].join(' ').toLowerCase()}
