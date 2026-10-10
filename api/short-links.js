@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 const ROOT = 'short-links/v1/';
 const PROJECT = 'academyvault-5d1eb';
 const PUBLIC_FIREBASE_KEY = 'AIzaSyATxKki6gkNWic_CnoGbZnOZjAUj1lbKGI';
-const RESERVED = new Set(['api','app','admin','about','help','privacy','terms','settings','home','index','login','logout','register','signup','dashboard','library','timetable','announcement','announcements','pdf','pdfs','share','s','short','download','manifest','favicon','robots','sitemap','assets','static','public','support','contact','status','vercel','www']);
+const RESERVED = new Set(['api','app','admin','about','help','privacy','terms','settings','home','index','login','logout','register','signup','dashboard','library','chatbot','timetable','announcement','announcements','pdf','pdfs','share','s','short','download','manifest','favicon','robots','sitemap','assets','static','public','support','contact','status','vercel','www']);
 const pattern = /^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])$/;
 
 function normalize(value) { return typeof value === 'string' ? value.trim().toLowerCase() : ''; }
