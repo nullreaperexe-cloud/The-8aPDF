@@ -1,0 +1,74 @@
+/* Timetable functionality only. Inherit current 8aPDF theme, typography and dialog. */
+#modalContent .tt-enhancement{color:var(--text);font:inherit;min-width:0}
+#modalContent .tt-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:11px 0 12px;flex-wrap:wrap}
+#modalContent .tt-tools-left{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#modalContent .tt-tools button,
+#modalContent .tt-bulk button{cursor:pointer;background:var(--surface-high);color:var(--text);border:1px solid var(--line-bold);border-radius:9px;padding:8px 10px;font:650 .72rem/1.3 inherit}
+#modalContent .tt-mark-caption{font-size:.72rem;color:var(--muted)}
+#modalContent .tt-tracker{border:1px solid var(--line);border-radius:11px;padding:0 12px;margin:0 0 13px;background:var(--surface-soft)}
+#modalContent .tt-tracker summary{cursor:pointer;padding:11px 0;display:flex;justify-content:space-between;gap:10px;font-size:.75rem;font-weight:700;list-style:none}
+#modalContent .tt-tracker summary::-webkit-details-marker{display:none}
+#modalContent .tt-tracker summary:before{content:'▸';padding-right:6px}
+#modalContent .tt-tracker[open] summary:before{content:'▾'}
+#modalContent .tt-tracker summary span{margin-left:auto;font-weight:500;color:var(--muted)}
+#modalContent .tt-subject-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:0 0 11px}
+#modalContent .tt-subject-button{display:flex;align-items:center;justify-content:space-between;gap:5px;background:var(--surface-high);color:var(--text);border:1px solid var(--line-bold);border-radius:8px;padding:8px;cursor:pointer;font:600 .69rem/1.35 inherit;min-width:0}
+#modalContent .tt-subject-button span{overflow-wrap:anywhere}
+#modalContent .tt-subject-button b{font-size:15px;flex:none}
+#modalContent .tt-subject-button[data-state=green],
+#modalContent .tt-subject-button[data-state=red]{border-color:currentColor}
+#modalContent .tt-subject-button[data-state=green]{color:#4bc987;background:rgba(40,166,95,.1)}
+#modalContent .tt-subject-button[data-state=red]{color:#ef7979;background:rgba(220,80,80,.1)}
+#modalContent .tt-bulk{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 0 9px}
+#modalContent .tt-tracker small{display:block;color:var(--muted);font-size:.67rem;line-height:1.5;padding:0 0 11px}
+#modalContent .tt-picked{font-size:.72rem;color:var(--muted);line-height:1.4;margin:9px 0!important}
+#modalContent .timetable-table td{cursor:pointer}
+#modalContent .timetable-table td.tt-complete{background:color-mix(in srgb,#2daa6c 17%,var(--surface))!important;box-shadow:inset 0 -3px #37b76f}
+#modalContent .timetable-table td.tt-pending{background:color-mix(in srgb,#d65454 14%,var(--surface))!important;box-shadow:inset 0 -3px #d65454}
+#modalContent .tt-mobile-fit{display:none}
+#modalContent .tt-zoom-layer[hidden]{display:none!important}
+#modalContent .tt-zoom-layer{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:12px;backdrop-filter:blur(6px)}
+#modalContent .tt-zoom-panel{width:min(520px,100%);max-height:calc(100dvh - 25px);overflow:auto;border:1px solid var(--line-bold);border-radius:16px;padding:18px;background:var(--surface);color:var(--text);box-shadow:0 28px 90px rgba(0,0,0,.4)}
+#modalContent .tt-zoom-header{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px;font-size:1rem}
+#modalContent .tt-zoom-header button{background:var(--surface-high);color:var(--text);border:1px solid var(--line-bold);border-radius:9px;padding:6px 11px;font-size:20px;cursor:pointer}
+#modalContent .tt-zoom-choose{display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:10px}
+#modalContent .tt-zoom-choose select{background:var(--surface-high);color:var(--text);border:1px solid var(--line-bold);padding:8px 10px;border-radius:9px}
+#modalContent .tt-zoom-periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#modalContent .tt-zoom-periods button{display:flex;flex-direction:column;gap:5px;text-align:left;min-width:0;background:var(--surface-soft);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--text);cursor:pointer;overflow-wrap:anywhere}
+#modalContent .tt-zoom-periods button small{font-size:.67rem;color:var(--muted)}
+#modalContent .tt-zoom-periods button strong{font-size:.87rem;line-height:1.4}
+#modalContent .tt-zoom-periods button span{font-size:.67rem;color:var(--muted)}
+#modalContent .tt-zoom-periods button[data-state=green]{border-color:#399b67}
+#modalContent .tt-zoom-periods button[data-state=red]{border-color:#b85858}
+@media(max-width:810px){
+ .sheet:has(#ttEnhancement) .dialog{width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important;padding:12px!important;max-height:calc(100dvh - 16px)!important}
+ .sheet:has(#ttEnhancement) .dialog-head{margin-bottom:6px!important}
+ #modalContent .tt-enhancement{min-width:0}
+ #modalContent .tt-tools{margin:3px 0 8px;gap:6px}
+ #modalContent .tt-tools-left{gap:4px}
+ #modalContent .tt-tools button{font-size:.66rem;padding:7px}
+ #modalContent .tt-mark-caption{font-size:.62rem}
+ #modalContent .tt-tracker{margin-bottom:7px}
+ #modalContent .tt-tracker summary{padding:8px 0;font-size:.72rem}
+ #modalContent .tt-subject-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #modalContent .tt-mobile-fit{display:block;width:100%;max-width:100%;overflow:hidden}
+ #modalContent .timetable-scroll{display:none!important}
+ #modalContent .tt-mobile-fit .tt-fit-table{width:100%!important;max-width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+ #modalContent .tt-fit-table th{background:var(--surface-high);color:var(--text-soft);font-size:.63rem;font-weight:700;height:27px;border-bottom:1px solid var(--line);padding:0 1px}
+ #modalContent .tt-fit-table th:first-child{width:33px}
+ #modalContent .tt-fit-table tbody th{height:33px;border-bottom:1px solid var(--line)}
+ #modalContent .tt-fit-table td{height:33px;padding:0;border-bottom:1px solid var(--line);border-left:1px solid var(--line);min-width:0}
+ #modalContent .tt-period-button{display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;height:100%;padding:2px 0;gap:2px;background:transparent;color:var(--text);border:0;cursor:pointer;min-width:0;overflow:hidden}
+ #modalContent .tt-period-button span{font-size:var(--tt-fit-font,8px);line-height:1.13;letter-spacing:-.015em;overflow-wrap:anywhere;text-align:center}
+ #modalContent .tt-period-button i{display:block;width:4px;height:4px;background:var(--line-bold);border-radius:50%}
+ #modalContent .tt-period-button[data-state=green]{background:rgba(39,169,94,.16)}
+ #modalContent .tt-period-button[data-state=green] i{background:#35be76}
+ #modalContent .tt-period-button[data-state=red]{background:rgba(210,62,70,.13)}
+ #modalContent .tt-period-button[data-state=red] i{background:#e26464}
+ .sheet:has(#ttEnhancement) .timetable-help{font-size:.67rem;margin:4px 0 7px!important}
+ .sheet:has(#ttEnhancement) .timetable-help:last-of-type{display:none}
+ #modalContent .tt-picked{margin:6px 0!important;font-size:.67rem}
+}
+@media(max-width:390px){#modalContent .tt-fit-table th:first-child{width:26px}#modalContent .tt-fit-table td{height:30px}#modalContent .tt-fit-table tbody th{height:30px}}
+@media(max-width:500px){#modalContent .tt-zoom-periods{grid-template-columns:repeat(2,minmax(0,1fr))}#modalContent .tt-zoom-panel{padding:13px}}
+@media(prefers-reduced-motion:reduce){#modalContent .tt-enhancement *{transition:none!important;animation:none!important}}
