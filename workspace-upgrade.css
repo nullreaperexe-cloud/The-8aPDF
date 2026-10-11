@@ -148,3 +148,20 @@ html[data-ui-mode="studio"] .filter-foot .mini-tabs{display:none!important}
 .ws-song-search{display:flex;gap:8px;margin:14px 0}.ws-song-search input{flex:1;min-width:0;border:1px solid rgba(127,127,127,.3);border-radius:12px;padding:12px;background:transparent;color:inherit}.ws-song-search button{border:0;border-radius:12px;padding:10px 16px;cursor:pointer}.ws-video-panel{margin-top:12px}
 @media(max-width:650px){.ws-music-dock{grid-template-columns:44px minmax(0,1fr) auto auto auto auto!important;padding:10px!important}.ws-music-dock .ws-album-art{width:44px;height:44px}}
 @media(prefers-reduced-motion:reduce){.ws-music-dock.is-playing .ws-orb{animation:none!important}}
+
+/* Restore compact equalizer and honor active theme */
+.ws-music-dock{grid-template-columns:34px minmax(110px,1fr) auto auto auto minmax(100px,1.2fr) auto auto!important;color:var(--text-primary,var(--text,#202124))!important;background:var(--surface,var(--card-bg,#fff))!important;border:1px solid var(--border-color,rgba(100,100,100,.22))!important}
+html[data-tone="dark"] .ws-music-dock,html[data-theme="dark"] .ws-music-dock,html[data-theme="pure-black"] .ws-music-dock{color:var(--text-primary,#f6f6f6)!important;background:var(--surface,#202124)!important}
+html[data-tone="light"] .ws-music-dock,html[data-theme="light"] .ws-music-dock{color:#202124!important;background:#fff!important;border-color:#dadce0!important}
+.ws-music-dock .ws-wave{display:flex!important;align-items:center;justify-content:center;width:34px;height:34px;gap:3px;border-radius:9px;background:rgba(127,127,127,.09)}
+.ws-music-dock .ws-wave i{display:block;width:3px;height:9px;border-radius:4px;background:currentColor}
+.ws-music-dock.is-playing .ws-wave i{animation:wsBeat .65s ease-in-out infinite alternate}
+.ws-music-dock.is-playing .ws-wave i:nth-child(2){animation-delay:-.23s}
+.ws-music-dock.is-playing .ws-wave i:nth-child(3){animation-delay:-.41s}
+.ws-music-dock.is-playing .ws-wave i:nth-child(4){animation-delay:-.15s}
+.ws-music-dock button{color:inherit!important;background:rgba(127,127,127,.12)!important}
+.ws-music-dock #wsPlayPause{background:rgba(127,127,127,.18)!important;filter:none!important}
+.ws-music-dock input{accent-color:currentColor}
+#wsSoundList{max-height:440px;overflow-y:auto}
+#wsSoundList .ws-track{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 6px}
+#wsSoundList .ws-track button{flex-shrink:0}
