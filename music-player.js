@@ -109,7 +109,7 @@ async function resolve(x){
  if(x.videoId)return x.videoId;
  if(state.searchUnavailable)throw Error('YouTube search is not configured. Use the YouTube link for this song.');
  const key='8apdf_yt_song_'+encodeURIComponent(x.title+'-'+x.artist).slice(0,150);
- try{const cache=JSON.parse(sessionStorage.getItem(key)||'null');if(cache?.videoId&&/^[\w-]{11}$/.test(cache.videoId)){x.videoId=cache.videoId;return x.videoId}}catch{}
+ try{const cache=JSON.parse(localStorage.getItem(key)||'null');if(cache?.videoId&&/^[\w-]{11}$/.test(cache.videoId)&&Date.now()-cache.savedAt<7*86400000){x.videoId=cache.videoId;return x.videoId}}catch{}
  const response=await fetch('/api/music-search?q='+encodeURIComponent(x.title+' '+x.artist+' official music video'),{headers:{Accept:'application/json'}});
  const result=await response.json().catch(()=>({}));
  if(!response.ok){if(response.status===503)state.searchUnavailable=true;throw Error(result.error||'YouTube video lookup unavailable')}
@@ -124,7 +124,7 @@ async function resolve(x){
  }).sort((a,b)=>b.score-a.score);
  if(!ranked.length||ranked[0].score<2)throw Error('No suitable embeddable video found.');
  x.videoId=ranked[0].videoId;
- try{sessionStorage.setItem(key,JSON.stringify({videoId:x.videoId}))}catch{}
+ try{localStorage.setItem(key,JSON.stringify({videoId:x.videoId,savedAt:Date.now()}))}catch{}
  return x.videoId;
 }
 async function play(i,fromAutonext=false){
