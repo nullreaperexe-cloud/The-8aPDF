@@ -1840,7 +1840,7 @@ function applySitePalette(){
  document.querySelector('meta[name="theme-color"]').content=values['--bg'];
  $('#selectedThemeName').textContent=t.name;
 }
-let activePaletteFilter='all',lastSelectedPreset='pure-black';
+let activePaletteFilter='all',lastSelectedPreset=allThemes.some(t=>t.id===settings.lastPresetTheme)?settings.lastPresetTheme:(allThemes.some(t=>t.id===settings.theme)?settings.theme:'pure-black');
 function renderRoleEditors(){
  const host=$('#themeRoleGrid');if(!host)return;
  const selected=selectedTheme(),colors=selected.roles||roleColors(selected);
@@ -1870,14 +1870,14 @@ $('#paletteFilters').onclick=e=>{const button=e.target.closest('[data-palette-fi
 $('#paletteSearch').oninput=renderPalette;
 $('#themeGrid').onclick=e=>{
  const button=e.target.closest('[data-theme-choice]');if(!button)return;
- settings.theme=button.dataset.themeChoice;lastSelectedPreset=settings.theme;setSettings();document.dispatchEvent(new Event('8apdf:palette-customized'));
+ settings.theme=button.dataset.themeChoice;lastSelectedPreset=settings.theme;settings.lastPresetTheme=settings.theme;setSettings();document.dispatchEvent(new Event('8apdf:palette-customized'));
 };
 $('#themeRoleGrid').addEventListener('input',e=>{
  const key=e.target.dataset.themeRole;
  if(!roleDefs.some(([role])=>role===key)||!/^#[0-9a-f]{6}$/i.test(e.target.value))return;
  // Start an independent ten-color mix from the current five-color preset.
  if(settings.theme!=='personal-mix'){
-  const t=selectedTheme();settings.personalColors={...roleColors(t)};lastSelectedPreset=t.id==='custom'?'pure-black':t.id;
+  const t=selectedTheme();settings.personalColors={...roleColors(t)};lastSelectedPreset=t.id==='custom'?'pure-black':t.id;settings.lastPresetTheme=lastSelectedPreset;
  }
  settings.personalColors[key]=e.target.value.toLowerCase();
  settings.theme='personal-mix';
