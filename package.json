@@ -7,6 +7,6 @@
     "@vercel/blob": "^2.6.1"
   },
   "scripts": {
-    "test": "node --check workspace-upgrade.js && node --check music-player.js && node --check api/pdf-summarize.js && node --check api/upload-pdf.js && node --check short-links-ui.js && node tests/workspace.test.cjs && node tests/music.test.cjs"
+    "test": "node --check workspace-upgrade.js && node --check music-player.js && node --check soundcloud-studio.js && node --check api/pdf-summarize.js && node --check api/upload-pdf.js && node --check short-links-ui.js && node tests/workspace.test.cjs && node tests/music.test.cjs && node tests/soundcloud.test.cjs"
   }
 }
