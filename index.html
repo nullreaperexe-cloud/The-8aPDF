@@ -1354,7 +1354,7 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
 .pdf-card .pdf-summary-utility:hover{color:var(--text)}
 #zipExport{white-space:nowrap}
 </style>
-<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/soundcloud-studio.css?v=sc-compact-20261011v3"/>
+<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=hybrid-ai-20261011"/><link rel="stylesheet" href="/soundcloud-studio.css?v=sc-compact-20261011v3"/>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -2018,6 +2018,7 @@ else openOriginalName();
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
 window.__8apdfStudyBridge={
  documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
+ announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:String(a.title||''),description:String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
  recents:()=>[...state.recent],bookmarks:()=>[...state.saved],
  openDocument:(id,action='preview')=>{const x=state.materials.find(x=>x.id===id);if(x)pdfAction(x,['preview','download','share'].includes(action)?action:'preview')},
  navigate:nav,subject:(subject)=>{state.filter=subject;state.query='';$('#searchInput').value='';showLibrary();renderMaterials();scrollToSection('#library')},
@@ -2391,11 +2392,11 @@ body.pdf-ai-open{overflow:hidden!important}.pdf-ai-layer button:focus-visible{ou
   <p class="ai-nav-footnote">Your searches stay on this device. Matching PDFs come straight from your library.</p>
 </nav>
 <div class="pdf-ai-main">
-  <div class="pdf-ai-top"><button type="button" class="ai-nav-menu" id="pdfAiNavToggle" aria-label="Toggle AI navigation" aria-expanded="false">☰</button><span class="pdf-ai-avatar" aria-hidden="true">✦</span><div><h2 id="pdfAiHeading">8aPDF AI Finder</h2><p id="pdfAiState">Instant search · Gemini only when needed</p></div><button type="button" id="pdfAiClose" class="pdf-ai-close" aria-label="Close AI finder">×</button></div>
+  <div class="pdf-ai-top"><button type="button" class="ai-nav-menu" id="pdfAiNavToggle" aria-label="Toggle AI navigation" aria-expanded="false">☰</button><span class="pdf-ai-avatar" aria-hidden="true">✦</span><div><h2 id="pdfAiHeading">8aPDF Study AI</h2><p id="pdfAiState">Instant search · Gemini only when needed</p></div><button type="button" id="pdfAiClose" class="pdf-ai-close" aria-label="Close AI finder">×</button></div>
   <div class="pdf-ai-feed" id="pdfAiFeed" role="log" aria-live="polite" aria-relevant="additions">
-   <div class="pdf-ai-welcome" id="pdfAiWelcome"><span class="ai-welcome-logo anime-logo-mark" aria-hidden="true"></span><span class="ai-welcome-kicker">8aPDF · YOUR STUDY ASSISTANT</span><h1>How can I help you study?</h1><p>Find PDFs by subject, chapter, topic or term. Instant library matches, without spending AI credits.</p><div class="pdf-ai-quick" id="pdfAiQuick"><button type="button" data-ai-prompt="Science chapter 3">Science Ch 3</button><button type="button" data-ai-prompt="Latest Computer PDFs">Computer PDFs</button><button type="button" data-ai-prompt="Hindi Term 2 PDFs">Hindi Term 2</button><button type="button" data-ai-prompt="Show all Mathematics PDFs">Maths PDFs</button></div></div>
+   <div class="pdf-ai-welcome" id="pdfAiWelcome"><span class="ai-welcome-logo anime-logo-mark" aria-hidden="true"></span><span class="ai-welcome-kicker">8aPDF · YOUR STUDY ASSISTANT</span><h1>How can I help you study?</h1><p>Find PDFs, ask about teacher messages, upcoming tests and notebook submissions. Instant answers first; Gemini only when needed.</p><div class="pdf-ai-quick" id="pdfAiQuick"><button type="button" data-ai-prompt="Science chapter 3">Science Ch 3</button><button type="button" data-ai-prompt="Latest Computer PDFs">Computer PDFs</button><button type="button" data-ai-prompt="Hindi Term 2 PDFs">Hindi Term 2</button><button type="button" data-ai-prompt="Which test is coming next?">Upcoming Test</button><button type="button" data-ai-prompt="Any notebook submissions coming up?">Notebook Submission</button><button type="button" data-ai-prompt="Show latest teacher announcements">Teacher Messages</button></div></div>
   </div>
-  <div class="pdf-ai-bottom"><form class="pdf-ai-compose" id="pdfAiForm"><textarea id="pdfAiInput" rows="1" maxlength="400" placeholder="Find Science chapter 3 PDF..." aria-label="Ask PDF Finder"></textarea><button class="pdf-ai-submit" type="submit" aria-label="Send question">➜</button></form><p class="pdf-ai-caption" id="pdfAiHint">Fast local matching · Server-side Gemini Flash-Lite when configured</p></div>
+  <div class="pdf-ai-bottom"><form class="pdf-ai-compose" id="pdfAiForm"><textarea id="pdfAiInput" rows="1" maxlength="400" placeholder="Ask about PDFs, tests, homework and teacher messages…" aria-label="Ask 8aPDF Study AI"></textarea><button class="pdf-ai-submit" type="submit" aria-label="Send question">➜</button></form><p class="pdf-ai-caption" id="pdfAiHint">Fast local matching · Server-side Gemini Flash-Lite when configured</p></div>
  </div>
  </section>
 </aside>
@@ -2431,13 +2432,33 @@ return rows.filter(x=>x.score>0).slice(0,6).map(x=>x.doc)}
 function makeMessage(text,type='ai'){const initial=el('pdfAiWelcome');if(initial)initial.hidden=true;const p=document.createElement('div');p.className='pdf-ai-message '+(type==='user'?'user':'ai');const z=document.createElement('p');z.textContent=text;p.append(z);feed.append(p);feed.scrollTop=feed.scrollHeight;return p}
 function showResults(text,docs){const node=makeMessage(text);if(!docs.length)return;const grid=document.createElement('div');grid.className='pdf-ai-results';for(const doc of docs){const card=document.createElement('article');card.className='pdf-ai-result';const h=document.createElement('h3');h.textContent=doc.title;const small=document.createElement('small');small.textContent=[doc.subject,doc.term==='term1'?'Term 1':doc.term==='term2'?'Term 2':'Date unavailable',doc.chapter].filter(Boolean).join(' · ');card.append(h,small);const actions=document.createElement('div');actions.className='pdf-ai-result-actions';for(const [label,action] of [['Preview','preview'],['Download','download'],['Share','share']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{if(!bridge()?.openDocument)return;bridge().openDocument(doc.id,action)});actions.append(b)}card.append(actions);grid.append(card)}node.append(grid);feed.scrollTop=feed.scrollHeight}
 let configured=false,checked=false,busy=false,lastFocus=null,seq=0;const memory=new Map();
-async function checkAI(){if(checked)return configured;checked=true;try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant search · Gemini Flash-Lite available':'Instant PDF search · no credits used';return configured}
+async function checkAI(){if(checked)return configured;checked=true;if(window.__8apdfStudyIntel?.customKey?.()){configured=true;status.textContent='Instant answers · Personal Gemini key active';return true}try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant answers · Gemini available when needed':'Local-first search · no AI credits';return configured}
+document.addEventListener('8apdf:gemini-key-changed',()=>{checked=false;checkAI()});
 async function open(){lastFocus=document.activeElement;layer.hidden=false;document.body.classList.add('pdf-ai-open');if(document.documentElement.dataset.studioMobileMenu==='open')el('studioSidebarClose')?.click();input.focus({preventScroll:true});checkAI();}
 function close(){layer.hidden=true;document.body.classList.remove('pdf-ai-open');lastFocus?.focus?.({preventScroll:true})}
 el('studioAssistantLink')?.addEventListener('click',open);el('pdfAiClose').addEventListener('click',close);el('pdfAiShade').addEventListener('click',close);
 const morePanel=el('studioMorePanel');if(morePanel){const btn=document.createElement('button');btn.type='button';btn.id='studioMoreAssistant';btn.textContent='✦ AI PDF Finder';btn.addEventListener('click',()=>{morePanel.hidden=true;open()});morePanel.append(btn)}
 document.addEventListener('keydown',e=>{if(layer.hidden||el('settingsPanel')?.classList.contains('open'))return;if(e.key==='Escape'){e.preventDefault();close();return}if(e.key==='Tab'){const focusable=[...layer.querySelectorAll('button:not([disabled]),textarea')];if(!focusable.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
 el('pdfAiQuick').addEventListener('click',e=>{const b=e.target.closest('[data-ai-prompt]');if(!b)return;input.value=b.dataset.aiPrompt;el('pdfAiForm').requestSubmit()});
+function showNoticeResults(result){
+ const matches=result.announcements||[];
+ showResults(result.message,result.results||[]);
+ if(!matches.length)return;
+ const messages=Array.from(feed.querySelectorAll('.pdf-ai-message.ai'));
+ const parent=messages[messages.length-1];
+ if(!parent)return;
+ const list=document.createElement('div');list.className='pdf-ai-results';
+ for(const a of matches.slice(0,4)){
+  const card=document.createElement('article');card.className='pdf-ai-result';
+  const h=document.createElement('h3');h.textContent=a.title||'Teacher announcement';
+  const sub=document.createElement('small');sub.textContent=[a.subject,a.category].filter(Boolean).join(' · ')||'Teacher message';
+  const p=document.createElement('p');p.textContent=String(a.description||a.message||'').slice(0,350);
+  const btn=document.createElement('button');btn.type='button';btn.className='pdf-ai-source-link';btn.textContent='View Teacher Messages →';
+  btn.onclick=()=>{close();bridge()?.navigate?.('announcements')};
+  card.append(h,sub,p,btn);list.append(card)
+ }
+ parent.append(list);feed.scrollTop=feed.scrollHeight;
+}
 function answerLocal(query,docs){const norm=normalize(query),all=docs.length,sub=subjectOf(query),chap=chapterOf(query),term=termOf(query);
 if(/^(hi|hii|hello|hey|namaste|hello bhai|hlo)\b/.test(norm))return{message:'Hey! 👋 Ask me for any PDF by subject, chapter, term or topic.',results:[]};
 if(/\b(timetable|time table|periods|schedule)\b/.test(norm)&&!sub){const days=bridge()?.timetable?.();const detail=Array.isArray(days)?'\n\n'+days.map(x=>'Day '+x.day+': '+x.periods.slice(1).join(' · ')).join('\n'):'';return{message:'Your six-day school timetable is also available in the left sidebar → Timetable.'+detail,results:[]}}
@@ -2446,11 +2467,30 @@ const found=rank(query,docs);
 if(found.length)return{message:'Found '+found.length+' matching PDF'+(found.length===1?'':'s')+' in your 8aPDF library. Open, download or share below:',results:found};
 if(sub||chap||term||/\bpdfs?|notes?|worksheet|study\s+material\b/.test(norm))return{message:'I couldn’t find a matching PDF in the current library. Try another chapter name, subject or term.',results:[]};
 return null;}
-async function answerAI(question,docs){if(!configured)return null;const key=normalize(question);if(memory.has(key))return memory.get(key);
-const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),9000);
-try{const pool=docs.slice(0,80).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,120),chapter:d.chapter,term:d.term}));const r=await fetch('/api/pdf-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,catalog:pool}),signal:controller.signal});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'AI service unavailable');const ids=new Set(Array.isArray(j.ids)?j.ids:[]);const matches=docs.filter(d=>ids.has(d.id)).slice(0,5);const result={message:String(j.answer||'Here are the closest documents I found.'),results:matches};memory.set(key,result);if(memory.size>25)memory.delete(memory.keys().next().value);return result;
-}catch(e){hint.textContent=e.name==='AbortError'?'Gemini timed out. Instant search still works.':'Gemini unavailable right now. Instant search is ready.';return null}finally{clearTimeout(timer)}}
-async function send(){const question=input.value.trim();if(!question||busy)return;input.value='';makeMessage(question,'user');const docs=bridge()?.documents?.()||[];const result=answerLocal(question,docs);if(result){showResults(result.message,result.results);return}busy=true;let placeholder=makeMessage('Searching your library…');try{await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();if(resultAI)showResults(resultAI.message,resultAI.results);else showResults('I couldn’t find a reliable matching PDF. Try a subject and chapter name, such as “Science chapter 3”.',[])}finally{busy=false}}
+async function answerAI(question,docs){
+ if(!configured)return null;
+ const anns=bridge()?.announcements?.()||[];
+ const key=normalize(question)+'|'+docs.length+'|'+anns.length;
+ if(memory.has(key))return memory.get(key);
+ const tokens=words(question).filter(x=>x.length>2);
+ const score=x=>{const t=normalize([x.title,x.subject,x.category].join(' ')),d=normalize([x.description,x.message,x.fullMessage].join(' '));return tokens.reduce((v,k)=>v+(t.includes(k)?5:d.includes(k)?2:0),0)};
+ const catalog=docs.slice().sort((a,b)=>score(b)-score(a)).slice(0,36).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,170),chapter:d.chapter,term:d.term}));
+ const announcements=anns.slice().sort((a,b)=>score(b)-score(a)).slice(0,38).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,350),eventDate:typeof a.eventDate==='string'?a.eventDate:'',messageDate:typeof a.messageDate==='string'?a.messageDate:''}));
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),11000);
+ try{
+  const headers={'Content-Type':'application/json'},personal=window.__8apdfStudyIntel?.customKey?.();
+  if(personal)headers['x-8apdf-gemini-key']=personal;
+  const response=await fetch('/api/pdf-chat',{method:'POST',headers,body:JSON.stringify({question,catalog,announcements}),signal:controller.signal});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error(data.error||'AI currently unavailable');
+  const ids=new Set(Array.isArray(data.ids)?data.ids:[]),annIds=new Set(Array.isArray(data.announcementIds)?data.announcementIds:[]);
+  const result={message:String(data.answer||'No confirmed match in the current materials.'),results:docs.filter(d=>ids.has(d.id)).slice(0,4),announcements:anns.filter(a=>annIds.has(a.id)).slice(0,4)};
+  memory.set(key,result);if(memory.size>30)memory.delete(memory.keys().next().value);
+  return result;
+ }catch(e){hint.textContent=e.name==='AbortError'?'Gemini timed out. Local answers remain available.':'Gemini unavailable: '+String(e.message||'Please retry').slice(0,140);return null}
+ finally{clearTimeout(timer)}
+}
+async function send(){const question=input.value.trim();if(!question||busy)return;input.value='';makeMessage(question,'user');const docs=bridge()?.documents?.()||[];const announcement=window.__8apdfStudyIntel?.answer?.(question);if(announcement){showNoticeResults(announcement);return}const result=answerLocal(question,docs);if(result){showResults(result.message,result.results);return}busy=true;const placeholder=makeMessage('Checking PDFs and teacher announcements…');try{await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();if(resultAI)showNoticeResults(resultAI);else showResults('No confirmed answer from the current PDFs or teacher announcements. Ask a specific subject, test or notebook submission question.',[])}finally{busy=false}}
 el('pdfAiForm').addEventListener('submit',e=>{e.preventDefault();send()});input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();el('pdfAiForm').requestSubmit()}});
 window.__8apdfAiFinderTest={rank,answerLocal,normalize,subjectOf,chapterOf,termOf};
 })();
@@ -2911,6 +2951,6 @@ document.getElementById('modal')?.addEventListener('submit',event=>{
 
 draw();
 })();
-</script><script defer src="/soundcloud-catalog.js?v=sc-compact-20261011v3"></script><script defer src="/soundcloud-studio.js?v=sc-compact-20261011v3"></script><script defer src="/study-typing.js?v=typewriter-20261011"></script><script defer src="/workspace-upgrade.js?v=motivation-20261011"></script>
+</script><script defer src="/soundcloud-catalog.js?v=sc-compact-20261011v3"></script><script defer src="/soundcloud-studio.js?v=sc-compact-20261011v3"></script><script defer src="/study-typing.js?v=typewriter-20261011"></script><script defer src="/study-intelligence.js?v=hybrid-ai-20261011"></script><script defer src="/workspace-upgrade.js?v=motivation-20261011"></script>
 </body>
 </html>
