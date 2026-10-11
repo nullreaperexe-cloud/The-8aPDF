@@ -8,11 +8,10 @@ export default async function handler(req,res) {
   }
   const slug=typeof req.query.slug==='string'?req.query.slug.trim().toLowerCase():'';
   if(!VALID.test(slug)||slug.includes('--'))return res.status(404).send('8aPDF short link not found.');
-  if(!process.env.BLOB_READ_WRITE_TOKEN)return res.status(503).send('8aPDF short links are not configured yet.');
   try {
     let item;
-    try{item=await get(ROOT+slug+'.json',{access:'private'})}
-    catch(firstError){item=await get(ROOT+slug+'.json',{access:'public'})}
+    try{item=await get(ROOT+slug+'.json',{access:'public'})}
+    catch(firstError){item=await get(ROOT+slug+'.json',{access:'private'})}
     if(!item||item.statusCode!==200)return res.status(404).send('8aPDF short link not found.');
     const record=JSON.parse(await new Response(item.stream).text());
     const u=new URL(record.url);
