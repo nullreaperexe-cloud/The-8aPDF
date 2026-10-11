@@ -65,7 +65,7 @@ function paint(){
  const filtered=all.map((x,i)=>({...x,i})).filter(x=>(genre==='All'||x.genre===genre)&&(!search||(x.title+' '+x.artist).toLowerCase().includes(search)));
  $('scmGenres').innerHTML=['All','Hindi','Punjabi','English'].map(g=>'<button type="button" class="'+(genre===g?'selected':'')+'" data-scm-genre="'+g+'">'+g+'</button>').join('');
  $('scmSongCount').textContent=filtered.length+' tracks · '+all.length+' total';
- $('scmSongs').innerHTML=filtered.map(x=>'<div class="scm-song '+(x.i===current&&!dock.hidden?'selected':'')+'"><button type="button" class="scm-song-play" data-scm-index="'+x.i+'"><span class="scm-song-note">♫</span><span class="scm-song-details"><strong>'+esc(x.title)+'</strong><small>'+esc(x.artist||'SoundCloud upload')+' · '+esc(x.genre||'Added')+'</small></span><span class="scm-song-arrow">▶</span></button>'+(x.i>=FEATURED.length?'<button class="scm-song-delete" type="button" data-scm-remove="'+x.i+'" aria-label="Remove '+esc(x.title)+'">×</button>':'')+'</div>').join('')||'<p class="scm-empty">No songs match this search.</p>';
+ $('scmSongs').innerHTML=filtered.map(x=>'<div class="scm-song '+(x.i===current&&!dock.hidden?'selected':'')+'"><button type="button" class="scm-song-play" data-scm-index="'+x.i+'"><span class="scm-song-note">♫</span><span class="scm-song-details"><strong>'+esc(x.title)+'</strong><small>'+esc(x.artist||'SoundCloud upload')+' · '+esc(x.genre||'Added')+'</small></span><span class="scm-song-arrow">▶</span></button>'+(x.i>=(FEATURED.length||1)?'<button class="scm-song-delete" type="button" data-scm-remove="'+x.i+'" aria-label="Remove '+esc(x.title)+'">×</button>':'')+'</div>').join('')||'<p class="scm-empty">No songs match this search.</p>';
  message(status);
 }
 function sync(){
@@ -76,6 +76,7 @@ function sync(){
  $('scmEq').classList.toggle('active',playing);
  $('scmTime').textContent=fmt(position)+' / '+fmt(duration);
  $('scmSeek').value=String(duration?Math.max(0,Math.min(1000,Math.round(position/duration*1000))):0);
+ $('scmSeek').style.setProperty('--scm-percent',duration?Math.max(0,Math.min(100,position/duration*100))+'%':'0%');
  $('scmPrev').disabled=songs().length<2;$('scmNext').disabled=songs().length<2;
 }
 function ensureScript(){
@@ -137,7 +138,7 @@ function addTrack(raw){
  .then(r=>r.ok?r.json():null).then(data=>{if(!data||!saved.includes(x))return;if(data.title&&typeof data.title==='string'){x.title=data.title.slice(0,125);try{localStorage.setItem(KEY,JSON.stringify(saved))}catch{};paint();sync()}}).catch(()=>{});
 }
 function removeTrack(index){
- const i=index-FEATURED.length;if(i<0||i>=saved.length)return;
+ const i=index-(FEATURED.length||1);if(i<0||i>=saved.length)return;
  if(index===current){try{widget?.pause()}catch{};current=0;playing=false;sync()}
  else if(index<current)current--;
  saved.splice(i,1);try{localStorage.setItem(KEY,JSON.stringify(saved))}catch{};paint();sync();
