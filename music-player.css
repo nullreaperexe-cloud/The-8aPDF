@@ -109,3 +109,90 @@ body.apm-open .apm-sheet{max-height:calc(100dvh - 154px)}
  body.apm-open .apm-sheet{overflow-y:auto;max-height:calc(100dvh - 172px)}
  .apm-video-frame #apmYTMount{height:200px;min-height:200px}
 }
+
+
+/* Persistent picture-in-page YouTube mode.
+   Closing the library changes layout only. The SAME iframe stays connected,
+   so background-in-the-page playback continues with a visible official player.
+   Keep every video viewport at least 200x200px per YouTube API requirements. */
+#apmOverlay.apm-overlay.apm-minimized{
+ position:fixed!important;
+ inset:auto 18px 120px auto!important;
+ display:block!important;
+ width:min(340px,calc(100vw - 28px))!important;
+ height:auto!important;
+ padding:0!important;
+ margin:0!important;
+ border:0!important;
+ border-radius:17px!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;
+ overflow:visible!important;
+ pointer-events:none!important;
+ z-index:10535!important;
+}
+#apmOverlay.apm-minimized .apm-sheet{
+ width:100%!important;
+ height:auto!important;
+ max-height:none!important;
+ min-height:0!important;
+ padding:0!important;
+ margin:0!important;
+ background:transparent!important;
+ border:0!important;
+ border-radius:15px!important;
+ box-shadow:0 16px 55px rgba(0,0,0,.55)!important;
+ overflow:visible!important;
+ display:block!important;
+}
+#apmOverlay.apm-minimized .apm-sheet>:not(#apmVideoFrame){
+ display:none!important;
+}
+#apmOverlay.apm-minimized #apmVideoFrame{
+ display:block!important;
+ width:100%!important;
+ height:auto!important;
+ margin:0!important;
+ padding:0!important;
+ border:1px solid rgba(255,255,255,.22)!important;
+ border-radius:15px!important;
+ background:#090909!important;
+ overflow:hidden!important;
+ pointer-events:auto!important;
+}
+#apmOverlay.apm-minimized #apmYTMount,
+#apmOverlay.apm-minimized #apmYTMount iframe{
+ width:100%!important;
+ height:202px!important;
+ min-height:200px!important;
+ display:block!important;
+ opacity:1!important;
+ visibility:visible!important;
+}
+#apmOverlay.apm-minimized #apmVideoFrame p{
+ font-size:9px!important;
+ padding:4px!important;
+ margin:0!important;
+ background:#151515!important;
+ color:#ccc!important;
+}
+html[data-ui-mode="studio"] body.apm-docked main{
+ padding-bottom:max(390px,calc(390px + env(safe-area-inset-bottom,0px)))!important;
+}
+@media(max-width:810px){
+ #apmOverlay.apm-overlay.apm-minimized{
+  left:50%!important;
+  right:auto!important;
+  bottom:calc(190px + env(safe-area-inset-bottom,0px))!important;
+  transform:translateX(-50%)!important;
+  width:min(330px,calc(100vw - 26px))!important;
+ }
+ html[data-ui-mode="studio"] body.apm-docked main{
+  padding-bottom:calc(480px + env(safe-area-inset-bottom,0px))!important;
+ }
+}
+@media(max-width:360px){
+ #apmOverlay.apm-overlay.apm-minimized{width:calc(100vw - 22px)!important}
+}
