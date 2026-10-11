@@ -28,7 +28,7 @@ function bindDock(){
  document.body.append(dock);
  $('apmPlay').onclick=()=>{if(!visible()){open();notice('Keep the YouTube player visible to continue playback.');return;}if(state.index<0){play(0);return}const ps=playerSafe('getPlayerState',-1);if(ps===1)state.player.pauseVideo();else if(state.playerReady)state.player.playVideo();else play(state.index)};
  $('apmPrev').onclick=()=>jump(-1);$('apmNext').onclick=()=>jump(1);$('apmQueue').onclick=open;
- $('apmClose').onclick=()=>{pause();hideDock()};
+ $('apmClose').onclick=()=>{pause();if(overlay){overlay.hidden=true;overlay.classList.remove('apm-minimized')}document.body.classList.remove('apm-open');hideDock()};
  $('apmSeek').oninput=e=>{const d=playerSafe('getDuration',0);if(d>0&&state.playerReady)state.player.seekTo(d*Number(e.target.value)/1000,true)};
  $('apmVolume').oninput=e=>{const n=Number(e.target.value);try{sessionStorage.setItem('8apdf_yt_volume',String(n))}catch{};if(state.playerReady)state.player.setVolume(n)};
  try{const v=Number(sessionStorage.getItem('8apdf_yt_volume'));if(Number.isFinite(v)&&v>=0&&v<=100)$('apmVolume').value=String(v)}catch{}
@@ -52,10 +52,10 @@ function buildOverlay(){
  '<footer class="apm-foot">Play opens an official YouTube embed when available. If embedding or search is unavailable, use the YouTube link. Audio-only hidden-video playback is not supported by YouTube.</footer></section>';
  document.body.append(overlay);
  $('apmDismiss').onclick=close;
- overlay.onclick=e=>{if(e.target===overlay)close();const b=e.target.closest('[data-apm-index]');if(b)play(Number(b.dataset.apmIndex));};
+ overlay.onclick=e=>{if(e.target===overlay&&!overlay.classList.contains('apm-minimized'))close();const b=e.target.closest('[data-apm-index]');if(b)play(Number(b.dataset.apmIndex));};
  $('apmFind').oninput=e=>{state.search=e.target.value.toLowerCase().trim();render()};
  $('apmGenres').onclick=e=>{const b=e.target.closest('[data-apm-genre]');if(b){state.filter=b.dataset.apmGenre;render()}};
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden&&!overlay.classList.contains('apm-minimized'))close()});
 }
 function render(){
  if(!overlay)return;
@@ -71,14 +71,20 @@ function render(){
 }
 function open(){
  bindDock();buildOverlay();state.previousFocus=document.activeElement;
- overlay.hidden=false;document.body.classList.add('apm-open');render();
+ overlay.hidden=false;overlay.classList.remove('apm-minimized');overlay.setAttribute('aria-label','Music library');document.body.classList.add('apm-open');render();
  $('apmFind').focus({preventScroll:true});
 }
 function close(){
- if(!overlay||overlay.hidden)return;
- pause();overlay.hidden=true;document.body.classList.remove('apm-open');
+ if(!overlay||overlay.hidden||overlay.classList.contains('apm-minimized'))return;
+ document.body.classList.remove('apm-open');
+ const frame=$('apmVideoFrame');
+ // Keep original YouTube iframe mounted, visible, and playing.
+ if(frame&&!frame.hidden&&state.playerReady){
+  overlay.classList.add('apm-minimized');
+  overlay.setAttribute('aria-label','Visible floating YouTube player');
+  notice('Music continues in the visible floating YouTube player.');
+ }else{overlay.hidden=true;pause()}
  state.previousFocus?.focus?.({preventScroll:true});
- if(!dock.hidden)notice('Paused. Open Music Studio again to continue playback.');
 }
 function ensureYouTube(){
  if(window.YT?.Player)return Promise.resolve();
@@ -102,12 +108,12 @@ function onPlayerState(ev){
 function onPlayerError(ev){
  sync(false);clock(true);
  const msg=ev.data===101||ev.data===150?'This song does not allow embedding.':ev.data===100?'This video is unavailable.':'YouTube could not play this video.';
- notice(msg+' Use its YouTube link or try another track.');
+ notice(msg+' Trying the next embedded track.');
  if(state.errorCount++<3&&visible())setTimeout(()=>jump(1,true),500);
 }
 async function resolve(x){
  if(x.videoId)return x.videoId;
- if(state.searchUnavailable)throw Error('YouTube search is not configured. Use the YouTube link for this song.');
+ if(state.searchUnavailable)throw Error('Video lookup unavailable (YouTube API key missing or quota exceeded). A verified video ID is required.');
  const key='8apdf_yt_song_'+encodeURIComponent(x.title+'-'+x.artist).slice(0,150);
  try{const cache=JSON.parse(localStorage.getItem(key)||'null');if(cache?.videoId&&/^[\w-]{11}$/.test(cache.videoId)&&Date.now()-cache.savedAt<7*86400000){x.videoId=cache.videoId;return x.videoId}}catch{}
  const response=await fetch('/api/music-search?q='+encodeURIComponent(x.title+' '+x.artist+' official music video'),{headers:{Accept:'application/json'}});
@@ -139,7 +145,7 @@ async function play(i,fromAutonext=false){
  $('apmCredit').textContent='YouTube ↗';
  $('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';$('apmSeek').value='0';
  sync(false);clock(true);notice('Finding official YouTube video for '+x.title+'…');
- if(fromAutonext&&state.searchUnavailable&&!x.videoId){jump(1,true);return}
+ if(fromAutonext&&state.searchUnavailable&&!x.videoId){if(state.errorCount++>6){notice('No other linked playable tracks. Please retry later.');return}jump(1,true);return}
  try{
   const id=await resolve(x);
   if(token!==state.playToken)return;
@@ -159,7 +165,7 @@ async function play(i,fromAutonext=false){
   if(token!==state.playToken)return;
   state.loading=false;sync(false);clock(true);
   $('apmVideoFrame').hidden=!state.playerReady;
-  notice(e.message+' · Use the YouTube ↗ link beside the song.');
+  notice(e.message+' · Could not play this track inside 8aPDF yet.');
   if(fromAutonext&&state.errorCount++<3)setTimeout(()=>jump(1,true),400);
  }
 }
