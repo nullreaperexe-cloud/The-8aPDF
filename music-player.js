@@ -49,7 +49,7 @@ function buildOverlay(){
  '<div class="apm-searchline"><input id="apmFind" type="search" placeholder="Search your favourite songs…" aria-label="Search music library"><span id="apmCount"></span></div>'+
  '<div class="apm-genres" id="apmGenres" aria-label="Music categories"></div>'+
  '<div class="apm-status" id="apmStatus" role="status"></div><div class="apm-tracks" id="apmTracks"></div>'+
- '<footer class="apm-foot">Play opens an official YouTube embed when available. If embedding or search is unavailable, use the YouTube link. Audio-only hidden-video playback is not supported by YouTube.</footer></section>';
+ '<footer class="apm-foot">Play opens an official YouTube embed when available. Songs play inside 8aPDF when their official video IDs are available and embedding is permitted. An external YouTube video lookup key is needed for unlinked titles.</footer></section>';
  document.body.append(overlay);
  $('apmDismiss').onclick=close;
  overlay.onclick=e=>{if(e.target===overlay&&!overlay.classList.contains('apm-minimized'))close();const b=e.target.closest('[data-apm-index]');if(b)play(Number(b.dataset.apmIndex));};
@@ -61,13 +61,13 @@ function render(){
  if(!overlay)return;
  const genres=['All','Hindi','Punjabi','English'];
  $('apmGenres').innerHTML=genres.map(g=>'<button type="button" data-apm-genre="'+g+'" class="'+(state.filter===g?'selected':'')+'" aria-pressed="'+(state.filter===g)+'">'+g+'</button>').join('');
- const visibleTracks=tracks.map((x,i)=>({...x,index:i})).filter(x=>(state.filter==='All'||x.genre===state.filter)&&(!state.search||(x.title+' '+x.artist).toLowerCase().includes(state.search)));
- $('apmCount').textContent=visibleTracks.length+' / '+tracks.length+' songs';
+ const visibleTracks=tracks.map((x,i)=>({...x,index:i})).filter(x=>(state.filter==='All'||x.genre===state.filter)&&(!state.search||(x.title+' '+x.artist).toLowerCase().includes(state.search))).sort((a,b)=>Number(!!b.videoId)-Number(!!a.videoId));
+ $('apmCount').textContent=visibleTracks.filter(x=>x.videoId).length+' linked / '+visibleTracks.length+' listed';
  $('apmTracks').innerHTML=visibleTracks.map(x=>'<div class="apm-track'+(x.index===state.index?' current':'')+'">'+
  '<button type="button" class="apm-trackchoice" data-apm-index="'+x.index+'" aria-label="Play '+esc(x.title)+'">'+
  '<span class="apm-trackmark">♫</span><span class="apm-trackwords"><strong>'+esc(x.title)+'</strong><small>'+esc(x.artist)+' · '+esc(x.genre)+'</small></span><span class="apm-trackplay">▶</span></button>'+
- '<a class="apm-direct" title="'+(x.videoId?'Open YouTube video':'Find official song on YouTube')+'" target="_blank" rel="noopener noreferrer" href="'+ytLink(x)+'" aria-label="Open '+esc(x.title)+' on YouTube">YouTube ↗</a></div>').join('')||'<p class="apm-empty">No matching songs found.</p>';
- $('apmStatus').textContent=state.status||'Choose a song to play. YouTube content requires a visible video player.';
+ '<span class="apm-direct apm-source-state" aria-label="'+(x.videoId?'YouTube video linked':'Video ID lookup required')+'">'+(x.videoId?'Ready ✓':'Lookup needed')+'</span></div>').join('')||'<p class="apm-empty">No matching songs found.</p>';
+ $('apmStatus').textContent=state.status||'Select a linked track. Unlinked tracks require a configured YouTube video lookup.';
 }
 function open(){
  bindDock();buildOverlay();state.previousFocus=document.activeElement;
