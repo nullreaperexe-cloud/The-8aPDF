@@ -381,3 +381,55 @@ html[data-ui-mode="studio"] .hero p{
     line-height:1.55!important;
   }
 }
+
+/* 8aPDF Typing Hero — centered typographic headline, not a card or a banner. */
+html[data-ui-mode="studio"] .hero h1.study-typing-heading{
+  position:relative;
+  display:block!important;
+  width:100%;
+  max-width:min(100%,1100px)!important;
+  min-height:1.28em;
+  margin:14px auto 9px!important;
+  text-align:center!important;
+  line-height:1.14!important;
+  overflow-wrap:normal;
+  text-wrap:balance;
+}
+html[data-ui-mode="studio"] .hero #studyTypingText{
+  font:inherit;
+  letter-spacing:inherit;
+  color:inherit;
+}
+html[data-ui-mode="studio"] .hero .study-typing-caret{
+  display:inline-block;
+  vertical-align:-.105em;
+  height:.9em;
+  width:3px;
+  margin-inline-start:.09em;
+  border-radius:3px;
+  background:currentColor;
+  animation:studyTypingBlink 1s steps(1,end) infinite;
+}
+@keyframes studyTypingBlink{
+  0%,49%{opacity:.92}
+  50%,100%{opacity:0}
+}
+html[data-ui-mode="studio"] .hero .study-typing-heading.study-typing-still .study-typing-caret{display:none}
+@media(max-width:850px){
+ html[data-ui-mode="studio"] .hero h1.study-typing-heading{
+   min-height:2.35em;
+   font-size:clamp(1.85rem,7.3vw,2.25rem)!important;
+   line-height:1.14!important;
+   margin:10px auto 9px!important;
+ }
+}
+@media(max-width:375px){
+ html[data-ui-mode="studio"] .hero h1.study-typing-heading{
+   min-height:2.5em;
+   font-size:clamp(1.6rem,7.7vw,1.85rem)!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-ui-mode="studio"] .hero .study-typing-caret{animation:none!important;display:none!important}
+}
+html[data-motion="off"][data-ui-mode="studio"] .hero .study-typing-caret{animation:none!important;display:none!important}
