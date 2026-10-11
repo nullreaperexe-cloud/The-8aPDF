@@ -108,3 +108,8 @@ html[data-ui-mode="studio"] #workspaceHomeActions .ws-quiet{min-width:175px;text
 /* Clean mobile PDF toolbar: no redundant live-library caption or layout toggles */
 html[data-ui-mode="studio"] #gridToggle,html[data-ui-mode="studio"] #listToggle{display:none!important}
 html[data-ui-mode="studio"] .pdf-toolbar .library-meta,html[data-ui-mode="studio"] .pdf-toolbar .live-library-label{display:none!important}
+
+html[data-ui-mode="studio"] #libraryStatus{display:none!important}
+html[data-ui-mode="studio"] #gridBtn,html[data-ui-mode="studio"] #listBtn{display:none!important}
+html[data-ui-mode="studio"] .filter-foot{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px}
+html[data-ui-mode="studio"] .filter-foot .mini-tabs{display:none!important}
