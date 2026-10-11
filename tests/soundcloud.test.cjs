@@ -1,0 +1,22 @@
+/* SoundCloud player contract checks. Does not claim remote audio playback success. */
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+const src=fs.readFileSync('soundcloud-studio.js','utf8');
+const style=fs.readFileSync('soundcloud-studio.css','utf8');
+new vm.Script(src,{filename:'soundcloud-studio.js'});
+const fake={window:{},URLSearchParams,localStorage:{getItem:()=>null}};
+vm.runInNewContext(src,fake,{filename:'soundcloud-studio.js'});
+const player=fake.window.__8apdfSoundCloud;
+assert.equal(player.featuredTrack,'https://soundcloud.com/radhi14891/tum-hi-ho-meri-ashiqui-ashiqui');
+assert.equal(player.trackCount(),1);
+assert.match(src,/soundcloud%3Atracks%3A85728261/);
+assert.match(src,/https:\/\/w\.soundcloud\.com\/player\/api\.js/);
+assert.match(src,/widget\.bind\(E\.FINISH,/);
+const close=src.slice(src.indexOf('function close(){'),src.indexOf('window.__8apdfSoundCloud='));
+assert.ok(close.includes('overlay.hidden=true'),'Library should close');
+assert.ok(!close.includes('widget?.pause()'),'Closing library must not pause SoundCloud');
+assert.ok(!close.includes('iframe.hidden'),'Closing library must not hide the provider widget');
+assert.ok(style.includes('bottom:calc(81px + env(safe-area-inset-bottom,0px))'),'Mobile audio player must clear bottom navigation');
+assert.ok(style.includes('z-index:10660'),'SoundCloud player must stay usable with modal open');
+console.log('SoundCloud static integration checks passed.');
