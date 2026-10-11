@@ -1441,7 +1441,7 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
 .pdf-card .pdf-summary-utility:hover{color:var(--text)}
 #zipExport{white-space:nowrap}
 </style>
-<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=school-ai-20261011-v2"/><link rel="stylesheet" href="/timetable-tracker.css?v=approved-20261011v1"/>
+<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=school-ai-20261011-v2"/><link rel="stylesheet" href="/timetable-tracker.css?v=approved-20261011v1"/><link rel="stylesheet" href="/theme-studio.css?v=ten-colors-78-themes-20261011"/>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1631,17 +1631,18 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
 <div class="setting-row"><span>Glow Color</span><select aria-label="Glow color" class="glow-color-mode" id="glowColorMode"><option value="theme">Match Website</option><option value="custom">Custom Color</option></select></div>
 <label class="glow-custom-color" for="glowCustomColor" id="glowCustomColorWrap">Custom Glow Color <input id="glowCustomColor" type="color" value="#e9e9e9"/></label>
 </div>
-<div class="setting-group palette-section"><div class="palette-title"><span class="setting-label">Whole-Site Color Themes</span><span class="palette-count" id="themeCount">78 choices</span></div>
-<p class="setting-explainer">One tap recolors every section: background, navigation, cards, PDF buttons, timetable, dialogs and footer.</p>
-<div class="palette-filters" id="paletteFilters"><button class="active" data-palette-filter="all">All</button><button data-palette-filter="mono">Mono</button><button data-palette-filter="dark">Dark</button><button data-palette-filter="light">Light</button></div>
-<input aria-label="Search appearance themes" class="palette-search" id="paletteSearch" placeholder="Find a color (e.g. emerald, pink, navy...)" type="search"/>
-<div aria-label="Choose a full website color theme" class="theme-grid palette-grid" id="themeGrid"></div>
+<div class="setting-group palette-section"><div class="palette-title"><span class="setting-label">Coordinated 5-Color Themes</span><span class="palette-count" id="themeCount">78 themes</span></div>
+<p class="setting-explainer">Choose from 78 curated 5-color combinations. Each theme updates backgrounds, surfaces, text, buttons and highlights across 8aPDF.</p>
+<div class="theme-five-legend"><strong>Each theme:</strong> Background · Surface · Text · Buttons · Accent</div>
+<div class="palette-filters" id="paletteFilters"><button class="active" data-palette-filter="all">All</button><button data-palette-filter="mono">Neutral</button><button data-palette-filter="dark">Dark</button><button data-palette-filter="light">Light</button></div>
+<input aria-label="Search appearance themes" class="palette-search" id="paletteSearch" placeholder="Search themes (e.g. ocean, rose, forest...)" type="search"/>
+<div aria-label="Choose a full website five-color theme" class="theme-grid palette-grid" id="themeGrid"></div>
 <div class="palette-current">Active theme: <strong id="selectedThemeName">Pure Black</strong></div>
 </div>
-<div class="setting-group custom-palette"><span class="setting-label">Create Your Own Color</span><p class="setting-explainer">Any color you choose becomes a complete website theme, not just a button accent.</p>
-<div class="custom-palette-row"><label class="custom-color-label" for="customColor">Choose a color <input id="customColor" type="color" value="#7364cf"/></label><label class="custom-mode-label" for="customMode">Appearance <select id="customMode"><option value="dark">Dark</option><option value="light">Light</option></select></label></div>
-<label class="custom-strength" for="customStrength">Color richness <span id="strengthValue">65%</span><input id="customStrength" max="100" min="15" type="range" value="65"/></label>
-<button class="custom-apply" id="applyCustomTheme">Apply Custom Theme to Everything ↗</button>
+<div class="setting-group custom-palette"><div class="palette-title"><span class="setting-label">10-Color Theme Editor</span><span class="palette-count">10 INDEPENDENT COLORS</span></div>
+<p class="theme-control-intro">Fine-tune 10 color roles across your website. A preset starts with five matching colors; the editor derives 10 roles from them. Each adjustment is saved automatically on this device.</p>
+<div id="themeRoleGrid" class="theme-role-grid" aria-label="Ten customizable website colors"></div>
+<div class="theme-editor-tools"><button type="button" id="themeRoleReset">↺ Reset to selected preset</button><small id="themeRoleState" style="color:var(--muted);font-size:10px">Changes autosave</small></div>
 </div>
 <div class="setting-group"><span class="setting-label">Display &amp; Layout</span><label class="setting-row"><span>Compact Mode</span><input class="toggle" id="compactToggle" type="checkbox"/></label><label class="setting-row"><span>Sidebar Layout</span><input class="toggle" id="sidebarToggle" type="checkbox"/></label><div class="setting-row"><span>Card View</span><div class="segmented" style="padding:2px;margin-right:5px"><button class="active" data-card-choice="grid" title="Cards"><svg style="width:15px;height:15px"><use href="#i-grid"></use></svg></button><button data-card-choice="list" title="List"><svg style="width:15px;height:15px"><use href="#i-list"></use></svg></button></div></div><label class="setting-row"><span>Reading Mode</span><input class="toggle" id="readingToggle" type="checkbox"/></label></div><div class="setting-group" id="advancedPersonalization">
 <span class="setting-label">Fine-Tune the Interface</span><p class="setting-explainer">These change the actual website layout and animations—not just the settings preview.</p>
@@ -1715,60 +1716,178 @@ if(!store.get('8apdf_radiant_default_migrated_v1',false)){
  store.set('8apdf_classic_glass_settings_v2',settings);
  store.set('8apdf_radiant_default_migrated_v1',true);
 }
-// 36 colour families x dark/light + 6 monochrome = 78 built-in themes, plus unlimited custom colors.
-const monoThemes=[['dark','Dark'],['pure-black','Pure Black'],['graphite','Graphite'],['light','Light'],['paper','Paper'],['silver','Silver']].map(([id,name])=>({id,name,type:'mono',tone:['light','paper','silver'].includes(id)?'light':'dark'}));
-const colorFamilies=[
- ['Ruby',355,68],['Crimson',0,73],['Garnet',346,55],['Rose',334,68],['Blush',324,58],
- ['Fuchsia',313,68],['Orchid',302,56],['Plum',286,52],['Violet',272,62],['Amethyst',260,54],
- ['Indigo',246,66],['Midnight Blue',234,49],['Cobalt',224,71],['Royal Blue',215,76],['Sky',201,67],
- ['Ice Blue',191,53],['Cyan',186,62],['Teal',177,58],['Lagoon',166,59],['Jade',153,63],
- ['Emerald',142,67],['Forest',130,46],['Pine',119,42],['Mint',161,55],['Lime',102,58],
- ['Olive',80,44],['Moss',97,45],['Lemon',59,74],['Gold',47,73],['Amber',39,75],
- ['Bronze',31,52],['Copper',23,63],['Coral',12,66],['Peach',19,62],['Terracotta',9,57],['Wine',339,46]
+// 6 neutral five-color palettes + 12 color families × 6 combinations = EXACTLY 78 themes.
+// Every theme has five independently defined palette anchors:
+// [page background, surface, readable text, action, highlight].
+const monoThemes=[
+ {id:'dark',name:'Neutral Night',type:'mono',tone:'dark',colors:['#101116','#1e1f26','#f5f5f7','#e3e5ea','#9a9da8']},
+ {id:'pure-black',name:'Pure Black',type:'mono',tone:'dark',colors:['#000000','#161616','#ffffff','#e5e5e5','#8b8b8b']},
+ {id:'graphite',name:'Graphite',type:'mono',tone:'dark',colors:['#11151c','#252b35','#f2f6fa','#bfd1df','#8092a3']},
+ {id:'light',name:'Light',type:'mono',tone:'light',colors:['#ffffff','#f2f4f7','#171b23','#344251','#9cabbc']},
+ {id:'paper',name:'Warm Paper',type:'mono',tone:'light',colors:['#fbf7ed','#f0e8da','#242a23','#566d52','#adbd9d']},
+ {id:'silver',name:'Soft Silver',type:'mono',tone:'light',colors:['#edf1f5','#dee5ed','#222b38','#536780','#abc0d7']}
 ];
-const colorThemes=colorFamilies.flatMap(([name,hue,sat],i)=>[
- {id:'color-dark-'+i,name:name+' Dark',type:'dark',tone:'dark',hue,sat},
- {id:'color-light-'+i,name:name+' Light',type:'light',tone:'light',hue,sat}
-]);
-const signatureTheme={id:'signature-lime',name:'Classic Lime Glass',type:'signature',tone:'light'};
-const allThemes=[...monoThemes,signatureTheme,...colorThemes];
-const paletteVars=['--bg','--bg-alt','--surface','--surface-high','--surface-soft','--surface-glass','--text','--text-soft','--muted','--line','--line-bold','--button','--button-text','--pill','--hover','--shadow','--hero-glow'];
-function hexHSL(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;let mx=Math.max(r,g,b),mn=Math.min(r,g,b),delta=mx-mn,h=0,s=0,l=(mx+mn)/2;if(delta){s=delta/(1-Math.abs(2*l-1));switch(mx){case r:h=((g-b)/delta)%6;break;case g:h=(b-r)/delta+2;break;default:h=(r-g)/delta+4;}h=(h*60+360)%360;}return {hue:Math.round(h),sat:Math.round(s*100)}}
-function paletteFor(t){
- const h=Math.max(0,Math.min(360,Number(t.hue)||0)), strength=Math.max(15,Math.min(100,Number(t.strength||65))), s=Math.round(Math.min(95,Number(t.sat)||65)*strength/70), dark=t.tone!=='light';
- const hue=(percent,light)=>`hsl(${h} ${Math.min(95,Math.round(percent))}% ${light}%)`;
- const rgba=(percent,light,a)=>`hsl(${h} ${Math.min(95,Math.round(percent))}% ${light}% / ${a})`;
- if(dark){return {
- '--bg':hue(s*.68,8),'--bg-alt':hue(s*.66,10),'--surface':hue(s*.7,14),'--surface-high':hue(s*.65,19),'--surface-soft':hue(s*.63,17),
- '--surface-glass':rgba(s*.62,15,.96),'--text':hue(14,97),'--text-soft':hue(17,85),'--muted':hue(21,67),
- '--line':rgba(s*.43,80,.16),'--line-bold':rgba(s*.43,86,.28),'--button':hue(Math.min(93,s),78),'--button-text':hue(s*.68,10),
- '--pill':hue(s*.52,22),'--hover':hue(s*.58,27),'--shadow':`0 18px 56px ${rgba(s*.48,2,.33)}`,'--hero-glow':rgba(s*.75,51,.13)};}
- return {
- '--bg':hue(s*.52,96),'--bg-alt':hue(s*.52,93),'--surface':hue(s*.45,99),'--surface-high':hue(s*.53,94),'--surface-soft':hue(s*.49,95),
- '--surface-glass':rgba(s*.43,99,.96),'--text':hue(Math.min(s,55),13),'--text-soft':hue(s*.55,29),'--muted':hue(s*.34,41),
- '--line':rgba(s*.38,17,.14),'--line-bold':rgba(s*.42,17,.25),'--button':hue(Math.max(35,s),28),'--button-text':hue(9,99),
- '--pill':hue(s*.46,91),'--hover':hue(s*.51,87),'--shadow':`0 18px 52px ${rgba(s*.25,25,.11)}`,'--hero-glow':rgba(s*.68,57,.10)};
+const comboFamilies=[
+ ['Emerald Aurora','#3bdfa3','#a2e8c5'],
+ ['Sunset Ember','#fb875d','#ffca77'],
+ ['Violet Pulse','#a890ff','#6dd4ff'],
+ ['Ocean Signal','#4abaf5','#63dac6'],
+ ['Rose Quartz','#f68ab1','#c7a2ff'],
+ ['Citrus Shift','#e1d65f','#85d5a0'],
+ ['Copper Night','#e9a174','#e2c6ae'],
+ ['Royal Sapphire','#678cfc','#bca8ff'],
+ ['Forest Mint','#54c98a','#afe2a0'],
+ ['Crimson Bloom','#ee7897','#f4bb78'],
+ ['Peach Lavender','#f0a58f','#a9a1ff'],
+ ['Arctic Sky','#77c7e0','#bec5f5']
+];
+const colorThemeVariants=[
+ {key:'midnight',name:'Midnight',type:'dark',tone:'dark'},
+ {key:'dusk',name:'Dusk',type:'dark',tone:'dark'},
+ {key:'velvet',name:'Velvet',type:'dark',tone:'dark'},
+ {key:'daylight',name:'Daylight',type:'light',tone:'light'},
+ {key:'mist',name:'Mist',type:'light',tone:'light'},
+ {key:'paper',name:'Paper',type:'light',tone:'light'}
+];
+function ensureHex(value){return /^#[0-9a-f]{6}$/i.test(String(value))?String(value).toLowerCase():'#181818'}
+function rgbOf(hex){let s=ensureHex(hex);return [1,3,5].map(i=>parseInt(s.slice(i,i+2),16))}
+function mixHex(a,b,r){const left=rgbOf(a),right=rgbOf(b),ratio=Math.max(0,Math.min(1,r));return '#'+left.map((v,i)=>Math.round(v*(1-ratio)+right[i]*ratio).toString(16).padStart(2,'0')).join('')}
+function alphaHex(hex,opacity){return 'rgb('+rgbOf(hex).join(' ')+' / '+opacity+')'}
+function luminance(hex){return rgbOf(hex).map(v=>{const s=v/255;return s<=.04045?s/12.92:Math.pow((s+.055)/1.055,2.4)}).reduce((acc,v,i)=>acc+v*[.2126,.7152,.0722][i],0)}
+function contrastInk(hex){return luminance(hex)>.19?'#10141b':'#ffffff'}
+function comboColors(primary,highlight,variation){
+ const p=ensureHex(primary),h=ensureHex(highlight);
+ switch(variation){
+  case 'midnight':return [mixHex('#070a11',h,.045),mixHex('#161923',p,.11),'#f6f7fd',p,h];
+  case 'dusk':return [mixHex('#17111a',p,.12),mixHex('#29212d',h,.12),'#fff6fc',mixHex(p,'#ffffff',.10),mixHex(h,p,.10)];
+  case 'velvet':return [mixHex('#090e16',h,.15),mixHex('#1b1b2a',p,.20),'#f1f5fc',mixHex(p,h,.22),mixHex(h,'#ffffff',.15)];
+  case 'daylight':return [mixHex('#fcfdff',p,.10),mixHex('#ffffff',h,.09),'#17212c',mixHex(p,'#101827',.36),mixHex(h,'#17212c',.22)];
+  case 'mist':return [mixHex('#f0f4f9',h,.13),mixHex('#ffffff',p,.04),'#17232c',mixHex(p,'#101827',.29),mixHex(h,p,.17)];
+  default:return [mixHex('#fdf8ee',h,.09),mixHex('#ffffff',p,.08),'#26242c',mixHex(p,'#211b28',.33),mixHex(h,'#384139',.20)];
+ }
 }
-function selectedTheme(){if(settings.theme==='custom'){let hsl=hexHSL(settings.customColor||defaults.customColor);return {id:'custom',name:'Custom '+(settings.customMode==='light'?'Light':'Dark'),type:'custom',tone:settings.customMode==='light'?'light':'dark',...hsl,strength:settings.customStrength||65}}return allThemes.find(t=>t.id===settings.theme)||monoThemes[0]}
-function applySitePalette(){let t=selectedTheme(),root=document.documentElement;root.dataset.theme=t.id;root.dataset.tone=t.tone;root.style.colorScheme=t.tone;
- if(t.type==='mono' || t.type==='signature'){paletteVars.forEach(v=>root.style.removeProperty(v))}else{let v=paletteFor(t);paletteVars.forEach(k=>root.style.setProperty(k,v[k]))}
- document.querySelector('meta[name="theme-color"]').content=getComputedStyle(root).getPropertyValue('--bg').trim()||'#111111';
+const colorThemes=comboFamilies.flatMap(([name,primary,highlight],i)=>colorThemeVariants.map(v=>({
+ id:'combo-'+i+'-'+v.key,name:name+' '+v.name,type:v.type,tone:v.tone,
+ colors:comboColors(primary,highlight,v.key)
+})));
+const allThemes=[...monoThemes,...colorThemes]; // 6+72 = 78, not 79.
+const roleDefs=[
+ ['page','Page background','--bg'],
+ ['backgroundAlt','Secondary background','--bg-alt'],
+ ['surface','Card surfaces','--surface'],
+ ['raised','Raised panels','--surface-high'],
+ ['soft','Soft panels','--surface-soft'],
+ ['text','Main text','--text'],
+ ['textSoft','Secondary text','--text-soft'],
+ ['muted','Muted text','--muted'],
+ ['action','Primary actions','--button'],
+ ['accent','Accent & tags','--pill']
+];
+const paletteVars=['--bg','--bg-alt','--surface','--surface-high','--surface-soft','--surface-glass','--text','--text-soft','--muted','--line','--line-bold','--button','--button-text','--pill','--hover','--shadow','--hero-glow','--primary','--primary-dark'];
+function roleColors(t){
+ const [background,surface,text,button,highlight]=(t.colors||monoThemes[1].colors).map(ensureHex);
+ return {
+  page:background,
+  backgroundAlt:mixHex(background,surface,.32),
+  surface,
+  raised:mixHex(surface,text,t.tone==='light'?.025:.085),
+  soft:mixHex(background,surface,.68),
+  text,
+  textSoft:mixHex(text,background,t.tone==='light'?.27:.18),
+  muted:mixHex(text,background,t.tone==='light'?.43:.34),
+  action:button,
+  accent:mixHex(surface,highlight,t.tone==='light'?.28:.32)
+ };
+}
+function paletteFor(t){
+ const r=t.roles||roleColors(t);
+ return {
+ '--bg':r.page,'--bg-alt':r.backgroundAlt,'--surface':r.surface,
+ '--surface-high':r.raised,'--surface-soft':r.soft,
+ '--surface-glass':alphaHex(r.surface,.95),
+ '--text':r.text,'--text-soft':r.textSoft,'--muted':r.muted,
+ '--line':alphaHex(r.text,.13),'--line-bold':alphaHex(r.text,.26),
+ '--button':r.action,'--button-text':contrastInk(r.action),
+ '--pill':r.accent,'--hover':mixHex(r.surface,r.accent,.30),
+ '--shadow':'0 18px 56px '+alphaHex(r.page,t.tone==='light'?.15:.42),
+ '--hero-glow':alphaHex(r.accent,t.tone==='light'?.16:.19),
+ '--primary':r.action,'--primary-dark':mixHex(r.action,r.page,.24)
+ };
+}
+function selectedTheme(){
+ if(settings.theme==='personal-mix'){
+  const valid=roleDefs.every(([key])=>/^#[0-9a-f]{6}$/i.test(settings.personalColors?.[key]||''));
+  if(valid){const roles=Object.fromEntries(roleDefs.map(([key])=>[key,ensureHex(settings.personalColors[key])]));return {id:'personal-mix',name:'My 10-Color Theme',type:'personal',tone:luminance(roles.page)>.32?'light':'dark',colors:[roles.page,roles.surface,roles.text,roles.action,roles.accent],roles}}
+ }
+ if(settings.theme==='custom'){
+  // Keep users' previously saved custom shade functional after the migration.
+  const accent=ensureHex(settings.customColor||'#7364cf');
+  const light=settings.customMode==='light';
+  const colors=comboColors(accent,mixHex(accent,light?'#ffffff':'#7cd2ff',.45),light?'mist':'midnight');
+  return {id:'custom',name:'Legacy Custom',type:'personal',tone:light?'light':'dark',colors};
+ }
+ const known=allThemes.find(t=>t.id===settings.theme);
+ if(known)return known;
+ const old=String(settings.theme||'').match(/^color-(dark|light)-(\d+)$/);
+ if(old){const family=Number(old[2])%comboFamilies.length,variant=old[1]==='light'?'mist':'midnight';return allThemes.find(t=>t.id==='combo-'+family+'-'+variant)||monoThemes[1]}
+ return allThemes.find(t=>t.id==='pure-black')||monoThemes[1];
+}
+function applySitePalette(){
+ const t=selectedTheme(),root=document.documentElement;
+ root.dataset.theme=t.id;root.dataset.tone=t.tone;root.style.colorScheme=t.tone;
+ const values=paletteFor(t);
+ paletteVars.forEach(key=>root.style.setProperty(key,values[key]));
+ document.querySelector('meta[name="theme-color"]').content=values['--bg'];
  $('#selectedThemeName').textContent=t.name;
 }
-let activePaletteFilter='all';
-function renderPalette(){const query=$('#paletteSearch').value.toLowerCase().trim();let themes=allThemes.filter(t=>(activePaletteFilter==='all'||t.type===activePaletteFilter)&&(!query||t.name.toLowerCase().includes(query)));
- $('#themeCount').textContent=allThemes.length+' presets';
- $('#themeGrid').innerHTML=themes.length?themes.map(t=>{let swatch=t.type==='mono'?({'signature-lime':'#b7ff2a',dark:'#202020','pure-black':'#000000',graphite:'#505050',light:'#f4f4f4',paper:'#e3e3e3',silver:'#bbbbbb'}[t.id]):`hsl(${t.hue} ${t.sat}% ${t.tone==='dark'?'33%':'78%'})`;return `<button class="theme-item ${settings.theme===t.id?'active':''}" data-theme-choice="${t.id}" aria-pressed="${settings.theme===t.id}" title="Apply ${safe(t.name)} to the entire website"><span class="theme-circle" style="background:${swatch}"></span>${safe(t.name)}</button>`}).join(''):'<p class="setting-explainer">No matching themes.</p>';
- $$('#paletteFilters [data-palette-filter]').forEach(b=>b.classList.toggle('active',b.dataset.paletteFilter===activePaletteFilter));
+let activePaletteFilter='all',lastSelectedPreset='pure-black';
+function renderRoleEditors(){
+ const host=$('#themeRoleGrid');if(!host)return;
+ const selected=selectedTheme(),colors=selected.roles||roleColors(selected);
+ if(!host.children.length){
+  host.innerHTML=roleDefs.map(([key,label])=>'<div class="theme-role-field"><input type="color" id="themeRole-'+key+'" data-theme-role="'+key+'" aria-label="'+label+' color"><span class="theme-role-field-text"><label for="themeRole-'+key+'">'+label+'</label><code id="themeRoleHex-'+key+'"></code></span></div>').join('');
+ }
+ for(const [key] of roleDefs){
+  const input=$('#themeRole-'+key),hex=$('#themeRoleHex-'+key);
+  if(input&&document.activeElement!==input)input.value=colors[key];
+  if(hex)hex.textContent=colors[key].toUpperCase();
+ }
+ const st=$('#themeRoleState');
+ if(st)st.textContent=settings.theme==='personal-mix'?'Personal theme · saved':'10 colors · live changes';
 }
-$('#paletteFilters').onclick=e=>{let b=e.target.closest('[data-palette-filter]');if(b){activePaletteFilter=b.dataset.paletteFilter;renderPalette()}};
+function renderPalette(){
+ const query=$('#paletteSearch').value.toLowerCase().trim();
+ const themes=allThemes.filter(t=>(activePaletteFilter==='all'||t.type===activePaletteFilter)&&(!query||t.name.toLowerCase().includes(query)));
+ $('#themeCount').textContent=allThemes.length+' themes';
+ $('#themeGrid').innerHTML=themes.length?themes.map(t=>{
+  const chips=t.colors.map(c=>'<i style="background:'+c+'"></i>').join('');
+  return '<button type="button" class="theme-item '+(settings.theme===t.id?'active':'')+'" data-theme-choice="'+t.id+'" aria-pressed="'+(settings.theme===t.id)+'" title="Apply '+safe(t.name)+' five-color combination"><span class="theme-swatches" aria-hidden="true">'+chips+'</span><span class="theme-name-text">'+safe(t.name)+'</span></button>'
+ }).join(''):'<p class="setting-explainer">No matching themes.</p>';
+ $$('#paletteFilters [data-palette-filter]').forEach(b=>b.classList.toggle('active',b.dataset.paletteFilter===activePaletteFilter));
+ renderRoleEditors();
+}
+$('#paletteFilters').onclick=e=>{const button=e.target.closest('[data-palette-filter]');if(button){activePaletteFilter=button.dataset.paletteFilter;renderPalette()}};
 $('#paletteSearch').oninput=renderPalette;
-$('#themeGrid').onclick=e=>{let b=e.target.closest('[data-theme-choice]');if(b){settings.theme=b.dataset.themeChoice;setSettings()}};
-$('#customColor').value=settings.customColor;$('#customMode').value=settings.customMode;$('#customStrength').value=settings.customStrength;
-$('#customColor').oninput=e=>{settings.customColor=e.target.value;settings.theme='custom';setSettings()};
-$('#customMode').onchange=e=>{settings.customMode=e.target.value;settings.theme='custom';setSettings()};
-$('#customStrength').oninput=e=>{settings.customStrength=Number(e.target.value);settings.theme='custom';setSettings()};
-$('#applyCustomTheme').onclick=()=>{settings.theme='custom';setSettings();toast('Custom colors applied to the entire website')};
+$('#themeGrid').onclick=e=>{
+ const button=e.target.closest('[data-theme-choice]');if(!button)return;
+ settings.theme=button.dataset.themeChoice;lastSelectedPreset=settings.theme;setSettings();
+};
+$('#themeRoleGrid').addEventListener('input',e=>{
+ const key=e.target.dataset.themeRole;
+ if(!roleDefs.some(([role])=>role===key)||!/^#[0-9a-f]{6}$/i.test(e.target.value))return;
+ // Start an independent ten-color mix from the current five-color preset.
+ if(settings.theme!=='personal-mix'){
+  const t=selectedTheme();settings.personalColors={...roleColors(t)};lastSelectedPreset=t.id==='custom'?'pure-black':t.id;
+ }
+ settings.personalColors[key]=e.target.value.toLowerCase();
+ settings.theme='personal-mix';
+ setSettings();
+});
+$('#themeRoleReset').onclick=()=>{
+ settings.theme=allThemes.some(t=>t.id===lastSelectedPreset)?lastSelectedPreset:'pure-black';
+ delete settings.personalColors;
+ setSettings();toast('Restored selected five-color preset');
+};
 function toast(message){let el=document.createElement('div');el.className='toast';el.textContent=message;$('#toastArea').append(el);setTimeout(()=>el.remove(),3600)}
 function scrollToSection(sel){const e=$(sel);if(e)e.scrollIntoView({behavior:settings.motion?'auto':'smooth',block:'start'})}
 
