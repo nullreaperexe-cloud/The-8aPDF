@@ -94,3 +94,18 @@ html[data-ui-mode="studio"] body.apm-docked main{padding-bottom:200px}
  .apm-dock #apmPrev,.apm-dock #apmNext{width:28px;height:30px;font-size:13px}
  .apm-meta strong{font-size:11px}
 }
+
+/* Keep transport controls accessible alongside the visible YouTube player. */
+body.apm-open .apm-dock{z-index:10550!important}
+body.apm-open .apm-overlay{padding-bottom:134px;align-items:flex-start;justify-content:center}
+body.apm-open .apm-sheet{max-height:calc(100dvh - 154px)}
+@media(max-width:810px){
+ body.apm-open .apm-overlay{padding:8px 8px calc(182px + env(safe-area-inset-bottom,0px));align-items:flex-start}
+ body.apm-open .apm-sheet{max-height:calc(100dvh - 196px - env(safe-area-inset-bottom,0px))}
+ body.apm-open #apmDock{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(max-height:610px){
+ body.apm-open .apm-overlay{padding-top:4px}
+ body.apm-open .apm-sheet{overflow-y:auto;max-height:calc(100dvh - 172px)}
+ .apm-video-frame #apmYTMount{height:200px;min-height:200px}
+}
