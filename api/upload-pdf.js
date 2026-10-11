@@ -24,5 +24,5 @@ export default async function handler(req,res){
   const record=JSON.stringify({version:2,slug,documentId:null,url:blob.url,title:name,ownerHash,createdAt:new Date().toISOString()});
   await put(`short-links/v1/${slug}.json`,record,{access:'public',addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60});
   return send(res,201,{shortUrl:`/${slug}`,pdfUrl:blob.url,title:name});
- }catch(e){console.error('8aPDF upload error',{name:e?.name,message:e?.message,code:e?.code});const msg=String(e?.message||'');return send(res,502,{error:/token|oidc|auth|credential|unauthorized|forbidden/i.test(msg)?'Blob authentication failed. Check the public Blob store is connected to this production project.':'Blob upload failed: '+String(e?.code||e?.name||'storage error')+'. Check Vercel function logs.',stage:'blob-upload',code:String(e?.code||'BLOB_ERROR')})}
+ }catch(e){console.error('8aPDF upload error',{name:e?.name,message:e?.message,code:e?.code});const msg=String(e?.message||e||'Unknown Blob error').slice(0,500);return send(res,502,{error:'Blob upload failed: '+msg,stage:'blob-upload',code:String(e?.code||e?.name||'BLOB_ERROR')})}
 }
