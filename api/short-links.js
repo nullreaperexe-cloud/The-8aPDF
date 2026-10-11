@@ -18,9 +18,9 @@ function isConflict(error){return /already exists|BlobAlreadyExists|pathname is 
 function storageError(operation,error){const e=new Error('Blob '+operation+' unavailable');e.code='STORAGE_UNAVAILABLE';e.cause=error;return e}
 async function existing(slug){
   const pathname=ROOT+slug+'.json';
-  try{return await get(pathname,{access:'private'})}
+  try{return await get(pathname,{access:'public'})}
   catch(firstError){
-    try{return await get(pathname,{access:'public'})}
+    try{return await get(pathname,{access:'private'})}
     catch(secondError){throw storageError('read',secondError)}
   }
 }
@@ -97,7 +97,6 @@ export default async function handler(req, res) {
     res.setHeader('Allow','GET, POST');
     return json(res,405,{error:'Method not allowed'});
   }
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return json(res,503,{error:'Short links need Vercel Blob storage. Connect a private Blob store to this project first.'});
   const action=req.method==='POST' ? (req.body?.action || 'create') : 'check';
   if (action === 'list') {
     const hash=ownerHash(req.body?.ownerKey);
@@ -131,10 +130,10 @@ export default async function handler(req, res) {
     const record = JSON.stringify({version:2,slug,documentId:docId,url:verified.url,title:verified.title,ownerHash:hash,createdAt:new Date().toISOString()});
     try {
       const options={addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60};
-      try{await put(ROOT+slug+'.json',record,{...options,access:'private'})}
+      try{await put(ROOT+slug+'.json',record,{...options,access:'public'})}
       catch(error){
         if(isConflict(error))throw error;
-        try{await put(ROOT+slug+'.json',record,{...options,access:'public'})}
+        try{await put(ROOT+slug+'.json',record,{...options,access:'private'})}
         catch(second){
           if(isConflict(second))throw second;
           throw storageError('write',second);
