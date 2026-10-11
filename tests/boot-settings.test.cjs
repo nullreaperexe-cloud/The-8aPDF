@@ -1,0 +1,22 @@
+/* Prevent boot-breaking Settings regressions: PDFs and announcements must not be blocked by missing UI controls. */
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const html=fs.readFileSync('index.html','utf8');
+const ids=new Set([...html.matchAll(/\bid=["']([^"']+)["']/g)].map(m=>m[1]));
+const main=html.slice(html.indexOf('const defaults='),html.indexOf('</script>',html.indexOf('const defaults=')));
+assert(main.includes('function setSettings(){'),'Main Settings startup missing');
+const required=['themeGrid','themeRoleGrid','selectedThemeName','settingsPanel','compactToggle','sidebarToggle','readingToggle','motionToggle','largeTextToggle','contrastToggle','fontRange','gridBtn','listBtn'];
+for(const id of required)assert(ids.has(id),'Required Settings element absent: '+id);
+const missing=[...main.matchAll(/\$\(['"]#([a-zA-Z0-9_-]+)['"]\)/g)].map(m=>m[1]).filter(id=>!ids.has(id));
+assert.deepEqual([...new Set(missing)],[],'Settings references removed elements and could crash app boot');
+assert(!main.includes("$('#customColor')"),'Removed Custom Color element still referenced');
+assert(!main.includes("$('#customMode')"),'Removed Custom Mode element still referenced');
+assert(!main.includes("$('#customStrength')"),'Removed Color Strength element still referenced');
+assert(!main.includes("$('#strengthValue')"),'Removed Strength Value element still referenced');
+assert(main.includes("store.set('8apdf_classic_glass_settings_v2',settings)"),'Theme settings persistence must remain enabled');
+const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].filter(m=>!m[1].includes('src=')&&m[2].trim());
+scripts.forEach((m,i)=>new vm.Script(m[2],{filename:'index.inline.'+i+'.js'}));
+assert(html.includes('id="announcementGrid"'),'Teacher announcements container missing');
+assert(html.includes('id="pdfGrid"')||html.includes('id="pdfGridView"')||html.includes('id="materialsGrid"'),'PDF library container missing');
+console.log('PASS 8aPDF core bootstrap: '+scripts.length+' inline scripts valid; all Settings controls present; school containers intact.');
