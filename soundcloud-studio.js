@@ -21,7 +21,7 @@ const songs=()=>[SOURCE,...saved];
 let overlay=null,dock=null,iframe=null,widget=null,ready=false,scriptLoading=null,current=0,pending=null,playing=false,position=0,duration=0,previousFocus=null;
 let status='Choose a track. Your SoundCloud widget will play audio without a video.';
 const embedUrl='https://w.soundcloud.com/player/?'+new URLSearchParams({
- url:'https://api.soundcloud.com/tracks/soundcloud:tracks:85728261',
+ url:'https://api.soundcloud.com/tracks/soundcloud%3Atracks%3A85728261',
  color:'#ff5500',auto_play:'false',hide_related:'false',show_comments:'false',show_user:'true',show_reposts:'false',show_teaser:'true',show_artwork:'false'
 });
 function makeUI(){
