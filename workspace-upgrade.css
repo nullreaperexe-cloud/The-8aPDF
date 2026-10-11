@@ -275,3 +275,6 @@ html[data-theme="light"] #wsMusicDock.ws-music-dock,html[data-tone="light"] #wsM
  background:rgba(255,255,255,.95)!important;color:#18181a!important;border-color:rgba(0,0,0,.1)!important;
  box-shadow:0 14px 42px rgba(0,0,0,.14),inset 0 1px 0 #fff!important
 }
+
+/* Ensure native hidden attribute always wins over music dock display rules */
+#wsMusicDock[hidden]{display:none!important}
