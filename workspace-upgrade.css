@@ -165,3 +165,9 @@ html[data-tone="light"] .ws-music-dock,html[data-theme="light"] .ws-music-dock{c
 #wsSoundList{max-height:440px;overflow-y:auto}
 #wsSoundList .ws-track{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 6px}
 #wsSoundList .ws-track button{flex-shrink:0}
+
+/* Official YouTube playback must remain visible; retain mini-player controls */
+.ws-music-dock{grid-template-columns:34px minmax(110px,1fr) auto auto auto minmax(100px,1.2fr) auto auto!important}
+.ws-music-dock #wsYTMount{position:relative!important;grid-column:1/-1;grid-row:2;opacity:1!important;pointer-events:auto!important;width:100%!important;height:160px!important;overflow:visible!important;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;background:#111}
+.ws-music-dock #wsYTMount iframe{width:min(100%,285px)!important;height:160px!important;min-width:285px;max-width:100%;border:0}
+@media(max-width:650px){.ws-music-dock #wsYTMount{grid-row:3;height:140px!important}.ws-music-dock #wsYTMount iframe{height:140px!important;width:250px!important;min-width:0}}
