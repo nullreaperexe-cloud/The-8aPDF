@@ -129,3 +129,22 @@ html[data-ui-mode="studio"] .filter-foot .mini-tabs{display:none!important}
 .ws-music-dock.is-playing .ws-wave i:nth-child(4){animation-duration:.7s!important;animation-delay:-.12s!important}
 @keyframes wsMusicWave{0%{height:6px;transform:scaleY(.7);opacity:.55}50%{height:24px;transform:scaleY(1);opacity:1}100%{height:12px;transform:scaleY(.85);opacity:.8}}
 @media (prefers-reduced-motion:reduce){.ws-music-dock.is-playing .ws-wave i{animation-duration:1.5s!important}}
+
+/* Apple-inspired animated artwork, fluid glass mini player */
+.ws-music-dock{--song-hue:215;grid-template-columns:54px minmax(110px,1fr) auto auto auto minmax(100px,1.2fr) auto auto!important;background:color-mix(in srgb,var(--panel,#181818) 90%,transparent)!important;backdrop-filter:blur(24px) saturate(1.3);border-radius:22px!important;padding:12px 16px!important;box-shadow:0 18px 60px rgba(0,0,0,.24)!important}
+.ws-music-dock .ws-album-art{position:relative;width:52px;height:52px;overflow:hidden;isolation:isolate;border-radius:13px;background:linear-gradient(135deg,hsl(var(--song-hue) 65% 30%),hsl(calc(var(--song-hue) + 80) 78% 58%));box-shadow:0 5px 15px rgba(0,0,0,.2);display:grid;place-items:center}
+.ws-music-dock .ws-album-art span{position:relative;z-index:2;font-size:24px;color:white;text-shadow:0 2px 12px rgba(0,0,0,.3)}
+.ws-music-dock .ws-orb{position:absolute;width:75%;height:75%;border-radius:45%;filter:blur(5px);opacity:.8;transition:transform .5s}
+.ws-music-dock .ws-orb-a{top:-25%;left:-20%;background:#ffb3c9}
+.ws-music-dock .ws-orb-b{bottom:-25%;right:-25%;background:#9ad8ff}
+.ws-music-dock .ws-orb-c{top:25%;right:0;background:#b9a1ff;mix-blend-mode:screen}
+.ws-music-dock.is-playing .ws-orb-a{animation:wsFlowA 4s ease-in-out infinite alternate}
+.ws-music-dock.is-playing .ws-orb-b{animation:wsFlowB 5s ease-in-out infinite alternate}
+.ws-music-dock.is-playing .ws-orb-c{animation:wsFlowC 6s ease-in-out infinite alternate}
+@keyframes wsFlowA{to{transform:translate(22px,23px) rotate(100deg) scale(1.5)}}
+@keyframes wsFlowB{to{transform:translate(-22px,-20px) rotate(-90deg) scale(1.5)}}
+@keyframes wsFlowC{to{transform:translate(-15px,12px) rotate(180deg) scale(.65)}}
+.ws-music-dock #wsPlayPause{background:currentColor;filter:invert(.06);font-weight:700}
+.ws-song-search{display:flex;gap:8px;margin:14px 0}.ws-song-search input{flex:1;min-width:0;border:1px solid rgba(127,127,127,.3);border-radius:12px;padding:12px;background:transparent;color:inherit}.ws-song-search button{border:0;border-radius:12px;padding:10px 16px;cursor:pointer}.ws-video-panel{margin-top:12px}
+@media(max-width:650px){.ws-music-dock{grid-template-columns:44px minmax(0,1fr) auto auto auto auto!important;padding:10px!important}.ws-music-dock .ws-album-art{width:44px;height:44px}}
+@media(prefers-reduced-motion:reduce){.ws-music-dock.is-playing .ws-orb{animation:none!important}}
