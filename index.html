@@ -1795,7 +1795,7 @@ function roleColors(t){
   text,
   textSoft:mixHex(text,background,t.tone==='light'?.27:.18),
   muted:mixHex(text,background,t.tone==='light'?.43:.34),
-  action:button,
+  action:t.tone==='light'?mixHex(button,'#0a0c16',.15):button,
   accent:mixHex(surface,highlight,t.tone==='light'?.28:.32)
  };
 }
