@@ -1,133 +1,176 @@
-/* 8aPDF Audio Studio — authorized, visible audio controls; no hidden video extraction. */
+/* 8aPDF Music Studio: YouTube songs with official IFrame playback (visible video required by provider). */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-const searchGroups=[
- ['Study','instrumental music filetype:audio'],
- ['Piano','piano music filetype:audio'],
- ['Classical','classical music filetype:audio'],
- ['Guitar','guitar music filetype:audio'],
- ['Relax','relaxing music filetype:audio'],
- ['Indian','Indian classical music filetype:audio'],
- ['Jazz','jazz music filetype:audio'],
- ['Ambient','ambient music filetype:audio'],
- ['Instrumental','instrumental filetype:audio'],
- ['Orchestral','orchestral music filetype:audio'],
- ['Acoustic','acoustic music filetype:audio'],
- ['Music','music filetype:audio']
-];
-const state={tracks:[],seen:new Set(),current:-1,loading:false,loaded:false,filter:'All',search:'',skipFailures:0};
-const audio=new Audio();audio.preload='none';audio.volume=.65;
-let lastStatus='',panel=null,dock=null,controller=null;
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const time=x=>Number.isFinite(x)?Math.floor(x/60)+':'+String(Math.floor(x%60)).padStart(2,'0'):'0:00';
-const safeUrl=u=>{try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}};
-function status(msg){lastStatus=msg;const e=$('apmStatus');if(e)e.textContent=msg;}
-function setup(){
+const tracks=Array.isArray(window.__8apdfMusicCatalog)?window.__8apdfMusicCatalog:[];
+const state={index:-1,status:'',filter:'All',search:'',loading:false,playToken:0,errorCount:0,searchUnavailable:false,playerReady:false,player:null,apiPromise:null,interval:0,previousFocus:null};
+let overlay=null,dock=null,playerShown=false;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+const mm=x=>{let n=Number(x);if(!Number.isFinite(n)||n<0)n=0;n=Math.floor(n);return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')};
+const item=i=>tracks[i];
+const active=()=>item(state.index);
+const ytSearch=x=>'https://www.youtube.com/results?search_query='+encodeURIComponent(x.title+' '+x.artist+' official music video');
+const ytLink=x=>x.videoId?'https://www.youtube.com/watch?v='+encodeURIComponent(x.videoId):ytSearch(x);
+function notice(message){state.status=message;const e=$('apmStatus');if(e)e.textContent=message}
+function playerSafe(name,fallback=0){try{return state.playerReady&&typeof state.player?.[name]==='function'?state.player[name]():fallback}catch{return fallback}}
+function bindDock(){
  if(dock)return;
- dock=document.createElement('section');dock.id='apmDock';dock.className='apm-dock';dock.hidden=true;dock.setAttribute('aria-label','Music playback');
+ dock=document.createElement('section');dock.id='apmDock';dock.className='apm-dock';dock.hidden=true;dock.setAttribute('aria-label','YouTube music controls');
  dock.innerHTML='<div class="apm-art" aria-hidden="true"><div class="apm-art-orbit"></div><div class="apm-bars"><i></i><i></i><i></i><i></i><i></i></div></div>'+
- '<div class="apm-meta"><strong id="apmTitle">Music</strong><small id="apmArtist">Audio Studio</small></div>'+
- '<button type="button" class="apm-icon" id="apmPrev" aria-label="Previous track" title="Previous">⏮</button>'+
- '<button type="button" class="apm-main" id="apmPlay" aria-label="Play" title="Play">▶</button>'+
- '<button type="button" class="apm-icon" id="apmNext" aria-label="Next track" title="Next">⏭</button>'+
- '<button type="button" class="apm-icon apm-queue" id="apmQueue" aria-label="Open music library" title="Music library">☷</button>'+
- '<button type="button" class="apm-icon apm-close" id="apmClose" aria-label="Close music player" title="Close">×</button>'+
+ '<div class="apm-meta"><strong id="apmTitle">Music Studio</strong><small id="apmArtist">Hindi · Punjabi · English</small></div>'+
+ '<button type="button" class="apm-icon" id="apmPrev" aria-label="Previous song" title="Previous">⏮</button>'+
+ '<button type="button" class="apm-main" id="apmPlay" aria-label="Play song" title="Play">▶</button>'+
+ '<button type="button" class="apm-icon" id="apmNext" aria-label="Next song" title="Next">⏭</button>'+
+ '<button type="button" class="apm-icon apm-queue" id="apmQueue" aria-label="Open song library" title="Song library">☷</button>'+
+ '<button type="button" class="apm-icon apm-close" id="apmClose" aria-label="Close music" title="Close">×</button>'+
  '<div class="apm-timeline"><span id="apmElapsed">0:00</span><input id="apmSeek" type="range" min="0" max="1000" value="0" aria-label="Song position"><span id="apmLength">0:00</span></div>'+
- '<div class="apm-volume"><label for="apmVolume" aria-label="Volume">♫</label><input id="apmVolume" type="range" min="0" max="100" value="65" aria-label="Volume"></div>'+
- '<a id="apmCredit" target="_blank" rel="noopener noreferrer" title="Artist credits and license">Source ↗</a>';
+ '<div class="apm-volume"><label for="apmVolume">♫</label><input id="apmVolume" aria-label="Music volume" type="range" min="0" max="100" value="65"></div>'+
+ '<a id="apmCredit" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" title="Open current song on YouTube">YouTube ↗</a>';
  document.body.append(dock);
- $('apmPlay').onclick=()=>{if(!audio.src&&state.tracks.length)select(0);else if(audio.paused)audio.play().catch(playbackFailure);else audio.pause()};
- $('apmPrev').onclick=()=>step(-1);
- $('apmNext').onclick=()=>step(1);
- $('apmQueue').onclick=open;
- $('apmClose').onclick=()=>{audio.pause();audio.removeAttribute('src');audio.load();dock.hidden=true;dock.classList.remove('apm-playing');};
- $('apmSeek').oninput=e=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*(Number(e.target.value)/1000)};
- $('apmVolume').oninput=e=>{audio.volume=Number(e.target.value)/100;try{localStorage.setItem('8apdf_audio_volume',String(audio.volume))}catch{}};
- try{const n=Number(localStorage.getItem('8apdf_audio_volume'));if(Number.isFinite(n)&&n>=0&&n<=1){audio.volume=n;$('apmVolume').value=String(Math.round(n*100))}}catch{}
- audio.addEventListener('play',sync);
- audio.addEventListener('pause',sync);
- audio.addEventListener('waiting',()=>{if(!audio.paused)status('Buffering audio…')});
- audio.addEventListener('playing',()=>{state.skipFailures=0;status('Playing');sync()});
- audio.addEventListener('loadedmetadata',progress);
- audio.addEventListener('durationchange',progress);
- audio.addEventListener('timeupdate',progress);
- audio.addEventListener('ended',()=>step(1));
- audio.addEventListener('error',()=>{if(state.current>=0){status('Track unavailable — finding the next playable track');recover()}});
+ $('apmPlay').onclick=()=>{if(!visible()){open();notice('Keep the YouTube player visible to continue playback.');return;}if(state.index<0){play(0);return}const ps=playerSafe('getPlayerState',-1);if(ps===1)state.player.pauseVideo();else if(state.playerReady)state.player.playVideo();else play(state.index)};
+ $('apmPrev').onclick=()=>jump(-1);$('apmNext').onclick=()=>jump(1);$('apmQueue').onclick=open;
+ $('apmClose').onclick=()=>{pause();hideDock()};
+ $('apmSeek').oninput=e=>{const d=playerSafe('getDuration',0);if(d>0&&state.playerReady)state.player.seekTo(d*Number(e.target.value)/1000,true)};
+ $('apmVolume').oninput=e=>{const n=Number(e.target.value);try{sessionStorage.setItem('8apdf_yt_volume',String(n))}catch{};if(state.playerReady)state.player.setVolume(n)};
+ try{const v=Number(sessionStorage.getItem('8apdf_yt_volume'));if(Number.isFinite(v)&&v>=0&&v<=100)$('apmVolume').value=String(v)}catch{}
 }
-function sync(){if(!dock)return;const playing=!audio.paused&&!audio.ended;dock.classList.toggle('apm-playing',playing);$('apmPlay').textContent=playing?'Ⅱ':'▶';$('apmPlay').setAttribute('aria-label',playing?'Pause':'Play');$('apmPlay').title=playing?'Pause':'Play'}
-function progress(){if(!dock)return;const duration=Number.isFinite(audio.duration)?audio.duration:0;const current=Number.isFinite(audio.currentTime)?audio.currentTime:0;$('apmElapsed').textContent=time(current);$('apmLength').textContent=time(duration);$('apmSeek').value=duration?String(Math.round(current/duration*1000)):'0';$('apmSeek').style.setProperty('--apm-progress',duration?(current/duration*100)+'%':'0%')}
-function playbackFailure(e){if(e?.name==='NotAllowedError'){status('Tap Play again to allow audio playback');sync();return}status('Could not play this track; trying the next one');recover()}
-function recover(){if(state.skipFailures++>=Math.min(6,state.tracks.length)){audio.pause();sync();status('Several tracks unavailable. Choose another song from the library.');return}step(1)}
-function select(i){
- setup();if(!state.tracks.length)return;
- const n=(i+state.tracks.length)%state.tracks.length,t=state.tracks[n];
- state.current=n;audio.pause();audio.src=t.src;audio.load();dock.hidden=false;
- dock.classList.remove('apm-appearing');void dock.offsetWidth;dock.classList.add('apm-appearing');
- $('apmTitle').textContent=t.title;$('apmArtist').textContent=t.artist+' · '+t.genre;
- $('apmCredit').href=t.source;$('apmCredit').textContent=t.license+' ↗';
- $('apmSeek').value='0';$('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';
- status('Loading '+t.title+'…');sync();audio.play().catch(err=>{if(state.current===n&&err?.name!=='AbortError')playbackFailure(err)});highlightPlaying();
- try{localStorage.setItem('8apdf_audio_last',t.id)}catch{}
-}
-function step(offset){if(!state.tracks.length){open();return}select(state.current<0?0:state.current+offset)}
-function highlightPlaying(){panel?.querySelectorAll('[data-apm-index]').forEach(x=>{const on=Number(x.dataset.apmIndex)===state.current;x.classList.toggle('current',on);x.setAttribute('aria-current',on?'true':'false')})}
-function ui(){
- if(panel)return;
- panel=document.createElement('div');panel.id='apmOverlay';panel.className='apm-overlay';panel.hidden=true;
- panel.innerHTML='<section class="apm-sheet" role="dialog" aria-modal="true" aria-labelledby="apmHeading">'+
- '<header class="apm-header"><div><span class="apm-kicker">8aPDF · FOCUS SOUNDTRACK</span><h2 id="apmHeading">Music Studio <span>♫</span></h2><p>Real music audio, no video. Auto-next when a track finishes.</p></div><button type="button" id="apmDismiss" aria-label="Close library">×</button></header>'+
- '<div class="apm-searchline"><input id="apmFind" type="search" placeholder="Search music or artist…" aria-label="Search songs"><span id="apmCount">Loading library…</span></div>'+
- '<div id="apmGenres" class="apm-genres" aria-label="Music category filters"></div>'+
- '<div id="apmStatus" class="apm-status" role="status"></div><div id="apmTracks" class="apm-tracks"></div>'+
- '<footer class="apm-foot">Music provided through openly licensed Wikimedia Commons audio files. Track credits and license information are linked in the player. Availability may vary by browser. Popular copyrighted YouTube songs cannot be played through a hidden player.</footer></section>';
- document.body.append(panel);
- $('apmDismiss').onclick=close;panel.addEventListener('click',e=>{if(e.target===panel)close();const b=e.target.closest('[data-apm-index]');if(b){select(Number(b.dataset.apmIndex));}});
+function hideDock(){dock.hidden=true;dock.classList.remove('apm-playing');document.body.classList.remove('apm-docked')}
+function showDock(){bindDock();dock.hidden=false;dock.classList.add('apm-appearing');document.body.classList.add('apm-docked')}
+function sync(playing){if(!dock)return;dock.classList.toggle('apm-playing',playing);$('apmPlay').textContent=playing?'Ⅱ':'▶';$('apmPlay').setAttribute('aria-label',playing?'Pause song':'Play song');$('apmPlay').title=playing?'Pause':'Play'}
+function progress(){if(!dock||dock.hidden)return;const d=playerSafe('getDuration',0),t=playerSafe('getCurrentTime',0);$('apmElapsed').textContent=mm(t);$('apmLength').textContent=mm(d);const pct=d>0?Math.max(0,Math.min(100,t/d*100)):0;$('apmSeek').value=String(Math.round(pct*10));$('apmSeek').style.setProperty('--apm-progress',pct+'%')}
+function clock(stop=false){clearInterval(state.interval);state.interval=0;if(!stop)state.interval=setInterval(progress,400);progress()}
+function pause(){if(state.playerReady)try{state.player.pauseVideo()}catch{}sync(false);clock(true)}
+function visible(){return !!overlay&&!overlay.hidden&&!!$('apmVideoFrame')&&!$('apmVideoFrame').hidden}
+function buildOverlay(){
+ if(overlay)return;
+ overlay=document.createElement('div');overlay.id='apmOverlay';overlay.className='apm-overlay';overlay.hidden=true;
+ overlay.innerHTML='<section class="apm-sheet" role="dialog" aria-modal="true" aria-labelledby="apmHeading">'+
+ '<header class="apm-header"><div><span class="apm-kicker">8aPDF · YOUTUBE MUSIC</span><h2 id="apmHeading">Viral Music <span>♫</span></h2><p>Hindi, Punjabi & English hits · 276 curated songs</p></div><button id="apmDismiss" aria-label="Close music library" type="button">×</button></header>'+
+ '<div class="apm-video-frame" id="apmVideoFrame" hidden><div id="apmYTMount"></div><p>Official YouTube player · keep this video visible during playback.</p></div>'+
+ '<div class="apm-searchline"><input id="apmFind" type="search" placeholder="Search your favourite songs…" aria-label="Search music library"><span id="apmCount"></span></div>'+
+ '<div class="apm-genres" id="apmGenres" aria-label="Music categories"></div>'+
+ '<div class="apm-status" id="apmStatus" role="status"></div><div class="apm-tracks" id="apmTracks"></div>'+
+ '<footer class="apm-foot">Play opens an official YouTube embed when available. If embedding or search is unavailable, use the YouTube link. Audio-only hidden-video playback is not supported by YouTube.</footer></section>';
+ document.body.append(overlay);
+ $('apmDismiss').onclick=close;
+ overlay.onclick=e=>{if(e.target===overlay)close();const b=e.target.closest('[data-apm-index]');if(b)play(Number(b.dataset.apmIndex));};
  $('apmFind').oninput=e=>{state.search=e.target.value.toLowerCase().trim();render()};
  $('apmGenres').onclick=e=>{const b=e.target.closest('[data-apm-genre]');if(b){state.filter=b.dataset.apmGenre;render()}};
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel&&!panel.hidden)close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)close()});
 }
 function render(){
- if(!panel)return;
- const genres=['All',...new Set(state.tracks.map(t=>t.genre))];
- $('apmGenres').innerHTML=genres.map(g=>'<button type="button" data-apm-genre="'+esc(g)+'" class="'+(state.filter===g?'selected':'')+'">'+esc(g)+'</button>').join('');
- const visible=state.tracks.map((t,i)=>({...t,index:i})).filter(t=>(state.filter==='All'||t.genre===state.filter)&&(!state.search||(t.title+' '+t.artist+' '+t.genre).toLowerCase().includes(state.search)));
- const limit=visible.slice(0,240);
- $('apmCount').textContent=state.tracks.length+' discovered tracks';
- $('apmTracks').innerHTML=limit.map(t=>'<button type="button" class="apm-track'+(state.current===t.index?' current':'')+'" data-apm-index="'+t.index+'" aria-current="'+(state.current===t.index)+'"><span class="apm-trackmark">♫</span><span class="apm-trackwords"><strong>'+esc(t.title)+'</strong><small>'+esc(t.genre)+' · '+esc(t.artist)+'</small></span><span class="apm-trackplay">▶</span></button>').join('')||'<p class="apm-empty">No matching tracks yet. Try another search or wait for more music to load.</p>';
- status(lastStatus);
+ if(!overlay)return;
+ const genres=['All','Hindi','Punjabi','English'];
+ $('apmGenres').innerHTML=genres.map(g=>'<button type="button" data-apm-genre="'+g+'" class="'+(state.filter===g?'selected':'')+'" aria-pressed="'+(state.filter===g)+'">'+g+'</button>').join('');
+ const visibleTracks=tracks.map((x,i)=>({...x,index:i})).filter(x=>(state.filter==='All'||x.genre===state.filter)&&(!state.search||(x.title+' '+x.artist).toLowerCase().includes(state.search)));
+ $('apmCount').textContent=visibleTracks.length+' / '+tracks.length+' songs';
+ $('apmTracks').innerHTML=visibleTracks.map(x=>'<div class="apm-track'+(x.index===state.index?' current':'')+'">'+
+ '<button type="button" class="apm-trackchoice" data-apm-index="'+x.index+'" aria-label="Play '+esc(x.title)+'">'+
+ '<span class="apm-trackmark">♫</span><span class="apm-trackwords"><strong>'+esc(x.title)+'</strong><small>'+esc(x.artist)+' · '+esc(x.genre)+'</small></span><span class="apm-trackplay">▶</span></button>'+
+ '<a class="apm-direct" title="'+(x.videoId?'Open YouTube video':'Find official song on YouTube')+'" target="_blank" rel="noopener noreferrer" href="'+ytLink(x)+'" aria-label="Open '+esc(x.title)+' on YouTube">YouTube ↗</a></div>').join('')||'<p class="apm-empty">No matching songs found.</p>';
+ $('apmStatus').textContent=state.status||'Choose a song to play. YouTube content requires a visible video player.';
 }
-function close(){if(!panel)return;panel.hidden=true;document.body.classList.remove('apm-open')}
-function open(){setup();ui();panel.hidden=false;document.body.classList.add('apm-open');render();if(!state.loaded&&!state.loading)loadLibrary();$('apmFind').focus({preventScroll:true})}
-function readableTitle(t){return String(t||'').replace(/^File:/,'').replace(/\.(?:ogg|oga|mp3|wav|opus|flac)$/i,'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'').trim().slice(0,115)}
-function validTrack(p,genre){
- const file=p?.imageinfo?.[0];if(!file)return;
- const src=safeUrl(file.url),source=safeUrl(file.descriptionurl);
- if(!src||!source||!/\.(ogg|oga|mp3|wav)(?:$|\?)/i.test(src))return;
- if(!['audio/ogg','application/ogg','audio/mpeg','audio/mp3','audio/x-wav','audio/wav','audio/wave'].includes(file.mime))return;
- if(audio.canPlayType(file.mime)==='')return;
- const ext=file.extmetadata||{},license=String(ext.LicenseShortName?.value||'');
- if(!/^(?:CC0|CC BY(?:-SA)?\b|Public domain|PD\b)/i.test(license))return;
- const title=readableTitle(p.title);if(!title||state.seen.has(src))return;
- state.seen.add(src);
- state.tracks.push({id:String(p.pageid),title,artist:'Wikimedia Commons',genre,src,source,license});
+function open(){
+ bindDock();buildOverlay();state.previousFocus=document.activeElement;
+ overlay.hidden=false;document.body.classList.add('apm-open');render();
+ $('apmFind').focus({preventScroll:true});
 }
-async function fetchPage(genre,term,continuation){
- const params=new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'6',gsrlimit:'80',prop:'imageinfo',iiprop:'url|mime|extmetadata',format:'json',formatversion:'2',origin:'*'});
- if(continuation)params.set('gsrcontinue',continuation);
- controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),14000);
- try{const r=await fetch('https://commons.wikimedia.org/w/api.php?'+params,{signal:controller.signal,referrerPolicy:'strict-origin-when-cross-origin'});if(!r.ok)throw Error('Commons returned '+r.status);const d=await r.json();if(d.error)throw Error(d.error.info||d.error.code);(d.query?.pages||[]).forEach(p=>validTrack(p,genre));return d.continue?.gsrcontinue||null}finally{clearTimeout(timeout)}
+function close(){
+ if(!overlay||overlay.hidden)return;
+ pause();overlay.hidden=true;document.body.classList.remove('apm-open');
+ state.previousFocus?.focus?.({preventScroll:true});
+ if(!dock.hidden)notice('Paused. Open Music Studio again to continue playback.');
 }
-async function loadLibrary(){
- if(state.loading)return;state.loading=true;status('Discovering Creative Commons music…');
- let failures=0;
- for(const [genre,term] of searchGroups){
-  if(state.tracks.length>=240)break;
-  try{let next=await fetchPage(genre,term);render();if(state.tracks.length<200&&next){await fetchPage(genre,term,next);render();}}catch(e){failures++;status('Some music searches could not load: '+e.message)}
+function ensureYouTube(){
+ if(window.YT?.Player)return Promise.resolve();
+ if(state.apiPromise)return state.apiPromise;
+ state.apiPromise=new Promise((resolve,reject)=>{
+  let done=false;const before=window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady=()=>{try{if(typeof before==='function')before()}catch{};if(!done){done=true;clearTimeout(timeout);resolve()}};
+  const timeout=setTimeout(()=>{if(!done){done=true;state.apiPromise=null;reject(Error('YouTube player could not load'))}},15000);
+  const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.onerror=()=>{if(!done){done=true;clearTimeout(timeout);state.apiPromise=null;reject(Error('YouTube is blocked by your connection'))}};document.head.append(script);
+ });return state.apiPromise;
+}
+function onPlayerState(ev){
+ if(!window.YT)return;
+ const p=YT.PlayerState;
+ if(ev.data===p.PLAYING){state.errorCount=0;sync(true);clock();notice('Playing via YouTube · Next song plays automatically.')}
+ else if(ev.data===p.PAUSED){sync(false);clock(true)}
+ else if(ev.data===p.ENDED){sync(false);clock(true);jump(1,true)}
+ else if(ev.data===p.BUFFERING){notice('Buffering song…');clock(true)}
+ else if(ev.data===p.CUED){notice('Ready to play.')}
+}
+function onPlayerError(ev){
+ sync(false);clock(true);
+ const msg=ev.data===101||ev.data===150?'This song does not allow embedding.':ev.data===100?'This video is unavailable.':'YouTube could not play this video.';
+ notice(msg+' Use its YouTube link or try another track.');
+ if(state.errorCount++<3&&visible())setTimeout(()=>jump(1,true),500);
+}
+async function resolve(x){
+ if(x.videoId)return x.videoId;
+ if(state.searchUnavailable)throw Error('YouTube search is not configured. Use the YouTube link for this song.');
+ const key='8apdf_yt_song_'+encodeURIComponent(x.title+'-'+x.artist).slice(0,150);
+ try{const cache=JSON.parse(sessionStorage.getItem(key)||'null');if(cache?.videoId&&/^[\w-]{11}$/.test(cache.videoId)){x.videoId=cache.videoId;return x.videoId}}catch{}
+ const response=await fetch('/api/music-search?q='+encodeURIComponent(x.title+' '+x.artist+' official music video'),{headers:{Accept:'application/json'}});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok){if(response.status===503)state.searchUnavailable=true;throw Error(result.error||'YouTube video lookup unavailable')}
+ const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
+ const queryWords=norm(x.title).split(' ').filter(z=>z.length>2);const artistWords=norm(x.artist).split(' ').filter(z=>z.length>3);
+ const ranked=(result.items||[]).filter(v=>/^[\w-]{11}$/.test(v.videoId)).map(v=>{
+  const t=norm(v.title),ch=norm(v.channel);
+  let score=queryWords.reduce((n,w)=>n+(t.includes(w)?3:-4),0)+artistWords.reduce((n,w)=>n+(t.includes(w)||ch.includes(w)?1:0),0);
+  if(/official video|official music|official audio|lyric video/.test(t))score+=4;
+  if(/reaction|cover song|slowed|nightcore|karaoke|tutorial|shorts|remix/.test(t))score-=12;
+  return {...v,score};
+ }).sort((a,b)=>b.score-a.score);
+ if(!ranked.length||ranked[0].score<2)throw Error('No suitable embeddable video found.');
+ x.videoId=ranked[0].videoId;
+ try{sessionStorage.setItem(key,JSON.stringify({videoId:x.videoId}))}catch{}
+ return x.videoId;
+}
+async function play(i,fromAutonext=false){
+ if(!tracks.length){notice('Music library failed to load. Please refresh.');return}
+ const token=++state.playToken;
+ const n=((i%tracks.length)+tracks.length)%tracks.length,x=item(n);
+ state.index=n;state.loading=true;
+ if(!overlay||overlay.hidden)open();
+ showDock();$('apmTitle').textContent=x.title;$('apmArtist').textContent=x.artist+' · '+x.genre;
+ $('apmCredit').href=ytLink(x);
+ $('apmCredit').textContent='YouTube ↗';
+ $('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';$('apmSeek').value='0';
+ sync(false);clock(true);notice('Finding official YouTube video for '+x.title+'…');
+ if(fromAutonext&&state.searchUnavailable&&!x.videoId){jump(1,true);return}
+ try{
+  const id=await resolve(x);
+  if(token!==state.playToken)return;
+  const frame=$('apmVideoFrame');frame.hidden=false;playerShown=true;
+  render();
+  await ensureYouTube();
+  if(token!==state.playToken||!visible())return;
+  if(!state.player){
+   state.playerReady=false;
+   state.player=new YT.Player('apmYTMount',{width:'480',height:'270',videoId:id,playerVars:{playsinline:1,controls:1,rel:0,origin:location.origin},
+    events:{onReady:e=>{state.playerReady=true;const v=Number($('apmVolume').value);e.target.setVolume(v);if(visible())e.target.playVideo()},
+            onStateChange:onPlayerState,onError:onPlayerError}});
+  }else if(state.playerReady){state.player.loadVideoById(id)}
+  else{notice('YouTube is still preparing playback. Try Play in a moment.')}
+  state.loading=false;state.errorCount=0;
+ }catch(e){
+  if(token!==state.playToken)return;
+  state.loading=false;sync(false);clock(true);
+  $('apmVideoFrame').hidden=!state.playerReady;
+  notice(e.message+' · Use the YouTube ↗ link beside the song.');
+  if(fromAutonext&&state.errorCount++<3)setTimeout(()=>jump(1,true),400);
  }
- state.loading=false;state.loaded=true;
- if(state.tracks.length)status(state.tracks.length+' real, openly licensed sources found. Tracks are checked for playback when selected.');
- else status('Music discovery is unavailable right now. Check internet access or try again.');
- render();
 }
-window.__8apdfMusic={open,close,getDiscoveredCount:()=>state.tracks.length};
+function jump(n,autonext=false){
+ if(!tracks.length)return;
+ let next=state.index<0?0:state.index+n;
+ if(autonext&&state.searchUnavailable){
+  const dir=n<0?-1:1;let j=0;
+  while(j<tracks.length&&!item((next+tracks.length)%tracks.length).videoId){next+=dir;j++;}
+  if(j===tracks.length){notice('No more playable embedded songs. Browse on YouTube for more.');return}
+ }
+ play(next,autonext);
+}
+window.__8apdfMusic={open,close,catalogCount:()=>tracks.length};
 })();
