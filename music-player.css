@@ -49,3 +49,48 @@ html[data-theme=light] #apmPlay,html[data-tone=light] #apmPlay{color:#fff;backgr
 html[data-theme=light] .apm-meta small,html[data-tone=light] .apm-meta small{color:#666}
 @media(max-width:580px){.apm-dock{bottom:max(12px,env(safe-area-inset-bottom));width:calc(100vw - 20px);padding:10px 11px 12px;gap:5px;grid-template-columns:40px minmax(0,1fr) 32px 42px 32px 28px;grid-template-rows:44px 16px;border-radius:18px}.apm-art{width:40px;height:40px;border-radius:11px}.apm-meta strong{font-size:12px}.apm-meta small{font-size:10px}.apm-dock button{width:32px;height:32px}.apm-dock #apmPlay{width:42px;height:42px}.apm-dock #apmPrev{grid-column:3}.apm-dock #apmPlay{grid-column:4}.apm-dock #apmNext{grid-column:5}.apm-dock #apmQueue{grid-column:6}.apm-dock #apmClose{position:absolute;right:4px;top:-28px;background:#28282b;border-radius:50%;width:26px;height:26px;font-size:17px}.apm-timeline{grid-column:1/-1;grid-row:2}.apm-volume{display:none}#apmCredit{bottom:-15px;right:12px;font-size:9px}.apm-overlay{padding:9px}.apm-sheet{max-height:calc(100dvh - 18px);border-radius:16px}.apm-header{padding:20px 16px 14px}.apm-header h2{font-size:23px}.apm-searchline{padding:0 16px 12px;display:block}.apm-searchline input{width:100%}.apm-searchline span{display:block;margin-top:7px}.apm-genres{padding:0 16px 12px}.apm-status{padding:0 16px 8px}.apm-tracks{padding:0 8px 12px}.apm-foot{padding:10px 16px 12px}}
 @media(prefers-reduced-motion:reduce){.apm-playing .apm-art-orbit,.apm-playing .apm-bars i{animation:none!important}.apm-dock.apm-appearing{animation:none!important}.apm-dock button{transition:none}}
+
+/* YouTube music library upgrade */
+.apm-video-frame[hidden]{display:none!important}
+.apm-video-frame{box-sizing:border-box;flex:0 0 auto;width:min(500px,calc(100% - 34px));margin:0 auto 14px;border:0;overflow:visible}
+.apm-video-frame #apmYTMount{width:100%;height:270px;min-height:200px;background:#080808;border-radius:13px;overflow:hidden}
+.apm-video-frame #apmYTMount iframe{display:block!important;border:0!important;width:100%!important;height:100%!important;min-height:200px!important;visibility:visible!important;opacity:1!important}
+.apm-video-frame p{font-size:10px;line-height:1.5;text-align:center;margin:6px 0 0;color:#a3a3a9}
+.apm-track{padding:0 9px 0 0!important;display:flex;align-items:center}
+.apm-trackchoice{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;color:inherit;text-align:left;font:inherit;background:none;border:0;min-height:56px;padding:9px 12px}
+.apm-trackchoice:focus-visible,.apm-direct:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.apm-direct{font-size:10px;white-space:nowrap;text-decoration:none!important;border:1px solid #414147;border-radius:9px;padding:8px 10px;color:#c9c9d2;flex-shrink:0;transition:background .18s}
+.apm-direct:hover{background:#35353b}
+.apm-track.current .apm-trackmark{background:#e6e6e9;color:#242428}
+.apm-sheet{overflow:hidden}
+html[data-ui-mode="studio"] body.apm-docked main{padding-bottom:200px}
+@media(max-width:810px){
+ /* Mobile navigation consumes roughly 76px plus the safe-area inset; never let the music dock cover it. */
+ html[data-ui-mode="studio"] .apm-dock{bottom:calc(84px + env(safe-area-inset-bottom,0px))!important}
+ html:not([data-ui-mode="studio"]) .apm-dock{bottom:calc(18px + env(safe-area-inset-bottom,0px))!important}
+ html[data-ui-mode="studio"] body.apm-docked main{padding-bottom:calc(270px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(max-width:580px){
+ .apm-video-frame{width:calc(100% - 26px);margin-bottom:10px}
+ .apm-video-frame #apmYTMount{height:210px;min-height:210px}
+ .apm-header{padding:16px 14px 8px}
+ .apm-header h2{font-size:22px}
+ .apm-header p{font-size:11px}
+ .apm-sheet{max-height:calc(100dvh - 16px)}
+ .apm-searchline{padding:0 14px 9px}
+ .apm-genres{padding:0 14px 8px}
+ .apm-status{padding:0 14px 8px;font-size:10px}
+ .apm-trackchoice{gap:9px;padding:8px 5px 8px 9px}
+ .apm-trackmark{width:29px;height:29px;flex-basis:29px}
+ .apm-direct{padding:7px 6px;font-size:9px}
+ .apm-trackwords strong{font-size:12px}
+ .apm-foot{padding:9px 14px}
+ .apm-dock #apmCredit{bottom:0;right:8px;transform:translateY(calc(100% + 3px));font-size:9px;color:#a1a1a7}
+}
+@media(max-width:345px){
+ .apm-dock{gap:3px!important;grid-template-columns:34px minmax(0,1fr) 28px 38px 28px 27px!important;padding:9px 8px 11px!important}
+ .apm-art{width:34px;height:34px}
+ .apm-dock #apmPlay{width:38px;height:38px}
+ .apm-dock #apmPrev,.apm-dock #apmNext{width:28px;height:30px;font-size:13px}
+ .apm-meta strong{font-size:11px}
+}
