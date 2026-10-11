@@ -1,0 +1,29 @@
+/* 8aPDF coordinated theme studio — scoped to Settings only. */
+#settingsPanel .palette-section .palette-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;max-height:350px!important;overflow-y:auto!important;padding:2px 4px 4px 1px!important}
+#settingsPanel .palette-grid .theme-item{min-width:0!important;min-height:78px!important;width:100%!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;gap:9px!important;padding:11px!important;border-radius:12px!important;font-size:11px!important;line-height:1.35!important;text-align:left!important;white-space:normal!important;word-break:normal!important}
+#settingsPanel .palette-grid .theme-item:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+#settingsPanel .palette-grid .theme-item.active{outline:1px solid var(--text);outline-offset:0}
+#settingsPanel .theme-name-text{font-weight:680;overflow:hidden;text-overflow:ellipsis;display:block;width:100%;min-height:16px;color:var(--text);font:inherit}
+#settingsPanel .theme-swatches{display:flex;width:100%;height:19px;border-radius:7px;overflow:hidden;border:1px solid var(--line-bold)}
+#settingsPanel .theme-swatches i{display:block;flex:1 1 20%;height:100%;min-width:0}
+#settingsPanel .theme-five-legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:10px;line-height:1.45;margin:5px 0 9px}
+#settingsPanel .theme-five-legend strong{color:var(--text)}
+#settingsPanel .theme-control-intro{color:var(--muted);font-size:11px;line-height:1.55;margin:7px 0 12px}
+#settingsPanel .theme-role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 9px}
+#settingsPanel .theme-role-field{min-width:0;display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:11px;padding:8px;background:var(--surface-soft)}
+#settingsPanel .theme-role-field input[type=color]{width:36px!important;height:38px!important;flex:none;border:1px solid var(--line-bold);background:transparent;border-radius:8px;padding:2px;cursor:pointer}
+#settingsPanel .theme-role-field-text{min-width:0;flex:1;display:grid;gap:3px}
+#settingsPanel .theme-role-field label{font-size:10px;font-weight:660;color:var(--text);line-height:1.25;overflow-wrap:anywhere}
+#settingsPanel .theme-role-field code{font-size:9px;font-family:ui-monospace,SFMono-Regular,monospace;color:var(--muted)}
+#settingsPanel .theme-editor-tools{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:7px;margin-top:13px}
+#settingsPanel .theme-editor-tools button{min-height:35px;border:1px solid var(--line-bold);border-radius:9px;background:var(--surface-high);color:var(--text);padding:8px 11px;font-size:11px;font-weight:650;cursor:pointer}
+#settingsPanel #themeRoleReset{color:var(--text-soft)}
+#settingsPanel .custom-palette .setting-explainer{margin-bottom:8px}
+#settingsPanel .palette-count{white-space:nowrap}
+@media(max-width:400px){
+ #settingsPanel .theme-role-grid{gap:7px}
+ #settingsPanel .theme-role-field{gap:5px;padding:6px}
+ #settingsPanel .theme-role-field input[type=color]{width:30px!important;height:34px!important}
+ #settingsPanel .theme-role-field label{font-size:9px}
+ #settingsPanel .palette-grid .theme-item{padding:9px!important;min-height:73px!important}
+}
