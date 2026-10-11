@@ -105,3 +105,4 @@ function appInit(){if(!$('studioSidebar')||!$('dashboardWidgets'))return;buildSi
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&musicEngine?.context?.state==='running')musicEngine.context.suspend().catch(()=>{});else if(!document.hidden&&musicEngine?.context?.state==='suspended')musicEngine.context.resume().catch(()=>{})});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',appInit,{once:true});else appInit();
 })();
+/* redeploy blob storage connection */
