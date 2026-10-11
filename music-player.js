@@ -137,35 +137,52 @@ async function play(i,fromAutonext=false){
  if(!tracks.length){notice('Music library failed to load. Please refresh.');return}
  const token=++state.playToken;
  const n=((i%tracks.length)+tracks.length)%tracks.length,x=item(n);
- state.index=n;state.loading=true;
- pause();
+ state.loading=true;
  if(!overlay||overlay.hidden)open();
- showDock();$('apmTitle').textContent=x.title;$('apmArtist').textContent=x.artist+' · '+x.genre;
- $('apmCredit').href=ytLink(x);
- $('apmCredit').textContent='YouTube ↗';
- $('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';$('apmSeek').value='0';
- sync(false);clock(true);notice('Finding official YouTube video for '+x.title+'…');
- if(fromAutonext&&state.searchUnavailable&&!x.videoId){if(state.errorCount++>6){notice('No other linked playable tracks. Please retry later.');return}jump(1,true);return}
+ if(fromAutonext&&state.searchUnavailable&&!x.videoId){
+  if(state.errorCount++>6){notice('No more linked tracks available.');state.loading=false;return}
+  jump(1,true);return;
+ }
+ notice('Finding official YouTube video for '+x.title+'…');
  try{
   const id=await resolve(x);
   if(token!==state.playToken)return;
-  const frame=$('apmVideoFrame');frame.hidden=false;playerShown=true;
-  render();
   await ensureYouTube();
-  if(token!==state.playToken||!visible())return;
+  if(token!==state.playToken)return;
+  const frame=$('apmVideoFrame');frame.hidden=false;
+  state.index=n;state.pendingVideoId=id;
+  showDock();
+  $('apmTitle').textContent=x.title;$('apmArtist').textContent=x.artist+' · '+x.genre;
+  $('apmCredit').href=ytLink(x);$('apmCredit').textContent='YouTube ↗';
+  $('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';$('apmSeek').value='0';
+  pause();render();
+  if(!visible()){state.loading=false;notice('The official YouTube player must stay visible.');return}
   if(!state.player){
    state.playerReady=false;
-   state.player=new YT.Player('apmYTMount',{width:'480',height:'270',videoId:id,playerVars:{playsinline:1,controls:1,rel:0,origin:location.origin},
-    events:{onReady:e=>{state.playerReady=true;const v=Number($('apmVolume').value);e.target.setVolume(v);if(visible())e.target.playVideo()},
-            onStateChange:onPlayerState,onError:onPlayerError}});
+   state.player=new YT.Player('apmYTMount',{
+    width:'480',height:'270',videoId:id,
+    playerVars:{playsinline:1,controls:1,rel:0,origin:location.origin},
+    events:{
+     onReady:e=>{
+      state.playerReady=true;
+      e.target.setVolume(Number($('apmVolume').value));
+      const wanted=state.pendingVideoId;
+      if(visible()&&wanted){
+       if(wanted!==id)e.target.loadVideoById(wanted);
+       else e.target.playVideo();
+      }
+     },
+     onStateChange:onPlayerState,onError:onPlayerError
+    }});
   }else if(state.playerReady){state.player.loadVideoById(id)}
-  else{notice('YouTube is still preparing playback. Try Play in a moment.')}
+  else notice('Preparing the next song…');
   state.loading=false;
  }catch(e){
   if(token!==state.playToken)return;
-  state.loading=false;sync(false);clock(true);
-  $('apmVideoFrame').hidden=!state.playerReady;
-  notice(e.message+' · Could not play this track inside 8aPDF yet.');
+  state.loading=false;
+  // Never interrupt the currently playing song merely because another
+  // catalogue entry has no valid YouTube video ID.
+  notice((e?.message||'Song lookup failed')+' · This song is not yet available inside 8aPDF.');
   if(fromAutonext&&state.errorCount++<3)setTimeout(()=>jump(1,true),400);
  }
 }
