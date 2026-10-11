@@ -2475,7 +2475,8 @@ async function answerAI(question,docs){
  const tokens=words(question).filter(x=>x.length>2);
  const score=x=>{const t=normalize([x.title,x.subject,x.category].join(' ')),d=normalize([x.description,x.message,x.fullMessage].join(' '));return tokens.reduce((v,k)=>v+(t.includes(k)?5:d.includes(k)?2:0),0)};
  const catalog=docs.slice().sort((a,b)=>score(b)-score(a)).slice(0,36).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,170),chapter:d.chapter,term:d.term}));
- const announcements=anns.slice().sort((a,b)=>score(b)-score(a)).slice(0,38).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,350),eventDate:typeof a.eventDate==='string'?a.eventDate:'',messageDate:typeof a.messageDate==='string'?a.messageDate:''}));
+ const dateText=v=>{if(typeof v==='string')return v.slice(0,50);try{if(v?.toDate)return v.toDate().toISOString().slice(0,10);if(typeof v?.seconds==='number')return new Date(v.seconds*1000).toISOString().slice(0,10)}catch{}return''};
+ const announcements=anns.slice().sort((a,b)=>score(b)-score(a)).slice(0,38).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,350),eventDate:dateText(a.eventDate),messageDate:dateText(a.messageDate)}));
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),11000);
  try{
   const headers={'Content-Type':'application/json'},personal=window.__8apdfStudyIntel?.customKey?.();
