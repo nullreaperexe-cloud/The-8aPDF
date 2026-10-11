@@ -44,7 +44,7 @@ function buildOverlay(){
  if(overlay)return;
  overlay=document.createElement('div');overlay.id='apmOverlay';overlay.className='apm-overlay';overlay.hidden=true;
  overlay.innerHTML='<section class="apm-sheet" role="dialog" aria-modal="true" aria-labelledby="apmHeading">'+
- '<header class="apm-header"><div><span class="apm-kicker">8aPDF · YOUTUBE MUSIC</span><h2 id="apmHeading">Viral Music <span>♫</span></h2><p>Hindi, Punjabi & English hits · 276 curated songs</p></div><button id="apmDismiss" aria-label="Close music library" type="button">×</button></header>'+
+ '<header class="apm-header"><div><span class="apm-kicker">8aPDF · YOUTUBE MUSIC</span><h2 id="apmHeading">Viral Music <span>♫</span></h2><p>Hindi, Punjabi & English hits · '+tracks.length+' curated songs</p></div><button id="apmDismiss" aria-label="Close music library" type="button">×</button></header>'+
  '<div class="apm-video-frame" id="apmVideoFrame" hidden><div id="apmYTMount"></div><p>Official YouTube player · keep this video visible during playback.</p></div>'+
  '<div class="apm-searchline"><input id="apmFind" type="search" placeholder="Search your favourite songs…" aria-label="Search music library"><span id="apmCount"></span></div>'+
  '<div class="apm-genres" id="apmGenres" aria-label="Music categories"></div>'+
@@ -132,6 +132,7 @@ async function play(i,fromAutonext=false){
  const token=++state.playToken;
  const n=((i%tracks.length)+tracks.length)%tracks.length,x=item(n);
  state.index=n;state.loading=true;
+ pause();
  if(!overlay||overlay.hidden)open();
  showDock();$('apmTitle').textContent=x.title;$('apmArtist').textContent=x.artist+' · '+x.genre;
  $('apmCredit').href=ytLink(x);
