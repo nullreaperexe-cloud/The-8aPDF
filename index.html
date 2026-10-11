@@ -1441,7 +1441,7 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
 .pdf-card .pdf-summary-utility:hover{color:var(--text)}
 #zipExport{white-space:nowrap}
 </style>
-<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=school-ai-20261011-v2"/><link rel="stylesheet" href="/soundcloud-studio.css?v=sc-compact-20261011v3"/>
+<link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=school-ai-20261011-v2"/><link rel="stylesheet" href="/timetable-tracker.css?v=approved-20261011v1"/>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1859,7 +1859,7 @@ function showTimetable(){
  const header=['DAY','P0','P1','P2','P3','P4','P5','P6','P7','P8'].map(t=>`<th scope="col">${t}</th>`).join('');
  const rows=timetable.map((periods,i)=>`<tr class="${i+1===selectedSchoolDay?'selected-day':''}"><th scope="row">DAY ${i+1}</th>${periods.map((subject,p)=>`<td class="${p===0?'dash-period':''}">${safe(subject).replace(/ \(([^)]+)\)/g,'<span class="detail">($1)</span>')}</td>`).join('')}</tr>`).join('');
  showModal('Class Timetable — Day 1 to Day 6',`<p class="timetable-help">Your updated six-day rotating school timetable. P0 has no class; choose the current school day from the dashboard.</p><div class="timetable-scroll"><table class="timetable-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table></div><p class="timetable-help">On smaller screens, swipe horizontally to view all periods. Recess timing has not been specified.</p>`,`<button class="solid" id="timetableDone">Done</button>`);
- $('#timetableDone').onclick=closeModal
+ $('#timetableDone').onclick=closeModal;document.dispatchEvent(new Event('8apdf:timetable-open'))
 }
 function renderTimetable(){
  $('#daySelect').value=String(selectedSchoolDay);
@@ -3072,6 +3072,9 @@ document.getElementById('modal')?.addEventListener('submit',event=>{
 
 draw();
 })();
-</script><script defer src="/soundcloud-catalog.js?v=sc-compact-20261011v3"></script><script defer src="/soundcloud-studio.js?v=sc-compact-20261011v3"></script><script defer src="/study-typing.js?v=typewriter-20261011"></script><script defer src="/study-intelligence.js?v=school-ai-20261011-v2"></script><script defer src="/workspace-upgrade.js?v=school-ai-20261011-v2"></script>
+</script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/study-typing.js?v=typewriter-20261011"></script><script defer src="/study-intelligence.js?v=school-ai-20261011-v2"></script><script defer src="/workspace-upgrade.js?v=school-ai-20261011-v2"></script>
+<!-- Elfsight Background Music | Untitled Background Music -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653" data-elfsight-app-lazy></div>
 </body>
 </html>
