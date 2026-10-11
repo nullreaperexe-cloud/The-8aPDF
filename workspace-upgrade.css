@@ -328,3 +328,40 @@ html[data-ui-mode="studio"] #dashboardWidgets button:focus-visible,html[data-ui-
  html[data-ui-mode="studio"] #dashboardWidgets .list-row .item-body strong{font-size:.73rem!important}
 }
 @media(prefers-reduced-motion:reduce){html[data-ui-mode="studio"] #dashboardWidgets .list-row{transition:none!important}}
+
+/* 2026-10-11 — center the study-library hero on BOTH desktop and mobile.
+   Override earlier left-alignment rules without modifying the classic layout,
+   dashboard widgets, navigation, or the search input's typing direction. */
+html[data-ui-mode="studio"] .hero .hero-inner{
+  text-align:center!important;
+}
+html[data-ui-mode="studio"] .hero .eyebrow-pill{
+  margin:0 auto!important;
+}
+html[data-ui-mode="studio"] .hero h1{
+  text-align:center!important;
+  margin:14px auto 9px!important;
+  text-wrap:balance;
+}
+html[data-ui-mode="studio"] .hero p{
+  text-align:center!important;
+  margin:0 auto!important;
+  max-width:min(100%,720px)!important;
+  text-wrap:pretty;
+}
+html[data-ui-mode="studio"] .hero .big-search{
+  margin:19px auto 10px!important;
+  width:100%;
+  max-width:760px!important;
+}
+html[data-ui-mode="studio"] #workspaceHomeActions{
+  justify-content:center!important;
+  margin-inline:auto!important;
+}
+@media(max-width:850px){
+  html[data-ui-mode="studio"] .hero .hero-inner{text-align:center!important}
+  html[data-ui-mode="studio"] .hero .eyebrow-pill{margin:0 auto!important}
+  html[data-ui-mode="studio"] .hero h1{text-align:center!important;margin:10px auto 9px!important}
+  html[data-ui-mode="studio"] .hero p{text-align:center!important;margin:0 auto!important;max-width:min(100%,540px)!important}
+  html[data-ui-mode="studio"] .hero .big-search{margin:19px auto 10px!important}
+}
