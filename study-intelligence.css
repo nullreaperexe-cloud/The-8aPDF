@@ -102,3 +102,19 @@ html[data-ui-mode="studio"] #dashboardWidgets .small-icon{
  .ws-event-toast{top:max(12px,env(safe-area-inset-top));right:12px;width:calc(100vw - 24px)}
 }
 @media(prefers-reduced-motion:reduce){.ws-event-toast{animation:none!important}}
+
+/* Titles remain concise even when teacher or PDF metadata is very long. */
+html[data-ui-mode="studio"] #dashboardWidgets .list-row .item-body strong{
+ display:-webkit-box!important;
+ -webkit-line-clamp:2!important;
+ -webkit-box-orient:vertical!important;
+ overflow:hidden!important;
+ text-overflow:ellipsis!important;
+ white-space:normal!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets .widget-header button{
+ min-height:30px;white-space:nowrap;
+}
+@media(max-width:550px){
+ html[data-ui-mode="studio"] #dashboardWidgets .widget-header{flex-wrap:wrap}
+}
