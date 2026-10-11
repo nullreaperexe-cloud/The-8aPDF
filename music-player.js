@@ -66,7 +66,7 @@ function select(i){
  $('apmTitle').textContent=t.title;$('apmArtist').textContent=t.artist+' · '+t.genre;
  $('apmCredit').href=t.source;$('apmCredit').textContent=t.license+' ↗';
  $('apmSeek').value='0';$('apmElapsed').textContent='0:00';$('apmLength').textContent='0:00';
- status('Loading '+t.title+'…');sync();audio.play().catch(playbackFailure);highlightPlaying();
+ status('Loading '+t.title+'…');sync();audio.play().catch(err=>{if(state.current===n&&err?.name!=='AbortError')playbackFailure(err)});highlightPlaying();
  try{localStorage.setItem('8apdf_audio_last',t.id)}catch{}
 }
 function step(offset){if(!state.tracks.length){open();return}select(state.current<0?0:state.current+offset)}
