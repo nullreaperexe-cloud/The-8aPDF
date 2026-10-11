@@ -171,3 +171,45 @@ html[data-tone="light"] .ws-music-dock,html[data-theme="light"] .ws-music-dock{c
 .ws-music-dock #wsYTMount{position:relative!important;grid-column:1/-1;grid-row:2;opacity:1!important;pointer-events:auto!important;width:100%!important;height:160px!important;overflow:visible!important;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;background:#111}
 .ws-music-dock #wsYTMount iframe{width:min(100%,285px)!important;height:160px!important;min-width:285px;max-width:100%;border:0}
 @media(max-width:650px){.ws-music-dock #wsYTMount{grid-row:3;height:140px!important}.ws-music-dock #wsYTMount iframe{height:140px!important;width:250px!important;min-width:0}}
+
+/* Ultra-premium responsive music dock — keep fully inside mobile viewport */
+.ws-music-dock{
+ left:max(12px,env(safe-area-inset-left))!important;
+ right:max(12px,env(safe-area-inset-right))!important;
+ bottom:max(12px,env(safe-area-inset-bottom))!important;
+ width:auto!important;max-width:760px!important;margin-inline:auto!important;
+ box-sizing:border-box!important;overflow:hidden!important;
+ padding:12px 14px!important;border-radius:22px!important;
+ background:color-mix(in srgb,var(--surface,#fff) 92%,transparent)!important;
+ border:1px solid color-mix(in srgb,currentColor 16%,transparent)!important;
+ box-shadow:0 18px 55px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.12)!important;
+ backdrop-filter:blur(24px) saturate(155%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(155%)!important;
+}
+html[data-theme="dark"] .ws-music-dock,html[data-theme="pure-black"] .ws-music-dock,html[data-tone="dark"] .ws-music-dock{
+ background:rgba(20,20,22,.88)!important;border-color:rgba(255,255,255,.13)!important;color:#f7f7f8!important;
+ box-shadow:0 20px 65px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)!important
+}
+html[data-theme="light"] .ws-music-dock,html[data-tone="light"] .ws-music-dock{
+ background:rgba(255,255,255,.91)!important;border-color:rgba(20,20,20,.12)!important;color:#171717!important;
+ box-shadow:0 18px 55px rgba(20,20,20,.16),inset 0 1px 0 rgba(255,255,255,.8)!important
+}
+.ws-music-dock .ws-now{min-width:0!important}.ws-music-dock .ws-now strong,.ws-music-dock .ws-now small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ws-music-dock button{border-radius:999px!important;min-width:40px!important;height:40px!important;transition:transform .18s ease,background .18s ease!important}
+.ws-music-dock button:active{transform:scale(.94)}
+.ws-music-dock #wsPlayPause{min-width:46px!important;height:46px!important}
+.ws-music-dock .ws-wave{border-radius:12px!important}
+@media(max-width:650px){
+ .ws-music-dock{
+  left:max(10px,env(safe-area-inset-left))!important;right:max(10px,env(safe-area-inset-right))!important;
+  bottom:max(10px,env(safe-area-inset-bottom))!important;max-width:none!important;
+  padding:10px 11px!important;border-radius:20px!important;
+  grid-template-columns:38px minmax(0,1fr) 42px 46px 42px 36px!important;
+  gap:7px!important
+ }
+ .ws-music-dock #wsBack10,.ws-music-dock #wsFwd10{font-size:13px!important;padding:0!important}
+ .ws-music-dock #wsDockClose{min-width:36px!important;width:36px!important}
+ .ws-music-dock #wsSeek{grid-column:1/6!important;width:100%!important;min-width:0!important;margin:2px 0 0!important}
+ .ws-music-dock #wsMusicTime{grid-column:6!important;font-size:11px!important;white-space:nowrap!important}
+ .ws-music-dock #wsYTMount{grid-column:1/-1!important;width:100%!important;max-width:100%!important}
+}
