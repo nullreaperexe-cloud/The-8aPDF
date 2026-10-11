@@ -1,5 +1,5 @@
 // Authenticated manual PDF upload. Never allow unlimited public uploads by default.
-// Required Vercel environment variables: PDF_UPLOAD_TOKEN, BLOB_READ_WRITE_TOKEN.
+// PDF_UPLOAD_TOKEN is required; Blob authentication is supplied by the connected Vercel store (OIDC or server-side token).
 import {put} from '@vercel/blob';
 import {randomBytes,timingSafeEqual,createHash} from 'node:crypto';
 export const config={api:{bodyParser:false}};
@@ -24,5 +24,5 @@ export default async function handler(req,res){
   const record=JSON.stringify({version:2,slug,documentId:null,url:blob.url,title:name,ownerHash,createdAt:new Date().toISOString()});
   await put(`short-links/v1/${slug}.json`,record,{access:'public',addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60});
   return send(res,201,{shortUrl:`/${slug}`,pdfUrl:blob.url,title:name});
- }catch(e){console.error('8aPDF upload error',{name:e?.name,message:e?.message,code:e?.code});const msg=String(e?.message||e||'Unknown Blob error').slice(0,500);return send(res,502,{error:'Blob upload failed: '+msg,stage:'blob-upload',code:String(e?.code||e?.name||'BLOB_ERROR')})}
+ }catch(e){console.error('8aPDF upload error',{name:e?.name,message:e?.message,code:e?.code});return send(res,502,{error:'Blob upload failed. Check the connected public Vercel Blob store and function logs.',stage:'blob-upload',code:String(e?.code||e?.name||'BLOB_ERROR').slice(0,80)})}
 }
