@@ -53,15 +53,15 @@ function playSound(mode,vol){stopSound();const AC=window.AudioContext||window.we
 function music(){show('Relaxing Background Sounds',`<p>6 offline-generated ambient soundscapes. Koi external MP3 stream nahi; volume low rakhna aur jab chaaho stop kar dena.</p><div id="wsSoundList">${sounds().map(([name,id])=>`<div class="ws-track ${musicEngine?.mode===id?'active':''}"><span>♫ ${esc(name)}</span><button type="button" data-ws-sound="${esc(id)}">Play</button></div>`).join('')}</div><label class="ws-line"><span>Volume</span><input type="range" id="wsVolume" value="45" min="0" max="100" aria-label="Sound volume"></label><div class="ws-tools"><button type="button" id="wsMusicStop">Stop sounds</button></div>`);
 $('wsSoundList').onclick=e=>{const btn=e.target.closest('[data-ws-sound]');if(!btn)return;playSound(btn.dataset.wsSound,+$('wsVolume').value);document.querySelectorAll('.ws-track').forEach(row=>row.classList.toggle('active',row.querySelector('[data-ws-sound]')?.dataset.wsSound===btn.dataset.wsSound))};$('wsVolume').oninput=e=>{if(musicEngine)musicEngine.gain.gain.value=(+e.target.value/100)*.19};$('wsMusicStop').onclick=()=>{stopSound();showToast('Background sound stopped')}}
 function localStudySummary(raw,title){
- const cleaned=String(raw||'').replace(/Page \\d+:/g,' ').replace(/\\s+/g,' ').trim();
- const sentences=cleaned.split(/(?<=[.!?।])\\s+/).map(x=>x.trim()).filter(x=>x.length>=35&&x.length<=420);
+ const cleaned=String(raw||'').replace(/Page \d+:/g,' ').replace(/\s+/g,' ').trim();
+ const sentences=cleaned.split(/(?<=[.!?।])\s+/).map(x=>x.trim()).filter(x=>x.length>=35&&x.length<=420);
  if(!sentences.length)return '';
- const words=cleaned.toLowerCase().match(/[\\p{L}\\p{N}]{3,}/gu)||[],stop=new Set(['this','that','with','from','have','will','your','about','into','their','there','which','when','where','were','been','also','लिए','और','का','की','के','है','हैं','को','में','से','पर','यह','एक','तथा','the','and','for','are','was']);
+ const words=cleaned.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu)||[],stop=new Set(['this','that','with','from','have','will','your','about','into','their','there','which','when','where','were','been','also','लिए','और','का','की','के','है','हैं','को','में','से','पर','यह','एक','तथा','the','and','for','are','was']);
  const freq={};for(const w of words)if(!stop.has(w))freq[w]=(freq[w]||0)+1;
- const ranked=sentences.map((text,i)=>{const ws=text.toLowerCase().match(/[\\p{L}\\p{N}]{3,}/gu)||[];const score=ws.reduce((a,w)=>a+(freq[w]||0),0)/Math.sqrt(Math.max(8,ws.length))+(i<12?2:0);return{text,i,score}}).sort((a,b)=>b.score-a.score);
+ const ranked=sentences.map((text,i)=>{const ws=text.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu)||[];const score=ws.reduce((a,w)=>a+(freq[w]||0),0)/Math.sqrt(Math.max(8,ws.length))+(i<12?2:0);return{text,i,score}}).sort((a,b)=>b.score-a.score);
  const chosen=[];for(const x of ranked){if(chosen.some(y=>y.text.toLowerCase().slice(0,45)===x.text.toLowerCase().slice(0,45)))continue;chosen.push(x);if(chosen.length===6)break}chosen.sort((a,b)=>a.i-b.i);
  const key=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);
- return 'Quick study summary\\n\\n'+chosen.map(x=>'• '+x.text).join('\\n\\n')+(key.length?'\\n\\nKey terms: '+key.join(', '):'');
+ return 'Quick study summary\n\n'+chosen.map(x=>'• '+x.text).join('\n\n')+(key.length?'\n\nKey terms: '+key.join(', '):'');
 }
 async function summarize(doc){
  if(!doc?.pdfUrl)return show('PDF Summary','<div class="ws-notice">The selected PDF has no accessible URL. Try opening the PDF directly.</div>');
@@ -73,7 +73,7 @@ async function summarize(doc){
   const resp=await fetch('/api/download?url='+encodeURIComponent(doc.pdfUrl)+'&filename=summary.pdf',{signal:abort.signal});if(!resp.ok)throw Error('PDF download could not be accessed ('+resp.status+').');
   const bytes=await resp.arrayBuffer();if(bytes.byteLength>12*1024*1024)throw Error('PDF exceeds the safe summary size limit (12 MB).');
   status.textContent='Reading PDF…';const pdf=await pdfjs.getDocument({data:new Uint8Array(bytes)}).promise;let text='';
-  for(let i=1;i<=Math.min(pdf.numPages,12)&&text.length<23000;i++){if(abort.signal.aborted)throw Error('Cancelled');const page=await pdf.getPage(i),tc=await page.getTextContent();text+='\\nPage '+i+': '+tc.items.map(x=>x.str||'').join(' ').replace(/\\s+/g,' ').slice(0,3500)}
+  for(let i=1;i<=Math.min(pdf.numPages,12)&&text.length<23000;i++){if(abort.signal.aborted)throw Error('Cancelled');const page=await pdf.getPage(i),tc=await page.getTextContent();text+='\nPage '+i+': '+tc.items.map(x=>x.str||'').join(' ').replace(/\s+/g,' ').slice(0,3500)}
   if(text.trim().length<80)throw Error('No readable text found. This may be a scanned PDF.');
   let summary='',source='On-device smart summary';
   status.textContent='Preparing study summary…';
