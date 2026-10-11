@@ -2006,7 +2006,13 @@ $('#nameForm').addEventListener('submit',e=>{
 });
 // Same welcome animation on every reload and every new website open.
 const previousName=existingUserName().trim();
-if(previousName && previousName!=='Student')originalShowWelcome(previousName);
+let skipWelcome=false;
+try{skipWelcome=localStorage.getItem('8apdf_skip_welcome')==='1'}catch{}
+if(skipWelcome && previousName && previousName!=='Student'){
+  closeOriginalWelcome();
+  originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('locked');
+}else if(previousName && previousName!=='Student')originalShowWelcome(previousName);
 else openOriginalName();
 
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
