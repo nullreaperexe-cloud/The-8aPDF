@@ -58,7 +58,8 @@ function dayName(date){
 function ingest(raw){
  if(!Array.isArray(raw)||!raw.length)return;
  announcements=raw.filter(x=>x&&x.id).slice(0,180).map(a=>({id:str(a.id,110),title:str(a.title,180),description:str(a.description,700),message:str(a.message,500),fullMessage:str(a.fullMessage,700),category:str(a.category,75),subject:str(a.subject,65),eventDate:a.eventDate,messageDate:a.messageDate,createdAt:a.createdAt}));
- const map=new Map(events.map(x=>[x.id+'|'+x.date,x]));
+ const activeIds=new Set(announcements.map(a=>a.id));
+ const map=new Map(events.filter(x=>!activeIds.has(x.id)).map(x=>[x.id+'|'+x.date,x]));
  for(const a of announcements){const e=toEvent(a);if(e)map.set(e.id+'|'+e.date,e)}
  events=[...map.values()].filter(e=>e.date>=keyDate(new Date(Date.now()-86400000))).slice(-120);
  try{localStorage.setItem(K,JSON.stringify(events))}catch{}
