@@ -153,7 +153,7 @@ async function play(i,fromAutonext=false){
             onStateChange:onPlayerState,onError:onPlayerError}});
   }else if(state.playerReady){state.player.loadVideoById(id)}
   else{notice('YouTube is still preparing playback. Try Play in a moment.')}
-  state.loading=false;state.errorCount=0;
+  state.loading=false;
  }catch(e){
   if(token!==state.playToken)return;
   state.loading=false;sync(false);clock(true);
