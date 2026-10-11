@@ -133,11 +133,7 @@ export default async function handler(req, res) {
       try{await put(ROOT+slug+'.json',record,{...options,access:'public'})}
       catch(error){
         if(isConflict(error))throw error;
-        try{await put(ROOT+slug+'.json',record,{...options,access:'private'})}
-        catch(second){
-          if(isConflict(second))throw second;
-          throw storageError('write',second);
-        }
+        throw storageError('write',error);
       }
     } catch (error) {
       if (isConflict(error)) {
