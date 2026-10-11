@@ -9,7 +9,7 @@ function matches(given,expected){if(!given||!expected)return false;const a=Buffe
 async function readStream(req){const chunks=[];let bytes=0;for await(const part of req){bytes+=part.length;if(bytes>MAX){const e=new Error('File exceeds 4 MB server upload limit');e.status=413;throw e}chunks.push(part)}return Buffer.concat(chunks)}
 export default async function handler(req,res){
  if(req.method!=='POST')return send(res,405,{error:'POST only'});
- if(!process.env.PDF_UPLOAD_TOKEN||!process.env.BLOB_READ_WRITE_TOKEN)return send(res,503,{error:'Set PDF_UPLOAD_TOKEN and BLOB_READ_WRITE_TOKEN in Vercel before enabling public uploads.'});
+ if(!process.env.PDF_UPLOAD_TOKEN)return send(res,503,{error:'PDF_UPLOAD_TOKEN is not configured for this deployment.'});
  if(!matches(String(req.headers['x-upload-token']||''),process.env.PDF_UPLOAD_TOKEN))return send(res,401,{error:'Incorrect upload authorization code.'});
  if(!String(req.headers['content-type']||'').toLowerCase().startsWith('application/pdf'))return send(res,415,{error:'PDF files only.'});
  const claimed=Number(req.headers['content-length']||0);if(claimed>MAX)return send(res,413,{error:'Maximum PDF upload size is 4 MB.'});
@@ -24,5 +24,5 @@ export default async function handler(req,res){
   const record=JSON.stringify({version:2,slug,documentId:null,url:blob.url,title:name,ownerHash,createdAt:new Date().toISOString()});
   await put(`short-links/v1/${slug}.json`,record,{access:'public',addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60});
   return send(res,201,{shortUrl:`/${slug}`,pdfUrl:blob.url,title:name});
- }catch(e){console.error('8aPDF upload error',String(e));return send(res,502,{error:'PDF hosting or short-link storage is unavailable. Check Vercel Blob storage connection.'})}
+ }catch(e){console.error('8aPDF upload error',{name:e?.name,message:e?.message,code:e?.code});const msg=String(e?.message||'');return send(res,502,{error:/token|oidc|auth|credential|unauthorized|forbidden/i.test(msg)?'Blob authentication failed. Check the public Blob store is connected to this production project.':'Blob upload failed: '+String(e?.code||e?.name||'storage error')+'. Check Vercel function logs.',stage:'blob-upload',code:String(e?.code||'BLOB_ERROR')})}
 }
