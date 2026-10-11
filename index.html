@@ -3054,6 +3054,179 @@ html[data-ui-mode="studio"] .studio-side-link>span{min-width:0}
 @media(max-width:600px){html[data-ui-mode="studio"] .top-shell{width:100%!important;max-width:100%!important;box-sizing:border-box!important}#newSchoolPlanner{margin:16px auto 26px}}
 @media(prefers-reduced-motion:reduce){#newSchoolPlanner .widget{transition:none}#newSchoolPlanner .widget:hover{transform:none}}
 </style>
+
+<style id="8apdf-school-planner-compact">
+/* Studio dashboard: make the school planner match the compact editorial widgets.
+   Presentation-only: existing Firestore, due-date, checkbox, storage and navigation JS is unchanged. */
+html[data-ui-mode="studio"] #newSchoolPlanner{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:start!important;
+  gap:18px!important;
+  margin:14px auto 30px!important;
+  padding-top:0!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner>.widget{
+  box-sizing:border-box;
+  align-self:start!important;
+  height:auto!important;
+  min-height:0!important;
+  min-width:0;
+  padding:19px 21px!important;
+  background:var(--surface)!important;
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  box-shadow:none!important;
+  overflow:hidden;
+  transform:none!important;
+  transition:border-color .2s ease,background .2s ease!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner>.widget:hover{
+  transform:none!important;
+  box-shadow:none!important;
+  border-color:var(--line-bold)!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .widget-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+  min-height:25px;
+  margin-bottom:14px!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .widget-header svg{
+  width:17px;
+  height:17px;
+  flex:none;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .widget-header strong{
+  min-width:0;
+  font-size:.84rem!important;
+  font-weight:720;
+  line-height:1.4;
+  letter-spacing:-.018em;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .widget-header .planner-go{
+  margin-left:auto!important;
+  min-height:30px;
+  padding:5px 3px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--muted)!important;
+  font-size:.70rem!important;
+  font-weight:600;
+  white-space:nowrap;
+  cursor:pointer;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .widget-header .planner-go:hover{
+  color:var(--text)!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-list{
+  min-width:0;
+  min-height:0;
+  padding:0!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+  margin:0!important;
+  padding:10px 3px!important;
+  border:0!important;
+  border-bottom:1px solid var(--line)!important;
+  border-radius:0!important;
+  background:transparent;
+  color:var(--text-soft);
+  font-size:.76rem!important;
+  line-height:1.5;
+  transition:background .17s ease,padding .17s ease;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task:last-child{
+  border-bottom:0!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task:hover{
+  background:var(--surface-high);
+  padding-left:9px!important;
+  padding-right:9px!important;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task input[type="checkbox"]{
+  width:17px!important;
+  height:17px!important;
+  margin:3px 0 0;
+  flex:none;
+  accent-color:var(--text);
+  cursor:pointer;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task>span{
+  flex:1;
+  min-width:0;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task strong{
+  display:block;
+  color:var(--text);
+  font-size:.77rem!important;
+  font-weight:660;
+  line-height:1.5;
+  letter-spacing:-.015em;
+  white-space:normal!important;
+  overflow-wrap:anywhere;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task small{
+  display:block;
+  margin-top:3px;
+  font-size:.67rem;
+  line-height:1.4;
+  color:var(--muted);
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-task:has(input:checked) strong{
+  color:var(--muted);
+  text-decoration:line-through;
+  text-decoration-thickness:1px;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-empty,
+html[data-ui-mode="studio"] #newSchoolPlanner .load-state{
+  min-height:0!important;
+  max-width:52ch;
+  margin:0;
+  padding:7px 3px 3px!important;
+  color:var(--muted);
+  font-size:.73rem!important;
+  line-height:1.65;
+  text-align:left;
+}
+html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkbox"]):focus-visible{
+  outline:2px solid var(--text-soft);
+  outline-offset:3px;
+}
+@media(max-width:850px){
+  html[data-ui-mode="studio"] #newSchoolPlanner{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:12px!important;
+    margin:13px auto 24px!important;
+  }
+  html[data-ui-mode="studio"] #newSchoolPlanner>.widget{
+    padding:16px!important;
+    border-radius:15px!important;
+  }
+}
+@media(max-width:420px){
+  html[data-ui-mode="studio"] #newSchoolPlanner>.widget{padding:14px 13px!important}
+  html[data-ui-mode="studio"] #newSchoolPlanner .widget-header{gap:5px}
+  html[data-ui-mode="studio"] #newSchoolPlanner .widget-header strong{font-size:.76rem!important}
+  html[data-ui-mode="studio"] #newSchoolPlanner .planner-task strong{font-size:.73rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-ui-mode="studio"] #newSchoolPlanner :is(.widget,.planner-task){transition:none!important}
+}
+</style>
 <script id="8apdf-school-planner">
 (()=>{'use strict';
 let feed=[];
