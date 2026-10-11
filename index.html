@@ -1870,7 +1870,7 @@ $('#paletteFilters').onclick=e=>{const button=e.target.closest('[data-palette-fi
 $('#paletteSearch').oninput=renderPalette;
 $('#themeGrid').onclick=e=>{
  const button=e.target.closest('[data-theme-choice]');if(!button)return;
- settings.theme=button.dataset.themeChoice;lastSelectedPreset=settings.theme;setSettings();
+ settings.theme=button.dataset.themeChoice;lastSelectedPreset=settings.theme;setSettings();document.dispatchEvent(new Event('8apdf:palette-customized'));
 };
 $('#themeRoleGrid').addEventListener('input',e=>{
  const key=e.target.dataset.themeRole;
@@ -1881,12 +1881,12 @@ $('#themeRoleGrid').addEventListener('input',e=>{
  }
  settings.personalColors[key]=e.target.value.toLowerCase();
  settings.theme='personal-mix';
- setSettings();
+ setSettings();document.dispatchEvent(new Event('8apdf:palette-customized'));
 });
 $('#themeRoleReset').onclick=()=>{
  settings.theme=allThemes.some(t=>t.id===lastSelectedPreset)?lastSelectedPreset:'pure-black';
  delete settings.personalColors;
- setSettings();toast('Restored selected five-color preset');
+ setSettings();document.dispatchEvent(new Event('8apdf:palette-customized'));toast('Restored selected five-color preset');
 };
 function toast(message){let el=document.createElement('div');el.className='toast';el.textContent=message;$('#toastArea').append(el);setTimeout(()=>el.remove(),3600)}
 function scrollToSection(sel){const e=$(sel);if(e)e.scrollIntoView({behavior:settings.motion?'auto':'smooth',block:'start'})}
