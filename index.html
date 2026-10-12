@@ -1500,6 +1500,7 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
     <button type="button" data-go="announcements" class="studio-side-link" aria-label="Announcements"><svg><use href="#i-megaphone"/></svg><span>Teacher Messages</span></button>
     <button type="button" data-go="saved" class="studio-side-link" aria-label="Saved PDFs"><svg><use href="#i-bookmark"/></svg><span>Saved PDFs</span></button>
   </div>
+  <div class="studio-nav-group studio-friends-group"><span class="studio-nav-caption">CONNECT</span><a href="/chat" class="studio-side-link" aria-label="Chat with your friends"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11.5a7.8 7.8 0 0 1-8.1 7.5 9.2 9.2 0 0 1-3.5-.7L4 20l1.1-4.4A7.2 7.2 0 0 1 4 11.5 7.8 7.8 0 0 1 12 4a7.8 7.8 0 0 1 8 7.5Z"/></svg><span>Chat with Your Friends</span><kbd>NEW</kbd></a></div>
   <div class="studio-nav-group studio-subject-group"><span class="studio-nav-caption">SUBJECTS</span><div class="studio-subject-list" id="studioSubjects" aria-label="Filter PDFs by subject"></div></div>
   <div class="studio-nav-group studio-nav-secondary"><span class="studio-nav-caption">YOUR TOOLS</span>
     <button type="button" data-go="timetable" class="studio-side-link" aria-label="Timetable"><svg><use href="#i-calendar"/></svg><span>Timetable</span></button>
@@ -1525,7 +1526,7 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
   <button type="button" id="studioMobileMore" class="studio-mobile-item"><svg><use href="#i-menu"/></svg><span>More</span></button>
 </nav>
 <div class="studio-more-panel" id="studioMorePanel" hidden><div class="studio-more-title">Quick navigation <button type="button" id="studioCloseMore" aria-label="Close quick navigation">×</button></div>
-  <button type="button" data-go="tasks">Study To-Do</button><button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
+  <button type="button" data-open-friends-chat>Chat with Your Friends</button><button type="button" data-go="tasks">Study To-Do</button><button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
 </div>
 <main>
 <section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1 id="studyTypingHeadline" class="study-typing-heading" aria-label="Stay curious, keep learning and make progress every day"><span id="studyTypingText" aria-hidden="true">Learn today. Lead tomorrow.</span><span class="study-typing-caret" aria-hidden="true"></span></h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p>
@@ -3368,5 +3369,6 @@ draw();
 <!-- Elfsight Background Music | Untitled Background Music -->
 <script src="https://elfsightcdn.com/platform.js" async></script>
 <div class="elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653" data-elfsight-app-lazy></div>
+<script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 </body>
 </html>
