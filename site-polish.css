@@ -130,3 +130,31 @@ html[data-ui-mode="studio"] #newSchoolPlanner:not(:has(>.widget:not(.ws-hidden-w
  html[data-ui-mode="studio"] #workspaceHomeActions :is(.ws-quiet,.ws-upcoming-btn){min-height:40px!important;padding:9px 12px!important}
 }
 @media(prefers-reduced-motion:reduce){.eightapdf-chat-alert{animation:none}}
+
+/* Background music is loaded in its own viewport so a third-party
+   floating player can never overlap the study page or mobile tab bar. */
+#eightapdfSettingsMusic{
+  display:block!important;
+  contain:layout style!important;
+  overflow:hidden!important;
+  padding:18px!important;
+}
+#eightapdfMusicPlayerFrame{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:230px!important;
+  border:0!important;
+  border-radius:12px!important;
+  overflow:hidden!important;
+  background:var(--surface-high,var(--surface))!important;
+}
+@media(max-width:700px){
+  #eightapdfSettingsMusic{padding:14px!important}
+  #eightapdfMusicPlayerFrame{height:240px!important;min-height:230px!important}
+}
+/* Old global music dock/launcher, if cached markup survives an in-place update. */
+body>.ws-music-dock,
+body>#wsMusicDock{
+  display:none!important;
+}
