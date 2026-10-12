@@ -50,7 +50,7 @@ function textPreview(m){return (m.body|| (m.attachment_name?'Shared '+m.attachme
 async function revealMessage(msg,roomSlug,initial=false){
  if(!enabled(NOTICES_KEY)||msg.sender_id===visitor?.id)return;
  const old=get(SEEN_KEY,'');
- if(old===msg.id)return;
+ if(old===msg.id&&!initial)return;
  put(SEEN_KEY,msg.id);
  if(document.hidden)return;
  const {data:p}=await db.from('chat_profiles').select('display_name').eq('id',msg.sender_id).maybeSingle();
@@ -88,7 +88,7 @@ async function initializeNotifications(){
    const last=get(SEEN_KEY,'');
    if(!last){
     put(SEEN_KEY,recent.id);
-    if(Date.now()-new Date(recent.created_at).getTime()<24*3600*1000)revealMessage({...recent,id:recent.id+'-first'},roomSlugs.get(recent.room_id),true).catch(()=>{});
+    if(Date.now()-new Date(recent.created_at).getTime()<24*3600*1000)revealMessage(recent,roomSlugs.get(recent.room_id),true).catch(()=>{});
    }else if(last!==recent.id && Date.now()-new Date(recent.created_at).getTime()<24*3600*1000){
     await revealMessage(recent,roomSlugs.get(recent.room_id),true);
    }
