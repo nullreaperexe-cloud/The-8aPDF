@@ -143,7 +143,7 @@ async function loadMessages(reset=false){
   const senderIds=[...new Set(state.messages.map(m=>m.sender_id))];await loadProfiles(senderIds);
   renderMessages();
   const inbound=updated.filter(m=>m.sender_id!==state.user?.id);
-  if(state.messageInitialized&&inbound.length){const newest=inbound.at(-1);if(newest&&!state.lastInbound.has(currentRoom+':'+newest.id)){state.lastInbound.set(currentRoom+':'+newest.id,true);playMessageBeep()}}
+  if(inbound.length){const newest=inbound.at(-1);const oldId=state.lastInbound.get(currentRoom);if(state.messageInitialized&&oldId&&oldId!==newest.id)playMessageBeep();state.lastInbound.set(currentRoom,newest.id)}
   state.messageInitialized=true;
  }catch(e){console.warn('Cannot refresh chat',e.message);if(reset)notify('Messages could not load: '+e.message,true)}
  finally{state.refreshing=false}
@@ -215,21 +215,33 @@ function renderMessages(keepPosition=false){
  const el=$('messages');const area=$('messagesArea');const beforeHeight=area.scrollHeight;const beforeTop=area.scrollTop;
  const nearBottom=area.scrollHeight-area.scrollTop-area.clientHeight<150;
  const combined=state.messages.concat(state.pending.filter(p=>!state.messages.find(m=>m.id===p.id)));
- const signature=combined.map(m=>m.id+(m.pending?'p':'')+String(m.body)).join('|');
+ const signature=combined.map(m=>m.id+(m.pending?'p':'')+String(m.body)+(m.reply_to||'')).join('|');
  if(signature===state.lastSignature)return;state.lastSignature=signature;
  if(!combined.length){el.innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('chat')+'</div><h3>Good conversations start here.</h3><p>Say hi, share a photo, or send a video. Everything stays saved.</p></div>';return}
  el.innerHTML=combined.map(m=>{
   const mine=m.sender_id===state.user.id;
   const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Friend');
   const canDelete=mine||state.members.some(x=>x.user_id===state.user.id&&['owner','admin'].includes(x.role));
-  const body=m.body?'<div class="msg-bubble">'+esc(m.body)+'</div>':'';
+  const original=state.messages.find(x=>x.id===m.reply_to);
+  const quote=m.reply_to?'<div class="msg-reply-quote"><strong>'+esc(original?(state.profiles.get(original.sender_id)?.display_name||'Friend'):'Replied message')+'</strong>'+esc((original?.body||original?.attachment_name||'Original message').slice(0,180))+'</div>':'';
+  const body=m.body?'<div class="msg-bubble">'+quote+esc(m.body)+'</div>':quote;
   return '<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+'" data-message-id="'+esc(m.id)+'">'+
    '<div class="msg-avatar">'+esc(who.slice(0,1).toUpperCase())+'</div><div class="msg-content"><div class="msg-meta"><strong>'+esc(mine?'You':who)+'</strong><span>'+esc(when(m.created_at))+'</span></div>'+
    body+(m.attachment_path?'<div class="msg-attachment" data-media-path="'+esc(m.attachment_path)+'" data-media-type="'+esc(m.attachment_type||'')+'" data-media-name="'+esc(m.attachment_name||'File')+'"><div class="media-open">'+icon('file')+' '+esc(m.attachment_name||'Loading file…')+'</div></div>':'')+
-   '<div class="msg-options">'+(m.pending?'Sending…':canDelete?'<button type="button" data-delete-message="'+esc(m.id)+'">Delete message</button>':'')+'</div></div></div>';
+   (m.pending?'<div class="msg-options">Sending…</div>':
+     '<div class="message-actions"><button type="button" data-reply="'+esc(m.id)+'">↩ Reply</button><button type="button" data-pick-emoji="'+esc(m.id)+'">☺ React</button>'+
+     (canDelete?'<button type="button" data-delete-message="'+esc(m.id)+'">Delete</button>':'')+'</div>'+
+     renderReactions(m.id)+
+     '<div class="emoji-picker" data-emoji-picker="'+esc(m.id)+'" hidden>'+REACTION_EMOJIS.map(e=>'<button type="button" data-react="'+esc(m.id)+'" data-emoji="'+esc(e)+'">'+esc(e)+'</button>').join('')+'</div>')+'</div></div>';
  }).join('');
  el.querySelectorAll('[data-media-path]').forEach(holder=>{renderAttachment(holder).catch(e=>{holder.textContent='Attachment unavailable: '+e.message})});
  el.querySelectorAll('[data-delete-message]').forEach(b=>b.onclick=()=>deleteMessage(b.dataset.deleteMessage));
+ el.querySelectorAll('[data-reply]').forEach(b=>b.onclick=()=>beginReply(b.dataset.reply));
+ el.querySelectorAll('[data-pick-emoji]').forEach(b=>b.onclick=()=>{
+   const picker=el.querySelector('[data-emoji-picker="'+b.dataset.pickEmoji+'"]');
+   if(picker)picker.hidden=!picker.hidden;
+ });
+ el.querySelectorAll('[data-react]').forEach(b=>b.onclick=()=>toggleReaction(b.dataset.react,b.dataset.emoji));
  if(keepPosition)area.scrollTop=area.scrollHeight-beforeHeight+beforeTop;
  else if(nearBottom||state.messages.length<15)area.scrollTop=area.scrollHeight;
 }
@@ -286,12 +298,12 @@ async function sendMessage(body='',attachment=null){
  ensureReady();if(!state.room)throw Error('Choose a room');
  const current=state.room.id;const trimmed=body.trim();if(!trimmed&&!attachment)return;
  const id=crypto.randomUUID();
- const msg={id,room_id:current,sender_id:state.user.id,body:trimmed,attachment_path:attachment?.path||null,attachment_name:attachment?.name||null,attachment_type:attachment?.type||null,created_at:new Date().toISOString(),pending:true};
+ const msg={id,room_id:current,sender_id:state.user.id,reply_to:state.replyTo?.id||null,body:trimmed,attachment_path:attachment?.path||null,attachment_name:attachment?.name||null,attachment_type:attachment?.type||null,created_at:new Date().toISOString(),pending:true};
  state.pending.push(msg);state.lastSignature='';renderMessages();
  const {error}=await state.sb.from('chat_messages').insert({...msg,pending:undefined});
  state.pending=state.pending.filter(p=>p.id!==id);
  if(error){state.lastSignature='';renderMessages();throw error}
- state.messages.push({...msg,pending:false});state.lastSignature='';renderMessages();loadMessages(false).catch(()=>{});
+ state.messages.push({...msg,pending:false});state.replyTo=null;updateReplyDraft();state.lastSignature='';renderMessages();loadMessages(false).catch(()=>{});
 }
 async function sendText(e){
  e.preventDefault();const box=$('messageInput');const text=box.value.trim();if(!text)return;
@@ -458,6 +470,10 @@ function installEvents(){
  $('loadOlder').onclick=()=>loadOlder().catch(e=>notify(e.message,true));
  $('composerForm').addEventListener('submit',sendText);
  $('messageInput').addEventListener('input',()=>{resizeTextarea();if(state.user)sendTyping()});
+ $('cancelReply').onclick=()=>{state.replyTo=null;updateReplyDraft()};
+ document.addEventListener('pointerdown',()=>{userActivated=true},{once:true});
+ document.addEventListener('keydown',()=>{userActivated=true},{once:true});
+ document.querySelectorAll('.app-rail a[href="/"]').forEach(link=>link.addEventListener('click',()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}}));
  $('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('composerForm').requestSubmit()}});
  $('mediaInput').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;
   try{await uploadFile(file)}catch(err){notify(err.message||'Upload failed',true)}
