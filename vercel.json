@@ -2,6 +2,22 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/chat",
+      "destination": "/chat/index.html"
+    },
+    {
+      "source": "/chat/",
+      "destination": "/chat/index.html"
+    },
+    {
+      "source": "/chat/:room",
+      "destination": "/chat/index.html"
+    },
+    {
+      "source": "/chat/:room/",
+      "destination": "/chat/index.html"
+    },
+    {
       "source": "/announcements",
       "destination": "/index.html"
     },
