@@ -1,0 +1,392 @@
+/* 8aPDF Friends Chat — secure, persistent multi-device client */
+(() => {
+'use strict';
+const URL='https://uumqvvsfqwpwtwerdylv.supabase.co';
+const KEY='sb_publishable_M1C4bP9ijOsm08ugE1uJig_ERVxR-zi';
+const BUCKET='8apdf-chat-uploads';
+const MAX=8*1024*1024;
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+const icon=n=>'<svg aria-hidden="true"><use href="#i-'+n+'"></use></svg>';
+const when=d=>{const t=new Date(d);return t.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
+const shortAgo=d=>{if(!d)return 'Offline';const n=Math.max(0,Math.floor((Date.now()-new Date(d).getTime())/60000));return n<1?'Just now':n<60?n+' min ago':n<1440?Math.floor(n/60)+'h ago':Math.floor(n/1440)+'d ago'};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const state={sb:null,user:null,displayName:'Student',room:null,rooms:[],members:[],profiles:new Map(),messages:[],pending:[],oldest:null,more:false,loadingOlder:false,refreshing:false,channel:null,presence:null,onlineIds:new Set(),fileUrls:new Map(),lastSignature:'',currentRoomChange:0,invitesShown:new Set(),initError:null};
+function notify(message,bad=false){const holder=$('toastStack');const n=document.createElement('div');n.className='toast'+(bad?' error':'');n.textContent=message;holder.append(n);setTimeout(()=>n.remove(),5000)}
+function showConnection(text,ready=false){$('connectionBadge').innerHTML='<span class="status-light '+(ready?'':'off')+'"></span> '+esc(text);$('identityStatus').textContent=ready?'Connected privately':'Connection issue'}
+function nameFromSite(){try{return (localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim().slice(0,40)||'Student'}catch{return 'Student'}}
+function hideMobile(){ $('chatSidebar').classList.remove('open');$('membersPanel').classList.remove('open');$('mobileBackdrop').hidden=true }
+function toggleMobile(which){const el=$(which);const opening=!el.classList.contains('open');hideMobile();if(opening){el.classList.add('open');$('mobileBackdrop').hidden=false}}
+function showDialog(title,content,buttons=[],kicker='8aPDF CHAT'){const d=$('actionDialog');$('dialogTitle').textContent=title;$('dialogKicker').textContent=kicker;$('dialogContent').innerHTML=content;$('dialogFooter').innerHTML='';const cancel=document.createElement('button');cancel.textContent='Cancel';cancel.onclick=()=>d.close();$('dialogFooter').append(cancel);buttons.forEach(({label,act,primary=true})=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=primary?'confirm':'';b.onclick=()=>Promise.resolve(act(b)).catch(e=>notify(e.message||'Could not complete action',true));$('dialogFooter').append(b)});d.showModal()}
+function closeDialog(){$('actionDialog').close()}
+function ensureReady(){if(!state.user)throw Error('Chat session not ready. Try reloading.')}
+function urlForRoom(slug,token=''){return location.origin+'/chat/'+encodeURIComponent(slug)+(token?'?invite='+encodeURIComponent(token):'')}
+async function copyText(s){try{await navigator.clipboard.writeText(s);notify('Invite link copied')}catch{showDialog('Copy invite link','<p>Copy and share this link with a friend.</p><div class="dialog-result">'+esc(s)+'</div>',[])}}
+function normalizeSlug(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48)}
+async function start(){
+ state.displayName=nameFromSite();$('sideName').textContent=state.displayName;
+ $('miniAvatar').textContent=state.displayName[0].toUpperCase();$('railAvatar').textContent=state.displayName[0].toUpperCase();
+ if(!window.supabase?.createClient){showConnection('Service unavailable');notify('Chat library could not load. Check internet / ad blocker.',true);return}
+ state.sb=window.supabase.createClient(URL,KEY,{auth:{storageKey:'8apdf_social_auth_v2',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:12}}});
+ try{
+  let {data:{session},error:sessionError}=await state.sb.auth.getSession();if(sessionError)throw sessionError;
+  if(!session){const result=await state.sb.auth.signInAnonymously();if(result.error)throw result.error;session=result.data.session}
+  if(!session?.user)throw Error('Unable to initialize guest session');
+  state.user=session.user;
+  await upsertProfile();
+  await state.sb.rpc('chat_enter_lobby').then(({error})=>{if(error)throw error});
+  const match=location.pathname.match(/^\/chat\/([a-zA-Z0-9-]{2,48})\/?$/);
+  const slug=match?match[1]:'general';
+  try{await openRoom(slug,new URLSearchParams(location.search).get('invite'),false)}
+  catch(e){notify((e.message||'Cannot enter room')+'. Opening General Chat.',true);await openRoom('general',null,false)}
+  showConnection('Live',true);
+  await loadRooms();
+  await checkInvites();
+  setInterval(()=>{if(!document.hidden&&state.user)heartbeat().catch(()=>{})},20000);
+  setInterval(()=>{if(!document.hidden&&state.room){loadMessages(false).catch(()=>{});loadMembers().catch(()=>{});checkInvites().catch(()=>{})}},11000);
+  window.addEventListener('focus',()=>{heartbeat().catch(()=>{});loadMessages(false).catch(()=>{});loadMembers().catch(()=>{})});
+  window.addEventListener('storage',e=>{if(['eightapdf_user_name_v2','eightapdf_user_name'].includes(e.key)){state.displayName=nameFromSite();upsertProfile().catch(()=>{})}});
+ }catch(e){
+  state.initError=e;showConnection('Guest access unavailable');notify('Could not connect: '+e.message,true);
+  $('messages').innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('lock')+'</div><h3>Chat needs a one-time backend setting</h3><p>Anonymous sign-ins must be enabled by the 8aPDF site owner in Supabase → Authentication → Providers → Anonymous Sign-Ins. No login screen is required.</p></div>';
+  $('identityStatus').textContent='Backend setup required';
+ }
+}
+async function upsertProfile(){
+ if(!state.user)return;
+ const {error}=await state.sb.from('chat_profiles').upsert({id:state.user.id,display_name:state.displayName,last_seen:new Date().toISOString()},{onConflict:'id'});
+ if(error)throw error;
+ state.profiles.set(state.user.id,{id:state.user.id,display_name:state.displayName,last_seen:new Date().toISOString()});
+}
+async function heartbeat(){if(!state.user)return;const {error}=await state.sb.from('chat_profiles').update({last_seen:new Date().toISOString()}).eq('id',state.user.id);if(error)console.warn('Presence heartbeat failed',error.message);if(state.presence)await state.presence.track({user_id:state.user.id,display_name:state.displayName})}
+async function loadRooms(){
+ if(!state.user)return;
+ const {data,error}=await state.sb.from('chat_members').select('role,room_id,chat_rooms(id,slug,name,kind,owner_id,created_at)').eq('user_id',state.user.id).order('joined_at',{ascending:false});
+ if(error){console.warn(error.message);return}
+ const entries=(data||[]).filter(v=>v.chat_rooms).map(v=>({...v.chat_rooms,role:v.role}));
+ entries.sort((a,b)=>a.slug==='general'?-1:b.slug==='general'?1:new Date(b.created_at)-new Date(a.created_at));
+ state.rooms=entries;renderRooms();
+}
+function renderRooms(){
+ const list=$('roomList');if(!state.rooms.length){list.innerHTML='<div class="list-loading">No conversations yet. Create one!</div>';return}
+ list.innerHTML=state.rooms.map(r=>'<button class="room-item '+(r.id===state.room?.id?'selected':'')+'" data-room="'+esc(r.slug)+'" type="button"><span class="room-icon">'+(r.kind==='private'?icon('lock'):'#')+'</span><span class="room-text"><strong>'+esc(r.name)+'</strong><small>'+esc(r.kind==='private'?'Private conversation':'# '+r.slug)+'</small></span>'+icon('chevron')+'</button>').join('');
+ list.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>openRoom(b.dataset.room)));
+}
+async function openRoom(slug,token=null,changeUrl=true){
+ ensureReady();const run=++state.currentRoomChange;
+ const {data:id,error:joinError}=await state.sb.rpc('chat_join_room',{p_slug:slug,p_token:token||null});if(joinError)throw joinError;
+ const {data:room,error}=await state.sb.from('chat_rooms').select('*').eq('id',id).single();if(error)throw error;
+ if(run!==state.currentRoomChange)return;
+ if(state.channel)await state.sb.removeChannel(state.channel);
+ if(state.presence)await state.sb.removeChannel(state.presence);
+ state.room=room;state.messages=[];state.pending=[];state.oldest=null;state.more=false;state.lastSignature='';state.onlineIds.clear();
+ $('roomTitle').textContent=room.name;$('roomSubtitle').textContent=room.kind==='private'?'Private conversation · Invite-only':'# '+room.slug+' · Your friends are here';
+ $('topicIcon').innerHTML=room.kind==='private'?icon('lock'):'#';
+ $('messages').innerHTML='';$('loadOlder').hidden=true;hideMobile();
+ if(changeUrl)history.pushState({room:slug},'',urlForRoom(slug));document.title=room.name+' · 8aPDF';
+ renderRooms();
+ await Promise.all([loadMessages(true),loadMembers(),loadRooms()]);
+ if(run!==state.currentRoomChange)return;
+ setupRealtime(room);
+}
+function setupRealtime(room){
+ state.channel=state.sb.channel('chat_messages_'+room.id)
+  .on('postgres_changes',{event:'*',schema:'public',table:'chat_messages',filter:'room_id=eq.'+room.id},()=>loadMessages(false).catch(()=>{}))
+  .subscribe(status=>{if(status==='SUBSCRIBED')showConnection('Live',true);if(status==='CHANNEL_ERROR')showConnection('Reconnecting…',false)});
+ state.presence=state.sb.channel('8apdf_presence_'+room.id,{config:{presence:{key:state.user.id}}})
+  .on('presence',{event:'sync'},()=>{
+   state.onlineIds=new Set(Object.keys(state.presence.presenceState()));renderMembers();
+  }).on('broadcast',{event:'typing'},({payload})=>{if(!payload||payload.user_id===state.user.id)return;const p=state.profiles.get(payload.user_id);$('typingStatus').textContent=(p?.display_name||'Someone')+' is typing…';clearTimeout(typingTimeout);typingTimeout=setTimeout(()=>$('typingStatus').textContent='',1500)})
+  .subscribe(async status=>{if(status==='SUBSCRIBED')await state.presence.track({user_id:state.user.id,display_name:state.displayName})});
+}
+let typingTimeout,typingSent=0;
+function sendTyping(){if(state.presence&&Date.now()-typingSent>1300){typingSent=Date.now();state.presence.send({type:'broadcast',event:'typing',payload:{user_id:state.user.id}}).catch(()=>{})}}
+async function loadMessages(reset=false){
+ if(!state.room||state.refreshing)return;state.refreshing=true;const currentRoom=state.room.id;
+ try{
+  const {data,error}=await state.sb.from('chat_messages').select('id,room_id,sender_id,body,attachment_path,attachment_name,attachment_type,created_at').eq('room_id',currentRoom).order('created_at',{ascending:false}).limit(120);
+  if(error)throw error;if(currentRoom!==state.room?.id)return;
+  const updated=(data||[]).reverse();state.more=(data||[]).length===120;$('loadOlder').hidden=!state.more;
+  if(!reset&&state.messages.length>120){
+   const seen=new Set(updated.map(x=>x.id));state.messages=state.messages.filter(x=>!seen.has(x.id)).concat(updated);
+  }else state.messages=updated;
+  state.oldest=state.messages[0]?.created_at||null;
+  const senderIds=[...new Set(state.messages.map(m=>m.sender_id))];await loadProfiles(senderIds);
+  renderMessages();
+ }catch(e){console.warn('Cannot refresh chat',e.message);if(reset)notify('Messages could not load: '+e.message,true)}
+ finally{state.refreshing=false}
+}
+async function loadOlder(){
+ if(!state.more||!state.oldest||state.loadingOlder)return;state.loadingOlder=true;const room=state.room?.id;
+ const {data,error}=await state.sb.from('chat_messages').select('id,room_id,sender_id,body,attachment_path,attachment_name,attachment_type,created_at').eq('room_id',room).lt('created_at',state.oldest).order('created_at',{ascending:false}).limit(120);
+ state.loadingOlder=false;if(error){notify(error.message,true);return}if(room!==state.room?.id)return;
+ const batch=(data||[]).reverse();state.more=(data||[]).length===120;$('loadOlder').hidden=!state.more;const seen=new Set(state.messages.map(m=>m.id));
+ state.messages=batch.filter(m=>!seen.has(m.id)).concat(state.messages);state.oldest=state.messages[0]?.created_at;
+ await loadProfiles(batch.map(m=>m.sender_id));renderMessages(true);
+}
+async function loadProfiles(ids){
+ const missing=[...new Set(ids)].filter(id=>id&&!state.profiles.has(id));if(!missing.length)return;
+ const {data,error}=await state.sb.from('chat_profiles').select('id,display_name,last_seen').in('id',missing.slice(0,150));
+ if(!error)(data||[]).forEach(p=>state.profiles.set(p.id,p));
+}
+function renderMessages(keepPosition=false){
+ const el=$('messages');const area=$('messagesArea');const beforeHeight=area.scrollHeight;const beforeTop=area.scrollTop;
+ const nearBottom=area.scrollHeight-area.scrollTop-area.clientHeight<150;
+ const combined=state.messages.concat(state.pending.filter(p=>!state.messages.find(m=>m.id===p.id)));
+ const signature=combined.map(m=>m.id+(m.pending?'p':'')+String(m.body)).join('|');
+ if(signature===state.lastSignature)return;state.lastSignature=signature;
+ if(!combined.length){el.innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('chat')+'</div><h3>Good conversations start here.</h3><p>Say hi, share a photo, or send a video. Everything stays saved.</p></div>';return}
+ el.innerHTML=combined.map(m=>{
+  const mine=m.sender_id===state.user.id;
+  const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Friend');
+  const canDelete=mine||state.members.some(x=>x.user_id===state.user.id&&['owner','admin'].includes(x.role));
+  const body=m.body?'<div class="msg-bubble">'+esc(m.body)+'</div>':'';
+  return '<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+'" data-message-id="'+esc(m.id)+'">'+
+   '<div class="msg-avatar">'+esc(who.slice(0,1).toUpperCase())+'</div><div class="msg-content"><div class="msg-meta"><strong>'+esc(mine?'You':who)+'</strong><span>'+esc(when(m.created_at))+'</span></div>'+
+   body+(m.attachment_path?'<div class="msg-attachment" data-media-path="'+esc(m.attachment_path)+'" data-media-type="'+esc(m.attachment_type||'')+'" data-media-name="'+esc(m.attachment_name||'File')+'"><div class="media-open">'+icon('file')+' '+esc(m.attachment_name||'Loading file…')+'</div></div>':'')+
+   '<div class="msg-options">'+(m.pending?'Sending…':canDelete?'<button type="button" data-delete-message="'+esc(m.id)+'">Delete message</button>':'')+'</div></div></div>';
+ }).join('');
+ el.querySelectorAll('[data-media-path]').forEach(holder=>{renderAttachment(holder).catch(e=>{holder.textContent='Attachment unavailable: '+e.message})});
+ el.querySelectorAll('[data-delete-message]').forEach(b=>b.onclick=()=>deleteMessage(b.dataset.deleteMessage));
+ if(keepPosition)area.scrollTop=area.scrollHeight-beforeHeight+beforeTop;
+ else if(nearBottom||state.messages.length<15)area.scrollTop=area.scrollHeight;
+}
+async function getMediaUrl(path){
+ const existing=state.fileUrls.get(path);if(existing&&existing.expires>Date.now()+60000)return existing.url;
+ const {data,error}=await state.sb.storage.from(BUCKET).createSignedUrl(path,3600);
+ if(error)throw error;state.fileUrls.set(path,{url:data.signedUrl,expires:Date.now()+3500000});return data.signedUrl;
+}
+function safeMediaType(type,name){const ext=(name||'').split('.').pop().toLowerCase();if(type.startsWith('image/')&&!['svg+xml'].some(x=>type.includes(x)))return 'image';if(type.startsWith('video/'))return 'video';if(type.startsWith('audio/'))return 'audio';if(type==='application/pdf'||ext==='pdf')return 'pdf';if(type==='text/plain'||ext==='txt')return 'text';return 'other'}
+async function renderAttachment(holder){
+ const path=holder.dataset.mediaPath,name=holder.dataset.mediaName,type=holder.dataset.mediaType;
+ const url=await getMediaUrl(path);if(!holder.isConnected)return;
+ const group=safeMediaType(type,name);
+ if(group==='image'){holder.innerHTML='<button class="media-open" type="button" aria-label="Open image preview" style="padding:0;width:100%"><img loading="lazy" src="'+esc(url)+'" alt="'+esc(name)+'"></button>'}
+ else if(group==='video'){holder.innerHTML='<video controls playsinline preload="metadata" src="'+esc(url)+'" aria-label="'+esc(name)+'"></video><button type="button" class="file-open">'+icon('eye')+' Open full preview</button>'}
+ else if(group==='audio'){holder.innerHTML='<audio controls preload="metadata" src="'+esc(url)+'"></audio>'}
+ else{holder.innerHTML='<button class="file-open" type="button">'+icon('file')+'<span>'+esc(name)+'<small>'+ (group==='pdf'?'PDF · Preview available':group==='text'?'Text file · Preview available':'File · Download available')+'</small></span>'+icon('eye')+'</button>'}
+ const btn=holder.querySelector('button');if(btn)btn.onclick=()=>openPreview({url,name,type,group});
+}
+async function openPreview({url,name,type,group}){
+ $('previewTitle').textContent=name;$('previewDownload').href=url;$('previewDownload').download=name;
+ const holder=$('previewContent');holder.replaceChildren();
+ if(group==='image'){const img=document.createElement('img');img.src=url;img.alt=name;holder.append(img)}
+ else if(group==='video'){const v=document.createElement('video');v.src=url;v.controls=true;v.autoplay=true;v.playsInline=true;holder.append(v)}
+ else if(group==='audio'){const v=document.createElement('audio');v.src=url;v.controls=true;v.autoplay=true;holder.append(v)}
+ else if(group==='pdf'){const frame=document.createElement('iframe');frame.src=url;frame.title=name;holder.append(frame)}
+ else if(group==='text'){const pre=document.createElement('pre');pre.textContent='Loading preview…';holder.append(pre);try{const r=await fetch(url);if(!r.ok)throw Error('Not available');pre.textContent=(await r.text()).slice(0,200000)}catch(e){pre.textContent='Preview unavailable: '+e.message}}
+ else{holder.innerHTML='<p>This file type has no safe browser preview. Use the download button above.</p>'}
+ $('mediaDialog').showModal();
+}
+async function deleteMessage(id){
+ if(!confirm('Delete this message for everyone?'))return;
+ const {error}=await state.sb.from('chat_messages').delete().eq('id',id).eq('room_id',state.room.id);
+ if(error){notify('Cannot delete: '+error.message,true);return}
+ state.messages=state.messages.filter(m=>m.id!==id);state.lastSignature='';renderMessages();notify('Message deleted');
+}
+async function loadMembers(){
+ if(!state.room)return;const roomId=state.room.id;
+ const {data,error}=await state.sb.from('chat_members').select('user_id,role,joined_at').eq('room_id',roomId);
+ if(error){console.warn('Members:',error.message);return}if(roomId!==state.room?.id)return;
+ state.members=data||[];await loadProfiles(state.members.map(m=>m.user_id));renderMembers();
+}
+function renderMembers(){
+ const members=state.members.map(m=>({...m,profile:state.profiles.get(m.user_id)}));
+ members.sort((a,b)=>Number(isOnline(b))-Number(isOnline(a)));
+ $('memberCount').textContent=members.length;
+ $('membersList').innerHTML=members.map(m=>{
+  const name=m.profile?.display_name||'Friend';const online=isOnline(m);
+  return '<div class="member-row"><div class="member-avatar">'+esc(name.slice(0,1).toUpperCase())+'<i class="'+(online?'online':'')+'"></i></div><span class="member-info"><strong>'+esc(name)+(m.user_id===state.user?.id?' (you)':'')+'</strong><small>'+esc(m.role==='owner'?'Room owner · ':m.role==='admin'?'Admin · ':'')+esc(online?'Online now':shortAgo(m.profile?.last_seen))+'</small></span></div>';
+ }).join('') || '<div class="list-loading">No members found</div>';
+}
+function isOnline(m){return state.onlineIds.has(m.user_id)||!!m.profile?.last_seen&&(Date.now()-new Date(m.profile.last_seen).getTime()<60000)}
+async function sendMessage(body='',attachment=null){
+ ensureReady();if(!state.room)throw Error('Choose a room');
+ const current=state.room.id;const trimmed=body.trim();if(!trimmed&&!attachment)return;
+ const id=crypto.randomUUID();
+ const msg={id,room_id:current,sender_id:state.user.id,body:trimmed,attachment_path:attachment?.path||null,attachment_name:attachment?.name||null,attachment_type:attachment?.type||null,created_at:new Date().toISOString(),pending:true};
+ state.pending.push(msg);state.lastSignature='';renderMessages();
+ const {error}=await state.sb.from('chat_messages').insert({...msg,pending:undefined});
+ state.pending=state.pending.filter(p=>p.id!==id);
+ if(error){state.lastSignature='';renderMessages();throw error}
+ state.messages.push({...msg,pending:false});state.lastSignature='';renderMessages();loadMessages(false).catch(()=>{});
+}
+async function sendText(e){
+ e.preventDefault();const box=$('messageInput');const text=box.value.trim();if(!text)return;
+ box.value='';box.style.height='35px';
+ try{await sendMessage(text)}catch(err){box.value=text;notify('Failed to send: '+err.message,true)}
+}
+function resizeTextarea(){const el=$('messageInput');el.style.height='35px';el.style.height=Math.min(150,el.scrollHeight)+'px'}
+async function imageCompress(file){
+ if(file.type==='image/gif')throw Error('Large animated GIF cannot be safely recompressed. Send a GIF under 8 MB.');
+ let img;try{img=await createImageBitmap(file)}catch{throw Error('Cannot decode this image for compression')}
+ let w=img.width,h=img.height;let target=1800;
+ try{
+  while(target>=320){
+   const scale=Math.min(1,target/Math.max(w,h));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));
+   const ctx=canvas.getContext('2d');if(!ctx)break;ctx.drawImage(img,0,0,canvas.width,canvas.height);
+   for(const quality of [.82,.68,.50,.34]){
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',quality));if(blob&&blob.size<=MAX){
+     const result=new File([blob],file.name.replace(/\.[^.]+$/,'')+'-compressed.jpg',{type:'image/jpeg'});
+     notify('Image compressed: '+Math.round(file.size/1048576)+' MB → '+(blob.size/1048576).toFixed(1)+' MB');
+     return result;
+    }
+   }target=Math.floor(target*.68);
+  }
+ }finally{img.close?.()}
+ throw Error('This image could not be compressed under 8 MB');
+}
+async function videoCompress(file){
+ if(!('MediaRecorder' in window)||!HTMLMediaElement.prototype.captureStream)throw Error('This browser cannot compress videos. Compress it first, then upload.');
+ const supported=['video/webm;codecs=vp8,opus','video/webm;codecs=vp9,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));
+ if(!supported)throw Error('Video compression not supported in this browser');
+ const video=document.createElement('video');const object=URL.createObjectURL(file);video.src=object;video.preload='auto';video.playsInline=true;video.muted=true;
+ try{
+  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(Error('Cannot read video'));setTimeout(()=>reject(Error('Video preview timed out')),15000)});
+  if(!Number.isFinite(video.duration)||video.duration>180)throw Error('Videos over 3 minutes need to be compressed before upload');
+  video.currentTime=0;await video.play().catch(e=>{throw Error('Cannot play video to compress: '+e.message)});
+  const stream=video.captureStream();const chunks=[];
+  const recorder=new MediaRecorder(stream,{mimeType:supported,videoBitsPerSecond:Math.max(220000,Math.floor((MAX*8*.76)/Math.max(1,video.duration))),audioBitsPerSecond:64000});
+  const blob=await new Promise((resolve,reject)=>{
+   recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+   recorder.onerror=e=>reject(Error(e.error?.message||'Video encoding failed'));
+   recorder.onstop=()=>resolve(new Blob(chunks,{type:'video/webm'}));
+   video.onended=()=>{if(recorder.state!=='inactive')recorder.stop()};
+   recorder.start(700);
+   setTimeout(()=>{if(recorder.state!=='inactive'){recorder.stop()}},Math.min(210000,(video.duration+15)*1000));
+  });
+  if(!blob.size||blob.size>MAX)throw Error('Compressed video is still over 8 MB. Try a shorter/lower-resolution clip.');
+  notify('Video converted to '+(blob.size/1048576).toFixed(1)+' MB WebM; preview after upload.');
+  return new File([blob],file.name.replace(/\.[^.]+$/,'')+'-compressed.webm',{type:'video/webm'});
+ }finally{video.pause();URL.revokeObjectURL(object);video.removeAttribute('src');video.load()}
+}
+async function prepareUpload(file){
+ if(file.size<=MAX)return file;
+ notify('Compressing '+file.name+'… This may take a moment.');
+ if(file.type.startsWith('image/'))return imageCompress(file);
+ if(file.type.startsWith('video/'))return videoCompress(file);
+ throw Error('Automatic compression of '+(file.type||'this file format')+' cannot guarantee a smaller valid file. Compress it externally to 8 MB or less.');
+}
+async function uploadFile(file){
+ ensureReady();if(!state.room)throw Error('Choose a room first');
+ const accepted=['image/','video/','audio/'];const types=['application/pdf','text/plain','application/zip','application/octet-stream'];
+ if(!accepted.some(x=>file.type.startsWith(x))&&!types.includes(file.type))throw Error('For safety, supported formats are photos, video, audio, PDF, text and ZIP');
+ const prepared=await prepareUpload(file);
+ if(prepared.size>MAX)throw Error('File is still over 8 MB');
+ const slug=prepared.name.replace(/[^\w.\-]+/g,'_').slice(-90)||'upload';
+ const path=state.room.id+'/'+state.user.id+'/'+crypto.randomUUID()+'-'+slug;
+ $('composerInfo').textContent='Uploading '+prepared.name+'…';
+ try{
+  const {error}=await state.sb.storage.from(BUCKET).upload(path,prepared,{contentType:prepared.type||'application/octet-stream',upsert:false,cacheControl:'3600'});
+  if(error)throw error;
+  await sendMessage('',{path,name:prepared.name,type:prepared.type});
+  notify('File shared successfully');
+ }finally{$('composerInfo').textContent='Enter to send · Shift + Enter for new line'}
+}
+async function makeRoom(kind='group'){
+ ensureReady();
+ showDialog(kind==='private'?'Start a private chat':'Create a room',
+ '<p>'+(kind==='private'?'A private, invite-only space for you and your friend.':'Make a new group space for your friends. Invite using a shareable link.')+'</p><label for="createRoomName">Room name</label><input id="createRoomName" maxlength="70" placeholder="'+(kind==='private'?'Best friend':'Goku squad')+'"><p class="help">Room link: /chat/your-room-name</p>',
+ [{label:'Create '+(kind==='private'?'private chat':'room'),act:async b=>{b.disabled=true;try{
+ const name=$('createRoomName').value.trim();const slug=normalizeSlug(name);if(name.length<2||slug.length<2)throw Error('Enter a room name with at least two letters');
+ const {data,error}=await state.sb.from('chat_rooms').insert({slug,name,kind,owner_id:state.user.id}).select('id,slug,name,kind').single();
+ if(error)throw error;closeDialog();await openRoom(slug);notify('Room created!');if(kind==='private')await shareRoom();else copyText(urlForRoom(slug));
+ }finally{b.disabled=false}}}]);
+}
+async function joinRoom(){
+ ensureReady();
+ showDialog('Join a room','<p>Paste a room invite URL or enter the short room name.</p><label for="roomJoinValue">Room link or name</label><input id="roomJoinValue" placeholder="https://8apdf.vercel.app/chat/goku"><p class="help">Public groups are open by link. Private groups require a valid invitation.</p>',
+ [{label:'Join room',act:async b=>{b.disabled=true;try{
+  const val=$('roomJoinValue').value.trim();let slug=val,token=null;
+  if(val.includes('/chat/')){const link=new URL(val,location.origin);slug=link.pathname.split('/chat/')[1]?.split('/')[0];token=link.searchParams.get('invite')}
+  slug=normalizeSlug(slug);if(!slug)throw Error('Enter a room name');
+  await openRoom(slug,token);closeDialog();notify('Room joined');
+ }finally{b.disabled=false}}}]);
+}
+async function shareRoom(){
+ ensureReady();const room=state.room;if(!room)return;
+ if(room.kind==='private'){
+  const {data,error}=await state.sb.from('chat_invites').insert({room_id:room.id,created_by:state.user.id}).select('token').single();if(error)throw error;
+  await copyText(urlForRoom(room.slug,data.token));return;
+ }
+ await copyText(urlForRoom(room.slug));
+}
+async function inviteFriend(){
+ ensureReady();const room=state.room;
+ showDialog('Invite a friend','<p>Search the name your friend chose on 8aPDF, or simply copy an invite link.</p><label for="friendSearch">Find a friend</label><input id="friendSearch" placeholder="Search by name" maxlength="40"><div id="friendResults" class="member-search-list"></div><p class="help">Friend names are not verified identities. Confirm with them before sharing private details.</p>',
+ [{label:'Copy invite link',act:async()=>{await shareRoom();closeDialog()}}]);
+ const input=$('friendSearch');let debounce;
+ input.oninput=()=>{clearTimeout(debounce);debounce=setTimeout(async()=>{
+  const query=input.value.trim();if(query.length<2){$('friendResults').innerHTML='';return}
+  const {data,error}=await state.sb.from('chat_profiles').select('id,display_name').ilike('display_name','%'+query.replace(/[%_]/g,'')+'%').neq('id',state.user.id).limit(12);
+  if(error)return;$('friendResults').innerHTML=(data||[]).map(p=>'<div class="inline-member"><strong>'+esc(p.display_name)+' <small style="color:#888">('+esc(p.id.slice(0,6))+')</small></strong><button data-invite-user="'+esc(p.id)+'">Invite</button></div>').join('')||'<p>No matching names found.</p>';
+  $('friendResults').querySelectorAll('[data-invite-user]').forEach(b=>b.onclick=async()=>{b.disabled=true;
+   const {error:err}=await state.sb.from('chat_invites').insert({room_id:room.id,created_by:state.user.id,invited_user_id:b.dataset.inviteUser});
+   if(err){notify(err.message,true);b.disabled=false;return}notify('Invitation sent to friend');closeDialog();
+  });
+ },300)};
+}
+async function checkInvites(){
+ if(!state.user)return;
+ const {data,error}=await state.sb.from('chat_invites').select('id,room_id,created_by,status,chat_rooms(name,slug)').eq('invited_user_id',state.user.id).eq('status','pending').order('created_at',{ascending:false}).limit(8);
+ if(error)return;
+ for(const invite of data||[]){
+  if(state.invitesShown.has(invite.id))continue;state.invitesShown.add(invite.id);
+  const name=invite.chat_rooms?.name||'Private room';
+  showDialog('You have a chat invitation','<p><strong>'+esc(name)+'</strong> invited you to join a conversation.</p><p>Accept to join, or dismiss the request.</p>',
+   [{label:'Dismiss',primary:false,act:async()=>{const {error:e}=await state.sb.rpc('chat_respond_invite',{p_invite:invite.id,p_accept:false});if(e)throw e;closeDialog()}},
+    {label:'Join chat',act:async()=>{const {data:roomId,error:e}=await state.sb.rpc('chat_respond_invite',{p_invite:invite.id,p_accept:true});if(e)throw e;closeDialog();const {data:room}=await state.sb.from('chat_rooms').select('slug').eq('id',roomId).single();if(room){await openRoom(room.slug);notify('Invitation accepted')}}}], 'FRIEND REQUEST');
+  break;
+ }
+}
+async function roomManagement(){
+ ensureReady();if(!state.room)return;
+ await loadMembers();
+ const mine=state.members.find(m=>m.user_id===state.user.id);
+ const manager=mine?.role==='owner'||mine?.role==='admin';const owner=mine?.role==='owner';
+ const content='<p>'+esc(state.room.name)+' · '+esc(mine?.role||'member')+'</p>'+(manager?'<p>Manage members or remove inappropriate messages. Only room owners can promote other admins.</p>':'<p>This room is managed by its owner. Only owners and admins can moderate other members.</p>')+
+ state.members.map(m=>{
+  const prof=state.profiles.get(m.user_id);const canManage=manager&&m.user_id!==state.user.id&&m.role!=='owner';
+  return '<div class="inline-member"><strong>'+esc(prof?.display_name||'Friend')+' <small style="color:#888">· '+esc(m.role)+'</small></strong>'+
+  (canManage&&owner?'<button data-make-admin="'+esc(m.user_id)+'">'+(m.role==='admin'?'Demote':'Make admin')+'</button>':'')+
+  (canManage&&(owner||m.role!=='admin')?'<button class="danger" data-ban="'+esc(m.user_id)+'">Ban</button>':'')+'</div>';
+ }).join('');
+ showDialog('Room management',content,[],'ADMIN CONTROLS');
+ $('dialogContent').querySelectorAll('[data-make-admin]').forEach(b=>b.onclick=async()=>{
+  const mem=state.members.find(m=>m.user_id===b.dataset.makeAdmin);const role=mem.role==='admin'?'member':'admin';
+  const {error}=await state.sb.rpc('chat_set_member_role',{p_room:state.room.id,p_user:b.dataset.makeAdmin,p_role:role});
+  if(error)notify(error.message,true);else{closeDialog();notify('Role changed');roomManagement()}
+ });
+ $('dialogContent').querySelectorAll('[data-ban]').forEach(b=>b.onclick=async()=>{
+  if(!confirm('Permanently ban this member from this room?'))return;
+  const {error}=await state.sb.rpc('chat_ban_member',{p_room:state.room.id,p_user:b.dataset.ban,p_reason:'Removed by a moderator'});
+  if(error)notify(error.message,true);else{closeDialog();notify('Member banned');roomManagement()}
+ });
+}
+function installEvents(){
+ document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
+  const actions={create:()=>makeRoom('group'),join:joinRoom,private:()=>makeRoom('private'),new:()=>makeRoom('group')};
+  Promise.resolve(actions[b.dataset.action]?.()).catch(e=>notify(e.message,true));
+ });
+ $('refreshRooms').onclick=()=>loadRooms().then(()=>notify('Conversations refreshed'));
+ $('adminBtn').onclick=()=>roomManagement().catch(e=>notify(e.message,true));
+ $('inviteBtn').onclick=()=>inviteFriend().catch(e=>notify(e.message,true));
+ $('headerMoreBtn').onclick=()=>showDialog('Chat options','<p>Share a link to this room, invite a friend, or manage participants.</p>',[
+  {label:'Share room',act:async()=>{await shareRoom();closeDialog()}},{label:'Invite friends',act:()=>{closeDialog();inviteFriend()}}]);
+ $('loadOlder').onclick=()=>loadOlder().catch(e=>notify(e.message,true));
+ $('composerForm').addEventListener('submit',sendText);
+ $('messageInput').addEventListener('input',()=>{resizeTextarea();if(state.user)sendTyping()});
+ $('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('composerForm').requestSubmit()}});
+ $('mediaInput').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;
+  try{await uploadFile(file)}catch(err){notify(err.message||'Upload failed',true)}
+ });
+ $('closeDialog').onclick=closeDialog;$('previewClose').onclick=()=>{$('mediaDialog').close();$('previewContent').replaceChildren()};
+ $('mediaDialog').addEventListener('close',()=>$('previewContent').replaceChildren());
+ $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');$('mobileOpenMembers').onclick=()=>toggleMobile('membersPanel');
+ $('closeMembers').onclick=hideMobile;$('mobileBackdrop').onclick=hideMobile;
+ window.addEventListener('popstate',()=>{const slug=location.pathname.match(/\/chat\/([^/?]+)/)?.[1]||'general';if(state.user)openRoom(slug,new URLSearchParams(location.search).get('invite'),false).catch(e=>notify(e.message,true))});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)heartbeat().catch(()=>{})});
+}
+installEvents();
+start();
+})();
