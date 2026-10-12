@@ -1450,6 +1450,7 @@ html[data-ui-mode="studio"] #studioSidebar{position:fixed!important;z-index:1010
 html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;transform:translate3d(0,0,0)!important}
 }
 </style>
+<link rel="stylesheet" href="/site-polish.css?v=1" />
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -2222,8 +2223,13 @@ $('#nameForm').addEventListener('submit',e=>{
 // Same welcome animation on every reload and every new website open.
 const previousName=existingUserName().trim();
 let skipWelcome=false;
+let comingBackFromChat=false;
 try{skipWelcome=localStorage.getItem('8apdf_skip_welcome')==='1'}catch{}
-if(skipWelcome && previousName && previousName!=='Student'){
+try{
+ comingBackFromChat=sessionStorage.getItem('8apdf_from_chat_v1')==='1';
+ if(comingBackFromChat)sessionStorage.removeItem('8apdf_from_chat_v1');
+}catch{}
+if((skipWelcome||comingBackFromChat) && previousName && previousName!=='Student'){
   closeOriginalWelcome();
   originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
   document.body.classList.remove('locked');
@@ -3264,10 +3270,17 @@ function markup(items){const status=done();return items.map(t=>'<label class="pl
 function draw(){
  const tasks=buildTasks(),now=day(),tomorrow=plus(now,1);
  const due=tasks.filter(t=>t.due===now||t.due===tomorrow);
+ const confirmed=(window.__8apdfStudyIntel?.upcoming?.()||[])
+   .filter(e=>e.date===now||e.date===tomorrow)
+   .map(e=>({id:'teacher-event:'+e.id,text:e.title,due:e.date,subject:e.subject||'Teacher message'}))
+   .filter(e=>!due.some(t=>t.text.toLowerCase()===e.text.toLowerCase()));
+ const undated=tasks.filter(t=>!t.due && /\b(test|exam|quiz|assessment)\b|परीक्षा|ਟेस्ट/i.test(t.text)).slice(0,3);
  const list=document.getElementById('smartTasks'),summary=document.getElementById('smartDue');
  if(!list||!summary)return;
  list.innerHTML=tasks.length?markup(tasks.slice(0,6)):'<div class="planner-empty">No clear task instruction detected yet. See Teacher Messages for other updates.</div>';
- summary.innerHTML=due.length?markup(due.slice(0,5)):'<div class="planner-empty">No confirmed tests or submissions dated today or tomorrow. Undated teacher instructions stay in your To-Do list.</div>';
+ const items=[...due,...confirmed].slice(0,5);
+ summary.innerHTML=(items.length?markup(items):'<div class="planner-empty">No tests or submissions with a confirmed date for today or tomorrow.</div>')+
+ (undated.length?'<div class="ws-due-unconfirmed">Test mentioned · date still unconfirmed</div>'+markup(undated):'');
 }
 document.addEventListener('8apdf:teacher-data',e=>{feed=Array.isArray(e.detail)?e.detail:[];draw()});
 document.getElementById('newSchoolPlanner')?.addEventListener('change',e=>{
@@ -3378,5 +3391,7 @@ draw();
 <script src="https://elfsightcdn.com/platform.js" async></script>
 <div class="elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653" data-elfsight-app-lazy></div>
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
+<script defer src="/site-polish.js?v=1"></script>
 </body>
 </html>
