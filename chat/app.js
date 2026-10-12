@@ -23,7 +23,30 @@ function ensureReady(){if(!state.user)throw Error('Chat session not ready. Try r
 function urlForRoom(slug,token=''){return location.origin+'/chat/'+encodeURIComponent(slug)+(token?'?invite='+encodeURIComponent(token):'')}
 async function copyText(s){try{await navigator.clipboard.writeText(s);notify('Invite link copied')}catch{showDialog('Copy invite link','<p>Copy and share this link with a friend.</p><div class="dialog-result">'+esc(s)+'</div>',[])}}
 function normalizeSlug(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48)}
+let startingChat=false;
+let chatRetryTimer=null;
+function showChatRecovery(error){
+ const msg=String(error?.message||'Unknown connection error');
+ const anonDisabled=/anonymous\s+sign[- ]?ins?\s+(are\s+)?disabled|anonymous\s+users?\s+disabled/i.test(msg);
+ showConnection(anonDisabled?'Guest sign-in disabled':'Connection issue');
+ $('roomList').innerHTML='<div class="list-loading">Chat will appear once connected.</div>';
+ $('memberCount').textContent='0';
+ $('membersList').replaceChildren();
+ $('messageInput').disabled=true;$('sendButton').disabled=true;$('mediaInput').disabled=true;
+ $('identityStatus').textContent=anonDisabled?'Waiting for guest access':'Chat disconnected';
+ $('messages').innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('lock')+'</div><h3>'+
+ (anonDisabled?'Guest access needs to be enabled':'Unable to connect right now')+
+ '</h3><p>'+(anonDisabled?'The Supabase owner must enable Anonymous Sign-Ins once. No name form, email or password will be required.':'Please retry. If this continues, report the error below to the site owner.')+
+ '</p><div class="chat-recovery-actions"><button type="button" class="connection-setup-button" id="retryChat">Retry connection</button>'+
+ (anonDisabled?'<a class="connection-help-link" href="https://supabase.com/dashboard/project/uumqvvsfqwpwtwerdylv/auth/providers" target="_blank" rel="noopener noreferrer">Owner: enable guest sign-in ↗</a>':'')+
+ '</div><p class="connection-error-detail">'+esc(msg)+'</p></div>';
+ $('retryChat').addEventListener('click',()=>start());
+ if(anonDisabled&&!chatRetryTimer){chatRetryTimer=setInterval(()=>{if(!document.hidden&&!state.user&&!startingChat)start()},45000)}
+}
 async function start(){
+ if(startingChat||state.user)return;
+ startingChat=true;
+ try {
  state.displayName=nameFromSite();$('sideName').textContent=state.displayName;
  $('miniAvatar').textContent=state.displayName[0].toUpperCase();$('railAvatar').textContent=state.displayName[0].toUpperCase();
  if(!window.supabase?.createClient){showConnection('Service unavailable');notify('Chat library could not load. Check internet / ad blocker.',true);return}
@@ -40,6 +63,8 @@ async function start(){
   try{await openRoom(slug,new URLSearchParams(location.search).get('invite'),false)}
   catch(e){notify((e.message||'Cannot enter room')+'. Opening General Chat.',true);await openRoom('general',null,false)}
   showConnection('Live',true);
+  $('messageInput').disabled=false;$('sendButton').disabled=false;$('mediaInput').disabled=false;
+  if(chatRetryTimer){clearInterval(chatRetryTimer);chatRetryTimer=null}
   await loadRooms();
   await checkInvites();
   setInterval(()=>{if(!document.hidden&&state.user)heartbeat().catch(()=>{})},20000);
@@ -47,10 +72,12 @@ async function start(){
   window.addEventListener('focus',()=>{heartbeat().catch(()=>{});loadMessages(false).catch(()=>{});loadMembers().catch(()=>{})});
   window.addEventListener('storage',e=>{if(['eightapdf_user_name_v2','eightapdf_user_name'].includes(e.key)){state.displayName=nameFromSite();upsertProfile().catch(()=>{})}});
  }catch(e){
-  state.initError=e;showConnection('Guest access unavailable');notify('Could not connect: '+e.message,true);
-  $('messages').innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('lock')+'</div><h3>Chat needs a one-time backend setting</h3><p>Anonymous sign-ins must be enabled by the 8aPDF site owner in Supabase → Authentication → Providers → Anonymous Sign-Ins. No login screen is required.</p></div>';
-  $('identityStatus').textContent='Backend setup required';
+  state.initError=e;
+  state.user=null;
+  showChatRecovery(e);
+  notify('Could not connect: '+(e.message||'Unknown error'),true);
  }
+} finally {startingChat=false}
 }
 async function upsertProfile(){
  if(!state.user)return;
