@@ -28,3 +28,13 @@ button{color:inherit;background:transparent;border:0}button:focus-visible,a:focu
 /* Additional compact navigation */
 .new-chat-link{width:100%;display:flex;align-items:center;gap:9px;justify-content:center;margin-top:10px;padding:8px 12px;border:1px solid transparent;border-radius:10px;color:#a7a7af;font-size:11px;font-weight:650;transition:background .2s,color .2s,transform .2s}
 .new-chat-link svg{width:14px;height:14px}.new-chat-link:hover{background:#222225;color:#fff;transform:translateY(-1px)}
+
+/* Clear recovery state when a guest session has not yet been enabled. */
+.chat-recovery-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:11px;margin:21px 0 13px}
+.connection-setup-button{background:#f0f0f2;color:#111113;border:1px solid #f0f0f2;border-radius:11px;padding:11px 18px;font-size:12px;font-weight:750;transition:transform .25s cubic-bezier(.2,.9,.2,1),background .2s}
+.connection-setup-button:hover{background:white;transform:translateY(-2px)}
+.connection-help-link{display:inline-flex;align-items:center;min-height:40px;color:#c4c4cc;background:#1b1b1f;border:1px solid #3b3b42;border-radius:11px;padding:9px 14px;font-size:11px;font-weight:660;transition:background .2s}
+.connection-help-link:hover{background:#2a2a2e;color:white}
+.connection-error-detail{margin:8px auto 0!important;font-size:10px!important;color:#a6a6af!important;max-width:550px;overflow-wrap:anywhere}
+.composer textarea:disabled{opacity:.55;cursor:not-allowed}
+.composer .send-button:disabled,.composer .attach-button:has(+ input:disabled){opacity:.45}
