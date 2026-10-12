@@ -222,7 +222,7 @@ function renderMessages(keepPosition=false){
  el.innerHTML=combined.map(m=>{
   const mine=m.sender_id===state.user.id;
   const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Friend');
-  const canDelete=mine||state.members.some(x=>x.user_id===state.user.id&&['owner','admin'].includes(x.role));
+  const canDelete=mine||(state.siteAdmin&&state.room?.kind==='group')||state.members.some(x=>x.user_id===state.user.id&&['owner','admin'].includes(x.role));
   const original=state.messages.find(x=>x.id===m.reply_to);
   const quote=m.reply_to?'<div class="msg-reply-quote"><strong>'+esc(original?(state.profiles.get(original.sender_id)?.display_name||'Friend'):'Replied message')+'</strong>'+esc((original?.body||original?.attachment_name||'Original message').slice(0,180))+'</div>':'';
   const body=m.body?'<div class="msg-bubble">'+quote+esc(m.body)+'</div>':quote;
