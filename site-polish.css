@@ -223,3 +223,22 @@ html[data-ui-mode="studio"] #newSchoolPlanner .planner-go:focus-visible{
     padding:5px 0!important;
   }
 }
+
+/* Keep borderless home content comfortably inset from the studio sidebar. */
+html[data-ui-mode="studio"] main :is(#dashboardWidgets,#newSchoolPlanner){
+  box-sizing:border-box!important;
+  padding-left:clamp(28px,3.1vw,54px)!important;
+  padding-right:clamp(28px,3.1vw,54px)!important;
+}
+@media(max-width:840px){
+  html[data-ui-mode="studio"] main :is(#dashboardWidgets,#newSchoolPlanner){
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+}
+@media(max-width:510px){
+  html[data-ui-mode="studio"] main :is(#dashboardWidgets,#newSchoolPlanner){
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+}
