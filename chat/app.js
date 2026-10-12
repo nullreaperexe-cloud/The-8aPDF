@@ -506,6 +506,7 @@ function installEvents(){
  document.addEventListener('pointerdown',()=>{userActivated=true},{once:true});
  document.addEventListener('keydown',()=>{userActivated=true},{once:true});
  document.querySelectorAll('.app-rail a[href="/"]').forEach(link=>link.addEventListener('click',()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}}));
+ window.addEventListener('pagehide',()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}});
  $('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('composerForm').requestSubmit()}});
  $('mediaInput').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;
   try{await uploadFile(file)}catch(err){notify(err.message||'Upload failed',true)}
