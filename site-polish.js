@@ -37,13 +37,19 @@ function mountSettings(){
  const music=document.createElement('div');music.className='eightapdf-settings-music';music.id='eightapdfSettingsMusic';
  music.innerHTML='<h4>Background Music</h4><p>Music controls are kept here instead of floating over your notes. Browsers may need you to press Play once before allowing audio.</p>';
  container.append(music);
- const target=document.querySelector('.elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653');
- if(target)music.append(target);
- const thirdParty=new MutationObserver(()=>{
-  const widget=document.querySelector('.elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653');
-  if(widget&&widget.parentElement!==music)music.append(widget);
- });
- thirdParty.observe(document.body,{childList:true,subtree:false});
+ const frame=document.createElement('iframe');
+ frame.id='eightapdfMusicPlayerFrame';
+ frame.title='Background Music - Elfsight';
+ frame.src='/music-player.html?v=settings-only-20261012';
+ frame.setAttribute('allow','autoplay; encrypted-media');
+ frame.setAttribute('loading','eager');
+ frame.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+ frame.style.cssText='width:100%;height:230px;min-height:210px;max-width:100%;display:block;border:0;border-radius:12px;background:transparent;overflow:hidden;';
+ music.append(frame);
+ /* Keep this iframe mounted even while Settings is closed.
+    Its floating controls are contained inside this frame, not the website viewport,
+    and playback can continue after the Settings panel closes. */
+
 }
 function htmlEscape(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function textPreview(m){return (m.body|| (m.attachment_name?'Shared '+m.attachment_name:'Sent an attachment')).slice(0,135)}
