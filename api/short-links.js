@@ -130,7 +130,7 @@ export default async function handler(req, res) {
     const record = JSON.stringify({version:2,slug,documentId:docId,url:verified.url,title:verified.title,ownerHash:hash,createdAt:new Date().toISOString()});
     try {
       const options={addRandomSuffix:false,allowOverwrite:false,contentType:'application/json',cacheControlMaxAge:60};
-      try{await put(ROOT+slug+'.json',record,{...options,access:'public'})}
+      try{await put(ROOT+slug+'.json',record,{...options,access:'private'})}
       catch(error){
         if(isConflict(error))throw error;
         throw storageError('write',error);
