@@ -1,7 +1,7 @@
 /* 8aPDF Friends Chat — secure, persistent multi-device client */
 (() => {
 'use strict';
-const URL='https://uumqvvsfqwpwtwerdylv.supabase.co';
+const SUPABASE_URL='https://uumqvvsfqwpwtwerdylv.supabase.co';
 const KEY='sb_publishable_M1C4bP9ijOsm08ugE1uJig_ERVxR-zi';
 const BUCKET='8apdf-chat-uploads';
 const MAX=8*1024*1024;
@@ -27,7 +27,7 @@ async function start(){
  state.displayName=nameFromSite();$('sideName').textContent=state.displayName;
  $('miniAvatar').textContent=state.displayName[0].toUpperCase();$('railAvatar').textContent=state.displayName[0].toUpperCase();
  if(!window.supabase?.createClient){showConnection('Service unavailable');notify('Chat library could not load. Check internet / ad blocker.',true);return}
- state.sb=window.supabase.createClient(URL,KEY,{auth:{storageKey:'8apdf_social_auth_v2',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:12}}});
+ state.sb=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{storageKey:'8apdf_social_auth_v2',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:12}}});
  try{
   let {data:{session},error:sessionError}=await state.sb.auth.getSession();if(sessionError)throw sessionError;
   if(!session){const result=await state.sb.auth.signInAnonymously();if(result.error)throw result.error;session=result.data.session}
