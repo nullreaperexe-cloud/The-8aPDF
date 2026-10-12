@@ -57,6 +57,7 @@ async function start(){
   if(!session?.user)throw Error('Unable to initialize guest session');
   state.user=session.user;
   await upsertProfile();
+  await refreshSiteAdmin();
   await state.sb.rpc('chat_enter_lobby').then(({error})=>{if(error)throw error});
   const match=location.pathname.match(/^\/chat\/([a-zA-Z0-9-]{2,48})\/?$/);
   const slug=match?match[1]:'general';
@@ -433,19 +434,50 @@ async function checkInvites(){
   break;
  }
 }
+async function refreshSiteAdmin(){
+ if(!state.user||!state.sb)return;
+ const {data,error}=await state.sb.rpc('chat_is_site_admin');
+ if(!error)state.siteAdmin=!!data;
+}
 async function roomManagement(){
  ensureReady();if(!state.room)return;
  await loadMembers();
  const mine=state.members.find(m=>m.user_id===state.user.id);
- const manager=mine?.role==='owner'||mine?.role==='admin';const owner=mine?.role==='owner';
- const content='<p>'+esc(state.room.name)+' · '+esc(mine?.role||'member')+'</p>'+(manager?'<p>Manage members or remove inappropriate messages. Only room owners can promote other admins.</p>':'<p>This room is managed by its owner. Only owners and admins can moderate other members.</p>')+
+ const globalModerator=state.siteAdmin&&state.room.kind==='group';
+ const manager=mine?.role==='owner'||mine?.role==='admin'||globalModerator;const owner=mine?.role==='owner'||globalModerator;
+ const content='<p>'+esc(state.room.name)+' · '+esc(state.siteAdmin?'Site admin':mine?.role||'member')+'</p>'+(!state.siteAdmin?'<label for="chatAdminPassword">Admin access key</label><input type="password" id="chatAdminPassword" autocomplete="off" placeholder="Enter admin access key"><button type="button" id="verifySiteAdmin" class="connection-setup-button" style="margin-top:9px">Verify admin access</button><p class="help">Verified securely on the server. The key is never stored in your browser.</p>':'')+(manager?'<p>Manage members or remove inappropriate messages. Only room owners can promote other admins.</p>':'<p>This room is managed by its owner. Only owners and admins can moderate other members.</p>')+
  state.members.map(m=>{
   const prof=state.profiles.get(m.user_id);const canManage=manager&&m.user_id!==state.user.id&&m.role!=='owner';
   return '<div class="inline-member"><strong>'+esc(prof?.display_name||'Friend')+' <small style="color:#888">· '+esc(m.role)+'</small></strong>'+
   (canManage&&owner?'<button data-make-admin="'+esc(m.user_id)+'">'+(m.role==='admin'?'Demote':'Make admin')+'</button>':'')+
   (canManage&&(owner||m.role!=='admin')?'<button class="danger" data-ban="'+esc(m.user_id)+'">Ban</button>':'')+'</div>';
  }).join('');
- showDialog('Room management',content,[],'ADMIN CONTROLS');
+ showDialog('Room management',content+(owner&&state.room.kind==='group'?'<div class="room-danger-zone"><p>Group moderation</p><button type="button" id="clearGroupChat">Clear group messages</button><button type="button" id="deleteGroupChat" '+(state.room.slug==='general'?'disabled':'')+'>Delete this group</button></div>':''),[],'ADMIN CONTROLS');
+ const verify=$('verifySiteAdmin');
+ if(verify)verify.onclick=async()=>{
+   const input=$('chatAdminPassword');if(!input?.value.trim())return notify('Enter the admin key',true);
+   const value=input.value;input.value='';verify.disabled=true;
+   try{
+    const {data,error}=await state.sb.rpc('chat_redeem_admin',{p_password:value});
+    if(error)throw error;if(!data)throw Error('Invalid admin access key');
+    await refreshSiteAdmin();notify('Site admin access enabled');closeDialog();await roomManagement();
+   }catch(e){notify(e.message||'Verification failed',true)}
+   finally{verify.disabled=false}
+ };
+ const clear=$('clearGroupChat');
+ if(clear)clear.onclick=async()=>{
+   if(!confirm('Delete ALL messages from this group for everyone? This cannot be undone.'))return;
+   const {data,error}=await state.sb.rpc('chat_clear_group',{p_room:state.room.id});
+   if(error){notify(error.message,true);return}
+   closeDialog();notify(data+' messages removed');state.messages=[];state.lastSignature='';renderMessages();await loadMessages(true);
+ };
+ const del=$('deleteGroupChat');
+ if(del)del.onclick=async()=>{
+   if(!confirm('Permanently delete this entire group and its messages?'))return;
+   const {error}=await state.sb.rpc('chat_delete_group',{p_room:state.room.id});
+   if(error){notify(error.message,true);return}
+   closeDialog();notify('Group deleted');await openRoom('general');
+ };
  $('dialogContent').querySelectorAll('[data-make-admin]').forEach(b=>b.onclick=async()=>{
   const mem=state.members.find(m=>m.user_id===b.dataset.makeAdmin);const role=mem.role==='admin'?'member':'admin';
   const {error}=await state.sb.rpc('chat_set_member_role',{p_room:state.room.id,p_user:b.dataset.makeAdmin,p_role:role});
