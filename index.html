@@ -1442,6 +1442,14 @@ html[data-ui-mode="studio"] .studio-sidebar *::-webkit-scrollbar{width:0!importa
 #zipExport{white-space:nowrap}
 </style>
 <link rel="stylesheet" href="/workspace-upgrade.css?v=typing-hero-20261011"/><link rel="stylesheet" href="/study-intelligence.css?v=school-ai-20261011-v2"/><link rel="stylesheet" href="/timetable-tracker.css?v=approved-20261011v1"/><link rel="stylesheet" href="/theme-studio.css?v=ten-colors-78-themes-20261011"/>
+<style id="8apdf-mobile-sidebar-layering-fix">
+/* Mobile navigation: keep the sidebar above the blur layer, not under it. */
+@media (max-width:810px){
+html[data-ui-mode="studio"] #studioSidebarShade{position:fixed!important;z-index:10100!important}
+html[data-ui-mode="studio"] #studioSidebar{position:fixed!important;z-index:10101!important;isolation:isolate}
+html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;transform:translate3d(0,0,0)!important}
+}
+</style>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
