@@ -158,3 +158,68 @@ body>.ws-music-dock,
 body>#wsMusicDock{
   display:none!important;
 }
+
+/* 8aPDF text-only home widgets: remove card chrome without changing content or animation logic. */
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner){
+  column-gap:clamp(26px,3.3vw,52px)!important;
+  row-gap:clamp(25px,3vw,40px)!important;
+  align-items:start!important;
+}
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget),
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget):hover{
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:8px 0!important;
+  overflow:visible!important;
+}
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner)>.widget:nth-child(odd){
+  border-right:0!important;
+}
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner) :is(.list-row,.planner-task),
+html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner) :is(.list-row,.planner-task):hover{
+  border:0!important;
+  border-bottom:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:11px 0!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets .task-row{
+  border:0!important;
+  background:transparent!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets .timetable-day-select{
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets .notes-form input{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding-inline:0!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets .notes-form button,
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-go{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  color:var(--text)!important;
+}
+html[data-ui-mode="studio"] #dashboardWidgets :is(.notes-form input,.notes-form button,.timetable-day-select):focus-visible,
+html[data-ui-mode="studio"] #newSchoolPlanner .planner-go:focus-visible{
+  outline:2px solid var(--text)!important;
+  outline-offset:3px!important;
+}
+@media(max-width:840px){
+  html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner){
+    row-gap:27px!important;
+  }
+  html[data-ui-mode="studio"] :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget){
+    padding:5px 0!important;
+  }
+}
