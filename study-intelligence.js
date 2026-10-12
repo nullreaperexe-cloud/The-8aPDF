@@ -94,7 +94,11 @@ function remind(){
  const heading=document.createElement('div');heading.className='ws-event-head';const label=document.createElement('strong');label.textContent='Upcoming school reminders';const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Dismiss upcoming reminders');close.onclick=()=>div.remove();heading.append(label,close);div.append(heading);
  for(const e of soon){const p=document.createElement('p');const b=document.createElement('strong');b.textContent=dayName(e.date)+' · '+(e.kind==='test'?'Test':'Submission');p.append(b,document.createTextNode(' — '+e.title));div.append(p)}
  const link=document.createElement('button');link.type='button';link.className='ws-event-view';link.textContent='Open teacher messages →';link.onclick=()=>{div.remove();document.querySelector('#studioSidebar [data-go="announcements"]')?.click()};div.append(link);
- document.body.append(div);try{localStorage.setItem(SEEN,JSON.stringify({day:today,id}))}catch{}
+ document.body.append(div);
+ let dismissTimer=setTimeout(()=>div.remove(),8500);
+ div.addEventListener('mouseenter',()=>clearTimeout(dismissTimer));
+ div.addEventListener('mouseleave',()=>{clearTimeout(dismissTimer);dismissTimer=setTimeout(()=>div.remove(),3500)});
+ try{localStorage.setItem(SEEN,JSON.stringify({day:today,id}))}catch{}
 }
 function updateButton(){
  const b=$('wsUpcomingBtn');if(!b)return;const n=upcoming().length;b.hidden=n===0;b.textContent='◷ '+n+' upcoming '+(n===1?'reminder':'reminders');
