@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-theme="pure-black">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080809"><meta name="description" content="Chat with your friends on 8aPDF.">
+<title>Chat with Your Friends · 8aPDF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/chat/style.css?v=2">
+</head>
+<body>
+<svg class="sprites" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.8 7.8 0 0 1-8.1 7.5 9.2 9.2 0 0 1-3.5-.7L4 20l1.1-4.4A7.2 7.2 0 0 1 4 11.5 7.8 7.8 0 0 1 12 4a7.8 7.8 0 0 1 8 7.5Z"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6M8 12h12"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.9M16 2.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7m2.7 6.4a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V6a4 4 0 1 1 8 0v4"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="m4 12 16-9-4 18-4-8-8-1Z"/><path d="m12 13 8-10"/></symbol>
+<symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m20 11-8 8a5 5 0 0 1-7-7l9-9a3 3 0 0 1 4 4L9 16a1 1 0 0 1-1.5-1.5L16 6"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.2 16.2 4 4"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="m3 7 4.5 4L12 5l4.5 6L21 7l-2 13H5L3 7Z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 2h8l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+<symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+<div class="app-shell" id="chatApp">
+<aside class="app-rail" aria-label="Main navigation">
+  <a class="rail-brand" href="/" title="8aPDF Home">8<span>a</span></a>
+  <div class="rail-separator"></div>
+  <a class="rail-button active" href="/chat" aria-label="Friends Chat" title="Friends Chat"><svg><use href="#i-chat"></use></svg></a>
+  <a class="rail-button" href="/" aria-label="Back to study library" title="Study Library"><svg><use href="#i-back"></use></svg></a>
+  <div class="rail-spacer"></div>
+  <span class="rail-avatar" id="railAvatar">8</span>
+</aside>
+<aside class="chat-sidebar" id="chatSidebar">
+  <div class="side-top"><div class="side-kicker"><span class="status-light"></span> 8aPDF SOCIAL</div><h1>Messages <span class="heading-star">✳</span></h1><p>Your people. Your conversations.</p></div>
+  <div class="side-controls">
+    <button type="button" class="side-primary" data-action="create"><svg><use href="#i-plus"></use></svg> Create a room</button>
+    <div class="two-actions"><button type="button" data-action="join"><svg><use href="#i-link"></use></svg> Join room</button><button type="button" data-action="private"><svg><use href="#i-lock"></use></svg> Private chat</button></div>
+  </div>
+  <div class="side-group-head"><span>YOUR CONVERSATIONS</span><button id="refreshRooms" title="Refresh conversations" aria-label="Refresh conversations"><svg><use href="#i-more"></use></svg></button></div>
+  <div id="roomList" class="room-list"><div class="list-loading">Finding your conversations…</div></div>
+  <div class="side-bottom"><button type="button" id="adminBtn" class="bottom-action"><svg><use href="#i-crown"></use></svg><span>Room management</span><svg class="arrow"><use href="#i-chevron"></use></svg></button><div class="mini-profile"><div class="mini-avatar" id="miniAvatar">8</div><span><strong id="sideName">Student</strong><small id="identityStatus">Connecting…</small></span></div></div>
+</aside>
+<main class="conversation" id="conversation">
+  <header class="chat-topbar"><div class="chat-title-area"><button id="mobileOpenRooms" class="icon-button mobile-only" type="button" aria-label="Open conversations"><svg><use href="#i-menu"></use></svg></button><div class="topic-icon" id="topicIcon">#</div><div class="topic-text"><h2 id="roomTitle">General Chat</h2><p id="roomSubtitle">Connecting to your friends…</p></div></div><div class="header-actions"><span id="connectionBadge" class="connection-badge"><span class="status-light"></span> Connecting</span><button id="inviteBtn" class="icon-button" title="Invite friends" aria-label="Invite friends"><svg><use href="#i-link"></use></svg></button><button id="mobileOpenMembers" class="icon-button" title="Show members" aria-label="Show members"><svg><use href="#i-users"></use></svg></button><button id="headerMoreBtn" class="icon-button" title="Chat options" aria-label="Chat options"><svg><use href="#i-more"></use></svg></button></div></header>
+  <section class="messages-area" id="messagesArea" aria-label="Conversation messages" aria-live="polite"><button class="load-older" id="loadOlder" hidden>Load older messages</button><div class="messages" id="messages"><div class="intro-space"><div class="intro-icon"><svg><use href="#i-chat"></use></svg></div><h3>Good conversations start here.</h3><p>Say hi, share a photo, or start a conversation with your friends.</p></div></div></section>
+  <div id="typingStatus" class="typing-status" aria-live="polite"></div>
+  <form class="composer-wrap" id="composerForm"><div class="composer"><label class="attach-button" for="mediaInput" title="Send file, photo, video or PDF"><svg><use href="#i-paperclip"></use></svg></label><input type="file" id="mediaInput" hidden accept="image/*,video/*,audio/*,application/pdf,text/plain,application/zip,application/octet-stream"><textarea id="messageInput" rows="1" maxlength="10000" placeholder="Message your friends…" aria-label="Message" autocomplete="off"></textarea><button type="submit" id="sendButton" class="send-button" aria-label="Send message"><svg><use href="#i-send"></use></svg></button></div><div class="composer-note"><span id="composerInfo">Enter to send · Shift + Enter for new line</span><span>Private storage · 8 MB / file after compression</span></div></form>
+</main>
+<aside class="members-panel" id="membersPanel"><div class="members-top"><div><h3>Members <span id="memberCount">0</span></h3><p>People in this conversation</p></div><button class="mobile-only icon-button" id="closeMembers" aria-label="Close members"><svg><use href="#i-close"></use></svg></button></div><div id="membersList" class="members-list"></div><div class="presence-footer"><span class="status-light"></span><span>Live presence<br><small>Online activity synced automatically</small></span></div></aside>
+</div>
+<div id="mobileBackdrop" class="mobile-backdrop" hidden></div>
+<div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+<dialog class="app-dialog" id="actionDialog"><div class="dialog-heading"><div><span class="dialog-kicker" id="dialogKicker">8aPDF CHAT</span><h3 id="dialogTitle">Create a room</h3></div><button class="icon-button" id="closeDialog" aria-label="Close dialog"><svg><use href="#i-close"></use></svg></button></div><div class="dialog-content" id="dialogContent"></div><div class="dialog-footer" id="dialogFooter"></div></dialog>
+<dialog class="preview-dialog" id="mediaDialog"><div class="preview-top"><strong id="previewTitle">Preview</strong><div class="preview-actions"><a class="icon-button" target="_blank" rel="noopener" id="previewDownload" download title="Download"><svg><use href="#i-download"></use></svg></a><button class="icon-button" id="previewClose" aria-label="Close preview"><svg><use href="#i-close"></use></svg></button></div></div><div class="preview-content" id="previewContent"></div></dialog>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
+<script defer src="/chat/app.js?v=2"></script>
+</body></html>
