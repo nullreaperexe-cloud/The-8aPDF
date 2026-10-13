@@ -63,8 +63,9 @@ Deno.serve(async(req:Request)=>{
   if(req.method!=='POST')return json({error:'Use GET or POST'},405,cors);
   if(Number(req.headers.get('Content-Length')||0)>10000)return json({error:'Request too large'},413,cors);
   const raw=await req.text();if(raw.length>10000)return json({error:'Request too large'},413,cors);const body=JSON.parse(raw||'{}');
-  if(body.action==='poll'||body.action==='dry-run'){
+  if(body.action==='poll'||body.action==='dry-run'||body.action==='crypto-check'){
    if(!secureEqual(req.headers.get('X-Worker-Secret')||'',cfg.worker_secret))return json({error:'Unauthorized'},401);
+   if(body.action==='crypto-check'){if(!validPushSubscription(body.subscription))return json({error:'Invalid test subscription'},400);const encrypted=webpush.generateRequestDetails(body.subscription,'8aPDF notification protocol verification',{vapidDetails:{subject:'https://8apdf.vercel.app/',publicKey:cfg.vapid_public_key,privateKey:cfg.vapid_private_key},contentEncoding:'aes128gcm',TTL:60});return json({encryptedBytes:encrypted.body.length,encoding:encrypted.headers['Content-Encoding']||encrypted.headers['content-encoding'],authenticated:!!(encrypted.headers.Authorization||encrypted.headers.authorization)});}
    return json(await poll(cfg,body.action==='dry-run'));
   }
   if(!allowed)return json({error:'Origin not allowed'},403);
