@@ -11,3 +11,7 @@ Deploy `supabase/functions/school-push/index.ts` with its `deno.json` and two sh
 Successful pushes mark delivery rows sent; temporary failures retry with bounded backoff. Expired 404/410 endpoints are removed. Groups of updates are combined into a compact notification with a stable tag. `school-worker.js` displays the OS notification and opens the appropriate test/PDF/message view. It does not cache the app shell, so deploys cannot be trapped behind stale HTML.
 
 The phone user must allow notifications once. On iPhone/iPad, install the site on the Home Screen and enable from that installed app. Browser/OS permission, connectivity and battery settings determine actual device delivery. No chat messages are sent by this school notification worker.
+
+## Feed availability
+
+School push depends on the existing AcademyVault Firestore feed being available. HTTP 429 RESOURCE_EXHAUSTED pauses new-event ingestion; the scheduled worker keeps retrying every ten minutes and preserves its deduplication baseline and pending deliveries. The notification settings show a delayed-feed notice after 25 minutes without a successful source check. No billing or upstream quota settings are changed automatically. The existing source currently returned quota-exceeded responses during final verification; native phone receipt still requires permission and the device test button.

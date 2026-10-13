@@ -13,7 +13,7 @@ async function send(sub:any,payload:any,cfg:any){
 }
 async function sourceEvents(collection:string){
  const response=await fetch('https://firestore.googleapis.com/v1/projects/academyvault-5d1eb/databases/(default)/documents:runQuery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:collection}],...(collection==='announcements'?{where:{fieldFilter:{field:{fieldPath:'published'},op:'EQUAL',value:{booleanValue:true}}}}:{}),limit:1000}}),signal:AbortSignal.timeout(12000)});
- if(!response.ok)throw Error('School feed unavailable');const rows=await response.json(),out=[];
+ if(!response.ok)throw Error('School feed HTTP '+response.status+': '+(await response.text()).slice(0,900));const rows=await response.json(),out=[];
  for(const r of rows){if(!r.document)continue;const raw=Object.fromEntries(Object.entries(r.document.fields||{}).map(([k,v])=>[k,decode(v)])),id=r.document.name.split('/').at(-1);
   if(collection==='announcements'&&raw.published!==true)continue;
   const source=collection==='study_materials'?'pdf':'announcement',title=cleanSchoolText(raw.title||raw.name||'School update').slice(0,180),body=cleanSchoolText(raw.message||raw.fullMessage||raw.description||raw.subject||'New school material').slice(0,220);
@@ -36,7 +36,7 @@ async function poll(cfg:any,dryRun=false){
     if(deliveries.length){const written=await db.from('school_push_deliveries').upsert(deliveries,{onConflict:'subscription_id,event_id',ignoreDuplicates:true});if(written.error)throw written.error}
     const sourceState=await db.from('school_push_sources').upsert({id:collection,initialized:true,last_checked_at:new Date().toISOString()});if(sourceState.error)throw sourceState.error;
     results.sources[collection]={records:records.length,new:fresh.length,baseline:!state?.initialized};
-   }catch{results.sources[collection]={error:'School feed temporarily unavailable'}}
+   }catch(error){console.error('School feed check:',collection,error instanceof Error?error.message:String(error));results.sources[collection]={error:'School feed temporarily unavailable',detail:error instanceof Error?error.message:String(error)}}
   }
   if(!dryRun){
    const {data:pending,error}=await db.from('school_push_deliveries').select('subscription_id,event_id,attempts,school_push_events(*)').eq('status','pending').lte('next_attempt_at',new Date().toISOString()).limit(1000);if(error)throw error;
@@ -50,7 +50,7 @@ async function poll(cfg:any,dryRun=false){
      else {for(const row of batch)await db.from('school_push_deliveries').update({attempts:row.attempts+1,next_attempt_at:new Date(Date.now()+Math.min(3600000,600000*2**row.attempts)).toISOString(),status:row.attempts>=5?'failed':'pending'}).eq('subscription_id',subId).eq('event_id',row.event_id);results.failed++}
     }
    }
-   await db.from('school_push_config').update({last_checked_at:new Date().toISOString()}).eq('id',1);
+   if(Object.values(results.sources).every((source:any)=>!source.error))await db.from('school_push_config').update({last_checked_at:new Date().toISOString()}).eq('id',1);
   }return results;
  }finally{await db.from('school_push_config').update({lease_until:null}).eq('id',1)}
 }
@@ -59,7 +59,7 @@ Deno.serve(async(req:Request)=>{
  if(req.method==='OPTIONS')return allowed?json({},200,cors):json({error:'Origin not allowed'},403);
  try{
   const {data:cfg,error}=await db.from('school_push_config').select('*').eq('id',1).single();if(error)throw error;
-  if(req.method==='GET')return json({enabled:true,publicKey:cfg.vapid_public_key,lastChecked:cfg.last_checked_at,intervalMinutes:10},200,cors);
+  if(req.method==='GET'){const {data:sources,error:sourceError}=await db.from('school_push_sources').select('last_checked_at');if(sourceError)throw sourceError;const dates=(sources||[]).map(s=>s.last_checked_at).filter(Boolean).sort();return json({enabled:true,publicKey:cfg.vapid_public_key,lastChecked:dates.length===2?dates[0]:null,intervalMinutes:10},200,cors);}
   if(req.method!=='POST')return json({error:'Use GET or POST'},405,cors);
   if(Number(req.headers.get('Content-Length')||0)>10000)return json({error:'Request too large'},413,cors);
   const raw=await req.text();if(raw.length>10000)return json({error:'Request too large'},413,cors);const body=JSON.parse(raw||'{}');
