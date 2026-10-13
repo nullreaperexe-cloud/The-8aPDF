@@ -43,7 +43,7 @@
    ['All PDFs & To-Do',()=>document.querySelector('#wsExtraLinks [data-ws-action="todo"]')?.click()],
    ['Download PDFs as ZIP',()=>document.querySelector('#wsExtraLinks [data-ws-action="zip"]')?.click()],
    ['Edit Home Widgets',()=>document.querySelector('#wsExtraLinks [data-ws-action="widgets"]')?.click()],
-   ['Reminders',()=>{bridge()?.navigate?.('settings');$('studyExperienceSettings')?.scrollIntoView({block:'center',behavior:'smooth'})}]
+   ['Reminders',()=>{if(!$('wsUpcomingBtn')?.hidden)$('wsUpcomingBtn').click();else bridge()?.notify?.('No upcoming dated school reminders.')}]
   ];
   links.forEach(([label,action])=>{
    const b=document.createElement('button');b.type='button';b.textContent=label;
@@ -54,7 +54,16 @@
  }
  function init(){
   if(!$('premiumWelcome')||!bridge())return;
+  const recents=$('dashboardWidgets').children[2];
+  if(recents&&studio()){
+   recents.id='premiumRecentWidget';
+   const extra=document.createElement('section');extra.id='premiumRecentSection';extra.className='shell widgets premium-extra-widgets';extra.setAttribute('aria-label','Latest school PDFs');
+   $('dashboardWidgets').after(extra);extra.append(recents);
+  }
   greeting();overview();summaryPosition();finishMore();routeTab();
+  const reminder=document.createElement('button');reminder.type='button';reminder.className='studio-side-link';reminder.id='premiumReminders';reminder.innerHTML='<svg aria-hidden="true"><use href="#i-bell"/></svg><span>School Reminders</span>';
+  reminder.onclick=()=>{if(!$('wsUpcomingBtn')?.hidden)$('wsUpcomingBtn').click();else bridge()?.notify?.('No upcoming dated school reminders.')};
+  document.querySelector('.studio-nav-secondary').append(reminder);
   const searchClose=document.createElement('button');searchClose.className='premium-search-close';searchClose.type='button';searchClose.setAttribute('aria-label','Close search');searchClose.textContent='Close search ×';
   searchClose.onclick=()=>{$('command').click();$('studioMobileSearch').focus()};
   $('command').querySelector('.command-card').prepend(searchClose);

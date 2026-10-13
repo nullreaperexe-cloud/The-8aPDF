@@ -46,22 +46,22 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-hero-note:before{c
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .hero .big-search{max-width:none!important;min-height:60px;margin:18px 0 0!important;background:linear-gradient(130deg,var(--surface-high),var(--surface));border:1px solid var(--line-bold);border-radius:19px!important;padding:7px 9px 7px 20px;box-shadow:none!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .big-search input{font-size:14px!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #workspaceHomeActions{display:none!important} /* Edit Home Widgets lives in both navigation menus. */
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner){gap:16px!important;padding-inline:var(--premium-gutter)!important;margin:0 auto 16px!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget){background:linear-gradient(135deg,var(--surface),var(--bg-alt))!important;border:1px solid var(--line)!important;border-radius:19px!important;padding:19px!important;min-width:0!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget):nth-child(odd){border-right:1px solid var(--line)!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner) .widget-header{margin:0 0 12px!important;padding:0!important;gap:12px!important;min-height:35px;border:0!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection){gap:16px!important;padding-inline:var(--premium-gutter)!important;margin:0 auto 16px!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection)>.widget:not(.ws-hidden-widget){background:linear-gradient(135deg,var(--surface),var(--bg-alt))!important;border:1px solid var(--line)!important;border-radius:19px!important;padding:19px!important;min-width:0!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection)>.widget:not(.ws-hidden-widget):nth-child(odd){border-right:1px solid var(--line)!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection) .widget-header{margin:0 0 12px!important;padding:0!important;gap:12px!important;min-height:35px;border:0!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header>svg{width:24px!important;height:24px!important;color:var(--text)!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header strong{font-size:16px!important;font-weight:650!important;letter-spacing:-.025em;line-height:1.25}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header>button{font-size:11px;white-space:nowrap;margin-left:auto;color:var(--text-soft)!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .timetable-day-select{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:8px!important;font-size:11px;max-width:85px;margin-left:auto;color:var(--text)!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .list-row{display:flex!important;align-items:center!important;gap:15px!important;width:100%;min-height:49px!important;padding:7px 10px!important;margin:5px 0 0!important;border:1px solid var(--line)!important;border-radius:13px!important;background:color-mix(in srgb,var(--surface-high) 40%,transparent)!important;text-align:left}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .list-row:hover{background:var(--hover)!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .list-row .item-body{min-width:0;flex:1}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .item-body strong{font-size:12px!important;font-weight:550!important;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .item-body>span{font-size:10px!important;color:var(--muted)!important;margin-top:3px;display:block}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .small-icon{display:grid!important;place-items:center!important;width:37px!important;height:37px!important;flex:none;border:1px solid var(--line)!important;border-radius:11px!important;background:var(--surface-high)!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .small-icon svg{width:18px!important;height:18px!important}
-html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .timestamp{display:grid!important;place-items:center;width:48px!important;min-width:48px;height:31px;font-size:12px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface-high)!important;color:var(--text)!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .timetable-day-select{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:10px!important;padding:8px!important;font-size:11px;max-width:85px;margin-left:auto;color:var(--text)!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .list-row{display:flex!important;align-items:center!important;gap:15px!important;width:100%;min-height:49px!important;padding:7px 10px!important;margin:5px 0 0!important;border:1px solid var(--line)!important;border-radius:13px!important;background:color-mix(in srgb,var(--surface-high) 40%,transparent)!important;text-align:left}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .list-row:hover{background:var(--hover)!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .list-row .item-body{min-width:0;flex:1}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .item-body strong{font-size:12px!important;font-weight:550!important;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .item-body>span{font-size:10px!important;color:var(--muted)!important;margin-top:3px;display:block}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .small-icon{display:grid!important;place-items:center!important;width:37px!important;height:37px!important;flex:none;border:1px solid var(--line)!important;border-radius:11px!important;background:var(--surface-high)!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .small-icon svg{width:18px!important;height:18px!important}
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .timestamp{display:grid!important;place-items:center;width:48px!important;min-width:48px;height:31px;font-size:12px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface-high)!important;color:var(--text)!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets #announcementsWidget .list-row:after{content:'›';font-size:22px;color:var(--text-soft);padding-inline:3px}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px!important}
 html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-stat{display:flex;align-items:center;position:relative;min-width:0;gap:16px;border:1px solid var(--line);border-radius:17px;padding:16px;background:linear-gradient(130deg,var(--surface-high),var(--bg-alt));color:var(--text);text-align:left;cursor:pointer;min-height:82px;transition:transform var(--duration) var(--ease),border-color var(--duration),box-shadow var(--duration)}
@@ -90,7 +90,7 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .command-card{border-radius
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-hero-note{right:25px;top:32px;font-size:8px}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-hero-copy{max-width:72%}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
- html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner){grid-template-columns:1fr!important}
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection){grid-template-columns:1fr!important}
 }
 @media(max-width:810px){
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]){--premium-gutter:12px}
@@ -116,14 +116,14 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .command-card{border-radius
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .hero .big-search{margin:13px 0 0!important;min-height:53px;padding:6px 7px 6px 15px;border-radius:16px!important;gap:10px}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .big-search input{font-size:12px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .big-search .search-submit{width:39px;height:39px;border-radius:11px}
- html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner){grid-template-columns:1fr!important;gap:13px!important;margin-bottom:14px!important}
- html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner)>.widget:not(.ws-hidden-widget){padding:16px 12px!important}
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection){grid-template-columns:1fr!important;gap:13px!important;margin-bottom:14px!important}
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection)>.widget:not(.ws-hidden-widget){padding:16px 12px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header{gap:8px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header strong{font-size:14px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header>svg{width:21px!important;height:21px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .widget-header>button{font-size:10px;padding-inline:0!important}
- html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .list-row{gap:11px!important;padding:7px 9px!important}
- html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #dashboardWidgets .item-body strong{font-size:12px!important}
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .list-row{gap:11px!important;padding:7px 9px!important}
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) :is(#dashboardWidgets,#premiumRecentSection) .item-body strong{font-size:12px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:14px!important}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-stat{min-height:93px;gap:10px;padding:13px;border-radius:14px}
  .premium-stat-icon{width:37px;height:40px;border-radius:11px}.premium-stat-icon svg{width:22px;height:22px}
@@ -152,3 +152,5 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .command-card{border-radius
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-hero-actions .primary svg:last-child{display:none}
  html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .premium-stat{padding:10px;gap:7px}
 }
+
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #premiumRecentSection{grid-template-columns:1fr!important}
