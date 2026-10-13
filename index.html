@@ -194,7 +194,7 @@ html[data-theme="signature-lime"] body{background:radial-gradient(circle at 14% 
 .pdf-card:nth-child(2){animation-delay:.045s}.pdf-card:nth-child(3){animation-delay:.09s}.pdf-card:nth-child(4){animation-delay:.13s}.pdf-card:nth-child(5){animation-delay:.17s}.pdf-card:nth-child(6){animation-delay:.21s}
 @keyframes classicCardReveal{from{opacity:0;transform:translateY(19px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes classicHeroReveal{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-.hero h1{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) both}
+.hero :is(h1,h2.study-typing-heading){animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) both}
 .hero p{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) .07s both}
 .big-search{animation:classicHeroReveal .95s cubic-bezier(.16,1,.3,1) .12s both}
 .pdf-card:hover{transform:translateY(-6px) scale(1.005);box-shadow:0 27px 72px rgba(22,35,24,.16)}
@@ -207,7 +207,7 @@ html[data-glass="on"] .pdf-card h3,html[data-glass="on"] .hero h1{filter:none;te
 html[data-theme="signature-lime"] :is(.pdf-card,.feature,.widget,.top-nav,.big-search,.notice-card,.settings,.dialog){border-color:rgba(30,48,22,.13)}
 /* Fast interactions even on compact phones. */
 @media(max-width:740px){.hero{padding-top:58px;padding-bottom:34px}.hero h1{font-size:clamp(2.8rem,12.4vw,4.6rem);line-height:.97}.top-nav{border-radius:19px;min-height:60px}.pdf-card:hover,.feature:hover{transform:none}.feature-strip{margin-top:23px}}
-@media(prefers-reduced-motion:reduce){.pdf-card,.hero h1,.hero p,.big-search{animation:none!important}.pdf-card:hover,.feature:hover{transform:none!important}}
+@media(prefers-reduced-motion:reduce){.pdf-card,.hero h1,.hero h2.study-typing-heading,.hero p,.big-search{animation:none!important}.pdf-card:hover,.feature:hover{transform:none!important}}
 
 /* PRESERVED VERBATIM FROM THE UPLOADED ORIGINAL: .welcome-screen, .name-modal and animations */
     .welcome-screen {
@@ -826,7 +826,7 @@ html[data-ui-mode="studio"] main .shell,html[data-ui-mode="studio"] footer .shel
 html[data-ui-mode="studio"] .hero{padding:45px 0 20px!important}
 html[data-ui-mode="studio"] .hero:before{display:none!important}
 html[data-ui-mode="studio"] .hero .hero-inner{max-width:1350px;text-align:left!important;padding-top:13px!important;padding-bottom:5px!important}
-html[data-ui-mode="studio"] .hero h1{max-width:930px;text-align:left!important;margin:18px 0 19px!important;font-size:clamp(2.8rem,4.4vw,4.8rem)!important;letter-spacing:-.065em!important;line-height:1.07!important}
+html[data-ui-mode="studio"] .hero :is(h1,h2.study-typing-heading){max-width:930px;text-align:left!important;margin:18px 0 19px!important;font-size:clamp(2.8rem,4.4vw,4.8rem)!important;letter-spacing:-.065em!important;line-height:1.07!important}
 html[data-ui-mode="studio"] .hero .classic-title-main,html[data-ui-mode="studio"] .hero .classic-title-accent{display:inline!important;font-size:inherit!important;line-height:inherit!important}
 html[data-ui-mode="studio"] .hero .classic-title-accent{margin-left:.16em}
 html[data-ui-mode="studio"] .hero p{max-width:720px!important;margin:0!important;text-align:left!important;line-height:1.65!important;font-size:.94rem!important}
@@ -926,7 +926,7 @@ html[data-ui-mode="studio"][data-local-preview="yes"] .studio-preview-links .stu
  html[data-ui-mode="studio"] .pdf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  html[data-ui-mode="studio"] .widgets{grid-template-columns:1fr}
  html[data-ui-mode="studio"] .hero{padding:28px 0 12px!important}
- html[data-ui-mode="studio"] .hero h1{font-size:clamp(2.45rem,7vw,3.7rem)!important}
+ html[data-ui-mode="studio"] .hero :is(h1,h2.study-typing-heading){font-size:clamp(2.45rem,7vw,3.7rem)!important}
  html[data-ui-mode="studio"] .studio-more-panel:not([hidden]){display:grid;position:fixed;z-index:399;left:12px;right:12px;bottom:80px;border:1px solid var(--line-bold);background:var(--surface);color:var(--text);border-radius:21px;padding:14px;gap:6px;box-shadow:0 22px 60px rgba(0,0,0,.3);backdrop-filter:blur(18px)}
  .studio-more-panel .studio-more-title{font-size:.83rem;font-weight:780;padding:6px 10px 9px;display:flex;justify-content:space-between;align-items:center}
  .studio-more-panel .studio-more-title button{font-size:24px;background:transparent;border:0;color:var(--text);cursor:pointer}
@@ -935,7 +935,7 @@ html[data-ui-mode="studio"][data-local-preview="yes"] .studio-preview-links .stu
 @media(max-width:585px){
  html[data-ui-mode="studio"] main .shell,html[data-ui-mode="studio"] footer .shell{padding-left:16px;padding-right:16px}
  html[data-ui-mode="studio"] .pdf-grid{grid-template-columns:1fr}
- html[data-ui-mode="studio"] .hero h1{font-size:clamp(2.2rem,10.8vw,3.15rem)!important;letter-spacing:-.065em!important;line-height:1.08!important}
+ html[data-ui-mode="studio"] .hero :is(h1,h2.study-typing-heading){font-size:clamp(2.2rem,10.8vw,3.15rem)!important;letter-spacing:-.065em!important;line-height:1.08!important}
  html[data-ui-mode="studio"] .hero .big-search{margin-top:22px!important}
  html[data-ui-mode="studio"] .hero p{font-size:.86rem!important}
  html[data-ui-mode="studio"] .hero .suggestions{gap:5px}
@@ -1452,6 +1452,8 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 }
 </style>
 <link rel="stylesheet" href="/site-polish.css?v=settings-music-contained-20261012" />
+<link rel="preload" as="image" href="/assets/study-landscape.webp" media="(min-width:811px)"/>
+<link rel="preload" as="image" href="/assets/study-landscape-mobile.webp" media="(max-width:810px)"/>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1490,7 +1492,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <symbol id="i-grid" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect></symbol>
 <symbol id="i-menu" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></symbol>
 <symbol id="i-check" viewbox="0 0 24 24"><path d="m5 12 5 5L20 7"></path></symbol>
-<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-7v-6h-4v6H3z"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></symbol></svg>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-7v-6h-4v6H3z"/></symbol><symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></symbol></svg>
 <div class="preview-ribbon" id="previewRibbon">Preview data shown because live Firestore hasn't connected. Document links require live data.</div>
 <header class="top-shell shell" id="home"><div class="top-nav">
 <button id="studioSidebarToggle" class="studio-sidebar-toggle" type="button" aria-label="Close sidebar" aria-controls="studioSidebar" aria-expanded="true" title="Hide sidebar (Ctrl+B)"><svg aria-hidden="true"><use href="#i-menu"></use></svg></button>
@@ -1503,7 +1505,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <aside class="studio-sidebar" id="studioSidebar" aria-label="8aPDF sidebar">
   <button id="studioSidebarClose" class="studio-sidebar-close" type="button" aria-label="Close sidebar" title="Close sidebar">×</button>
   <div class="studio-side-brand"><span class="studio-mark anime-logo-mark" role="img" aria-label="8aPDF anime logo"></span><div><strong>8aPDF</strong><small>Study Workspace</small></div></div>
-  <div class="studio-nav-group"><span class="studio-nav-caption">WORKSPACE</span>
+  <div class="studio-nav-group"><span class="studio-nav-caption">MAIN</span>
     <button type="button" data-go="home" class="studio-side-link active" aria-label="Home"><svg><use href="#i-home"/></svg><span>Home</span></button>
     <button type="button" data-go="library" class="studio-side-link" aria-label="PDF Library"><svg><use href="#i-file"/></svg><span>Study Material</span></button>
     <button type="button" data-go="latest" class="studio-side-link" aria-label="Latest PDFs"><svg><use href="#i-clock"/></svg><span>Latest Uploads</span></button>
@@ -1512,7 +1514,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
   </div>
   <div class="studio-nav-group studio-friends-group"><span class="studio-nav-caption">CONNECT</span><a href="/chat" class="studio-side-link" aria-label="Chat with your friends"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11.5a7.8 7.8 0 0 1-8.1 7.5 9.2 9.2 0 0 1-3.5-.7L4 20l1.1-4.4A7.2 7.2 0 0 1 4 11.5 7.8 7.8 0 0 1 12 4a7.8 7.8 0 0 1 8 7.5Z"/></svg><span>Chat with Your Friends</span><kbd>NEW</kbd></a></div>
   <div class="studio-nav-group studio-subject-group"><span class="studio-nav-caption">SUBJECTS</span><div class="studio-subject-list" id="studioSubjects" aria-label="Filter PDFs by subject"></div></div>
-  <div class="studio-nav-group studio-nav-secondary"><span class="studio-nav-caption">YOUR TOOLS</span>
+  <div class="studio-nav-group studio-nav-secondary"><span class="studio-nav-caption">TOOLS &amp; SUPPORT</span>
     <button type="button" data-go="timetable" class="studio-side-link" aria-label="Timetable"><svg><use href="#i-calendar"/></svg><span>Timetable</span></button>
     <button type="button" id="studioFocusLink" class="studio-side-link" aria-label="Focus Studio"><svg><use href="#i-clock"/></svg><span>Focus Studio</span></button>
     <button type="button" id="studioShortLinksLink" class="studio-side-link" aria-label="My Short Links"><svg><use href="#i-share"/></svg><span>My Short Links</span></button>
@@ -1539,7 +1541,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
   <button type="button" data-open-friends-chat>Chat with Your Friends</button><button type="button" data-go="tasks">Study To-Do</button><button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
 </div>
 <main>
-<section class="hero"><div class="shell hero-inner"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1 id="studyTypingHeadline" class="study-typing-heading" aria-label="Stay curious, keep learning and make progress every day"><span id="studyTypingText" aria-hidden="true">Learn today. Lead tomorrow.</span><span class="study-typing-caret" aria-hidden="true"></span></h1><p>Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p>
+<section class="hero"><div class="shell hero-inner"><div class="premium-hero-scene"><div class="premium-hero-copy"><span class="eyebrow-pill">THE 8aPDF STUDY LIBRARY</span><h1 id="premiumWelcome" class="premium-welcome">Welcome</h1><h2 id="studyTypingHeadline" class="study-typing-heading" aria-label="Stay curious, keep learning and make progress every day"><span id="studyTypingText" aria-hidden="true">Learn today. Lead tomorrow.</span><span class="study-typing-caret" aria-hidden="true"></span></h2><p class="hero-description">Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p><div class="premium-hero-actions"><button type="button" class="action primary" data-go="library"><svg aria-hidden="true"><use href="#i-search"/></svg>Explore Study Material<svg aria-hidden="true"><use href="#i-arrow"/></svg></button><button type="button" class="action" data-go="latest"><svg aria-hidden="true"><use href="#i-file"/></svg>Latest Uploads</button></div></div><span class="premium-hero-note" aria-hidden="true">A BRIGHTER<br/>TOMORROW<br/>BUILDS TODAY.</span></div>
 <form class="big-search" id="searchForm" role="search"><svg><use href="#i-search"></use></svg><input aria-label="Search study materials" autocomplete="off" id="searchInput" placeholder="Search PDFs, notes, subjects or announcements..." type="search"/><span class="shortcut">⌘ K</span><button aria-label="Search" class="search-submit" type="submit"><svg><use href="#i-arrow"></use></svg></button></form>
 <div class="suggestions"><span>Popular searches:</span><button class="chip" data-search="English">English</button><button class="chip" data-search="Mathematics">Mathematics</button><button class="chip" data-search="Hindi">Hindi</button><button class="chip" data-search="Computer">Computer</button><button class="chip" data-search="Circular">Circulars</button></div>
 <div class="feature-strip">
@@ -1572,6 +1574,12 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
   <div class="focus-tools"><button type="button" class="experience-link" id="focusHistory">Study history</button><button type="button" class="experience-link" id="focusFullscreen">Distraction-free view</button><button type="button" class="experience-link" id="focusHelp">Keyboard shortcuts</button></div>
  </div>
 </div>
+<section class="shell premium-summary" id="premiumSummary" aria-label="Your study overview">
+<button type="button" class="premium-stat" id="premiumSubjects" aria-label="Explore all subjects"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-book"/></svg></span><span class="premium-stat-copy"><strong id="premiumSubjectCount">—</strong><span>Subjects</span><small>Keep learning.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+<button type="button" class="premium-stat" data-go="saved"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-file"/></svg></span><span class="premium-stat-copy"><strong id="premiumSavedCount">0</strong><span>Saved PDFs</span><small>Your personal library.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+<button type="button" class="premium-stat" data-go="timetable"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="premium-stat-copy"><strong id="premiumDay">Day 1</strong><span>Timetable</span><small>Today's classes.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+<button type="button" class="premium-stat" data-go="announcements"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><span class="premium-stat-copy"><strong id="premiumMessageCount">—</strong><span>Messages</span><small>From your teachers.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+</section>
 <section class="shell widgets" id="dashboardWidgets">
 <div class="widget"><div class="widget-header"><svg><use href="#i-calendar"></use></svg><strong>Class Timetable</strong><select aria-label="Choose current school cycle day" class="timetable-day-select" id="daySelect"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
 <div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"></use></svg><strong>Latest Teacher Messages</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
@@ -2170,8 +2178,8 @@ function askNotification(){if(!('Notification' in window)){toast('Notifications 
 $('#notificationsBtn').onclick=askNotification;$('#footerBell').onclick=askNotification;
 function closeCommand(){$('#command').classList.remove('open')}
 function openCommand(){closeSettings();$('#command').classList.add('open');$('#commandInput').value='';renderCommand();setTimeout(()=>$('#commandInput').focus(),35)}
-function renderCommand(){const q=$('#commandInput').value.toLowerCase().trim();const items=[{title:'Go to PDF Library',act:'library',icon:'file'},{title:'View Announcements',act:'announcements',icon:'megaphone'},{title:'Open Timetable',act:'timetable',icon:'calendar'},{title:'Open Appearance Settings',act:'settings',icon:'settings'},{title:'Saved PDF Bookmarks',act:'saved',icon:'bookmark'},...state.materials.filter(x=>!q||keywords(x).includes(q)).slice(0,8).map(x=>({title:x.title,subtitle:x.subject,id:x.id,icon:'file'}))].filter(x=>!q||[x.title,x.subtitle||''].join(' ').toLowerCase().includes(q));$('#commandResults').innerHTML=items.length?items.map((x,i)=>`<button class="command-result" data-cmd="${x.id?'pdf:'+safe(x.id):x.act}">${ico(x.icon)}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe(x.title)}</span><small style="color:var(--muted)">${safe(x.subtitle||'')}</small></button>`).join(''):'<div class="empty">No matching commands or PDFs.</div>'}
-$('#topSearch').onclick=openCommand;$('#commandInput').oninput=renderCommand;$('#command').onclick=e=>{if(e.target===$('#command'))closeCommand();let b=e.target.closest('[data-cmd]');if(!b)return;const a=b.dataset.cmd;closeCommand();if(a.startsWith('pdf:')){const x=state.materials.find(x=>x.id===a.slice(4));if(x)pdfAction(x,'preview')}else nav(a)};
+function renderCommand(){const q=$('#commandInput').value.toLowerCase().trim();const items=[{title:'Go to PDF Library',act:'library',icon:'file'},{title:'View Announcements',act:'announcements',icon:'megaphone'},{title:'Open Timetable',act:'timetable',icon:'calendar'},{title:'Open Appearance Settings',act:'settings',icon:'settings'},{title:'Saved PDF Bookmarks',act:'saved',icon:'bookmark'},...state.materials.filter(x=>!q||keywords(x).includes(q)).slice(0,8).map(x=>({title:x.title,subtitle:x.subject,searchText:keywords(x),id:x.id,icon:'file'})),...state.announcements.filter(x=>q&&aText(x).includes(q)).slice(0,6).map(x=>({title:x.title,subtitle:'Teacher Message',searchText:aText(x),annId:x.id,icon:'megaphone'}))].filter(x=>!q||[x.title,x.subtitle||'',x.searchText||''].join(' ').toLowerCase().includes(q));$('#commandResults').innerHTML=items.length?items.map((x,i)=>`<button class="command-result" data-cmd="${x.id?'pdf:'+safe(x.id):x.annId?'ann:'+safe(x.annId):x.act}">${ico(x.icon)}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${safe(x.title)}</span><small style="color:var(--muted)">${safe(x.subtitle||'')}</small></button>`).join(''):'<div class="empty">No matching commands or PDFs.</div>'}
+$('#topSearch').onclick=openCommand;$('#commandInput').oninput=renderCommand;$('#command').onclick=e=>{if(e.target===$('#command'))closeCommand();let b=e.target.closest('[data-cmd]');if(!b)return;const a=b.dataset.cmd;closeCommand();if(a.startsWith('pdf:')){const x=state.materials.find(x=>x.id===a.slice(4));if(x)pdfAction(x,'preview')}else if(a.startsWith('ann:')){const x=state.announcements.find(x=>x.id===a.slice(4));if(x)openAnnouncement(x)}else nav(a)};
 $('#commandInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#commandResults [data-cmd]')?.click()}};
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCommand()}if(e.key==='Escape'){closeCommand();closeSettings();closeModal()}});
 $('#menuBtn').onclick=()=>showModal('Navigate 8aPDF',`<div style="display:grid;gap:8px"><button class="solid" data-menu-go="home">Home</button><button class="solid" data-menu-go="library">Study Material</button><button class="solid" data-menu-go="announcements">Announcements</button><button class="solid" data-menu-go="timetable">School Timetable</button><button class="solid" data-menu-go="settings">Customize Appearance</button></div>`);
@@ -3392,5 +3400,7 @@ draw();
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 <script defer src="/site-polish.js?v=settings-music-contained-20261012"></script>
+<link rel="stylesheet" href="/premium-workspace.css?v=20261013-1"/>
+<script defer src="/premium-workspace.js?v=20261013-1"></script>
 </body>
 </html>
