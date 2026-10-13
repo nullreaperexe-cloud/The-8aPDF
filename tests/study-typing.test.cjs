@@ -9,7 +9,7 @@ new vm.Script(js,{filename:'study-typing.js'});
 assert(!html.includes('<h1>Your study space.</h1>'),'Old static hero still rendered');
 assert(html.includes('id="studyTypingHeadline"'),'Typing headline element missing');
 assert(html.includes('id="studyTypingText"'),'Typing output span missing');
-assert(html.includes('study-typing.js?v=typewriter-20261011'),'Typing script not loaded');
+assert(html.includes('study-typing.js?v=welcome-20261013'),'Typing script not loaded');
 const match=js.match(/const lines=\[([\s\S]*?)\];/);
 assert(match,'Phrase catalogue missing');
 const lines=vm.runInNewContext('['+match[1]+']');

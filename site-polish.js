@@ -35,85 +35,59 @@ function mountSettings(){
  notices.addEventListener('change',()=>put(NOTICES_KEY,notices.checked?'on':'off'));
  sound.addEventListener('change',()=>put(SOUND_KEY,sound.checked?'on':'off'));
  const music=document.createElement('div');music.className='eightapdf-settings-music';music.id='eightapdfSettingsMusic';
- music.innerHTML='<h4>Background Music</h4><p>Music controls are kept here instead of floating over your notes. Browsers may need you to press Play once before allowing audio.</p>';
+ music.innerHTML='<h4>Background Music</h4><p>Music stays connected while you browse PDFs and Friends Chat. Your browser may need one tap on Play.</p>';
  container.append(music);
- const frame=document.createElement('iframe');
- frame.id='eightapdfMusicPlayerFrame';
- frame.title='Background Music - Elfsight';
- frame.src='/music-player.html?v=settings-only-20261012';
- frame.setAttribute('allow','autoplay; encrypted-media');
- frame.setAttribute('loading','eager');
- frame.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
- frame.style.cssText='width:100%;height:230px;min-height:210px;max-width:100%;display:block;border:0;border-radius:12px;background:transparent;overflow:hidden;';
- music.append(frame);
- /* Keep this iframe mounted even while Settings is closed.
-    Its floating controls are contained inside this frame, not the website viewport,
-    and playback can continue after the Settings panel closes. */
+ music.innerHTML+='<button type="button" id="eightapdfShowMusic">Open music controls</button>';
+ music.querySelector('button').onclick=()=>window.__8apdfMusic?.show?.();
 
 }
 function htmlEscape(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function textPreview(m){return (m.body|| (m.attachment_name?'Shared '+m.attachment_name:'Sent an attachment')).slice(0,135)}
-async function revealMessage(msg,roomSlug,initial=false){
- if(!enabled(NOTICES_KEY)||msg.sender_id===visitor?.id)return;
- const old=get(SEEN_KEY,'');
- if(old===msg.id&&!initial)return;
- put(SEEN_KEY,msg.id);
- if(document.hidden)return;
+let unreadBusy=false;
+async function refreshUnread(){
+ if(unreadBusy||!visitor||!db)return;unreadBusy=true;
+ try{
+  const {data:members,error:memberError}=await db.from('chat_members').select('room_id,joined_at,chat_rooms(slug)').eq('user_id',visitor.id);if(memberError)throw memberError;
+  activeRoomIds=new Set((members||[]).map(m=>m.room_id));
+  const {data:cursors,error:cursorError}=await db.from('chat_read_cursors').select('room_id,last_read_at').eq('user_id',visitor.id);if(cursorError)throw cursorError;
+  const byRoom=new Map((cursors||[]).map(c=>[c.room_id,c.last_read_at]));let total=0;
+  const counts=await Promise.all((members||[]).map(async m=>{
+   const {count,error}=await db.from('chat_messages').select('id',{count:'exact',head:true}).eq('room_id',m.room_id).neq('sender_id',visitor.id).gt('created_at',byRoom.get(m.room_id)||'1970-01-01T00:00:00Z');if(error)throw error;return count||0;
+  }));total=counts.reduce((a,b)=>a+b,0);
+  window.__8apdfUnreadCount=total;document.dispatchEvent(new CustomEvent('8apdf:chat-unread',{detail:{count:total}}));
+  return members;
+ }catch(e){window.__8apdfUnreadCount=null;document.dispatchEvent(new CustomEvent('8apdf:chat-unread',{detail:{count:null,error:true}}));console.warn('Unread count unavailable:',e.message)}finally{unreadBusy=false}
+}
+async function revealMessage(msg,roomSlug){
+ if(!enabled(NOTICES_KEY)||msg.sender_id===visitor?.id||document.hidden)return;
+ if(window.__8apdfPersistentPage==='chat'&&window.__8apdfActiveChatRoom===msg.room_id)return;
  const {data:p}=await db.from('chat_profiles').select('display_name').eq('id',msg.sender_id).maybeSingle();
- const author=p?.display_name||'Friend',wrap=$('eightapdfChatToastHolder')||document.createElement('div');
- if(!wrap.id){wrap.id='eightapdfChatToastHolder';wrap.className='eightapdf-chat-toasts';document.body.append(wrap)}
- const el=document.createElement('article');el.className='eightapdf-chat-alert';el.setAttribute('role','status');
- el.innerHTML='<strong>💬 '+htmlEscape(author)+'</strong><small>'+htmlEscape(initial?'A recent message from your friends':'New message · Chat with Your Friends')+'</small><p>'+htmlEscape(textPreview(msg))+'</p><button type="button" aria-label="Dismiss notification">×</button>';
- el.querySelector('button').onclick=e=>{e.stopPropagation();el.remove()};
- el.onclick=()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}location.href='/chat/'+encodeURIComponent(roomSlug||'general')};
- wrap.prepend(el);playAlert();
- let timer=setTimeout(()=>el.remove(),7300);
- el.onmouseenter=()=>clearTimeout(timer);
- el.onmouseleave=()=>{clearTimeout(timer);timer=setTimeout(()=>el.remove(),3200)};
+ window.__8apdfNotices?.publish({source:'chat',id:msg.id,fingerprint:msg.created_at+'|'+msg.body,title:p?.display_name||'Friends Chat',body:textPreview(msg),open:()=>window.__8apdfOpenPage?.('/chat/'+encodeURIComponent(roomSlug||'general'))});playAlert();
 }
 async function initializeNotifications(){
- if(!window.supabase?.createClient||!savedName()||savedName()==='Student')return;
+ if(db||!window.supabase?.createClient||savedName()==='Student')return;
  try{
-  db=window.supabase.createClient(SB_URL,SB_KEY,{
-   auth:{storageKey:CHAT_AUTH_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}
-  });
+  db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storageKey:CHAT_AUTH_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
   const {data:{session}}=await db.auth.getSession();let user=session?.user;
-  if(!user){const {data,error}=await db.auth.signInAnonymously();if(error)throw error;user=data.user}
-  visitor=user;if(!visitor)return;
+  if(!user){const {data,error}=await db.auth.signInAnonymously();if(error)throw error;user=data.user}visitor=user;if(!visitor)return;
   const {error}=await db.rpc('chat_enter_lobby');if(error)throw error;
-  const {data:memberRows}=await db.from('chat_members').select('room_id,chat_rooms(slug)').eq('user_id',visitor.id);
-  activeRoomIds=new Set((memberRows||[]).map(x=>x.room_id));
-  const roomSlugs=new Map((memberRows||[]).map(x=>[x.room_id,x.chat_rooms?.slug||'general']));
-  if(!activeRoomIds.size)return;
-  let latestRequest=db.from('chat_messages').select('id,room_id,sender_id,body,attachment_name,created_at')
-   .in('room_id',Array.from(activeRoomIds)).neq('sender_id',visitor.id)
-   .order('created_at',{ascending:false}).limit(1);
-  const {data:latest}=await latestRequest;
-  const recent=latest?.[0];
-  if(recent){
-   const last=get(SEEN_KEY,'');
-   if(!last){
-    put(SEEN_KEY,recent.id);
-    if(Date.now()-new Date(recent.created_at).getTime()<24*3600*1000)revealMessage(recent,roomSlugs.get(recent.room_id),true).catch(()=>{});
-   }else if(last!==recent.id && Date.now()-new Date(recent.created_at).getTime()<24*3600*1000){
-    await revealMessage(recent,roomSlugs.get(recent.room_id),true);
-   }
+  window.__8apdfSocial={refreshUnread};
+  const members=await refreshUnread()||[],roomSlugs=new Map(members.map(m=>[m.room_id,m.chat_rooms?.slug||'general']));
+  if(activeRoomIds.size){
+   const {data:cursors}=await db.from('chat_read_cursors').select('room_id,last_read_at').eq('user_id',visitor.id);const readMap=new Map((cursors||[]).map(c=>[c.room_id,c.last_read_at]));
+   for(const m of members){const {data:latest}=await db.from('chat_messages').select('id,room_id,sender_id,body,attachment_name,created_at').eq('room_id',m.room_id).neq('sender_id',visitor.id).gt('created_at',readMap.get(m.room_id)||'1970-01-01T00:00:00Z').order('created_at',{ascending:false}).limit(1);if(latest?.[0])revealMessage(latest[0],roomSlugs.get(m.room_id)).catch(()=>{})}
   }
-  channel=db.channel('8apdf_home_chat_notices')
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},({new:m})=>{
-    if(m&&activeRoomIds.has(m.room_id)&&m.sender_id!==visitor.id)revealMessage(m,roomSlugs.get(m.room_id)).catch(()=>{});
-   }).subscribe();
-  setInterval(async()=>{if(document.hidden||!visitor)return;
-   const {data}=await db.from('chat_members').select('room_id,chat_rooms(slug)').eq('user_id',visitor.id);
-   if(data){activeRoomIds=new Set(data.map(x=>x.room_id));data.forEach(x=>roomSlugs.set(x.room_id,x.chat_rooms?.slug||'general'))}
-  },90000);
- }catch(err){console.warn('8aPDF optional chat notifications unavailable:',err?.message||err)}
+  channel=db.channel('8apdf_home_chat_notices').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},({new:m})=>{if(m&&activeRoomIds.has(m.room_id)){refreshUnread();if(m.sender_id!==visitor.id)revealMessage(m,roomSlugs.get(m.room_id)).catch(()=>{})}}).subscribe();
+  setInterval(()=>{if(!document.hidden)refreshUnread()},35000);
+ }catch(err){db=null;console.warn('8aPDF chat status unavailable:',err?.message||err)}
 }
+window.addEventListener('storage',event=>{if(event.key==='8apdf_chat_read_changed')refreshUnread()});
+window.addEventListener('message',event=>{if(event.origin!==location.origin)return;if(event.data?.type==='8apdf:chat-read')refreshUnread()});
 function init(){
  mountSettings();
  document.addEventListener('pointerdown',()=>{soundUnlocked=true},{once:true});
  document.addEventListener('keydown',()=>{soundUnlocked=true},{once:true});
- setTimeout(initializeNotifications,2300);
+ setTimeout(initializeNotifications,150);document.getElementById('nameForm')?.addEventListener('submit',()=>setTimeout(initializeNotifications,0));
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
