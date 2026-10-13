@@ -1,0 +1,21 @@
+create extension if not exists pg_net;
+create extension if not exists pg_cron;
+create table public.school_push_config(id integer primary key check(id=1),vapid_public_key text not null,vapid_private_key text not null,worker_secret text not null,last_checked_at timestamptz,lease_until timestamptz);
+create table public.school_push_sources(id text primary key,initialized boolean not null default false,last_checked_at timestamptz);
+create table public.school_push_subscriptions(id text primary key,user_id uuid not null references auth.users(id) on delete cascade,origin text not null,subscription jsonb not null,preferences jsonb not null default '{"pdfs":true,"announcements":true}',created_at timestamptz not null default now(),updated_at timestamptz not null default now());
+create table public.school_push_events(id text primary key,source text not null,source_id text not null,title text not null,body text not null,path text not null,is_test boolean not null default false,detected_at timestamptz not null default now());
+create table public.school_push_deliveries(subscription_id text not null references public.school_push_subscriptions(id) on delete cascade,event_id text not null references public.school_push_events(id) on delete cascade,status text not null default 'pending',attempts integer not null default 0,next_attempt_at timestamptz not null default now(),primary key(subscription_id,event_id));
+alter table public.school_push_config enable row level security;
+alter table public.school_push_sources enable row level security;
+alter table public.school_push_subscriptions enable row level security;
+alter table public.school_push_events enable row level security;
+alter table public.school_push_deliveries enable row level security;
+revoke all on public.school_push_config,public.school_push_sources,public.school_push_subscriptions,public.school_push_events,public.school_push_deliveries from public,anon,authenticated;
+grant all on public.school_push_config,public.school_push_sources,public.school_push_subscriptions,public.school_push_events,public.school_push_deliveries to service_role;
+create index school_push_subscriptions_user_idx on public.school_push_subscriptions(user_id);
+create index school_push_deliveries_retry_idx on public.school_push_deliveries(status,next_attempt_at);
+create or replace function public.school_push_claim_run() returns boolean language sql security invoker set search_path='' as $$
+ with claimed as (update public.school_push_config set lease_until=now()+interval '100 seconds' where id=1 and (lease_until is null or lease_until<now()) returning id) select exists(select 1 from claimed);
+$$;
+revoke all on function public.school_push_claim_run() from public,anon,authenticated;
+grant execute on function public.school_push_claim_run() to service_role;

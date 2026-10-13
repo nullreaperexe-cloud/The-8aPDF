@@ -1454,7 +1454,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <link rel="stylesheet" href="/site-polish.css?v=settings-music-contained-20261012" />
 <link rel="preload" as="image" href="/assets/study-landscape.webp" media="(min-width:811px)"/>
 <link rel="preload" as="image" href="/assets/study-landscape-mobile.webp" media="(max-width:810px)"/>
-</head>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/app-icon-192.png"></head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
 <h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
@@ -2049,9 +2049,11 @@ $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){le
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
 async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Firestore data is required.');return}if(what==='summary'){await summarizePdf(x);return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='https://8apdf.vercel.app/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks(x);return;}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
 
-async function createPdfZip(){
+async function createPdfZip(selectedIds,onReady){
+ if(!Array.isArray(selectedIds)){window.__8apdfOpenPage?.('/pdf-explorer?select=zip');return;}
+ const selection=new Set(selectedIds.map(String));
  const button=$('#zipExport'),original=button?.textContent||'Download ZIP';
- const files=state.materials.filter(x=>validURL(x.pdfUrl));
+ const files=state.materials.filter(x=>selection.has(String(x.id))&&validURL(x.pdfUrl));
  if(!files.length){toast('No school PDFs available to export.');return}
  if(button){button.disabled=true;button.textContent='Preparing PDFs…'}
  let saved=0,skipped=0,parts=0;
@@ -2064,8 +2066,8 @@ async function createPdfZip(){
    if(button)button.textContent='Building ZIP '+parts+'…';
    const output=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:3}});
    const url=URL.createObjectURL(output),a=document.createElement('a');
-   a.href=url;a.download='8aPDF-All-PDFs'+(files.length>20?'-part-'+parts:'')+'.zip';
-   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+   a.href=url;a.download='8aPDF-Selected-PDFs'+(files.length>20?'-part-'+parts:'')+'.zip';if(typeof onReady==='function')onReady({url,filename:a.download});
+   document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),300000);
    zip=new JSZip();size=0;count=0;
   }
   for(let i=0;i<files.length;i++){
@@ -2085,8 +2087,8 @@ async function createPdfZip(){
   }
   await flush();
   if(!saved)throw Error('No PDFs could be retrieved.');
-  toast(saved+' of '+files.length+' PDFs exported'+(parts>1?' in '+parts+' ZIP parts (browser may ask to allow multiple downloads)':'')+(skipped?' · '+skipped+' unavailable.':''));
- }catch(error){console.warn('8aPDF ZIP error:',error);toast('ZIP export could not finish. Try again or download PDFs individually.')}
+  toast(saved+' of '+files.length+' PDFs exported'+(parts>1?' in '+parts+' ZIP parts (browser may ask to allow multiple downloads)':'')+(skipped?' · '+skipped+' unavailable.':''));return {saved,skipped,parts};
+ }catch(error){console.warn('8aPDF ZIP error:',error);toast('ZIP export could not finish. Try again or download PDFs individually.');return {error:'ZIP export could not finish. Try again or download PDFs individually.'}}
  finally{if(button){button.disabled=false;button.textContent=original}}
 }
 window.__8apdfZipExport=createPdfZip;
@@ -2174,7 +2176,7 @@ $('#noteForm').onsubmit=e=>{e.preventDefault();const v=$('#newNote').value.trim(
 $('#notesList').onchange=e=>{let id=e.target.dataset.taskCheck;if(!id)return;let t=state.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;saveTasks()}};$('#notesList').onclick=e=>{let id=e.target.dataset.taskDelete;if(!id)return;state.tasks=state.tasks.filter(t=>t.id!==id);saveTasks()};$('#clearCompleted').onclick=()=>{state.tasks=state.tasks.filter(x=>!x.done);saveTasks()};
 function openProfile(){showModal('Your 8aPDF Profile',`<p>Your name is saved privately on this device.</p><input id="editName" maxlength="40" value="${safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n)}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();document.dispatchEvent(new Event('8apdf:profile-changed'));toast('Profile updated')}}
 $('#profileBtn').onclick=openProfile;
-function askNotification(){if(!('Notification' in window)){toast('Notifications are not supported by this browser');return}if(Notification.permission==='granted'){toast('Notifications are enabled. Alerts work while this page stays open.');return}if(Notification.permission==='denied'){toast('Notifications are blocked. Enable them in browser site settings.');return}if(!window.isSecureContext){toast('Notification permission needs HTTPS or localhost.');return}Notification.requestPermission().then(x=>toast(x==='granted'?'Notifications enabled for this browser':'Notifications not enabled'))}
+function askNotification(){if(window.__8apdfPush){window.__8apdfOpenPage?.('/notification-settings');return;}if(!('Notification' in window)){toast('Notifications are not supported by this browser');return}if(Notification.permission==='granted'){toast('Open notification settings to enable background updates.');return}if(Notification.permission==='denied'){toast('Notifications are blocked. Enable them in browser site settings.');return}if(!window.isSecureContext){toast('Notification permission needs HTTPS or localhost.');return}Notification.requestPermission().then(x=>toast(x==='granted'?'Notifications enabled for this browser':'Notifications not enabled'))}
 $('#notificationsBtn').onclick=askNotification;$('#footerBell').onclick=askNotification;
 function closeCommand(){$('#command').classList.remove('open')}
 function openCommand(){closeSettings();$('#command').classList.add('open');$('#commandInput').value='';renderCommand();setTimeout(()=>$('#commandInput').focus(),35)}
@@ -2245,7 +2247,8 @@ renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
 window.__8apdfStudyBridge={
  documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
  announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:String(a.title||''),description:String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
- recents:()=>[...state.recent],bookmarks:()=>[...state.saved],
+ recents:()=>[...state.recent],bookmarks:()=>[...state.saved],toggleBookmark:(id)=>{state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();document.dispatchEvent(new Event('8apdf:bookmarks-changed'));},
+ openAnnouncement:(id)=>{const n=state.announcements.find(n=>String(n.id)===String(id));if(n)openAnnouncement(n);},
  openDocument:(id,action='preview')=>{const x=state.materials.find(x=>x.id===id);if(x)pdfAction(x,['preview','download','share'].includes(action)?action:'preview')},
  navigate:nav,subject:(subject)=>{state.filter=subject;state.query='';$('#searchInput').value='';showLibrary();renderMaterials();scrollToSection('#library')},
  setSchoolDay:(day)=>{if(Number.isInteger(day)&&day>=1&&day<=6){selectedSchoolDay=day;renderTimetable();document.dispatchEvent(new Event('8apdf:school-day-changed'))}}, schoolDay:()=>selectedSchoolDay, timetable:()=>timetable.map((periods,i)=>({day:i+1,periods})),
@@ -2320,7 +2323,7 @@ const [{initializeApp},{getFirestore,collection,onSnapshot,getDocs,query,where,o
 const cfg={apiKey:'AIzaSyATxKki6gkNWic_CnoGbZnOZjAUj1lbKGI',authDomain:'academyvault-5d1eb.firebaseapp.com',projectId:'academyvault-5d1eb',storageBucket:'academyvault-5d1eb.firebasestorage.app',messagingSenderId:'933297255268',appId:'1:933297255268:web:51b4b015ed4df21ed64071',measurementId:'G-CE6QNNW4RD'};
 const db=getFirestore(initializeApp(cfg));
 onSnapshot(collection(db,'study_materials'),snap=>{state.live=true;state.error=false;state.materials=snap.docs.map(d=>normalizeDoc({id:d.id,...d.data()})).sort((a,b)=>(a.order-b.order)||(dateMs(b.createdAt)-dateMs(a.createdAt)));try{if(state.materials.length)localStorage.setItem('8a_cache_pdfs',JSON.stringify(state.materials.slice(0,150)))}catch{}$('#previewRibbon').classList.remove('show');renderMaterials();document.dispatchEvent(new Event('8apdf:library-updated'))},err=>{console.warn('8aPDF study_materials could not load:',err);showOffline()});
-try{let snap=await getDocs(query(collection(db,'announcements'),where('published','==',true),orderBy('createdAt','desc')));state.announcements=snap.docs.map(d=>({id:d.id,...d.data()}));state.annReady=true;renderAnnouncements()}
+try{let snap=await getDocs(query(collection(db,'announcements'),where('published','==',true),orderBy('createdAt','desc')));state.announcements=snap.docs.map(d=>({id:d.id,...d.data()}));state.annReady=true;renderAnnouncements();onSnapshot(query(collection(db,'announcements'),where('published','==',true)),live=>{state.announcements=live.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));renderAnnouncements()},error=>console.warn('School message live sync:',error.message));}
 catch(err){console.warn('Indexed announcements query unavailable, trying read fallback:',err);try{let snap=await getDocs(collection(db,'announcements'));state.announcements=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.published===true).sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));state.annReady=true;renderAnnouncements()}catch(e){console.warn('Announcement fetch error:',e);state.annReady=true;renderAnnouncements()}}
 }catch(e){console.warn('8aPDF Firebase SDK unavailable in offline preview:',e);showOffline();state.annReady=true;renderAnnouncements()}}
 function showOffline(){if(!state.live){if(previewMode)$('#previewRibbon').classList.add('show');else state.error=true;renderMaterials()}}
@@ -3391,14 +3394,14 @@ document.getElementById('modal')?.addEventListener('submit',event=>{
 
 draw();
 })();
-</script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=welcome-20261013"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=explorer-20261013"></script>
+</script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=welcome-20261013"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=advanced-settings-20261013"></script>
 <!-- Background music now lives inside Settings in a permanently mounted, isolated iframe. -->
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
-<script defer src="/site-polish.js?v=unread-20261013"></script>
-<link rel="stylesheet" href="/premium-workspace.css?v=20261013-2"/>
-<script defer src="/premium-workspace.js?v=20261013-2"></script>
-<script defer src="/workspace-pages.js?v=20261013-2"></script>
+<script defer src="/site-polish.js?v=unread-stable-20261013"></script><script defer src="/test-recognition-client.js?v=20261013"></script><script defer src="/push-notifications.js?v=20261013"></script>
+<link rel="stylesheet" href="/premium-workspace.css?v=20261013-3"/>
+<script defer src="/premium-workspace.js?v=20261013-3"></script>
+<script defer src="/workspace-pages.js?v=20261013-3"></script>
 <script defer src="/school-calendar-client.js?v=20261013-2"></script>
 </body>
 </html>

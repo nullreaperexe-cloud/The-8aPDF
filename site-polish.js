@@ -43,21 +43,34 @@ function mountSettings(){
 }
 function htmlEscape(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function textPreview(m){return (m.body|| (m.attachment_name?'Shared '+m.attachment_name:'Sent an attachment')).slice(0,135)}
-let unreadBusy=false;
-async function refreshUnread(){
- if(unreadBusy||!visitor||!db)return;unreadBusy=true;
- try{
-  const {data:members,error:memberError}=await db.from('chat_members').select('room_id,joined_at,chat_rooms(slug)').eq('user_id',visitor.id);if(memberError)throw memberError;
-  activeRoomIds=new Set((members||[]).map(m=>m.room_id));
-  const {data:cursors,error:cursorError}=await db.from('chat_read_cursors').select('room_id,last_read_at').eq('user_id',visitor.id);if(cursorError)throw cursorError;
-  const byRoom=new Map((cursors||[]).map(c=>[c.room_id,c.last_read_at]));let total=0;
-  const counts=await Promise.all((members||[]).map(async m=>{
-   const {count,error}=await db.from('chat_messages').select('id',{count:'exact',head:true}).eq('room_id',m.room_id).neq('sender_id',visitor.id).gt('created_at',byRoom.get(m.room_id)||'1970-01-01T00:00:00Z');if(error)throw error;return count||0;
-  }));total=counts.reduce((a,b)=>a+b,0);
-  window.__8apdfUnreadCount=total;document.dispatchEvent(new CustomEvent('8apdf:chat-unread',{detail:{count:total}}));
-  return members;
- }catch(e){window.__8apdfUnreadCount=null;document.dispatchEvent(new CustomEvent('8apdf:chat-unread',{detail:{count:null,error:true}}));console.warn('Unread count unavailable:',e.message)}finally{unreadBusy=false}
+let connecting=null,unreadBusy=false,unreadAgain=false,rooms=[];
+async function socialClient(){
+ if(connecting)return connecting;
+ connecting=(async()=>{
+  if(!window.supabase?.createClient)throw Error('Chat service is loading');
+  db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storageKey:CHAT_AUTH_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  let {data:{session},error}=await db.auth.getSession();if(error)throw error;
+  if(!session){const result=await db.auth.signInAnonymously();if(result.error)throw result.error;session=result.data.session}
+  visitor=session.user;
+  for(const fn of ['chat_enter_lobby','chat_bootstrap_read_state']){const result=await db.rpc(fn);if(result.error)throw result.error}
+  db.auth.onAuthStateChange((event,session)=>{if(session?.user&&visitor?.id!==session.user.id){visitor=session.user;setTimeout(refreshUnread,0)}});
+  return {db,user:visitor};
+ })().catch(error=>{connecting=null;throw error});return connecting;
 }
+window.__8apdfGetSocialClient=socialClient;
+async function refreshUnread(){
+ if(unreadBusy){unreadAgain=true;return}unreadBusy=true;
+ try{
+  await socialClient();
+  do{unreadAgain=false;const {data,error}=await db.rpc('chat_unread_counts');if(error)throw error;rooms=data||[];
+   activeRoomIds=new Set(rooms.map(r=>r.room_id));const count=rooms.reduce((sum,r)=>sum+Number(r.unread_count||0),0);
+   window.__8apdfUnreadCount=count;put('8apdf_unread_cache_v2:'+visitor.id,JSON.stringify({count,at:Date.now()}));document.dispatchEvent(new CustomEvent('8apdf:chat-unread',{detail:{count}}));
+  }while(unreadAgain);
+  return rooms;
+ }catch(e){console.warn('Unread count refresh:',e.message)}finally{unreadBusy=false}
+}
+async function markAllRead(){await socialClient();const result=await db.rpc('chat_mark_all_read');if(result.error)throw result.error;await refreshUnread();put('8apdf_chat_read_changed',Date.now())}
+window.__8apdfSocial={refreshUnread,markAllRead};
 async function revealMessage(msg,roomSlug){
  if(!enabled(NOTICES_KEY)||msg.sender_id===visitor?.id||document.hidden)return;
  if(window.__8apdfPersistentPage==='chat'&&window.__8apdfActiveChatRoom===msg.room_id)return;
@@ -65,21 +78,14 @@ async function revealMessage(msg,roomSlug){
  window.__8apdfNotices?.publish({source:'chat',id:msg.id,fingerprint:msg.created_at+'|'+msg.body,title:p?.display_name||'Friends Chat',body:textPreview(msg),open:()=>window.__8apdfOpenPage?.('/chat/'+encodeURIComponent(roomSlug||'general'))});playAlert();
 }
 async function initializeNotifications(){
- if(db||!window.supabase?.createClient||savedName()==='Student')return;
+ if(channel||!window.supabase?.createClient||savedName()==='Student')return;
  try{
-  db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storageKey:CHAT_AUTH_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-  const {data:{session}}=await db.auth.getSession();let user=session?.user;
-  if(!user){const {data,error}=await db.auth.signInAnonymously();if(error)throw error;user=data.user}visitor=user;if(!visitor)return;
-  const {error}=await db.rpc('chat_enter_lobby');if(error)throw error;
-  window.__8apdfSocial={refreshUnread};
-  const members=await refreshUnread()||[],roomSlugs=new Map(members.map(m=>[m.room_id,m.chat_rooms?.slug||'general']));
-  if(activeRoomIds.size){
-   const {data:cursors}=await db.from('chat_read_cursors').select('room_id,last_read_at').eq('user_id',visitor.id);const readMap=new Map((cursors||[]).map(c=>[c.room_id,c.last_read_at]));
-   for(const m of members){const {data:latest}=await db.from('chat_messages').select('id,room_id,sender_id,body,attachment_name,created_at').eq('room_id',m.room_id).neq('sender_id',visitor.id).gt('created_at',readMap.get(m.room_id)||'1970-01-01T00:00:00Z').order('created_at',{ascending:false}).limit(1);if(latest?.[0])revealMessage(latest[0],roomSlugs.get(m.room_id)).catch(()=>{})}
-  }
-  channel=db.channel('8apdf_home_chat_notices').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},({new:m})=>{if(m&&activeRoomIds.has(m.room_id)){refreshUnread();if(m.sender_id!==visitor.id)revealMessage(m,roomSlugs.get(m.room_id)).catch(()=>{})}}).subscribe();
+  await socialClient();const cached=get('8apdf_unread_cache_v2:'+visitor.id,'');try{const saved=JSON.parse(cached);if(Number.isInteger(saved.count)){window.__8apdfUnreadCount=saved.count;document.dispatchEvent(new Event('8apdf:chat-unread'))}}catch{}
+  await refreshUnread();
+  for(const r of rooms.filter(r=>Number(r.unread_count)>0)){const {data:latest}=await db.from('chat_messages').select('id,room_id,sender_id,body,attachment_name,created_at').eq('room_id',r.room_id).neq('sender_id',visitor.id).gt('created_at',r.last_read_at).order('created_at',{ascending:false}).limit(1);if(latest?.[0])revealMessage(latest[0],r.room_slug).catch(()=>{})}
+  channel=db.channel('8apdf_home_chat_notices').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},({new:m})=>{if(m&&activeRoomIds.has(m.room_id)){refreshUnread();if(m.sender_id!==visitor.id)revealMessage(m,rooms.find(r=>r.room_id===m.room_id)?.room_slug).catch(()=>{})}}).subscribe();
   setInterval(()=>{if(!document.hidden)refreshUnread()},35000);
- }catch(err){db=null;console.warn('8aPDF chat status unavailable:',err?.message||err)}
+ }catch(err){console.warn('8aPDF chat status unavailable:',err.message)}
 }
 window.addEventListener('storage',event=>{if(event.key==='8apdf_chat_read_changed')refreshUnread()});
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;if(event.data?.type==='8apdf:chat-read')refreshUnread()});
