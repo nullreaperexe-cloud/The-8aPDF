@@ -11,5 +11,6 @@ async function disable(){const reg=await worker(),sub=await reg.pushManager.getS
 async function savePreferences(next){preferences={...preferences,...next};localStorage.setItem(key,JSON.stringify(preferences));if(supported()&&Notification.permission==='granted'){const reg=await worker(),sub=await reg.pushManager.getSubscription();if(sub)await request('subscribe',sub)}return status()}
 async function test(){const reg=await worker(),sub=await reg.pushManager.getSubscription();if(!sub)throw Error('Enable notifications first');return request('test',sub)}
 window.__8apdfPush={status,enable,disable,savePreferences,test};
+const footerNote=document.getElementById('footerBell')?.previousElementSibling;if(footerNote?.tagName==='P')footerNote.textContent='Get new PDFs and school announcements on your phone, even when the website is closed.';
 if(supported()){worker().then(()=>{if(Notification.permission==='granted')return subscribe()}).catch(e=>console.warn('Background notifications:',e.message));navigator.serviceWorker.addEventListener('message',e=>{if(e.data?.type==='8apdf:notification-open'){const url=new URL(e.data.path,location.origin);if(url.origin===location.origin)window.__8apdfOpenPage?.(url.pathname+url.search)}})}
 })();
