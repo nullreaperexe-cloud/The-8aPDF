@@ -39,3 +39,18 @@ advance(5000);assert(!seen.includes('Welcome Kanish'),'Greeting must wait until 
 covered=false;advance(1300);assert(seen.includes('Welcome Kanish'));assert(!seen.includes('Learn today. Lead tomorrow.'));
 advance(5000);assert(seen.includes('Learn today. Lead tomorrow.'));
 console.log('PASS school rotation, confirmed closures, notification dedupe and greeting-to-motivation animation');
+// Verify the production compact toast waits five seconds and exits after three.
+let clock=0,seq=0;const jobs=new Map(),nodes=[];
+function node(tag){const classes=new Set();return {tag,children:[],setAttribute(){},append(...kids){this.children.push(...kids)},classList:{contains:c=>classes.has(c),add:c=>classes.add(c)},remove(){this.removed=true}}}
+const body=node('body'),documentMock={hidden:false,body,querySelector:()=>null,addEventListener(){},getElementById:id=>nodes.find(n=>n.id===id),createElement:tag=>{const n=node(tag);nodes.push(n);return n}};
+const storage=new Map(),ctx={document:documentMock,window:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},Intl,Date,performance:{now:()=>clock},notificationRules:{notificationAllowed,recordNotification},setTimeout:(fn,delay)=>{const id=++seq;jobs.set(id,{fn,at:clock+delay});return id},clearTimeout:id=>jobs.delete(id)};
+vm.runInNewContext(fs.readFileSync('compact-notices.js','utf8').replace("import('/shared/notification-policy.js')","Promise.resolve(notificationRules)"),ctx);
+await new Promise(setImmediate);
+const item={source:'chat',id:'one',fingerprint:'one-v1',title:'New message',body:'Unread message'};
+ctx.window.__8apdfNotices.publish(item);
+function move(ms){const end=clock+ms;while(jobs.size){const [id,t]=[...jobs].sort((a,b)=>a[1].at-b[1].at)[0];if(t.at>end)break;clock=t.at;jobs.delete(id);t.fn()}clock=end}
+move(4999);assert(!nodes.find(n=>n.className==='compact-notice'));
+move(1);const toast=nodes.find(n=>n.className==='compact-notice');assert(toast);move(2999);assert(!toast.classList.contains('leaving'));move(1);assert(toast.classList.contains('leaving'));move(240);assert(toast.removed);
+ctx.window.__8apdfNotices.publish(item);move(1000);assert.equal(nodes.filter(n=>n.className==='compact-notice').length,1);
+ctx.window.__8apdfNotices.publish({...item,fingerprint:'one-v2'});assert.equal(nodes.filter(n=>n.className==='compact-notice').length,2);
+console.log('PASS actual compact notification timer: 5 seconds delay, 3 seconds display, smooth exit and no repeated alert');

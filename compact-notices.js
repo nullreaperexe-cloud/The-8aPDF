@@ -4,7 +4,7 @@ try{saved=JSON.parse(localStorage.getItem(KEY)||'null')||saved}catch{}
 const day=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const today=day(),firstOpening=saved.openedDay!==today;saved.openedDay=today;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(saved))}catch{}};save();
-const readyAt=performance.now()+5000;
+const readyAt=5000;
 import('/shared/notification-policy.js').then(module=>{policy=module;flush()});
 function publish(item){if(!item?.id||!item.title)return;const key=(item.source||'school')+':'+item.id;pending.set(key,{...item,key,fingerprint:String(item.fingerprint||item.id)});flush()}
 function flush(){
