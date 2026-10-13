@@ -60,7 +60,7 @@ async function start(){
   await refreshSiteAdmin();
   await state.sb.rpc('chat_enter_lobby').then(({error})=>{if(error)throw error});
   const match=location.pathname.match(/^\/chat\/([a-zA-Z0-9-]{2,48})\/?$/);
-  const slug=match?match[1]:'general';
+  const slug=new URLSearchParams(location.search).get('room')||(match?match[1]:'general');
   try{await openRoom(slug,new URLSearchParams(location.search).get('invite'),false)}
   catch(e){notify((e.message||'Cannot enter room')+'. Opening General Chat.',true);await openRoom('general',null,false)}
   showConnection('Live',true);
@@ -111,7 +111,7 @@ async function openRoom(slug,token=null,changeUrl=true){
  $('roomTitle').textContent=room.name;$('roomSubtitle').textContent=room.kind==='private'?'Private conversation · Invite-only':'# '+room.slug+' · Your friends are here';
  $('topicIcon').innerHTML=room.kind==='private'?icon('lock'):'#';
  $('messages').innerHTML='';$('loadOlder').hidden=true;hideMobile();
- if(changeUrl)history.pushState({room:slug},'',urlForRoom(slug));document.title=room.name+' · 8aPDF';
+ if(changeUrl){if(window.parent!==window)history.replaceState({room:slug},'','/chat-frame.html?embedded=1&room='+encodeURIComponent(slug));else history.pushState({room:slug},'',urlForRoom(slug));}if(window.parent!==window)parent.postMessage({type:'8apdf:chat-route',path:'/chat/'+encodeURIComponent(slug),roomId:room.id},location.origin);document.title=room.name+' · 8aPDF';
  renderRooms();
  await Promise.all([loadMessages(true),loadMembers(),loadRooms()]);
  if(run!==state.currentRoomChange)return;
@@ -145,7 +145,7 @@ async function loadMessages(reset=false){
   renderMessages();
   const inbound=updated.filter(m=>m.sender_id!==state.user?.id);
   if(inbound.length){const newest=inbound.at(-1);const oldId=state.lastInbound.get(currentRoom);if(state.messageInitialized&&oldId&&oldId!==newest.id)playMessageBeep();state.lastInbound.set(currentRoom,newest.id)}
-  state.messageInitialized=true;
+  state.messageInitialized=true;requestAnimationFrame(markVisibleRead);
  }catch(e){console.warn('Cannot refresh chat',e.message);if(reset)notify('Messages could not load: '+e.message,true)}
  finally{state.refreshing=false}
 }
@@ -489,6 +489,18 @@ async function roomManagement(){
   if(error)notify(error.message,true);else{closeDialog();notify('Member banned');roomManagement()}
  });
 }
+const readWritten=new Map();let readTimer=0;
+function readingVisible(){try{return !document.hidden&&(window.parent===window||parent.__8apdfPersistentPage==='chat')}catch{return !document.hidden}}
+async function markVisibleRead(){
+ if(!readingVisible()||!state.user||!state.room||!state.messages.length)return;
+ const area=$('messagesArea').getBoundingClientRect(),visibleIds=new Set([...document.querySelectorAll('[data-message-id]')].filter(el=>{const r=el.getBoundingClientRect();return r.bottom>area.top&&r.top<area.bottom}).map(el=>el.dataset.messageId));
+ const visible=state.messages.filter(m=>!m.pending&&visibleIds.has(m.id)).sort((a,b)=>a.created_at.localeCompare(b.created_at)),latest=visible.at(-1);if(!latest)return;
+ const room=state.room.id,at=latest.created_at;if((readWritten.get(room)||'')>=at)return;
+ const {error}=await state.sb.rpc('chat_mark_read',{p_room:room,p_last_read:at});if(error){console.warn('Read marker:',error.message);return}
+ readWritten.set(room,at);try{localStorage.setItem('8apdf_chat_read_changed',String(Date.now()))}catch{}
+ if(window.parent!==window)parent.postMessage({type:'8apdf:chat-read',roomId:room},location.origin);
+}
+window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==window.parent)return;if(e.data?.type==='8apdf:tool-visible'&&e.data.visible)requestAnimationFrame(markVisibleRead);if(e.data?.type==='8apdf:open-chat-room'&&state.user&&state.room?.slug!==e.data.room)openRoom(e.data.room,e.data.invite||null,false).catch(err=>notify(err.message,true));});
 function installEvents(){
  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
   const actions={create:()=>makeRoom('group'),join:joinRoom,private:()=>makeRoom('private'),new:()=>makeRoom('group')};
@@ -505,7 +517,7 @@ function installEvents(){
  $('cancelReply').onclick=()=>{state.replyTo=null;updateReplyDraft()};
  document.addEventListener('pointerdown',()=>{userActivated=true},{once:true});
  document.addEventListener('keydown',()=>{userActivated=true},{once:true});
- document.querySelectorAll('.app-rail a[href="/"]').forEach(link=>link.addEventListener('click',()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}}));
+ document.querySelectorAll('.app-rail a[href="/"]').forEach(link=>link.addEventListener('click',e=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}if(window.parent!==window){e.preventDefault();parent.postMessage({type:'8apdf:home'},location.origin)}}));
  window.addEventListener('pagehide',()=>{try{sessionStorage.setItem('8apdf_from_chat_v1','1')}catch{}});
  $('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('composerForm').requestSubmit()}});
  $('mediaInput').addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;
@@ -516,7 +528,7 @@ function installEvents(){
  $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');$('mobileOpenMembers').onclick=()=>toggleMobile('membersPanel');
  $('closeMembers').onclick=hideMobile;$('mobileBackdrop').onclick=hideMobile;
  window.addEventListener('popstate',()=>{const slug=location.pathname.match(/\/chat\/([^/?]+)/)?.[1]||'general';if(state.user)openRoom(slug,new URLSearchParams(location.search).get('invite'),false).catch(e=>notify(e.message,true))});
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)heartbeat().catch(()=>{})});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){heartbeat().catch(()=>{});markVisibleRead()}});$('messagesArea').addEventListener('scroll',()=>{clearTimeout(readTimer);readTimer=setTimeout(markVisibleRead,150)},{passive:true});
 }
 installEvents();
 start();

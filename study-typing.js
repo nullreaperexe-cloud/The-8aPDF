@@ -39,14 +39,17 @@ const lines=[
  'Learn something new every day.',
  'Today is full of possibilities.'
 ];
-let index=0,count=0,deleting=false,timer=0;
+let index=0,count=0,deleting=false,timer=0,opening=true;
+const welcome=()=>{let name='';try{name=(localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim()}catch{}return name&&name!=='Student'?'Welcome '+name:'Welcome'};
+let greeting=welcome();headline.setAttribute('aria-label',greeting+'. Rotating study motivation.');
 const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
 const root=document.documentElement;
 const permitted=()=>root.dataset.uiMode==='studio'&&root.dataset.motion!=='off'&&!motion.matches&&!document.hidden;
 function schedule(delay){window.clearTimeout(timer);timer=window.setTimeout(tick,delay)}
 function tick(){
  if(!permitted())return;
- const phrase=lines[index];
+ if(document.querySelector('#welcomeScreen.show,#nameModal.show')){schedule(180);return;}
+ const phrase=opening?greeting:lines[index];
  if(!deleting){
   if(count<phrase.length){
    count+=1;
@@ -62,7 +65,7 @@ function tick(){
   schedule(26);
  }else{
   deleting=false;
-  index=(index+1)%lines.length;
+  if(opening){opening=false;index=0}else index=(index+1)%lines.length;
   schedule(360);
  }
 }
@@ -71,8 +74,8 @@ function sync(){
  headline.classList.toggle('study-typing-still',motion.matches||root.dataset.motion==='off');
  if(root.dataset.uiMode!=='studio')return;
  if(motion.matches||root.dataset.motion==='off'){
-  output.textContent=lines[index];
-  count=lines[index].length;
+  output.textContent=opening?greeting:lines[index];
+  count=output.textContent.length;
   deleting=false;
   return;
  }
@@ -82,10 +85,11 @@ function sync(){
 // Keep a complete meaningful headline without JavaScript, and respect reduced
 // motion when enabled before the first paint.
 if(motion.matches||root.dataset.motion==='off'){
- output.textContent=lines[0];count=lines[0].length;
+ output.textContent=greeting;count=greeting.length;
 }else{
  output.textContent='';count=0;schedule(160);
 }
+document.addEventListener('8apdf:profile-changed',()=>{const name=welcome();if(name===greeting)return;greeting=name;opening=true;count=0;deleting=false;output.textContent='';headline.setAttribute('aria-label',greeting+'. Rotating study motivation.');sync()});
 document.addEventListener('visibilitychange',sync);
 document.addEventListener('8apdf:ui-mode-changed',sync);
 motion.addEventListener?.('change',sync);

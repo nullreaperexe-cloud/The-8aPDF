@@ -2,20 +2,32 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/chat/index.html",
+      "destination": "/chat-frame.html"
+    },
+    {
+      "source": "/pdf-explorer",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/school-calendar",
+      "destination": "/index.html"
+    },
+    {
       "source": "/chat",
-      "destination": "/chat/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/chat/",
-      "destination": "/chat/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/chat/:room",
-      "destination": "/chat/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/chat/:room/",
-      "destination": "/chat/index.html"
+      "destination": "/index.html"
     },
     {
       "source": "/announcements",

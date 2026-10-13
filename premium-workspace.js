@@ -7,20 +7,20 @@
  const studio=()=>root.dataset.uiMode==='studio'&&root.dataset.novaUi!=='on';
  const read=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch{return fallback}};
  let returnFocus=null,lastTab='home';
- function greeting(){
-  const name=read('eightapdf_user_name_v2',read('eightapdf_user_name','')).trim();
-  $('premiumWelcome').textContent=name&&name!=='Student'?'Welcome '+name:'Welcome';
- }
+ function greeting(){document.dispatchEvent(new Event('8apdf:profile-changed'))}
  function overview(){
   const docs=bridge()?.documents?.()||[],messages=bridge()?.announcements?.()||[];
-  $('premiumSubjectCount').textContent=docs.length?String(new Set(docs.map(x=>x.subject).filter(Boolean)).size):'—';
-  $('premiumSavedCount').textContent=String(bridge()?.bookmarks?.()?.length||0);
+  $('premiumSubjectCount').textContent=Number.isInteger(window.__8apdfUnreadCount)?String(window.__8apdfUnreadCount):'—';
+  $('premiumSavedCount').textContent=bridge()?.isLive?.()?String(docs.length):'—';
   $('premiumMessageCount').textContent=messages.length?String(messages.length):(bridge()?.isLive?.()?'0':'—');
-  $('premiumDay').textContent='Day '+(bridge()?.schoolDay?.()||1);
+  const day=window.__8apdfCalendar?.today?.();$('premiumDay').textContent=day?.holiday?'Next Day '+day.nextDay:'Day '+(day?.schoolDay||bridge()?.schoolDay?.()||6);
  }
  function summaryPosition(){
   const summary=$('premiumSummary'),widgets=$('dashboardWidgets');
-  if(mobile.matches)widgets.before(summary);else widgets.after(summary);
+  widgets.before(summary);
+ }
+ function packWidgets(){
+  for(const id of ['dashboardWidgets','newSchoolPlanner','premiumRecentSection']){const container=$(id);if(!container)continue;const visible=[...container.children].filter(x=>x.classList.contains('widget')&&!x.classList.contains('ws-hidden-widget'));if(container.classList.contains('single-widget')!==(visible.length===1))container.classList.toggle('single-widget',visible.length===1);for(const widget of container.children)if(widget.classList.contains('widget'))widget.style.gridColumn=visible.length===1&&!widget.classList.contains('ws-hidden-widget')?'1 / -1':'';}
  }
  function activate(){
   const search=$('command').classList.contains('open'),more=!$('studioMorePanel').hidden;
@@ -54,13 +54,13 @@
  }
  function init(){
   if(!$('premiumWelcome')||!bridge())return;
-  const recents=$('dashboardWidgets').children[2];
+  const recents=$('dashboardWidgets').children[2],notes=$('dashboardWidgets').children[3];
   if(recents&&studio()){
    recents.id='premiumRecentWidget';
    const extra=document.createElement('section');extra.id='premiumRecentSection';extra.className='shell widgets premium-extra-widgets';extra.setAttribute('aria-label','Latest school PDFs');
-   $('dashboardWidgets').after(extra);extra.append(recents);
+   $('dashboardWidgets').after(extra);extra.append(recents);if(notes){notes.id='premiumNotesWidget';extra.append(notes)}
   }
-  greeting();overview();summaryPosition();finishMore();routeTab();
+  greeting();overview();summaryPosition();finishMore();routeTab();packWidgets();
   const reminder=document.createElement('button');reminder.type='button';reminder.className='studio-side-link';reminder.id='premiumReminders';reminder.innerHTML='<svg aria-hidden="true"><use href="#i-bell"/></svg><span>School Reminders</span>';
   reminder.onclick=()=>{if(!$('wsUpcomingBtn')?.hidden)$('wsUpcomingBtn').click();else bridge()?.notify?.('No upcoming dated school reminders.')};
   document.querySelector('.studio-nav-secondary').append(reminder);
@@ -74,10 +74,10 @@
   const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
   const use=document.createElementNS('http://www.w3.org/2000/svg','use');use.setAttribute('href','#i-search');icon.append(use);
   searchLabel.append(icon,document.createTextNode('Search PDFs, notes, subjects or announcements…'));
-  $('premiumSubjects').onclick=()=>document.querySelector('#studioSubjects [data-sidebar-subject="All Subjects"]')?.click();
+  $('premiumSubjects').onclick=()=>window.__8apdfOpenPage?.('/chat');
   $('nameForm').addEventListener('submit',greeting);
   $('daySelect').addEventListener('change',overview);
-  ['8apdf:library-updated','8apdf:teacher-data','8apdf:document-opened'].forEach(event=>document.addEventListener(event,overview));
+  ['8apdf:library-updated','8apdf:teacher-data','8apdf:document-opened','8apdf:chat-unread','8apdf:school-day-changed'].forEach(event=>document.addEventListener(event,overview));
   window.addEventListener('storage',()=>{greeting();overview()});
   window.addEventListener('pageshow',()=>{greeting();overview();routeTab()});
   window.addEventListener('popstate',()=>{routeTab();$('studioMorePanel').hidden=true});
@@ -108,6 +108,7 @@
   new MutationObserver(activate).observe($('command'),{attributes:true,attributeFilter:['class']});
   // Bookmark rendering already happens in the original PDF handlers.
   new MutationObserver(overview).observe($('pdfGrid'),{childList:true});
+  for(const id of ['dashboardWidgets','newSchoolPlanner','premiumRecentSection'])if($(id))new MutationObserver(packWidgets).observe($(id),{attributes:true,subtree:true,attributeFilter:['class']});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

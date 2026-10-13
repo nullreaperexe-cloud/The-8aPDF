@@ -86,19 +86,10 @@ function answer(query){
  return {message:'No matching confirmed '+(test?'test':submission?'notebook submission':'announcement')+' found in the announcements loaded so far.',announcements:[]};
 }
 function remind(){
- if(!ready||document.hidden)return;
- const soon=upcoming().slice(0,3);if(!soon.length||$('wsEventToast'))return;
- const id=soon.map(x=>x.id+'#'+x.date).join('|'),today=keyDate(new Date()),seen=fromStore(SEEN,{});
- if(seen.day===today&&seen.id===id)return;
- const div=document.createElement('aside');div.id='wsEventToast';div.className='ws-event-toast';div.setAttribute('role','status');
- const heading=document.createElement('div');heading.className='ws-event-head';const label=document.createElement('strong');label.textContent='Upcoming school reminders';const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Dismiss upcoming reminders');close.onclick=()=>div.remove();heading.append(label,close);div.append(heading);
- for(const e of soon){const p=document.createElement('p');const b=document.createElement('strong');b.textContent=dayName(e.date)+' · '+(e.kind==='test'?'Test':'Submission');p.append(b,document.createTextNode(' — '+e.title));div.append(p)}
- const link=document.createElement('button');link.type='button';link.className='ws-event-view';link.textContent='Open teacher messages →';link.onclick=()=>{div.remove();document.querySelector('#studioSidebar [data-go="announcements"]')?.click()};div.append(link);
- document.body.append(div);
- let dismissTimer=setTimeout(()=>div.remove(),8500);
- div.addEventListener('mouseenter',()=>clearTimeout(dismissTimer));
- div.addEventListener('mouseleave',()=>{clearTimeout(dismissTimer);dismissTimer=setTimeout(()=>div.remove(),3500)});
- try{localStorage.setItem(SEEN,JSON.stringify({day:today,id}))}catch{}
+ if(!ready)return;
+ const soon=upcoming().slice(0,3);
+ const notices=window.__8apdfNotices;if(!notices)return;
+ for(const e of soon)notices.publish({source:'school',id:e.id+'#'+e.date,fingerprint:e.date+'|'+e.title+'|'+e.excerpt,title:dayName(e.date)+' · '+(e.kind==='test'?'Test':'Submission'),body:e.title,open:()=>document.querySelector('#studioSidebar [data-go="announcements"]')?.click()});
 }
 function updateButton(){
  const b=$('wsUpcomingBtn');if(!b)return;const n=upcoming().length;b.hidden=n===0;b.textContent='◷ '+n+' upcoming '+(n===1?'reminder':'reminders');
