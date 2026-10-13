@@ -50,7 +50,7 @@ async function start(){
  state.displayName=nameFromSite();$('sideName').textContent=state.displayName;
  $('miniAvatar').textContent=state.displayName[0].toUpperCase();$('railAvatar').textContent=state.displayName[0].toUpperCase();
  if(!window.supabase?.createClient){showConnection('Service unavailable');notify('Chat library could not load. Check internet / ad blocker.',true);return}
- state.sb=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{storageKey:'8apdf_social_auth_v2',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:12}}});
+ if(window.parent!==window&&parent.__8apdfGetSocialClient){const shared=await parent.__8apdfGetSocialClient();state.sb=shared.db;}else state.sb=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{storageKey:'8apdf_social_auth_v2',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:12}}});
  try{
   let {data:{session},error:sessionError}=await state.sb.auth.getSession();if(sessionError)throw sessionError;
   if(!session){const result=await state.sb.auth.signInAnonymously();if(result.error)throw result.error;session=result.data.session}
@@ -59,6 +59,7 @@ async function start(){
   await upsertProfile();
   await refreshSiteAdmin();
   await state.sb.rpc('chat_enter_lobby').then(({error})=>{if(error)throw error});
+  await state.sb.rpc('chat_bootstrap_read_state').then(({error})=>{if(error)throw error});
   const match=location.pathname.match(/^\/chat\/([a-zA-Z0-9-]{2,48})\/?$/);
   const slug=new URLSearchParams(location.search).get('room')||(match?match[1]:'general');
   try{await openRoom(slug,new URLSearchParams(location.search).get('invite'),false)}
@@ -145,7 +146,7 @@ async function loadMessages(reset=false){
   renderMessages();
   const inbound=updated.filter(m=>m.sender_id!==state.user?.id);
   if(inbound.length){const newest=inbound.at(-1);const oldId=state.lastInbound.get(currentRoom);if(state.messageInitialized&&oldId&&oldId!==newest.id)playMessageBeep();state.lastInbound.set(currentRoom,newest.id)}
-  state.messageInitialized=true;requestAnimationFrame(markVisibleRead);
+  state.messageInitialized=true;requestAnimationFrame(()=>requestAnimationFrame(markVisibleRead));
  }catch(e){console.warn('Cannot refresh chat',e.message);if(reset)notify('Messages could not load: '+e.message,true)}
  finally{state.refreshing=false}
 }
@@ -494,10 +495,11 @@ function readingVisible(){try{return !document.hidden&&(window.parent===window||
 async function markVisibleRead(){
  if(!readingVisible()||!state.user||!state.room||!state.messages.length)return;
  const area=$('messagesArea').getBoundingClientRect(),visibleIds=new Set([...document.querySelectorAll('[data-message-id]')].filter(el=>{const r=el.getBoundingClientRect();return r.bottom>area.top&&r.top<area.bottom}).map(el=>el.dataset.messageId));
- const visible=state.messages.filter(m=>!m.pending&&visibleIds.has(m.id)).sort((a,b)=>a.created_at.localeCompare(b.created_at)),latest=visible.at(-1);if(!latest)return;
- const room=state.room.id,at=latest.created_at;if((readWritten.get(room)||'')>=at)return;
+ const atBottom=$('messagesArea').scrollHeight-$('messagesArea').scrollTop-$('messagesArea').clientHeight<30;
+ const visible=state.messages.filter(m=>!m.pending&&visibleIds.has(m.id)).sort((a,b)=>a.created_at.localeCompare(b.created_at)),latest=atBottom?state.messages.filter(m=>!m.pending).at(-1):visible.at(-1);if(!latest)return;
+ const room=state.room.id,at=latest.created_at;if(Date.parse(readWritten.get(room)||'1970-01-01')>=Date.parse(at))return;
  const {error}=await state.sb.rpc('chat_mark_read',{p_room:room,p_last_read:at});if(error){console.warn('Read marker:',error.message);return}
- readWritten.set(room,at);try{localStorage.setItem('8apdf_chat_read_changed',String(Date.now()))}catch{}
+ const old=readWritten.get(room);if(!old||Date.parse(at)>Date.parse(old))readWritten.set(room,at);try{localStorage.setItem('8apdf_chat_read_changed',String(Date.now()))}catch{}
  if(window.parent!==window)parent.postMessage({type:'8apdf:chat-read',roomId:room},location.origin);
 }
 window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==window.parent)return;if(e.data?.type==='8apdf:tool-visible'&&e.data.visible)requestAnimationFrame(markVisibleRead);if(e.data?.type==='8apdf:open-chat-room'&&state.user&&state.room?.slug!==e.data.room)openRoom(e.data.room,e.data.invite||null,false).catch(err=>notify(err.message,true));});

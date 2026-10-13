@@ -216,3 +216,12 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .single-widget #recentWidge
     flex-shrink: 0 !important;
   }
 }
+/* Light scene and unobtrusive settings-only music controls. */
+html[data-ui-mode="studio"][data-tone="light"]:not([data-nova-ui="on"]) .premium-hero-scene{background:#e7edf4 url('/assets/study-landscape-light.webp') center/cover no-repeat!important;color:#10151b;border-color:#40566a44}
+html[data-ui-mode="studio"][data-tone="light"]:not([data-nova-ui="on"]) .premium-hero-scene:before{background:linear-gradient(90deg,#f4f7fae8,#edf2f58c 47%,transparent 82%)}
+html[data-ui-mode="studio"][data-tone="light"]:not([data-nova-ui="on"]) .hero #studyTypingHeadline.premium-welcome{color:#10151b!important}
+html[data-tone="light"] .premium-hero-note,html[data-tone="light"] .hero .eyebrow-pill{color:#3e4c5b!important}
+.settings-music-only{inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.settings-music-only .persistent-music-panel{position:relative;inset:auto;width:min(350px,calc(100vw - 24px));pointer-events:none}
+.settings-music-only .persistent-music-panel.open{pointer-events:auto}
+@media(max-width:810px){html[data-ui-mode="studio"][data-tone="light"]:not([data-nova-ui="on"]) .premium-hero-scene{background-position:68% center!important}.settings-music-only,.tool-page-open .settings-music-only{inset:0}}

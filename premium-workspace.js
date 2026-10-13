@@ -38,12 +38,12 @@
   panel.setAttribute('role','dialog');panel.setAttribute('aria-label','More study tools');
   const links=[
    ['All Subjects',()=>{$('studioSidebarToggle').click()}],
-   ['Latest Uploads',()=>document.querySelector('#studioSidebar [data-go="latest"]')?.click()],
+   ['Important Messages',()=>window.__8apdfOpenPage?.('/important-messages')],
    ['Study Chatbot',()=>$('studioAssistantLink').click()],
    ['All PDFs & To-Do',()=>document.querySelector('#wsExtraLinks [data-ws-action="todo"]')?.click()],
    ['Download PDFs as ZIP',()=>document.querySelector('#wsExtraLinks [data-ws-action="zip"]')?.click()],
    ['Edit Home Widgets',()=>document.querySelector('#wsExtraLinks [data-ws-action="widgets"]')?.click()],
-   ['Reminders',()=>{if(!$('wsUpcomingBtn')?.hidden)$('wsUpcomingBtn').click();else bridge()?.notify?.('No upcoming dated school reminders.')}]
+   ['Reminders',()=>window.__8apdfOpenPage?.('/school-reminders')]
   ];
   links.forEach(([label,action])=>{
    const b=document.createElement('button');b.type='button';b.textContent=label;
@@ -62,7 +62,7 @@
   }
   greeting();overview();summaryPosition();finishMore();routeTab();packWidgets();
   const reminder=document.createElement('button');reminder.type='button';reminder.className='studio-side-link';reminder.id='premiumReminders';reminder.innerHTML='<svg aria-hidden="true"><use href="#i-bell"/></svg><span>School Reminders</span>';
-  reminder.onclick=()=>{if(!$('wsUpcomingBtn')?.hidden)$('wsUpcomingBtn').click();else bridge()?.notify?.('No upcoming dated school reminders.')};
+  reminder.onclick=()=>window.__8apdfOpenPage?.('/school-reminders');
   document.querySelector('.studio-nav-secondary').append(reminder);
   const searchClose=document.createElement('button');searchClose.className='premium-search-close';searchClose.type='button';searchClose.setAttribute('aria-label','Close search');searchClose.textContent='Close search ×';
   searchClose.onclick=()=>{$('command').click();$('studioMobileSearch').focus()};

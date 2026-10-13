@@ -1,0 +1,15 @@
+(()=>{'use strict';let core=null,running=false,pending=[],stopped=false;const cacheKey='8apdf_test_papers_v2';let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
+const docs=()=>window.__8apdfStudyBridge?.documents?.()||[],signature=d=>JSON.stringify([d.pdfUrl,d.title,d.description,2]);
+const result=d=>cache[d.id]?.signature===signature(d)?cache[d.id].result:core?.classifyTestPdf(d)||{isTest:false,candidate:false};
+function changed(){try{const ids=new Set(docs().map(d=>d.id));for(const key of Object.keys(cache))if(!ids.has(key))delete cache[key];localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}document.dispatchEvent(new Event('8apdf:tests-updated'))}
+async function inspect(d){
+ const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),35000);let pdf=null;
+ try{const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';const response=await fetch('/api/download?url='+encodeURIComponent(d.pdfUrl)+'&filename=test-check.pdf',{signal:ctrl.signal});if(!response.ok)throw Error('PDF unavailable');const bytes=await response.arrayBuffer();if(bytes.byteLength>12*1024*1024)throw Error('PDF too large');pdf=await pdfjs.getDocument({data:new Uint8Array(bytes)}).promise;let text='';for(let page=1;page<=Math.min(3,pdf.numPages);page++){const p=await pdf.getPage(page),content=await p.getTextContent();text+=' '+content.items.map(i=>i.str||'').join(' ')}const classified=core.classifyTestPdf(d,text);cache[d.id]={signature:signature(d),result:classified,checkedAt:Date.now(),readable:text.trim().length>80};changed();}
+ catch{cache[d.id]={signature:signature(d),result:core.classifyTestPdf(d),checkedAt:Date.now(),retryAfter:Date.now()+3600000};changed()}
+ finally{clearTimeout(timeout);pdf?.destroy?.()}
+}
+async function work(){if(running||!core||stopped)return;running=true;try{while(pending.length&&!document.hidden&&!stopped){const batch=pending.splice(0,2);await Promise.allSettled(batch.map(inspect));await new Promise(r=>setTimeout(r,300))}}finally{running=false;document.dispatchEvent(new Event('8apdf:tests-updated'))}}
+function scan(){if(!core)return;stopped=false;pending=docs().filter(d=>d.available&&!result(d).isTest&&(!cache[d.id]||cache[d.id].signature!==signature(d)||(cache[d.id].retryAfter&&Date.now()>cache[d.id].retryAfter))).sort((a,b)=>Number(result(b).candidate)-Number(result(a).candidate));work()}
+window.__8apdfTests={get:result,documents:()=>docs().filter(d=>result(d).isTest),scan,stop:()=>{stopped=true},status:()=>({running,pending:pending.length}),isTestNotice:item=>core?.isTestNotice(item)||false};
+import('/shared/test-recognition.js').then(m=>{core=m;changed();if(window.__8apdfPersistentPage==='tests')scan()});document.addEventListener('8apdf:library-updated',()=>{changed();if(window.__8apdfPersistentPage==='tests')scan()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!stopped)work()});
+})();
