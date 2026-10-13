@@ -172,3 +172,47 @@ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .single-widget #recentWidge
 @media(max-width:810px){html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .hero #studyTypingHeadline.premium-welcome{font-size:clamp(26px,7.2vw,45px)!important;min-height:2.35em!important;line-height:1.12!important;margin:17px 0 10px!important}html[data-ui-mode="studio"]:not([data-nova-ui="on"]) #premiumRecentSection{grid-template-columns:1fr!important}html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .single-widget #recentWidget{grid-template-columns:1fr}.compact-notice-holder{right:12px;bottom:calc(85px + env(safe-area-inset-bottom))}.persistent-music{left:12px;bottom:calc(80px + env(safe-area-inset-bottom))}.tool-page-open .persistent-music{bottom:12px}.workspace-page-header{padding:8px 10px;min-height:58px}.workspace-page-header button{font-size:10px;padding:8px 9px}.workspace-page-header strong{font-size:12px}}
 @media(max-width:359px){html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .hero #studyTypingHeadline.premium-welcome{min-height:3.36em!important}}
 @media(prefers-reduced-motion:reduce){.compact-notice{animation:none!important;transition:none!important}.persistent-music-panel{transition:none}}
+
+
+/* Mobile overflow correction — latest PDF titles and teacher messages.
+   Keep text readable without changing desktop cards, content or animations. */
+@media (max-width: 810px) {
+  html[data-ui-mode="studio"] :is(#dashboardWidgets, #premiumRecentSection, #newSchoolPlanner),
+  html[data-ui-mode="studio"] :is(#dashboardWidgets, #premiumRecentSection, #newSchoolPlanner) > .widget,
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) .list-row {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) .list-row .item-body {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 1 0% !important;
+    overflow: hidden !important;
+  }
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) .list-row .item-body strong {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.45 !important;
+  }
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) .list-row .item-body span {
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  html[data-ui-mode="studio"] :is(#recentWidget, #announcementsWidget) .list-row > :is(svg, .small-icon, .doc-tile) {
+    flex-shrink: 0 !important;
+  }
+}
