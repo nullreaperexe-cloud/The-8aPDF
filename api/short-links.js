@@ -96,25 +96,57 @@ function classifyAdminFailure(error){
     return verificationError('FIREBASE_ADMIN_NETWORK','Firebase Admin could not connect in time',error);
   return verificationError('FIREBASE_ADMIN_UNAVAILABLE','Firebase Admin read failed',error);
 }
+// Use Google OAuth + Firestore REST instead of Firebase Admin Firestore's gRPC client.
+// This relies only on the Vercel service account; Firebase Anonymous Auth is never required.
+function checkedPdf(fields,originalUrl){
+  const raw=fields?.pdf_url?.stringValue||fields?.pdfUrl?.stringValue||fields?.url?.stringValue;
+  if(typeof raw!=='string')return null;
+  try{
+    const stored=new URL(raw);
+    const requested=new URL(originalUrl);
+    if(stored.protocol!=='https:'||!stored.hostname.includes('.')||stored.username||stored.password||stored.toString()!==requested.toString())return null;
+    return {url:stored.toString(),title:String(fields?.title?.stringValue||'School PDF').slice(0,180)};
+  }catch{return null}
+}
+function firestoreHttpError(status,apiStatus){
+  if(status===401||apiStatus==='UNAUTHENTICATED')
+    return verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google rejected the service-account access token');
+  if(status===403||apiStatus==='PERMISSION_DENIED')
+    return verificationError('FIREBASE_ADMIN_PERMISSION_DENIED','Service account is not allowed to access Firestore');
+  if(apiStatus==='NOT_FOUND')
+    return verificationError('FIREBASE_DATABASE_NOT_FOUND','Firestore project/database could not be found');
+  if(status===429||status>=500)
+    return verificationError('FIREBASE_ADMIN_NETWORK','Firestore temporarily unavailable');
+  return verificationError('FIREBASE_ADMIN_HTTP_ERROR','Firestore REST returned HTTP '+status);
+}
 async function findPublishedPdf(id,originalUrl){
   if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id)||typeof originalUrl!=='string')return null;
   try{
     const credential=serviceCredential();
-    const {initializeApp,cert,getApps}=await import('firebase-admin/app');
-    const {getFirestore}=await import('firebase-admin/firestore');
-    const app=getApps().find(x=>x.name==='short-links-verifier')||
-      initializeApp({credential:cert(credential),projectId:PROJECT},'short-links-verifier');
-    const snap=await getFirestore(app).collection('study_materials').doc(id).get();
-    if(!snap.exists)return null;
-    const data=snap.data()||{};
-    const raw=data.pdf_url||data.pdfUrl||data.url;
-    if(typeof raw!=='string')return null;
-    const stored=new URL(raw),requested=new URL(originalUrl);
-    if(stored.protocol!=='https:'||!stored.hostname.includes('.')||stored.username||stored.password||stored.toString()!==requested.toString())return null;
-    return {url:stored.toString(),title:String(data.title||'School PDF').slice(0,180)};
+    const {cert}=await import('firebase-admin/app');
+    // CertCredential exchanges the server-side service-account private key for an
+    // OAuth token; neither the credential nor the token is sent to the browser.
+    const tokenData=await cert(credential).getAccessToken();
+    if(!tokenData?.access_token)throw verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google did not issue an access token');
+    const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id);
+    let response;
+    try{
+      response=await fetch(endpoint,{
+        headers:{Accept:'application/json',Authorization:'Bearer '+tokenData.access_token},
+        signal:AbortSignal.timeout(10000)
+      });
+    }catch(error){throw verificationError('FIREBASE_ADMIN_NETWORK','Firestore HTTPS request failed',error)}
+    if(response.status===404)return null;
+    if(!response.ok){
+      const payload=await response.json().catch(()=>({}));
+      throw firestoreHttpError(response.status,payload?.error?.status);
+    }
+    const payload=await response.json();
+    return checkedPdf(payload?.fields,originalUrl);
   }catch(error){
     const classified=classifyAdminFailure(error);
-    console.error('8aPDF short links / Firebase Admin:',classified.code);
+    console.error('8aPDF short-links Firebase REST verification:',classified.code,
+      error?.response?.status||error?.status||'');
     throw classified;
   }
 }
@@ -181,6 +213,7 @@ export default async function handler(req, res) {
       FIREBASE_ADMIN_PERMISSION_DENIED:'Firebase service account cannot read Firestore. Check its Cloud IAM Firestore access.',
       FIREBASE_DATABASE_NOT_FOUND:'The default Firestore database could not be found in academyvault-5d1eb.',
       FIREBASE_ADMIN_NETWORK:'Firebase Admin could not reach Firestore. Check Vercel function logs and retry.',
+      FIREBASE_ADMIN_HTTP_ERROR:'Firestore returned an unexpected response. Check the Firestore database in Firebase Console.',
       FIREBASE_ADMIN_UNAVAILABLE:'Firebase Admin failed unexpectedly. Open Vercel Runtime Logs for /api/short-links.'
     };
     if(Object.hasOwn(adminMessages,error?.code))
