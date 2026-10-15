@@ -96,15 +96,29 @@ function verifiedRecord(fields,originalUrl) {
     return {url:url.toString(),title:String(fields.title?.stringValue||'School PDF').slice(0,180)};
   }catch{return null}
 }
+function parseFirebaseCredential(value) {
+  let credential;
+  try {
+    credential=JSON.parse(String(value).trim());
+    if(typeof credential==='string')credential=JSON.parse(credential);
+  }catch(e){const err=new Error('Credential JSON parsing failed');err.code='FIREBASE_ADMIN_JSON_INVALID';throw err}
+  if(!credential||credential.type!=='service_account'||!credential.client_email||!credential.private_key){
+    const err=new Error('Missing required Firebase Admin credential fields');err.code='FIREBASE_ADMIN_MISSING_FIELDS';throw err;
+  }
+  if(credential.project_id!==PROJECT){
+    const err=new Error('Firebase Admin project ID mismatch');err.code='FIREBASE_ADMIN_PROJECT_MISMATCH';throw err;
+  }
+  return {...credential,private_key:credential.private_key.replace(/\\n/g,'\n')};
+}
 async function findPublishedPdf(id,originalUrl) {
   if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id)||typeof originalUrl!=='string')return null;
   let adminFailed=false;
+  let adminFailureCode='FIREBASE_ADMIN_UNAVAILABLE';
   if(process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
     try {
       const {initializeApp,cert,getApps}=await import('firebase-admin/app');
       const {getFirestore}=await import('firebase-admin/firestore');
-      const credential=JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-      if(credential.project_id!==PROJECT)throw Error('Service account project ID does not match the PDF library');
+      const credential=parseFirebaseCredential(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
       const app=getApps().find(a=>a.name==='short-links-verifier')||initializeApp({credential:cert(credential)},'short-links-verifier');
       const snap=await getFirestore(app).collection('study_materials').doc(id).get();
       if(!snap.exists)return null;
@@ -113,6 +127,7 @@ async function findPublishedPdf(id,originalUrl) {
       return verifiedRecord(fields,originalUrl);
     } catch(error) {
       adminFailed=true;
+      adminFailureCode=error?.code?.startsWith?.('FIREBASE_ADMIN_')?error.code:'FIREBASE_ADMIN_UNAVAILABLE';
       console.error('8aPDF PDF verification Admin SDK error:',error?.code||error?.name||'error',error?.message||'unknown');
       // If the server credential is invalid, authenticated Firestore rules may
       // still permit a read-only anonymous verification. Never skip verification.
@@ -128,12 +143,12 @@ async function findPublishedPdf(id,originalUrl) {
     }
   } catch(error) {
     if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')throw error;
-    throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'LIBRARY_UNAVAILABLE','Firebase document lookup failed',error);
+    throw verifyError(adminFailed?adminFailureCode:'LIBRARY_UNAVAILABLE','Firebase document lookup failed',error);
   }
   if(response.status===404)return null;
   if(response.status===401||response.status===403)
-    throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'FIRESTORE_PERMISSION_DENIED','Firestore did not authorize a verified document read');
-  if(!response.ok)throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'LIBRARY_UNAVAILABLE','Firestore document lookup returned HTTP '+response.status);
+    throw verifyError(adminFailed?adminFailureCode:'FIRESTORE_PERMISSION_DENIED','Firestore did not authorize a verified document read');
+  if(!response.ok)throw verifyError(adminFailed?adminFailureCode:'LIBRARY_UNAVAILABLE','Firestore document lookup returned HTTP '+response.status);
   let record;
   try{record=await response.json()}
   catch(error){throw verifyError('LIBRARY_UNAVAILABLE','Firestore returned invalid JSON',error)}
@@ -192,6 +207,9 @@ export default async function handler(req, res) {
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
     console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
+    if(error?.code==='FIREBASE_ADMIN_JSON_INVALID')return json(res,503,{code:error.code,error:'Vercel Firebase service account is not valid JSON. Replace it with the downloaded JSON file content.'});
+    if(error?.code==='FIREBASE_ADMIN_MISSING_FIELDS')return json(res,503,{code:error.code,error:'The Vercel variable is not a Firebase Admin service-account JSON. Download the correct key from Firebase Project Settings.'});
+    if(error?.code==='FIREBASE_ADMIN_PROJECT_MISMATCH')return json(res,503,{code:error.code,error:'The Firebase service account belongs to a different project. Use the key from academyvault-5d1eb.'});
     if(error?.code==='FIREBASE_ADMIN_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase Admin verification failed. Check the service-account JSON project ID and private key in Vercel, then redeploy.'});
     if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase anonymous authentication failed. Check Firebase Authentication → Sign-in method, or repair the Vercel service-account JSON.'});
     if(error?.code==='FIRESTORE_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'Firestore rules denied PDF verification even after anonymous sign-in. Verify study_materials read rules or service-account access.'});
