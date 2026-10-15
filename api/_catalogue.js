@@ -7,7 +7,7 @@ export function auth(req){const expected=process.env.ADMIN_API_TOKEN||'';const s
 export function db(){if(!getApps().length){const raw=process.env.FIREBASE_SERVICE_ACCOUNT_JSON;let credential;if(raw){const account=JSON.parse(raw);credential=cert(account)}else if(process.env.FIREBASE_PROJECT_ID&&process.env.FIREBASE_CLIENT_EMAIL&&process.env.FIREBASE_PRIVATE_KEY){credential=cert({projectId:process.env.FIREBASE_PROJECT_ID,clientEmail:process.env.FIREBASE_CLIENT_EMAIL,privateKey:process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g,'\n')})}else if(process.env.GOOGLE_APPLICATION_CREDENTIALS){credential=applicationDefault()}else throw Object.assign(new Error('Firebase Admin credentials are not configured'),{status:503});initializeApp({credential})}return getFirestore()}
 const banned=/^(?:password|secret|private.?key|access.?token|auth(?:orization)?|credential|api.?key)$/i;
 export function clean(value){if(value===null||value===undefined)return value;if(typeof value?.toDate==='function')return value.toDate().toISOString();if(value instanceof Date)return value.toISOString();if(typeof value?.path==='string'&&typeof value?.id==='string')return value.path;if(Array.isArray(value))return value.map(clean);if(typeof value==='object'){const out={};for(const [k,v] of Object.entries(value)){if(!banned.test(k))out[k]=clean(v)}return out}return value}
-export function shape(doc){return {id:doc.id,...clean(doc.data())}}
+export function shape(doc){return {...clean(doc.data()),id:doc.id}}
 export function fail(res,error){console.error('8aPDF database API',error?.code||error?.message||error);const status=Number(error?.status)||(/permission-denied/.test(error?.code||'')?403:500);return reply(res,status,{success:false,error:{code:status===503?'CONFIGURATION_ERROR':status===403?'FORBIDDEN':'SERVER_ERROR',message:status===503?'Database service is not configured':status===403?'Database access denied':'Unable to complete database request'}})}
 export function limitValue(v){const n=Number(v||100);return Number.isInteger(n)&&n>=1&&n<=200?n:null}
 export function parseBody(req){let value=req.body;if(typeof value==='string'){if(value.length>100000)throw Object.assign(new Error('Request too large'),{status:413});try{value=JSON.parse(value)}catch{throw Object.assign(new Error('Invalid JSON body'),{status:400})}}if(!value||typeof value!=='object'||Array.isArray(value))throw Object.assign(new Error('JSON object required'),{status:400});const str=JSON.stringify(value);if(str.length>100000)throw Object.assign(new Error('Request too large'),{status:413});if(Object.keys(value).some(k=>k==='id'||k==='__proto__'||k==='constructor'||k==='prototype'))throw Object.assign(new Error('Invalid record fields'),{status:400});return value}
@@ -16,7 +16,30 @@ export async function handler(req,res,kind,id){const collection=collections[kind
 const allowed=auth(req);if(method!=='GET'&&!allowed)return reply(res,process.env.ADMIN_API_TOKEN?401:503,{success:false,error:{code:process.env.ADMIN_API_TOKEN?'UNAUTHORIZED':'CONFIGURATION_ERROR',message:process.env.ADMIN_API_TOKEN?'Admin bearer token required':'ADMIN_API_TOKEN not configured'}});
 try{const ref=db().collection(collection);
 if(method==='GET'&&id){const doc=await ref.doc(id).get();if(!doc.exists||(!allowed&&(kind==='announcements'?doc.data()?.published!==true:doc.data()?.published===false)))return reply(res,404,{success:false,error:{code:'NOT_FOUND',message:'Record not found'}});return reply(res,200,{success:true,data:shape(doc)})}
-if(method==='GET'){const size=limitValue(req.query?.limit);if(!size)return validation(res,new Error('limit must be an integer between 1 and 200'));const cursor=String(req.query?.cursor||'');if(cursor.length>250)return validation(res,new Error('Invalid cursor'));let q=ref.orderBy(FieldPath.documentId()).limit(size+1);if(cursor)q=q.startAfter(cursor);const snap=await q.get();const docs=snap.docs.filter(d=>allowed||(kind==='announcements'?d.data()?.published===true:d.data()?.published!==false));const page=docs.slice(0,size).map(shape);const more=snap.docs.length>size;const nextCursor=more?snap.docs[size-1].id:null;return reply(res,200,{success:true,data:page,count:page.length,nextCursor,hasMore:more,source:collection,note:allowed?'Authorized admin view':'Publicly eligible records only. Use Bearer admin token to list unpublished records.'})}
+if(method==='GET'){
+const size=limitValue(req.query?.limit);
+if(!size)return validation(res,new Error('limit must be an integer between 1 and 200'));
+const cursor=String(req.query?.cursor||'');
+if(cursor.length>250||cursor&&!/^[A-Za-z0-9_-]+$/.test(cursor))return validation(res,new Error('Invalid cursor'));
+let query=ref.orderBy(FieldPath.documentId());
+if(cursor)query=query.startAfter(cursor);
+const data=[];let last=null;let exhausted=false;
+while(data.length<size+1&&!exhausted){
+ const snap=await query.limit(Math.min(200,Math.max(25,(size+1-data.length)*2))).get();
+ if(snap.empty){exhausted=true;break}
+ for(const doc of snap.docs){
+  if(allowed||(kind==='announcements'?doc.data()?.published===true:doc.data()?.published!==false))data.push(shape(doc));
+  if(data.length>=size+1)break;
+ }
+ last=snap.docs[snap.docs.length-1].id;
+ if(snap.size<Math.min(200,Math.max(25,(size+1-data.length)*2)))exhausted=true;
+ query=ref.orderBy(FieldPath.documentId()).startAfter(last);
+}
+const more=data.length>size;
+const page=data.slice(0,size);
+const nextCursor=more?page[page.length-1].id:null;
+return reply(res,200,{success:true,data:page,count:page.length,nextCursor,hasMore:more,source:collection});
+}
 if(method!=='GET'&&req.headers['content-type']&&!String(req.headers['content-type']).toLowerCase().startsWith('application/json'))return reply(res,415,{success:false,error:{code:'UNSUPPORTED_MEDIA_TYPE',message:'Use Content-Type: application/json'}});
 if(method==='POST'&&id)return reply(res,405,{success:false,error:{code:'METHOD_NOT_ALLOWED',message:'POST at collection route only'}});
 if(method==='POST'){let body;try{body=parseBody(req)}catch(e){return validation(res,e)}const doc=await ref.add({...body,createdAt:new Date(),updatedAt:new Date()});return reply(res,201,{success:true,data:shape(await doc.get())})}
