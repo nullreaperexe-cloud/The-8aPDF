@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@vercel/blob": "^2.6.1"
+    "@vercel/blob": "^2.6.1",
+    "firebase-admin": "^13.5.0"
   },
   "scripts": {
     "test": "node --check workspace-upgrade.js && node --check study-typing.js && node --check api/pdf-chat.js && node --check study-intelligence.js && node --check music-player.js && node --check soundcloud-catalog.js && node --check soundcloud-studio.js && node --check api/pdf-summarize.js && node --check api/upload-pdf.js && node --check short-links-ui.js && node tests/workspace.test.cjs && node tests/music.test.cjs && node tests/soundcloud.test.cjs && node tests/study-typing.test.cjs && node tests/study-intelligence.test.cjs && node tests/ai-chat.test.cjs && node tests/theme-studio.test.cjs && node tests/boot-settings.test.cjs && node tests/school-cycle.test.js && node tests/persistent-music.test.cjs && node tests/library-tools.test.js && node tests/test-ocr.test.cjs && node --check sw.js && node --check push-notifications.js && node tests/push-notifications.test.js"
