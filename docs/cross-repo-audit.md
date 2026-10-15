@@ -6,7 +6,7 @@ Reviewed repositories: `nullreaperexe-cloud/edusecure-pdf-sync` and `nullreapere
 
 | Finding | Repair |
 |---|---|
-| Production `https://the-8apdf.vercel.app` missing from the push CORS allowlist | Allow the exact current origin, retaining exact-match validation. |
+| Alternate `https://the-8apdf.vercel.app` origin missing from the push CORS allowlist | Allow both known origin names, retaining exact-match validation. The verified live origin is 8apdf.vercel.app. |
 | Random PDF document IDs duplicate writes after an ambiguous timeout | Create by SHA-256 of the canonical PDF URL; verify conflicts against the saved URL. |
 | Lowercasing an entire URL merges case-sensitive paths and signed tokens | Normalize only the scheme and host; preserve path/query case. |
 | Same date/title/subject used to suppress or delete different PDFs | Only exact URL identity confirms a PDF duplicate. |
@@ -15,7 +15,7 @@ Reviewed repositories: `nullreaperexe-cloud/edusecure-pdf-sync` and `nullreapere
 | HTTP-only retries missed connection errors and timeouts | Shared bounded retries cover transport failures, transient statuses and Retry-After, with jitter. |
 | Streamed PDF responses remained open on oversize/error exits | Close the response in a finally block. |
 | Early authentication/driver failures could miss diagnostics | Atomic reports capture startup failures and interrupted cycles; browser cleanup runs in finally. |
-| Sync unnecessarily opened a second browser against an older hostname | Current hostname is configurable; visual date audit is opt-in; Firestore remains authoritative. |
+| Sync unnecessarily opened a second browser for advisory dates | Live hostname is configurable; visual date audit is opt-in; Firestore remains authoritative. |
 | Workflow handoff failed on a transient GitHub HTTP error | Retry dispatch, cap cycle/run duration and put the report in the Actions summary. |
 | Push event insertion and delivery fan-out were separate transactions | `school_push_ingest` commits events, matching subscriptions and feed state atomically. |
 | Push reads silently truncated feeds and subscribers at 1,000 | Cursor-pagination for Firestore and direct subscription joins for due deliveries. |
@@ -58,7 +58,7 @@ The existing Supabase backend is retained; no second database or Firebase Messag
 4. Deploy the sync changes. `push_bridge.py` uses the existing Firebase ID token, validated by Google's account lookup endpoint and restricted to the existing sync administrator. No new GitHub secret is required with the existing default administrator. If `FIREBASE_ADMIN_EMAIL` is customized, set backend `FIREBASE_SYNC_EMAIL` to the same address.
 5. Preserve the existing Cron job and Vault worker secret as the independent ten-minute fallback.
 
-The backend SQL upgrade, backend version 7 and storage policy restriction were applied during this review. The live worker dry-run read 153 PDFs and 91 published announcements successfully. Repository changes still need their normal merge/deployment to activate the updated browser and sync code.
+The backend SQL upgrade, backend version 8 and storage policy restriction were applied during this review. The live worker dry-run read 153 PDFs and 91 published announcements successfully. The website and sync changes were merged in The-8aPDF PR #6 and edusecure-pdf-sync PR #3. Both GitHub check suites passed; both Vercel deployment statuses reported success. The actual public site is https://8apdf.vercel.app/; the remembered the-8apdf.vercel.app hostname currently returns DEPLOYMENT_NOT_FOUND.
 
 Frontend entry points, called from an actual button click:
 
@@ -78,7 +78,7 @@ The worker sends only after Firestore publication is confirmed. Its authenticate
 - Five backend handler tests passed with real Web Push encryption and mocked HTTP boundaries: 1,001-record pagination, transactional RPC usage, failure visibility, Retry-After delivery retry, expiry removal, CORS and administrator-only trigger authentication.
 - Deno type-check passed for the backend and its tests.
 - Live PostgreSQL rollback test passed for baseline suppression, atomic ingestion, duplicate suppression, subscription fan-out, lease exclusion and browser-role RPC denial. No synthetic test event or notification was committed.
-- Live current-origin CORS preflight: 200 with the exact production origin.
+- Live CORS preflight: 200 for the alternate allowed origin; the current 8apdf.vercel.app origin was already allowed.
 - Unauthenticated sync trigger: 401. Malformed payload: 400. Public health: 200.
 - Live dry-run: 200; 153 PDF records and 91 published announcement records read.
 - Legacy storage inspection now shows only the public SELECT policy for study-materials.
@@ -89,7 +89,7 @@ A push provider's accepted response is not proof that the phone displayed the al
 
 Retries provide at-least-once processing. A crash between a provider accepting a message and the database recording success can cause a repeat; stable notification tags reduce duplicate visible alerts. Failed deliveries after six attempts remain stored with `last_error` for operator review. The bounded worker drains up to 200 due delivery rows per invocation; very large backlogs need additional invocations. Feeds above 10,000 records fail explicitly rather than being truncated; partition or incrementally ingest them before that scale.
 
-The scheduled GitHub sync continues to depend on Actions availability and the upstream EduSecure/Firestore services; no implementation can guarantee their uptime. Actual authenticated school login/upload execution cannot be reproduced locally without the existing GitHub secrets. Local regression tests do not replace the next live Actions cycle.
+The scheduled GitHub sync continues to depend on Actions availability and the upstream EduSecure/Firestore services; no implementation can guarantee their uptime. Actual authenticated school login/upload execution cannot be reproduced locally without the existing GitHub secrets. The merged sync workflow is queued behind the existing worker; local tests do not prove that live cycle has completed. The connected Vercel account returns 403 for this team, so dashboard-level deployment/domain inspection is unavailable through that connection.
 
 The Supabase advisor also reports existing chat SECURITY DEFINER functions, intentional anonymous chat access, the pg_net extension location and disabled leaked-password protection. These are separate from the push fixes and need contextual review; advisor warnings alone do not prove an exploitable defect. Push tables intentionally have RLS and no browser-role policies/privileges. See the [Supabase advisor guidance](https://supabase.com/docs/guides/database/database-linter).
 

@@ -20,7 +20,7 @@ async function syncAuthorized(req:Request){
  return !!account&&!account.disabled&&account.email?.toLowerCase()===(Deno.env.get('FIREBASE_SYNC_EMAIL')||'nullreaper.exe@gmail.com').toLowerCase();
 }
 async function send(sub:any,payload:any,cfg:any){
- const req=webpush.generateRequestDetails(sub.subscription,JSON.stringify(payload),{vapidDetails:{subject:'https://the-8apdf.vercel.app/',publicKey:cfg.vapid_public_key,privateKey:cfg.vapid_private_key},contentEncoding:'aes128gcm',TTL:86400,urgency:'normal',topic:String(payload.tag).slice(0,32)});
+ const req=webpush.generateRequestDetails(sub.subscription,JSON.stringify(payload),{vapidDetails:{subject:'https://8apdf.vercel.app/',publicKey:cfg.vapid_public_key,privateKey:cfg.vapid_private_key},contentEncoding:'aes128gcm',TTL:86400,urgency:'normal',topic:String(payload.tag).slice(0,32)});
  const response=await fetch(req.endpoint,{method:req.method,headers:req.headers,body:new Uint8Array(req.body),redirect:'error',signal:AbortSignal.timeout(8000)});
  const result={status:response.status,retryAfter:response.headers.get('Retry-After')};
  await response.body?.cancel();return result;
