@@ -5,7 +5,7 @@
 <script id="novaos-root-restore">try{if((location.pathname==='/'||location.pathname==='/index.html')&&localStorage.getItem('8apdf_optional_novaos_v1')==='1'){location.replace('/novaos.html')}}catch(e){}</script>
 <script id="8apdf-ui-early">try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='false'?'closed':'open'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='open'}</script>
 <meta charset="utf-8"/>
-<script src="/background-music.js?v=20261015-1"></script>
+<script src="/background-music.js?v=20261015-2"></script>
 
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" name="viewport"/>
 <meta content="#000000" name="theme-color"/>
@@ -1631,9 +1631,10 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <div class="setting-group" id="backgroundMusicSettings" style="margin-top:16px">
  <div class="palette-title"><span class="setting-label">Background Music</span><span class="palette-count">INVISIBLE PLAYER</span></div>
  <p class="setting-explainer">8aPDF background music plays on repeat without an on-screen widget. Some browsers require your first interaction before sound can begin.</p>
- <label class="setting-row"><span><strong>Play Background Music</strong><small style="display:block">On/off preference saved on this device</small></span><input class="toggle" id="bgmEnable" type="checkbox" checked></label>
+ <label class="setting-row"><span><strong>Play Background Music</strong><small style="display:block">Turn OFF to permanently mute on this browser until you turn it ON again</small></span><input class="toggle" id="bgmEnable" type="checkbox" checked></label>
  <label class="liquid-range-line" for="bgmVolume"><span>Music Volume</span><strong id="bgmVolumeValue">35%</strong></label>
  <input type="range" id="bgmVolume" min="0" max="100" step="1" value="35" aria-label="Background music volume">
+ <button id="bgmRetry" type="button" class="solid" style="margin-top:12px">Test Music Playback</button>
  <p id="bgmStatus" class="setting-explainer" role="status">Preparing background music…</p>
 </div>
 <div class="setting-group" id="liquidGlassGroup">
