@@ -25,14 +25,15 @@ let query=ref.orderBy(FieldPath.documentId());
 if(cursor)query=query.startAfter(cursor);
 const data=[];let last=null;let exhausted=false;
 while(data.length<size+1&&!exhausted){
- const snap=await query.limit(Math.min(200,Math.max(25,(size+1-data.length)*2))).get();
+ const batchSize=Math.min(200,Math.max(25,(size+1-data.length)*2));
+ const snap=await query.limit(batchSize).get();
  if(snap.empty){exhausted=true;break}
  for(const doc of snap.docs){
   if(allowed||(kind==='announcements'?doc.data()?.published===true:doc.data()?.published!==false))data.push(shape(doc));
   if(data.length>=size+1)break;
  }
  last=snap.docs[snap.docs.length-1].id;
- if(snap.size<Math.min(200,Math.max(25,(size+1-data.length)*2)))exhausted=true;
+ if(snap.size<batchSize)exhausted=true;
  query=ref.orderBy(FieldPath.documentId()).startAfter(last);
 }
 const more=data.length>size;
