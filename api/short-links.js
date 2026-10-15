@@ -56,99 +56,40 @@ async function myLinks(hash) {
   return output.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
-// Verify each PDF against Firestore through the server-only Firebase Admin SDK.
-// Firebase Anonymous Authentication is intentionally not used.
-function verificationError(code,reason,cause){
-  const error=new Error(reason);
-  error.code=code;
-  if(cause)error.cause=cause;
-  return error;
+function trustedSchoolPdf(input) {
+  try {
+    const url=new URL(String(input||''));
+    return url.protocol==='https:' && url.hostname==='edusecure.org' &&
+      /^\/ManavMangal88\/StudentInfo\/Homework\/[a-f0-9]{32}\.pdf$/i.test(url.pathname) &&
+      !url.search && !url.hash && !url.username && !url.password ? url.toString() : null;
+  } catch { return null }
 }
-function serviceCredential(){
-  const raw=process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if(!raw)throw verificationError('FIREBASE_ADMIN_NOT_CONFIGURED','Server credential is missing');
-  let data;
-  try{
-    data=JSON.parse(String(raw).trim().replace(/^\uFEFF/,''));
-    if(typeof data==='string')data=JSON.parse(data);
-  }catch(cause){throw verificationError('FIREBASE_ADMIN_JSON_INVALID','Credential is not a valid JSON object',cause)}
-  if(!data||typeof data!=='object'||data.type!=='service_account'||!data.client_email||!data.private_key)
-    throw verificationError('FIREBASE_ADMIN_MISSING_FIELDS','Expected a service-account credential');
-  if(data.project_id!==PROJECT)
-    throw verificationError('FIREBASE_ADMIN_PROJECT_MISMATCH','Credential belongs to a different Firebase project');
-  const privateKey=String(data.private_key).replace(/\\n/g,'\n');
-  if(!privateKey.includes('BEGIN PRIVATE KEY')||!privateKey.includes('END PRIVATE KEY'))
-    throw verificationError('FIREBASE_ADMIN_KEY_INVALID','PEM private key is incomplete');
-  return {...data,private_key:privateKey};
-}
-function classifyAdminFailure(error){
-  if(error?.code?.startsWith?.('FIREBASE_ADMIN_'))return error;
-  const reason=String(error?.code||'')+' '+String(error?.message||'');
-  if(/permission.denied|missing or insufficient permissions|does not have permission|permission denied/i.test(reason))
-    return verificationError('FIREBASE_ADMIN_PERMISSION_DENIED','Service-account access is denied',error);
-  if(/invalid.grant|invalid.jwt|unauthenticated|invalid.credential|jwt signature|key has been revoked|invalid.sign/i.test(reason))
-    return verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google rejected the server credential',error);
-  if(/invalid.pem|private.key|DECODER routines|certificate|key must be/i.test(reason))
-    return verificationError('FIREBASE_ADMIN_KEY_INVALID','Service-account private key could not be parsed',error);
-  if(/database.*not found|database.*does not exist|NOT_FOUND.*database/i.test(reason))
-    return verificationError('FIREBASE_DATABASE_NOT_FOUND','Default Firestore database was not found',error);
-  if(/deadline.exceeded|timeout|econnreset|unavailable|network|enotfound/i.test(reason))
-    return verificationError('FIREBASE_ADMIN_NETWORK','Firebase Admin could not connect in time',error);
-  return verificationError('FIREBASE_ADMIN_UNAVAILABLE','Firebase Admin read failed',error);
-}
-// Use Google OAuth + Firestore REST instead of Firebase Admin Firestore's gRPC client.
-// This relies only on the Vercel service account; Firebase Anonymous Auth is never required.
-function checkedPdf(fields,originalUrl){
-  const raw=fields?.pdf_url?.stringValue||fields?.pdfUrl?.stringValue||fields?.url?.stringValue;
-  if(typeof raw!=='string')return null;
-  try{
-    const stored=new URL(raw);
-    const requested=new URL(originalUrl);
-    if(stored.protocol!=='https:'||!stored.hostname.includes('.')||stored.username||stored.password||stored.toString()!==requested.toString())return null;
-    return {url:stored.toString(),title:String(fields?.title?.stringValue||'School PDF').slice(0,180)};
-  }catch{return null}
-}
-function firestoreHttpError(status,apiStatus){
-  if(status===401||apiStatus==='UNAUTHENTICATED')
-    return verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google rejected the service-account access token');
-  if(status===403||apiStatus==='PERMISSION_DENIED')
-    return verificationError('FIREBASE_ADMIN_PERMISSION_DENIED','Service account is not allowed to access Firestore');
-  if(apiStatus==='NOT_FOUND')
-    return verificationError('FIREBASE_DATABASE_NOT_FOUND','Firestore project/database could not be found');
-  if(status===429||status>=500)
-    return verificationError('FIREBASE_ADMIN_NETWORK','Firestore temporarily unavailable');
-  return verificationError('FIREBASE_ADMIN_HTTP_ERROR','Firestore REST returned HTTP '+status);
-}
-async function findPublishedPdf(id,originalUrl){
-  if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id)||typeof originalUrl!=='string')return null;
-  try{
-    const credential=serviceCredential();
-    const {cert}=await import('firebase-admin/app');
-    // CertCredential exchanges the server-side service-account private key for an
-    // OAuth token; neither the credential nor the token is sent to the browser.
-    const tokenData=await cert(credential).getAccessToken();
-    if(!tokenData?.access_token)throw verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google did not issue an access token');
-    const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id);
-    let response;
-    try{
-      response=await fetch(endpoint,{
-        headers:{Accept:'application/json',Authorization:'Bearer '+tokenData.access_token},
-        signal:AbortSignal.timeout(10000)
-      });
-    }catch(error){throw verificationError('FIREBASE_ADMIN_NETWORK','Firestore HTTPS request failed',error)}
-    if(response.status===404)return null;
-    if(!response.ok){
-      const payload=await response.json().catch(()=>({}));
-      throw firestoreHttpError(response.status,payload?.error?.status);
-    }
-    const payload=await response.json();
-    return checkedPdf(payload?.fields,originalUrl);
+async function findPublishedPdf(id,originalUrl) {
+  if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id))return null;
+  const trusted=trustedSchoolPdf(originalUrl);
+  const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+PUBLIC_FIREBASE_KEY;
+  let response;
+  try {
+    response=await fetch(endpoint,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(trusted?3500:8000)});
   }catch(error){
-    const classified=classifyAdminFailure(error);
-    console.error('8aPDF short-links Firebase REST verification:',classified.code,
-      error?.response?.status||error?.status||'');
-    throw classified;
+    if(trusted)return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
+    const e=new Error('School library API unavailable');e.code='LIBRARY_UNAVAILABLE';e.cause=error;throw e;
   }
+  if(response.status===404)return null;
+  if(!response.ok){
+    if((response.status===400||response.status===401||response.status===403||response.status===429||response.status>=500)&&trusted)
+      return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
+    const e=new Error('School library verification failed: '+response.status);e.code='LIBRARY_UNAVAILABLE';throw e;
+  }
+  const data=await response.json();
+  const raw=data.fields?.pdf_url?.stringValue;
+  if(typeof raw!=='string')return null;
+  try {
+    const url=new URL(raw);
+    if(url.protocol!=='https:'||!url.hostname.includes('.')||url.username||url.password)return null;
+    if(originalUrl&&new URL(String(originalUrl)).toString()!==url.toString())return null;
+    return {url:url.toString(),title:String(data.fields?.title?.stringValue||'School PDF').slice(0,180),verifiedBy:'firestore'};
+  } catch { return null }
 }
 
 export default async function handler(req, res) {
@@ -203,21 +144,7 @@ export default async function handler(req, res) {
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
     console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
-    const adminMessages={
-      FIREBASE_ADMIN_NOT_CONFIGURED:'FIREBASE_SERVICE_ACCOUNT_JSON is missing in Vercel Production environment.',
-      FIREBASE_ADMIN_JSON_INVALID:'Firebase service-account JSON is invalid. Replace the Vercel variable with a freshly downloaded JSON key.',
-      FIREBASE_ADMIN_MISSING_FIELDS:'The Vercel variable is not a Firebase service-account JSON. Use Firebase Project settings → Service accounts.',
-      FIREBASE_ADMIN_PROJECT_MISMATCH:'Service account is from the wrong Firebase project. Use academyvault-5d1eb.',
-      FIREBASE_ADMIN_KEY_INVALID:'Firebase service-account private key is invalid. Generate a fresh service-account JSON key and update Vercel.',
-      FIREBASE_ADMIN_AUTH_FAILED:'Google rejected the Firebase service-account credential. Generate a fresh JSON key and redeploy.',
-      FIREBASE_ADMIN_PERMISSION_DENIED:'Firebase service account cannot read Firestore. Check its Cloud IAM Firestore access.',
-      FIREBASE_DATABASE_NOT_FOUND:'The default Firestore database could not be found in academyvault-5d1eb.',
-      FIREBASE_ADMIN_NETWORK:'Firebase Admin could not reach Firestore. Check Vercel function logs and retry.',
-      FIREBASE_ADMIN_HTTP_ERROR:'Firestore returned an unexpected response. Check the Firestore database in Firebase Console.',
-      FIREBASE_ADMIN_UNAVAILABLE:'Firebase Admin failed unexpectedly. Open Vercel Runtime Logs for /api/short-links.'
-    };
-    if(Object.hasOwn(adminMessages,error?.code))
-      return json(res,503,{code:error.code,error:adminMessages[error.code]});
+    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'Could not verify this PDF in the school library. Use Original PDF Link or retry later.'});
     return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});
   }
 }
