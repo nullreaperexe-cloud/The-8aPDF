@@ -56,107 +56,67 @@ async function myLinks(hash) {
   return output.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
-// Read only the saved Firestore PDF; a user-provided URL never proves publication.
-let anonymousSession=null;
-let anonymousRequest=null;
-function verifyError(code,message,cause) {
-  const error=new Error(message);
+// Verify each PDF against Firestore through the server-only Firebase Admin SDK.
+// Firebase Anonymous Authentication is intentionally not used.
+function verificationError(code,reason,cause){
+  const error=new Error(reason);
   error.code=code;
   if(cause)error.cause=cause;
   return error;
 }
-async function anonymousToken() {
-  if(anonymousSession?.expiresAt>Date.now()+60000)return anonymousSession.token;
-  if(anonymousRequest)return anonymousRequest;
-  anonymousRequest=(async()=>{
-    let response;
-    try {
-      response=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+encodeURIComponent(PUBLIC_FIREBASE_KEY),{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({returnSecureToken:true}),signal:AbortSignal.timeout(7000)
-      });
-    }catch(error){throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Anonymous Firebase sign-in could not connect',error)}
-    if(!response.ok)throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Anonymous Firebase sign-in returned HTTP '+response.status);
-    const data=await response.json();
-    if(typeof data.idToken!=='string'||!data.idToken)
-      throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Firebase did not provide an ID token');
-    anonymousSession={token:data.idToken,expiresAt:Date.now()+1000*Math.max(60,Number(data.expiresIn)||3600)};
-    return data.idToken;
-  })();
-  try{return await anonymousRequest}
-  finally{anonymousRequest=null}
+function serviceCredential(){
+  const raw=process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  if(!raw)throw verificationError('FIREBASE_ADMIN_NOT_CONFIGURED','Server credential is missing');
+  let data;
+  try{
+    data=JSON.parse(String(raw).trim().replace(/^\uFEFF/,''));
+    if(typeof data==='string')data=JSON.parse(data);
+  }catch(cause){throw verificationError('FIREBASE_ADMIN_JSON_INVALID','Credential is not a valid JSON object',cause)}
+  if(!data||typeof data!=='object'||data.type!=='service_account'||!data.client_email||!data.private_key)
+    throw verificationError('FIREBASE_ADMIN_MISSING_FIELDS','Expected a service-account credential');
+  if(data.project_id!==PROJECT)
+    throw verificationError('FIREBASE_ADMIN_PROJECT_MISMATCH','Credential belongs to a different Firebase project');
+  const privateKey=String(data.private_key).replace(/\\n/g,'\n');
+  if(!privateKey.includes('BEGIN PRIVATE KEY')||!privateKey.includes('END PRIVATE KEY'))
+    throw verificationError('FIREBASE_ADMIN_KEY_INVALID','PEM private key is incomplete');
+  return {...data,private_key:privateKey};
 }
-function verifiedRecord(fields,originalUrl) {
-  const raw=fields?.pdf_url?.stringValue||fields?.pdfUrl?.stringValue||fields?.url?.stringValue;
-  if(typeof raw!=='string')return null;
-  try {
-    const url=new URL(raw);
-    const requested=new URL(originalUrl);
-    if(url.protocol!=='https:'||!url.hostname.includes('.')||url.username||url.password||url.toString()!==requested.toString())return null;
-    return {url:url.toString(),title:String(fields.title?.stringValue||'School PDF').slice(0,180)};
-  }catch{return null}
+function classifyAdminFailure(error){
+  if(error?.code?.startsWith?.('FIREBASE_ADMIN_'))return error;
+  const reason=String(error?.code||'')+' '+String(error?.message||'');
+  if(/permission.denied|missing or insufficient permissions|does not have permission|permission denied/i.test(reason))
+    return verificationError('FIREBASE_ADMIN_PERMISSION_DENIED','Service-account access is denied',error);
+  if(/invalid.grant|invalid.jwt|unauthenticated|invalid.credential|jwt signature|key has been revoked|invalid.sign/i.test(reason))
+    return verificationError('FIREBASE_ADMIN_AUTH_FAILED','Google rejected the server credential',error);
+  if(/invalid.pem|private.key|DECODER routines|certificate|key must be/i.test(reason))
+    return verificationError('FIREBASE_ADMIN_KEY_INVALID','Service-account private key could not be parsed',error);
+  if(/database.*not found|database.*does not exist|NOT_FOUND.*database/i.test(reason))
+    return verificationError('FIREBASE_DATABASE_NOT_FOUND','Default Firestore database was not found',error);
+  if(/deadline.exceeded|timeout|econnreset|unavailable|network|enotfound/i.test(reason))
+    return verificationError('FIREBASE_ADMIN_NETWORK','Firebase Admin could not connect in time',error);
+  return verificationError('FIREBASE_ADMIN_UNAVAILABLE','Firebase Admin read failed',error);
 }
-function parseFirebaseCredential(value) {
-  let credential;
-  try {
-    credential=JSON.parse(String(value).trim());
-    if(typeof credential==='string')credential=JSON.parse(credential);
-  }catch(e){const err=new Error('Credential JSON parsing failed');err.code='FIREBASE_ADMIN_JSON_INVALID';throw err}
-  if(!credential||credential.type!=='service_account'||!credential.client_email||!credential.private_key){
-    const err=new Error('Missing required Firebase Admin credential fields');err.code='FIREBASE_ADMIN_MISSING_FIELDS';throw err;
-  }
-  if(credential.project_id!==PROJECT){
-    const err=new Error('Firebase Admin project ID mismatch');err.code='FIREBASE_ADMIN_PROJECT_MISMATCH';throw err;
-  }
-  return {...credential,private_key:credential.private_key.replace(/\\n/g,'\n')};
-}
-async function findPublishedPdf(id,originalUrl) {
+async function findPublishedPdf(id,originalUrl){
   if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id)||typeof originalUrl!=='string')return null;
-  let adminFailed=false;
-  let adminFailureCode='FIREBASE_ADMIN_UNAVAILABLE';
-  if(process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    try {
-      const {initializeApp,cert,getApps}=await import('firebase-admin/app');
-      const {getFirestore}=await import('firebase-admin/firestore');
-      const credential=parseFirebaseCredential(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-      const app=getApps().find(a=>a.name==='short-links-verifier')||initializeApp({credential:cert(credential)},'short-links-verifier');
-      const snap=await getFirestore(app).collection('study_materials').doc(id).get();
-      if(!snap.exists)return null;
-      const doc=snap.data();
-      const fields={title:{stringValue:doc.title},pdf_url:{stringValue:doc.pdf_url||doc.pdfUrl||doc.url}};
-      return verifiedRecord(fields,originalUrl);
-    } catch(error) {
-      adminFailed=true;
-      const reason=String(error?.code||'')+' '+String(error?.message||'');
-      adminFailureCode=error?.code?.startsWith?.('FIREBASE_ADMIN_')?error.code:
-        /permission.denied|caller does not have permission|missing or insufficient permissions/i.test(reason)?'FIREBASE_ADMIN_PERMISSION_DENIED':
-        /private.key|invalid.credential|invalid.grant|pem|invalid.sign|decoder routines|certificate/i.test(reason)?'FIREBASE_ADMIN_KEY_INVALID':
-        'FIREBASE_ADMIN_UNAVAILABLE';
-      console.error('8aPDF PDF verification Admin SDK error:',error?.code||error?.name||'error',error?.message||'unknown');
-      // If the server credential is invalid, authenticated Firestore rules may
-      // still permit a read-only anonymous verification. Never skip verification.
-    }
+  try{
+    const credential=serviceCredential();
+    const {initializeApp,cert,getApps}=await import('firebase-admin/app');
+    const {getFirestore}=await import('firebase-admin/firestore');
+    const app=getApps().find(x=>x.name==='short-links-verifier')||
+      initializeApp({credential:cert(credential),projectId:PROJECT},'short-links-verifier');
+    const snap=await getFirestore(app).collection('study_materials').doc(id).get();
+    if(!snap.exists)return null;
+    const data=snap.data()||{};
+    const raw=data.pdf_url||data.pdfUrl||data.url;
+    if(typeof raw!=='string')return null;
+    const stored=new URL(raw),requested=new URL(originalUrl);
+    if(stored.protocol!=='https:'||!stored.hostname.includes('.')||stored.username||stored.password||stored.toString()!==requested.toString())return null;
+    return {url:stored.toString(),title:String(data.title||'School PDF').slice(0,180)};
+  }catch(error){
+    const classified=classifyAdminFailure(error);
+    console.error('8aPDF short links / Firebase Admin:',classified.code);
+    throw classified;
   }
-  const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+encodeURIComponent(PUBLIC_FIREBASE_KEY);
-  let response;
-  try {
-    response=await fetch(endpoint,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(7000)});
-    if(response.status===401||response.status===403) {
-      const token=await anonymousToken();
-      response=await fetch(endpoint,{headers:{Accept:'application/json',Authorization:'Bearer '+token},signal:AbortSignal.timeout(7000)});
-    }
-  } catch(error) {
-    if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')throw error;
-    throw verifyError(adminFailed?adminFailureCode:'LIBRARY_UNAVAILABLE','Firebase document lookup failed',error);
-  }
-  if(response.status===404)return null;
-  if(response.status===401||response.status===403)
-    throw verifyError(adminFailed?adminFailureCode:'FIRESTORE_PERMISSION_DENIED','Firestore did not authorize a verified document read');
-  if(!response.ok)throw verifyError(adminFailed?adminFailureCode:'LIBRARY_UNAVAILABLE','Firestore document lookup returned HTTP '+response.status);
-  let record;
-  try{record=await response.json()}
-  catch(error){throw verifyError('LIBRARY_UNAVAILABLE','Firestore returned invalid JSON',error)}
-  return verifiedRecord(record.fields,originalUrl);
 }
 
 export default async function handler(req, res) {
@@ -211,15 +171,20 @@ export default async function handler(req, res) {
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
     console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
-    if(error?.code==='FIREBASE_ADMIN_JSON_INVALID')return json(res,503,{code:error.code,error:'Vercel Firebase service account is not valid JSON. Replace it with the downloaded JSON file content.'});
-    if(error?.code==='FIREBASE_ADMIN_MISSING_FIELDS')return json(res,503,{code:error.code,error:'The Vercel variable is not a Firebase Admin service-account JSON. Download the correct key from Firebase Project Settings.'});
-    if(error?.code==='FIREBASE_ADMIN_PROJECT_MISMATCH')return json(res,503,{code:error.code,error:'The Firebase service account belongs to a different project. Use the key from academyvault-5d1eb.'});
-    if(error?.code==='FIREBASE_ADMIN_KEY_INVALID')return json(res,503,{code:error.code,error:'Firebase service-account key is invalid. Generate a NEW private key from Firebase Project Settings → Service accounts and replace the full JSON in Vercel.'});
-    if(error?.code==='FIREBASE_ADMIN_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'The Firebase service account does not have permission to read study_materials. Check Firestore API and service-account IAM access.'});
-    if(error?.code==='FIREBASE_ADMIN_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase Admin verification failed. Check the service-account JSON project ID and private key in Vercel, then redeploy.'});
-    if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase anonymous authentication failed. Check Firebase Authentication → Sign-in method, or repair the Vercel service-account JSON.'});
-    if(error?.code==='FIRESTORE_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'Firestore rules denied PDF verification even after anonymous sign-in. Verify study_materials read rules or service-account access.'});
-    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase PDF verification is temporarily unavailable. Check the Vercel function logs.'});
+    const adminMessages={
+      FIREBASE_ADMIN_NOT_CONFIGURED:'FIREBASE_SERVICE_ACCOUNT_JSON is missing in Vercel Production environment.',
+      FIREBASE_ADMIN_JSON_INVALID:'Firebase service-account JSON is invalid. Replace the Vercel variable with a freshly downloaded JSON key.',
+      FIREBASE_ADMIN_MISSING_FIELDS:'The Vercel variable is not a Firebase service-account JSON. Use Firebase Project settings → Service accounts.',
+      FIREBASE_ADMIN_PROJECT_MISMATCH:'Service account is from the wrong Firebase project. Use academyvault-5d1eb.',
+      FIREBASE_ADMIN_KEY_INVALID:'Firebase service-account private key is invalid. Generate a fresh service-account JSON key and update Vercel.',
+      FIREBASE_ADMIN_AUTH_FAILED:'Google rejected the Firebase service-account credential. Generate a fresh JSON key and redeploy.',
+      FIREBASE_ADMIN_PERMISSION_DENIED:'Firebase service account cannot read Firestore. Check its Cloud IAM Firestore access.',
+      FIREBASE_DATABASE_NOT_FOUND:'The default Firestore database could not be found in academyvault-5d1eb.',
+      FIREBASE_ADMIN_NETWORK:'Firebase Admin could not reach Firestore. Check Vercel function logs and retry.',
+      FIREBASE_ADMIN_UNAVAILABLE:'Firebase Admin failed unexpectedly. Open Vercel Runtime Logs for /api/short-links.'
+    };
+    if(Object.hasOwn(adminMessages,error?.code))
+      return json(res,503,{code:error.code,error:adminMessages[error.code]});
     return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});
   }
 }
