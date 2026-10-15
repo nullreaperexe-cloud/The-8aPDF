@@ -67,6 +67,24 @@ function trustedSchoolPdf(input) {
 async function findPublishedPdf(id,originalUrl) {
   if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id))return null;
   const trusted=trustedSchoolPdf(originalUrl);
+  // Prefer server-side Firestore verification when a service account is configured.
+  // Never trust a client-supplied URL without verifying its stored document.
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    try {
+      const {initializeApp,cert,getApps}=await import('firebase-admin/app');
+      const {getFirestore}=await import('firebase-admin/firestore');
+      const app=getApps().find(a=>a.name==='short-links-verifier')||initializeApp({credential:cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON))},'short-links-verifier');
+      const snap=await getFirestore(app).collection('study_materials').doc(id).get();
+      if(!snap.exists)return null;
+      const item=snap.data(),raw=item.pdf_url||item.pdfUrl||item.url;
+      if(typeof raw!=='string')return null;
+      const url=new URL(raw),requested=new URL(String(originalUrl||raw));
+      if(url.protocol!=='https:'||url.username||url.password||url.toString()!==requested.toString())return null;
+      return {url:url.toString(),title:String(item.title||'School PDF').slice(0,180),verifiedBy:'firebase-admin'};
+    } catch(error) {
+      const e=new Error('Server-side PDF verification failed');e.code='LIBRARY_UNAVAILABLE';e.cause=error;throw e;
+    }
+  }
   const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+PUBLIC_FIREBASE_KEY;
   let response;
   try {
@@ -144,7 +162,7 @@ export default async function handler(req, res) {
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
     console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
-    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'Could not verify this PDF in the school library. Use Original PDF Link or retry later.'});
+    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'PDF verification is blocked by Firestore permissions. Configure FIREBASE_SERVICE_ACCOUNT_JSON in Vercel for secure server-side verification.'});
     return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});
   }
 }
