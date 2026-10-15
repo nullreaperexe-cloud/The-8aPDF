@@ -37,8 +37,8 @@ function mountSettings(){
  const music=document.createElement('div');music.className='eightapdf-settings-music';music.id='eightapdfSettingsMusic';
  music.innerHTML='<h4>Background Music</h4><p>Music stays connected while you browse PDFs and Friends Chat. Your browser may need one tap on Play.</p>';
  container.append(music);
- music.innerHTML+='<button type="button" id="eightapdfShowMusic">Open music controls</button>';
- music.querySelector('button').onclick=()=>window.__8apdfMusic?.show?.();
+
+
 
 }
 function htmlEscape(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -74,8 +74,8 @@ window.__8apdfSocial={refreshUnread,markAllRead};
 async function revealMessage(msg,roomSlug){
  if(!enabled(NOTICES_KEY)||msg.sender_id===visitor?.id||document.hidden)return;
  if(window.__8apdfPersistentPage==='chat'&&window.__8apdfActiveChatRoom===msg.room_id)return;
- const {data:p}=await db.from('chat_profiles').select('display_name').eq('id',msg.sender_id).maybeSingle();
- window.__8apdfNotices?.publish({source:'chat',id:msg.id,fingerprint:msg.created_at+'|'+msg.body,title:p?.display_name||'Friends Chat',body:textPreview(msg),open:()=>window.__8apdfOpenPage?.('/chat/'+encodeURIComponent(roomSlug||'general'))});playAlert();
+
+ window.__8apdfNotices?.publish({source:'chat',id:msg.id,fingerprint:msg.created_at+'|'+msg.body,title:'8aPDF · New message',body:'Unlock Friends Chat to read your message',open:()=>window.__8apdfOpenPage?.('/chat/'+encodeURIComponent(roomSlug||'general'))});playAlert();
 }
 async function initializeNotifications(){
  if(channel||!window.supabase?.createClient||savedName()==='Student')return;
