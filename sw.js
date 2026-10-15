@@ -14,8 +14,9 @@ self.addEventListener('push', event => {
     try { payload = event.data?.json() || {}; }
     catch { payload = { body: event.data?.text() || 'A new school update is available.' }; }
     if (typeof payload !== 'object' || Array.isArray(payload)) payload = {};
-    await self.registration.showNotification(String(payload.title || '8aPDF school update').slice(0, 180), {
-      body: String(payload.body || 'New PDFs or school messages are ready.').slice(0, 250),
+    const chatRelated = /^\/chat(?:\/|$)/.test(safePath(payload.url)) || String(payload.type || payload.kind || payload.tag || '').toLowerCase().includes('chat');
+    await self.registration.showNotification(chatRelated ? '8aPDF · New message' : String(payload.title || '8aPDF school update').slice(0, 180), {
+      body: chatRelated ? 'Unlock Friends Chat to read your message.' : String(payload.body || 'New PDFs or school messages are ready.').slice(0, 250),
       icon: '/assets/app-icon-192.png', badge: '/assets/app-icon-192.png',
       tag: String(payload.tag || '8apdf-school-update').slice(0, 100),
       renotify: false, data: { path: safePath(payload.url) }
