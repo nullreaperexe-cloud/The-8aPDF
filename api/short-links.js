@@ -127,7 +127,11 @@ async function findPublishedPdf(id,originalUrl) {
       return verifiedRecord(fields,originalUrl);
     } catch(error) {
       adminFailed=true;
-      adminFailureCode=error?.code?.startsWith?.('FIREBASE_ADMIN_')?error.code:'FIREBASE_ADMIN_UNAVAILABLE';
+      const reason=String(error?.code||'')+' '+String(error?.message||'');
+      adminFailureCode=error?.code?.startsWith?.('FIREBASE_ADMIN_')?error.code:
+        /permission.denied|caller does not have permission|missing or insufficient permissions/i.test(reason)?'FIREBASE_ADMIN_PERMISSION_DENIED':
+        /private.key|invalid.credential|invalid.grant|pem|invalid.sign|decoder routines|certificate/i.test(reason)?'FIREBASE_ADMIN_KEY_INVALID':
+        'FIREBASE_ADMIN_UNAVAILABLE';
       console.error('8aPDF PDF verification Admin SDK error:',error?.code||error?.name||'error',error?.message||'unknown');
       // If the server credential is invalid, authenticated Firestore rules may
       // still permit a read-only anonymous verification. Never skip verification.
@@ -210,6 +214,8 @@ export default async function handler(req, res) {
     if(error?.code==='FIREBASE_ADMIN_JSON_INVALID')return json(res,503,{code:error.code,error:'Vercel Firebase service account is not valid JSON. Replace it with the downloaded JSON file content.'});
     if(error?.code==='FIREBASE_ADMIN_MISSING_FIELDS')return json(res,503,{code:error.code,error:'The Vercel variable is not a Firebase Admin service-account JSON. Download the correct key from Firebase Project Settings.'});
     if(error?.code==='FIREBASE_ADMIN_PROJECT_MISMATCH')return json(res,503,{code:error.code,error:'The Firebase service account belongs to a different project. Use the key from academyvault-5d1eb.'});
+    if(error?.code==='FIREBASE_ADMIN_KEY_INVALID')return json(res,503,{code:error.code,error:'Firebase service-account key is invalid. Generate a NEW private key from Firebase Project Settings → Service accounts and replace the full JSON in Vercel.'});
+    if(error?.code==='FIREBASE_ADMIN_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'The Firebase service account does not have permission to read study_materials. Check Firestore API and service-account IAM access.'});
     if(error?.code==='FIREBASE_ADMIN_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase Admin verification failed. Check the service-account JSON project ID and private key in Vercel, then redeploy.'});
     if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase anonymous authentication failed. Check Firebase Authentication → Sign-in method, or repair the Vercel service-account JSON.'});
     if(error?.code==='FIRESTORE_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'Firestore rules denied PDF verification even after anonymous sign-in. Verify study_materials read rules or service-account access.'});
