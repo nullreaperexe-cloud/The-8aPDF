@@ -1,5 +1,2 @@
-/* Receive OS-level push while no 8aPDF tab is open; no stale app caching. */
-self.addEventListener('install',event=>event.waitUntil(self.skipWaiting()));
-self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
-self.addEventListener('push',event=>{let data={};try{data=event.data?.json()||{}}catch{data={body:event.data?.text()||'New school update'}}const url=new URL(data.url||'/',self.location.origin),path=url.origin===self.location.origin?url.pathname+url.search:'/';event.waitUntil(self.registration.showNotification(String(data.title||'8aPDF school update').slice(0,180),{body:String(data.body||'New PDFs or school messages are ready.').slice(0,250),icon:'/assets/app-icon-192.png',badge:'/assets/app-icon-192.png',tag:String(data.tag||'8apdf-school-update').slice(0,100),renotify:false,data:{path},requireInteraction:false}));});
-self.addEventListener('notificationclick',event=>{event.notification.close();const url=new URL(event.notification.data?.path||'/',self.location.origin),path=url.origin===self.location.origin?url.pathname+url.search:'/';event.waitUntil((async()=>{const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true}),existing=windows.find(c=>new URL(c.url).origin===self.location.origin);if(existing){await existing.focus();existing.postMessage({type:'8apdf:notification-open',path})}else await self.clients.openWindow(path)})())});
+/* Existing registrations keep their subscription while upgrading to sw.js. */
+importScripts('/sw.js');

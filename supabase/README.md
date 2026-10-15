@@ -15,3 +15,9 @@ The phone user must allow notifications once. On iPhone/iPad, install the site o
 ## Feed availability
 
 School push depends on the existing AcademyVault Firestore feed being available. HTTP 429 RESOURCE_EXHAUSTED pauses new-event ingestion; the scheduled worker keeps retrying every ten minutes and preserves its deduplication baseline and pending deliveries. The notification settings show a delayed-feed notice after 25 minutes without a successful source check. No billing or upstream quota settings are changed automatically. The existing source currently returned quota-exceeded responses during final verification; native phone receipt still requires permission and the device test button.
+
+## Reliability upgrade (2026-10-15)
+
+Apply `db/school-push-reliability.sql` before deploying the updated function. It adds an owned lease and the service-role-only `school_push_ingest` RPC for atomic baseline/event/delivery ingestion. The `sync` action verifies the existing Firebase sync administrator's ID token; `FIREBASE_SYNC_EMAIL` optionally overrides the existing default email. The ten-minute Cron poll remains the fallback.
+
+The active service worker is `sw.js`; `school-worker.js` loads it for old registrations. The frontend preserves explicit device opt-out. The backend uses cursor-pagination, joins each due row to its subscription, checks mutation errors, respects Retry-After and persists terminal failures. See `docs/cross-repo-audit.md` for evidence and limits. Run backend tests with `deno test --allow-env --config deno.json index_test.ts` from the function directory; HTTP dependencies are mocked, so no live push is sent.
