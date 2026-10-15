@@ -56,58 +56,88 @@ async function myLinks(hash) {
   return output.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
-function trustedSchoolPdf(input) {
-  try {
-    const url=new URL(String(input||''));
-    return url.protocol==='https:' && url.hostname==='edusecure.org' &&
-      /^\/ManavMangal88\/StudentInfo\/Homework\/[a-f0-9]{32}\.pdf$/i.test(url.pathname) &&
-      !url.search && !url.hash && !url.username && !url.password ? url.toString() : null;
-  } catch { return null }
+// Read only the saved Firestore PDF; a user-provided URL never proves publication.
+let anonymousSession=null;
+let anonymousRequest=null;
+function verifyError(code,message,cause) {
+  const error=new Error(message);
+  error.code=code;
+  if(cause)error.cause=cause;
+  return error;
 }
-async function findPublishedPdf(id,originalUrl) {
-  if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id))return null;
-  const trusted=trustedSchoolPdf(originalUrl);
-  // Prefer server-side Firestore verification when a service account is configured.
-  // Never trust a client-supplied URL without verifying its stored document.
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+async function anonymousToken() {
+  if(anonymousSession?.expiresAt>Date.now()+60000)return anonymousSession.token;
+  if(anonymousRequest)return anonymousRequest;
+  anonymousRequest=(async()=>{
+    let response;
     try {
-      const {initializeApp,cert,getApps}=await import('firebase-admin/app');
-      const {getFirestore}=await import('firebase-admin/firestore');
-      const app=getApps().find(a=>a.name==='short-links-verifier')||initializeApp({credential:cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON))},'short-links-verifier');
-      const snap=await getFirestore(app).collection('study_materials').doc(id).get();
-      if(!snap.exists)return null;
-      const item=snap.data(),raw=item.pdf_url||item.pdfUrl||item.url;
-      if(typeof raw!=='string')return null;
-      const url=new URL(raw),requested=new URL(String(originalUrl||raw));
-      if(url.protocol!=='https:'||url.username||url.password||url.toString()!==requested.toString())return null;
-      return {url:url.toString(),title:String(item.title||'School PDF').slice(0,180),verifiedBy:'firebase-admin'};
-    } catch(error) {
-      const e=new Error('Server-side PDF verification failed');e.code='LIBRARY_UNAVAILABLE';e.cause=error;throw e;
-    }
-  }
-  const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+PUBLIC_FIREBASE_KEY;
-  let response;
-  try {
-    response=await fetch(endpoint,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(trusted?3500:8000)});
-  }catch(error){
-    if(trusted)return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
-    const e=new Error('School library API unavailable');e.code='LIBRARY_UNAVAILABLE';e.cause=error;throw e;
-  }
-  if(response.status===404)return null;
-  if(!response.ok){
-    if((response.status===400||response.status===401||response.status===403||response.status===429||response.status>=500)&&trusted)
-      return {url:trusted,title:'School PDF',verifiedBy:'trusted-school-host'};
-    const e=new Error('School library verification failed: '+response.status);e.code='LIBRARY_UNAVAILABLE';throw e;
-  }
-  const data=await response.json();
-  const raw=data.fields?.pdf_url?.stringValue;
+      response=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+encodeURIComponent(PUBLIC_FIREBASE_KEY),{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({returnSecureToken:true}),signal:AbortSignal.timeout(7000)
+      });
+    }catch(error){throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Anonymous Firebase sign-in could not connect',error)}
+    if(!response.ok)throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Anonymous Firebase sign-in returned HTTP '+response.status);
+    const data=await response.json();
+    if(typeof data.idToken!=='string'||!data.idToken)
+      throw verifyError('FIREBASE_AUTH_UNAVAILABLE','Firebase did not provide an ID token');
+    anonymousSession={token:data.idToken,expiresAt:Date.now()+1000*Math.max(60,Number(data.expiresIn)||3600)};
+    return data.idToken;
+  })();
+  try{return await anonymousRequest}
+  finally{anonymousRequest=null}
+}
+function verifiedRecord(fields,originalUrl) {
+  const raw=fields?.pdf_url?.stringValue||fields?.pdfUrl?.stringValue||fields?.url?.stringValue;
   if(typeof raw!=='string')return null;
   try {
     const url=new URL(raw);
-    if(url.protocol!=='https:'||!url.hostname.includes('.')||url.username||url.password)return null;
-    if(originalUrl&&new URL(String(originalUrl)).toString()!==url.toString())return null;
-    return {url:url.toString(),title:String(data.fields?.title?.stringValue||'School PDF').slice(0,180),verifiedBy:'firestore'};
-  } catch { return null }
+    const requested=new URL(originalUrl);
+    if(url.protocol!=='https:'||!url.hostname.includes('.')||url.username||url.password||url.toString()!==requested.toString())return null;
+    return {url:url.toString(),title:String(fields.title?.stringValue||'School PDF').slice(0,180)};
+  }catch{return null}
+}
+async function findPublishedPdf(id,originalUrl) {
+  if(typeof id!=='string'||!/^[\w-]{1,160}$/.test(id)||typeof originalUrl!=='string')return null;
+  let adminFailed=false;
+  if(process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    try {
+      const {initializeApp,cert,getApps}=await import('firebase-admin/app');
+      const {getFirestore}=await import('firebase-admin/firestore');
+      const credential=JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+      if(credential.project_id!==PROJECT)throw Error('Service account project ID does not match the PDF library');
+      const app=getApps().find(a=>a.name==='short-links-verifier')||initializeApp({credential:cert(credential)},'short-links-verifier');
+      const snap=await getFirestore(app).collection('study_materials').doc(id).get();
+      if(!snap.exists)return null;
+      const doc=snap.data();
+      const fields={title:{stringValue:doc.title},pdf_url:{stringValue:doc.pdf_url||doc.pdfUrl||doc.url}};
+      return verifiedRecord(fields,originalUrl);
+    } catch(error) {
+      adminFailed=true;
+      console.error('8aPDF PDF verification Admin SDK error:',error?.code||error?.name||'error',error?.message||'unknown');
+      // If the server credential is invalid, authenticated Firestore rules may
+      // still permit a read-only anonymous verification. Never skip verification.
+    }
+  }
+  const endpoint='https://firestore.googleapis.com/v1/projects/'+PROJECT+'/databases/(default)/documents/study_materials/'+encodeURIComponent(id)+'?key='+encodeURIComponent(PUBLIC_FIREBASE_KEY);
+  let response;
+  try {
+    response=await fetch(endpoint,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(7000)});
+    if(response.status===401||response.status===403) {
+      const token=await anonymousToken();
+      response=await fetch(endpoint,{headers:{Accept:'application/json',Authorization:'Bearer '+token},signal:AbortSignal.timeout(7000)});
+    }
+  } catch(error) {
+    if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')throw error;
+    throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'LIBRARY_UNAVAILABLE','Firebase document lookup failed',error);
+  }
+  if(response.status===404)return null;
+  if(response.status===401||response.status===403)
+    throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'FIRESTORE_PERMISSION_DENIED','Firestore did not authorize a verified document read');
+  if(!response.ok)throw verifyError(adminFailed?'FIREBASE_ADMIN_UNAVAILABLE':'LIBRARY_UNAVAILABLE','Firestore document lookup returned HTTP '+response.status);
+  let record;
+  try{record=await response.json()}
+  catch(error){throw verifyError('LIBRARY_UNAVAILABLE','Firestore returned invalid JSON',error)}
+  return verifiedRecord(record.fields,originalUrl);
 }
 
 export default async function handler(req, res) {
@@ -162,7 +192,10 @@ export default async function handler(req, res) {
     return json(res,201,{slug,shortUrl:`https://8apdf.vercel.app/${slug}`,message:'Short link created'});
   } catch (error) {
     console.error('8aPDF short-link API:',error?.code||'UNKNOWN',error?.cause?.message||error?.message||error);
-    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'PDF verification is blocked by Firestore permissions. Configure FIREBASE_SERVICE_ACCOUNT_JSON in Vercel for secure server-side verification.'});
+    if(error?.code==='FIREBASE_ADMIN_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase Admin verification failed. Check the service-account JSON project ID and private key in Vercel, then redeploy.'});
+    if(error?.code==='FIREBASE_AUTH_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase anonymous authentication failed. Check Firebase Authentication → Sign-in method, or repair the Vercel service-account JSON.'});
+    if(error?.code==='FIRESTORE_PERMISSION_DENIED')return json(res,503,{code:error.code,error:'Firestore rules denied PDF verification even after anonymous sign-in. Verify study_materials read rules or service-account access.'});
+    if(error?.code==='LIBRARY_UNAVAILABLE')return json(res,503,{code:error.code,error:'Firebase PDF verification is temporarily unavailable. Check the Vercel function logs.'});
     return json(res,503,{code:'STORAGE_UNAVAILABLE',error:'Short-link storage is unavailable. Check the connected Vercel Blob store.'});
   }
 }
