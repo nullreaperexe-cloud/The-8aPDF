@@ -59,9 +59,14 @@ async function myLinks(hash) {
 function trustedSchoolPdf(input) {
   try {
     const url=new URL(String(input||''));
-    return url.protocol==='https:' && url.hostname==='edusecure.org' &&
-      /^\/ManavMangal88\/StudentInfo\/Homework\/[a-f0-9]{32}\.pdf$/i.test(url.pathname) &&
-      !url.search && !url.hash && !url.username && !url.password ? url.toString() : null;
+    // Explicitly allow only the two PDF host/path formats used by the 8aPDF library.
+    // Do not broaden this to arbitrary URL hosts, redirects, or Image2URL paths.
+    const school=url.host==='edusecure.org' &&
+      /^\/ManavMangal88\/StudentInfo\/Homework\/[a-f0-9]{32}\.pdf$/i.test(url.pathname);
+    const uploaded=(url.host==='www.image2url.com'||url.host==='image2url.com') &&
+      /^\/r2\/default\/documents\/\d{10,17}-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\.pdf$/i.test(url.pathname);
+    return url.protocol==='https:' && !url.search && !url.hash &&
+      !url.username && !url.password && (school||uploaded) ? url.toString() : null;
   } catch { return null }
 }
 async function findPublishedPdf(id,originalUrl) {
