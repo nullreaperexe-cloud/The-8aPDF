@@ -24,5 +24,5 @@ if(!await check(password)){failures++;message.textContent='Incorrect password ('
 document.documentElement.classList.add('chat-unlocked');gate.hidden=true;message.textContent='';if(!initialized){initialized=true;const script=document.createElement('script');script.src='/chat/app.js?v=20261015-privacy';script.onerror=()=>{initialized=false;message.textContent='Chat could not load. Reload and retry.';gate.hidden=false;document.documentElement.classList.remove('chat-unlocked');};document.body.append(script)}
 });
 window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.data?.type==='8apdf:chat-lock'){document.documentElement.classList.remove('chat-unlocked');gate.hidden=false;gate.querySelector('input').value='';gate.querySelector('input').focus();}});
-window.addEventListener('pagehide',()=>{document.documentElement.classList.remove('chat-unlocked')});
+window.addEventListener('pagehide',()=>{document.documentElement.classList.remove('chat-unlocked');gate.hidden=false;});
 })();
