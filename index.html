@@ -1628,14 +1628,6 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
   <button type="button" data-set-ui="classic" aria-pressed="false"><strong>Classic 8aPDF</strong><small>Original navigation and layout</small></button>
  </div>
 </div>
-<div class="setting-group" id="backgroundMusicSettings" style="margin-top:16px">
- <div class="palette-title"><span class="setting-label">Background Music</span><span class="palette-count">ELFSIGHT PLAYER</span></div>
- <p class="setting-explainer">Play or pause music using the player below. The player is only inside Settings, not floating on the website. Browsers may block automatic sound until you press Play.</p>
- <div id="elfsightMusicHost" style="position:relative;min-height:125px;width:100%;overflow:visible">
-  <div class="elfsight-app-734e7f5b-61a1-4dba-9f12-0a50c61a494a"></div>
- </div>
- <p id="bgmStatus" class="setting-explainer" role="status">If the player does not appear, check that the Elfsight widget is published and not blocked by your browser.</p>
-</div>
 <div class="setting-group" id="liquidGlassGroup">
 <div class="palette-title"><span class="setting-label">Liquid Glass Experience</span><span class="palette-count">NEW · iOS-inspired</span></div>
 <p class="setting-explainer">Live depth, luminous glass edges and silky interface transitions across the entire website.</p>
@@ -3413,5 +3405,10 @@ draw();
 <script defer src="/premium-workspace.js?v=20261013-3"></script>
 <script defer src="/workspace-pages.js?v=20261013-3"></script>
 <script defer src="/school-calendar-client.js?v=20261013-2"></script>
+
+<!-- Visible Elfsight Audio Player. Use the player's own Play button to start audio. -->
+<div id="elfsightMusicHost" aria-label="Website music player" style="position:fixed;bottom:18px;right:18px;z-index:9990;width:min(360px,calc(100vw - 36px));max-height:65vh;overflow:auto;border-radius:14px;">
+ <div class="elfsight-app-734e7f5b-61a1-4dba-9f12-0a50c61a494a"></div>
+</div>
 </body>
 </html>
