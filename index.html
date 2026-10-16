@@ -2436,38 +2436,38 @@ async function refreshSupabaseMaterials(){
  }catch(err){console.warn('8aPDF Supabase study_materials could not load:',err);showOffline()}
  finally{pdfSyncInProgress=false}
 }
-async function connectAnnouncements(){
+// The school announcements have migrated to the dedicated Supabase table.
+// Preserve the original Firestore-format timestamp objects stored in 'raw'.
+let announcementsSyncInProgress=false;
+async function refreshSupabaseAnnouncements(){
+ if(announcementsSyncInProgress)return;
+ announcementsSyncInProgress=true;
  try{
-  const [{initializeApp},{getFirestore,collection,onSnapshot,getDocs,query,where,orderBy}]=await Promise.all([
-   import('https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js'),
-   import('https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js')
-  ]);
-  const cfg={apiKey:'AIzaSyATxKki6gkNWic_CnoGbZnOZjAUj1lbKGI',authDomain:'academyvault-5d1eb.firebaseapp.com',projectId:'academyvault-5d1eb',storageBucket:'academyvault-5d1eb.firebasestorage.app',messagingSenderId:'933297255268',appId:'1:933297255268:web:51b4b015ed4df21ed64071',measurementId:'G-CE6QNNW4RD'};
-  const db=getFirestore(initializeApp(cfg));
-  try{
-   let snap=await getDocs(query(collection(db,'announcements'),where('published','==',true),orderBy('createdAt','desc')));
-   state.announcements=snap.docs.map(d=>({id:d.id,...d.data()}));
-   state.annReady=true;renderAnnouncements();
-   onSnapshot(query(collection(db,'announcements'),where('published','==',true)),live=>{
-    state.announcements=live.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));
-    renderAnnouncements();
-   },error=>console.warn('School message live sync:',error.message));
-  }catch(err){
-   console.warn('Indexed announcements query unavailable, trying read fallback:',err);
+  const {fetchAllSupabaseAnnouncements,normalizeSupabaseAnnouncement}=await import('/supabase-announcements.js');
+  const rows=await fetchAllSupabaseAnnouncements();
+  state.announcements=rows.filter(x=>x&&x.published===true)
+   .map(normalizeSupabaseAnnouncement)
+   .sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));
+  state.annReady=true;
+  renderAnnouncements();
+ }catch(e){
+  console.warn('8aPDF Supabase announcements unavailable:',e?.message||e);
+  if(!state.annReady){
    try{
-    let snap=await getDocs(collection(db,'announcements'));
-    state.announcements=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.published===true).sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));
-    state.annReady=true;renderAnnouncements();
-   }catch(e){console.warn('Announcement fetch error:',e);state.annReady=true;renderAnnouncements()}
+    const cached=JSON.parse(localStorage.getItem('8a_cache_messages')||'[]');
+    if(Array.isArray(cached))state.announcements=cached.filter(x=>x?.published===true);
+   }catch{}
+   state.annReady=true;
+   renderAnnouncements();
   }
- }catch(e){console.warn('8aPDF announcement service unavailable:',e);state.annReady=true;renderAnnouncements()}
+ }finally{announcementsSyncInProgress=false}
 }
 function showOffline(){if(!state.live){if(previewMode)$('#previewRibbon').classList.add('show');else state.error=true;renderMaterials()}}
 setTimeout(()=>{if(!state.live)showOffline()},4200);
 refreshSupabaseMaterials();
-connectAnnouncements();
-setInterval(()=>{if(!document.hidden)refreshSupabaseMaterials()},120000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshSupabaseMaterials()});
+refreshSupabaseAnnouncements();
+setInterval(()=>{if(!document.hidden){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}},120000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}});
 
 })();
 </script>
