@@ -61,9 +61,13 @@ export async function fetchAllStudyMaterials({pageSize=500,maxRows=30000,fetchIm
   if(!size||!max)throw new RangeError('Invalid Supabase read limit');
   const result=[];
   for(let offset=0;offset<max;offset+=size){
-    const next=await listStudyMaterials({limit:Math.min(size,max-offset),offset,fetchImpl});
+    const requestSize=Math.min(size,max-offset);
+    const next=await listStudyMaterials({limit:requestSize,offset,fetchImpl});
     result.push(...next);
-    if(next.length<size)return result;
+    if(next.length<requestSize)return result;
   }
-  throw new Error('Supabase materials limit reached; increase maxRows to load the complete library');
+  // An exact multiple of pageSize may also be the end of the table.
+  const extra=await listStudyMaterials({limit:1,offset:max,fetchImpl});
+  if(extra.length)throw new Error('Supabase materials limit reached; increase maxRows to load the complete library');
+  return result;
 }
