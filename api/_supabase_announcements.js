@@ -29,7 +29,7 @@ async function change(method,id,body){
  if(!Array.isArray(value))throw new Error('Supabase announcement response is invalid');
  return value;
 }
-function mapped(body){
+function mapped(body,{partial=false}={}){
  const keys=['title','description','subject','category','published','original_message','attachment_url','has_attachment','priority','ai_model','ai_status','source_message_id','created_at','message_date'];
  const next={};
  for(const k of keys)if(Object.prototype.hasOwnProperty.call(body,k))next[k]=body[k];
@@ -47,8 +47,9 @@ function mapped(body){
    next[k]=new Date(v.seconds*1000+Math.floor((v.nanoseconds||0)/1e6)).toISOString();
   }
  }
- next.raw=body.raw&&typeof body.raw==='object'&&!Array.isArray(body.raw)?body.raw:{...body};
- if(!next.title||typeof next.title!=='string')throw Object.assign(new Error('Announcement title required'),{status:400});
+ if(Object.prototype.hasOwnProperty.call(body,'raw'))next.raw=body.raw;
+ else if(!partial)next.raw={...body};
+ if(!partial&&(!next.title||typeof next.title!=='string'))throw Object.assign(new Error('Announcement title required'),{status:400});
  return next;
 }
 export async function supabaseAnnouncementsHandler(req,res,id,{auth,reply,clean,parseBody,validation}){
@@ -91,13 +92,15 @@ export async function supabaseAnnouncementsHandler(req,res,id,{auth,reply,clean,
   }
   if(!id)return reply(res,405,{success:false,error:{code:'METHOD_NOT_ALLOWED',message:'Record ID required'}});
   if(method==='PATCH'){
-   let body;try{body=mapped(parseBody(req))}catch(e){return validation(res,e)}
-   // Partial edits may not contain a title: use current value to retain it.
+   let rawInput,body;
+   try{rawInput=parseBody(req);body=mapped(rawInput,{partial:true})}catch(e){return validation(res,e)}
    const prev=await listSupabaseAnnouncements({limit:1,id});
    if(!prev.length)return reply(res,404,{success:false,error:{code:'NOT_FOUND',message:'Announcement not found'}});
-   const next={...prev[0],...body};
-   delete next.id;
-   const rows=await change('PATCH',id,next);
+   body.raw={
+    ...(prev[0].raw&&typeof prev[0].raw==='object'?prev[0].raw:{}),
+    ...rawInput
+   };
+   const rows=await change('PATCH',id,body);
    return reply(res,200,{success:true,data:clean(normalizeSupabaseAnnouncement(rows[0]))});
   }
   const removed=await change('DELETE',id);
