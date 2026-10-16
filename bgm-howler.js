@@ -1,7 +1,7 @@
 /* 8aPDF invisible music: external stream only; controls live in website Settings. */
 (()=>{
 'use strict';
-const URL_AUDIO='https://8apdf.xo.je/BGM.MP3?i=1';
+const URL_AUDIO='/assets/8apdf-background-music.mp3';
 const PREF_KEY='8apdf_background_music_v1';
 let pref={enabled:true,volume:18};
 try{const v=JSON.parse(localStorage.getItem(PREF_KEY)||'null');if(v&&typeof v==='object'){if(typeof v.enabled==='boolean')pref.enabled=v.enabled;if(Number.isFinite(v.volume))pref.volume=Math.max(0,Math.min(100,Math.round(v.volume)));}}catch{}
@@ -18,7 +18,7 @@ function sync(){
 }
 function reportMediaError(prefix,e){
  const n=(engine==='native'?music?.error?.code:e);
- return prefix+' (media error '+String(n??'unknown')+'). The external xo.je host may block playback from other websites.';
+ return prefix+' (media error '+String(n??'unknown')+'). Upload /assets/8apdf-background-music.mp3 to the website repository.';
 }
 function clearPlayer(){
  if(!music)return;
@@ -36,7 +36,7 @@ function makeNative(){
  music.addEventListener('playing',()=>{playing=true;pending=false;blocked=false;sourceError='';status('Playing in the background ✓');sync();});
  music.addEventListener('pause',()=>{playing=false;pending=false;sync();if(!pref.enabled)status('Music is off.');});
  music.addEventListener('waiting',()=>{status('Buffering external music…');});
- music.addEventListener('error',()=>{playing=false;pending=false;sourceError=reportMediaError('Could not load the audio',null);status(sourceError);sync();console.warn('8aPDF BGM: remote audio failed. Check browser Network tab for 403, blocked hotlinking, or HTML instead of MP3.');});
+ music.addEventListener('error',()=>{playing=false;pending=false;sourceError=reportMediaError('Could not load the audio',null);status(sourceError);sync();console.warn('8aPDF BGM: remote audio failed. Check browser Network tab for a missing or invalid /assets/8apdf-background-music.mp3 file.');});
  sync();
 }
 function makeHowler(){
@@ -58,7 +58,7 @@ function makeHowler(){
   onloaderror(id,error){
    pending=false;playing=false;sourceError=reportMediaError('Howler could not load the audio',error);
    console.warn('8aPDF BGM:',sourceError,'Trying native HTML5 audio.');
-   status('Howler could not load MP3. Trying browser audio engine…');
+   status('Howler could not load local MP3. Trying browser audio engine…');
    const retry=pref.enabled&&!blocked;
    makeNative();
    if(retry)start();
@@ -116,7 +116,7 @@ function mount(){
  let host=$('eightapdfSettingsMusic');
  if(!host){const parent=$('studioUiSetting')||document.querySelector('#settingsPanel .setting-body');if(!parent)return;host=document.createElement('div');host.id='eightapdfSettingsMusic';host.className='eightapdf-settings-music';parent.appendChild(host);}
  host.innerHTML='<h4>Background Music</h4>'+
- '<p>Your MP3 plays invisibly while you browse. No floating music widget.</p>'+
+ '<p>The website plays its own MP3 invisibly in a continuous loop. No floating widget.</p>'+
  '<label class="eightapdf-setting-toggle" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0"><span>Enable background music</span><input id="eightapdfBgmToggle" type="checkbox" aria-label="Enable background music"></label>'+
  '<label for="eightapdfBgmVolume" style="display:flex;justify-content:space-between;gap:12px;margin:14px 0 6px"><span>Music volume</span><strong id="eightapdfBgmVolumeLabel">18%</strong></label>'+
  '<input id="eightapdfBgmVolume" type="range" min="0" max="100" step="1" aria-label="Background music volume" style="width:100%;accent-color:var(--button,#ddd)">'+
