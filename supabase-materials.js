@@ -3,8 +3,8 @@
  * Supabase publishable keys are intended for browser use. Ensure public SELECT
  * is restricted using Supabase Row Level Security (RLS) policies.
  */
-export const SUPABASE_PROJECT_URL='https://rzhtesfikvykdnmrqwjs.supabase.co';
-export const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Jofg81Ze1uBcMPo85QRaKw_wQkS0080';
+export const SUPABASE_PROJECT_URL='https://xudhjwojgxblbsebkzso.supabase.co';
+export const SUPABASE_PUBLISHABLE_KEY='sb_publishable_fVH-3bHJHdIlCpiL31f1rw_tqWhgTP1';
 export const SUPABASE_MATERIALS_TABLE='study_materials';
 export const SUPABASE_MATERIALS_URL=SUPABASE_PROJECT_URL+'/rest/v1/'+SUPABASE_MATERIALS_TABLE;
 
