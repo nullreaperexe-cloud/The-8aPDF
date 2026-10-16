@@ -4,6 +4,7 @@
  * Admin changes require both ADMIN_API_TOKEN and a SERVER-SIDE
  * SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY).
  */
+import {randomUUID} from 'node:crypto';
 import {listStudyMaterials,SUPABASE_MATERIALS_URL} from '../supabase-materials.js';
 
 function validId(id){return /^[A-Za-z0-9_-]{1,200}$/.test(String(id||''))}
@@ -21,6 +22,33 @@ function adminKey(){return process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE
 function supabaseError(e,res,reply){
  console.error('8aPDF Supabase materials API:',e?.message||e);
  return reply(res,502,{success:false,error:{code:'SUPABASE_UNAVAILABLE',message:'Unable to reach Supabase study_materials. Check the table, RLS policy, and API credentials.'}});
+}
+function prepareMaterial(input,{partial=false}={}){
+ const aliases={pdfUrl:'pdf_url',url:'pdf_url',className:'class_name',
+  createdAt:'created_at',sourceDate:'source_date'};
+ const fields=new Set(['title','description','subject','pdf_url','kind','date_iso','date_display',
+  'term','raw','created_at','updated_at','source','source_date','order','class_name',
+  'chapter','language','tags','published']);
+ const body={};
+ for(const [key,value] of Object.entries(input)){
+  const name=aliases[key]||key;
+  if(fields.has(name))body[name]=value;
+ }
+ if(!partial){
+  if(typeof body.title!=='string'||!body.title.trim())
+   throw Object.assign(new Error('PDF title is required'),{status:400});
+  if(typeof body.pdf_url!=='string')
+   throw Object.assign(new Error('PDF URL is required'),{status:400});
+ }
+ if(body.pdf_url!==undefined){
+  try{
+   const u=new URL(body.pdf_url);
+   if(!['https:','http:'].includes(u.protocol))throw Error();
+  }catch{throw Object.assign(new Error('PDF URL must be HTTP or HTTPS'),{status:400})}
+ }
+ if(body.tags!==undefined&&!Array.isArray(body.tags))
+  throw Object.assign(new Error('tags must be an array'),{status:400});
+ return body;
 }
 async function mutation(method,id,body){
  const key=adminKey();
@@ -78,7 +106,15 @@ export async function supabaseMaterialsHandler(req,res,id,{auth,reply,clean,pars
   if(method==='POST'&&id)return reply(res,405,{success:false,error:{code:'METHOD_NOT_ALLOWED',message:'POST at collection route only'}});
   if(method==='POST'||method==='PATCH'){
    if(method==='PATCH'&&!id)return reply(res,405,{success:false,error:{code:'METHOD_NOT_ALLOWED',message:'PATCH requires an ID route'}});
-   let body;try{body=parseBody(req)}catch(e){return validation(res,e)}
+   let body;
+   try{body=prepareMaterial(parseBody(req),{partial:method==='PATCH'})}
+   catch(e){return validation(res,e)}
+   if(method==='POST'){
+    body.id=randomUUID();
+    body.created_at=body.created_at||new Date().toISOString();
+    body.kind=body.kind||'pdf';
+   }
+   if(method==='PATCH')body.updated_at=new Date().toISOString();
    const rows=await mutation(method,id,body);
    if(method==='PATCH'&&!rows.length)return reply(res,404,{success:false,error:{code:'NOT_FOUND',message:'Record not found'}});
    return reply(res,method==='POST'?201:200,{success:true,data:clean(rows[0])});
