@@ -2415,6 +2415,9 @@ setTimeout(()=>{if(!state.live)showOffline()},4200);
 refreshSupabaseMaterials();
 refreshSupabaseAnnouncements();
 setInterval(()=>{if(!document.hidden){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}},120000);
+// Admin saves refresh already-open student tabs immediately on this origin.
+try{new BroadcastChannel('8apdf-catalogue').addEventListener('message',()=>{refreshSupabaseMaterials();refreshSupabaseAnnouncements()});}catch{}
+window.addEventListener('storage',e=>{if(e.key==='8apdf_admin_catalogue_changed'){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}});
 
 })();

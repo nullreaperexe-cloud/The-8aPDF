@@ -1,0 +1,6 @@
+project_id = "8apdf"
+
+[functions.admin-command]
+# The handler validates the Auth token, live auth.sessions row, and DB role.
+# The gateway's legacy JWT verifier does not accept modern publishable keys.
+verify_jwt = false

@@ -40,7 +40,7 @@ async function fetchLegacy(slug){
  return null;
 }
 function supabaseHeaders(){
- const headers={apikey:key,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates,return=representation'};
+ const headers={apikey:key,'Content-Type':'application/json','x-apdf-legacy-import':'true',Prefer:'resolution=ignore-duplicates,return=representation'};
  if(key.split('.').length===3)headers.Authorization='Bearer '+key;
  return headers;
 }

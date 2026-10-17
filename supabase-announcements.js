@@ -55,19 +55,21 @@ export async function fetchAllSupabaseAnnouncements({pageSize=500,maxRows=20000,
 export function normalizeSupabaseAnnouncement(row){
  if(!row||typeof row!=='object')return {};
  const original=row.raw&&typeof row.raw==='object'&&!Array.isArray(row.raw)?row.raw:{};
+ const edited=new Set(Array.isArray(row.admin_edited_fields)?row.admin_edited_fields:[]);
+ const pick=(column,legacy,fallback)=>edited.has(column)?(row[column]??fallback):(original[legacy]??row[column]??fallback);
  return {
   ...original,
   id:String(row.id),
-  title:original.title??row.title??'School announcement',
-  subject:original.subject??row.subject??'General',
-  category:original.category??row.category??'General',
-  description:original.description??row.description??'',
-  published:original.published??row.published??true,
+  title:pick('title','title','School announcement'),
+  subject:pick('subject','subject','General'),
+  category:pick('category','category','General'),
+  description:pick('description','description',''),
+  published:row.published??original.published??true,
   createdAt:original.createdAt??row.created_at??null,
-  messageDate:original.messageDate??row.message_date??null,
-  originalMessage:original.originalMessage??row.original_message??'',
-  attachmentUrl:original.attachmentUrl??row.attachment_url??'',
+  messageDate:pick('message_date','messageDate',null),
+  originalMessage:pick('original_message','originalMessage',''),
+  attachmentUrl:pick('attachment_url','attachmentUrl',''),
   sourceMessageId:original.sourceMessageId??row.source_message_id??String(row.id),
-  priority:original.priority??row.priority??'normal'
+  priority:pick('priority','priority','normal')
  };
 }
