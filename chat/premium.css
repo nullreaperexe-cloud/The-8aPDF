@@ -431,3 +431,10 @@ button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+/* Account popover must escape the navigation rail without clipping. */
+@media (min-width:781px){
+ .app-rail{overflow:visible;z-index:35}
+ .app-rail .rail-account[hidden]{display:none!important}
+}
+/* Keep emoji pickers and hidden controls truly hidden after the old base CSS. */
+.emoji-picker[hidden],.room-actions-menu[hidden],.members-search-wrap[hidden]{display:none!important}
