@@ -1592,10 +1592,10 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <section class="section" id="library"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">EXPLORE STUDY MATERIAL</div><h2>Browse Our PDF Library</h2><p>Find notes, worksheets, previous year papers, practical files and more.</p></div><span class="count-text" id="pdfCount">Connecting to live PDFs…</span></div>
 <div class="school-term-toolbar" id="schoolTermBar" aria-label="Filter PDFs by school term">
   <div class="school-term-title"><span class="school-term-kicker">YOUR MATERIALS</span><strong>Term</strong><span id="termContext">From 29 Sep 2026</span></div>
-  <div class="school-term-segment" role="group" aria-label="School term"><button data-school-term="term1" type="button" aria-pressed="false">Term 1</button><button data-school-term="term2" type="button" aria-pressed="true">Term 2</button><button data-school-term="undated" type="button" aria-pressed="false" hidden>Undated</button></div>
+  <div class="school-term-segment" role="group" aria-label="School term"><button data-school-term="all" type="button" aria-pressed="true">All PDFs</button><button data-school-term="term1" type="button" aria-pressed="false">Term 1</button><button data-school-term="term2" type="button" aria-pressed="true">Term 2</button><button data-school-term="undated" type="button" aria-pressed="false" hidden>Undated</button></div>
 </div>
 <div aria-label="Subject filters" class="filters" id="subjectFilters"><button class="chip active" data-subject="All Subjects">All Subjects</button></div>
-<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><button type="button" id="zipExport" class="solid" style="min-height:36px;padding:7px 12px;font-size:.72rem">↓ Download ZIP</button><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="default">Original Order</option><option value="new">Latest First</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
+<div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><button type="button" id="zipExport" class="solid" style="min-height:36px;padding:7px 12px;font-size:.72rem">↓ Download ZIP</button><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="new" selected>Latest First</option><option value="default">Original Order</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
 <div aria-live="polite" class="pdf-grid" id="pdfGrid"></div><div class="view-more" id="moreWrap"><button class="solid" id="morePdf">Load More PDFs ↓</button></div>
 </div></section>
 <section class="section" id="announcements" style="display:none"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">LATEST SCHOOL UPDATES</div><h2>Teacher Messages &amp; Notices</h2><p>Stay informed about circulars, events, homework and school notices.</p></div><span class="count-text" id="announcementCount">Loading…</span></div><div class="filters" id="announcementFilters"></div><div class="notice-grid" id="announcementGrid"></div><div class="view-more" id="moreAnnouncementsWrap" style="display:none"><button class="solid" id="moreAnnouncements">Load More Announcements ↓</button></div></div></section>
@@ -1703,7 +1703,7 @@ const ico=n=>`<svg aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const validURL=s=>{try{let u=new URL(s);return /^https?:$/.test(u.protocol)}catch{return false}};
 const store={get(k,fall){try{const v=localStorage.getItem(k);return v===null?fall:JSON.parse(v)}catch{return fall}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
-const fmtDate=v=>{try{let d=v?.toDate?v.toDate():new Date(v);return !isNaN(d)?d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):''}catch{return ''}};
+const fmtDate=v=>{try{const ms=dateMs(v);return ms?new Date(ms).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',year:'numeric'}):''}catch{return ''}};
 const today=new Date();$('#year').textContent=today.getFullYear();
 // The offline placeholders below are based on the website screenshot provided in this chat,
 // and are never passed off as a fresh Firestore sync. Real document URLs load from the Supabase materials table.
@@ -1726,9 +1726,10 @@ const cats=['All','Tests','Exams','Homework','Assignments','Projects','Important
 const existingUserName=()=>{try{return localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'Student'}catch{return 'Student'}};
 const previewMode=location.protocol==='file:'||location.protocol==='about:';
 const TERM_BOUNDARY='2026-09-28'; // 28 Sep inclusive in Term 1; 29 Sep begins Term 2.
-const storedTerm=store.get('8apdf_term_choice_v2',null);
-const defaultTerm=storedTerm==='term1'||storedTerm==='term2'||storedTerm==='undated' ? storedTerm : 'term2';
-const state={materials:previewMode?previewDocuments:[],live:false,error:false,filter:'All Subjects',term:defaultTerm,query:'',sort:'default',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
+// Start on All PDFs; old Term 2 preference must not hide migrated records.
+const storedTerm=store.get('8apdf_term_choice_v3',null);
+const defaultTerm=['all','term1','term2','undated'].includes(storedTerm)?storedTerm:'all';
+const state={materials:previewMode?previewDocuments:[],live:false,error:false,filter:'All Subjects',term:defaultTerm,query:'',sort:'new',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
 const defaults={theme:'pure-black',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65,glass:true,glassIntensity:100,glassMotion:true,glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glowCustomColor:'#e9e9e9',cornerRadius:36,animationSpeed:3,fontChoice:'modern',showActions:true,showSuggestions:true,stickyNav:true};
 let settings={...defaults,...store.get('8apdf_classic_glass_settings_v2',{})};
 // One-time upgrade: match the approved Radiant default on this device without discarding other preferences.
@@ -2007,10 +2008,25 @@ function renderTimetable(){
  $('#todayList').innerHTML=subjects.slice(1,6).map((sub,i)=>`<button class="list-row" data-go="timetable"><span class="timestamp">P${i+1}</span><span class="item-body"><strong>${safe(sub)}</strong><span>Day ${selectedSchoolDay} · Period ${i+1}</span></span></button>`).join('');
 }
 function keywords(x){return [x.title,x.subject,x.description,x.className||'',x.chapter||'',x.language||'',...(x.tags||[])].join(' ').toLowerCase()}
-function sortedDocs(){let a=state.materials.filter(x=>termOfPdf(x)===state.term&&(state.filter==='All Subjects'||x.subject.toLowerCase()===state.filter.toLowerCase())&&(!state.query||keywords(x).includes(state.query.toLowerCase())));if(state.sort==='new')a.sort((x,y)=>dateMs(y.createdAt)-dateMs(x.createdAt));if(state.sort==='old')a.sort((x,y)=>dateMs(x.createdAt)-dateMs(y.createdAt));if(state.sort==='az')a.sort((x,y)=>x.title.localeCompare(y.title));return a}
+function sortedDocs(){
+ let a=state.materials.filter(x=>(state.term==='all'||termOfPdf(x)===state.term)&&
+ (state.filter==='All Subjects'||x.subject.toLowerCase()===state.filter.toLowerCase())&&
+ (!state.query||keywords(x).includes(state.query.toLowerCase())));
+ const chrono=(x,y)=>dateMs(y.createdAt)-dateMs(x.createdAt)||
+  (x.order-y.order)||x.title.localeCompare(y.title);
+ if(state.sort==='old')a.sort((x,y)=>-chrono(x,y));
+ else if(state.sort==='az')a.sort((x,y)=>x.title.localeCompare(y.title));
+ else if(state.sort==='default')a.sort((x,y)=>x.order-y.order||chrono(x,y));
+ else a.sort(chrono);
+ return a;
+}
 function dateMs(v){try{if(v==null||v==='')return 0;
   if(typeof v==='number')return v>1e12?v:v>1e9?v*1000:0;
-  if(typeof v==='object'&&typeof v.seconds==='number')return v.seconds*1000;
+  if(typeof v==='object'&&v!==null){
+    const sec=v.seconds??v._seconds;
+    if(sec!==undefined&&Number.isFinite(Number(sec)))
+      return Number(sec)*1000+Math.floor(Number(v.nanoseconds??v._nanoseconds??0)/1e6);
+  }
   const dt=v?.toDate?v.toDate():new Date(v);
   const ms=dt.getTime();return Number.isFinite(ms)?ms:0;
 }catch{return 0}}
@@ -2028,25 +2044,37 @@ function pdfDateYMD(v){
  }catch{return ''}
 }
 function termOfPdf(x){const day=pdfDateYMD(x.createdAt);return !day?'undated':day<=TERM_BOUNDARY?'term1':'term2'}
-function termDocuments(){return state.materials.filter(x=>termOfPdf(x)===state.term)}
-function termTitle(){return state.term==='term1'?'Term 1':state.term==='term2'?'Term 2':'Undated'}
+function termDocuments(){return state.materials.filter(x=>state.term==='all'||termOfPdf(x)===state.term)}
+function termTitle(){return state.term==='all'?'All dates':state.term==='term1'?'Term 1':state.term==='term2'?'Term 2':'Undated'}
 function renderTermSwitch(){
  const undated=state.materials.filter(x=>termOfPdf(x)==='undated').length;
  const bar=$('#schoolTermBar');if(!bar)return;
  bar.querySelectorAll('[data-school-term]').forEach(btn=>{btn.classList.toggle('active',btn.dataset.schoolTerm===state.term);btn.setAttribute('aria-pressed',String(btn.dataset.schoolTerm===state.term))});
  const unknownButton=bar.querySelector('[data-school-term="undated"]');
  unknownButton.hidden=!undated&&state.term!=='undated';
- $('#termContext').textContent=state.term==='term1'?'Up to 28 Sep 2026':state.term==='term2'?'From 29 Sep 2026':undated+' PDF(s) without a reliable date';
+ $('#termContext').textContent=state.term==='all'?state.materials.length+' PDFs · newest first':state.term==='term1'?'Up to 28 Sep 2026':state.term==='term2'?'From 29 Sep 2026':undated+' PDF(s) without a reliable date';
 }
 $('#schoolTermBar').addEventListener('click',event=>{
  const button=event.target.closest('[data-school-term]');if(!button)return;
- const newTerm=button.dataset.schoolTerm;if(!['term1','term2','undated'].includes(newTerm)||newTerm===state.term)return;
- state.term=newTerm;store.set('8apdf_term_choice_v2',state.term);state.visible=12;state.filter='All Subjects';renderMaterials();
+ const newTerm=button.dataset.schoolTerm;if(!['all','term1','term2','undated'].includes(newTerm)||newTerm===state.term)return;
+ state.term=newTerm;store.set('8apdf_term_choice_v3',state.term);state.visible=12;state.filter='All Subjects';renderMaterials();
 });
 function card(x){const saved=state.saved.includes(x.id);return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(x.title)}">${safe(x.title)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button></div><button class="pdf-summary-utility" data-pdf="summary" data-id="${safe(x.id)}" type="button">✧ Summarize PDF</button></article>`}
 function renderSubjectFilters(){const subs=['All Subjects',...new Set(state.materials.map(x=>x.subject).filter(Boolean))].sort((a,b)=>a==='All Subjects'?-1:b==='All Subjects'?1:a.localeCompare(b));$('#subjectFilters').innerHTML=subs.map(v=>'<button class="chip '+(v===state.filter?'active':'')+'" data-subject="'+safe(v)+'">'+safe(v)+'</button>').join('');const sidebar=$('#studioSubjects');if(sidebar)sidebar.innerHTML=subs.map(v=>'<button type="button" class="studio-side-link '+(v===state.filter?'active':'')+'" data-sidebar-subject="'+safe(v)+'"><svg><use href="#i-file"/></svg><span>'+safe(v)+'</span></button>').join('');}
 function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);renderTermSwitch();$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No PDFs match '+termTitle()+' in this '+(state.live?'library':'local preview')+'. '+(state.live?'Try another subject or check Undated PDFs.':'The downloaded preview contains archived October samples; live PDFs sync when hosted.')+'</div>';$('#pdfCount').textContent=state.live?`${termDocuments().length} PDFs · ${termTitle()}`:previewMode?`${termDocuments().length} archived PDFs · ${termTitle()}`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' '+termTitle()+' matches':previewMode?'Local HTML preview · Real PDFs sync on the hosted website':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
-function normalizeDoc(d){return{id:String(d.id??''),title:String(d.title||d.name||'Untitled Material'),subject:String(d.subject||d.subject_name||'Other'),description:String(d.description||d.summary||''),pdfUrl:String(d.pdf_url||d.pdfUrl||d.file_url||d.fileUrl||''),className:String(d.class_name||d.className||''),chapter:String(d.chapter||d.chapter_name||''),language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],order:d.order!=null&&Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,createdAt:d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null}}
+function normalizeDoc(d){
+ const schoolDate=d.source_date||d.date_iso||d.date_display||
+  d.raw?.source_date||d.raw?.date_iso||d.raw?.createdAt||d.raw?.date||
+  d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null;
+ return{id:String(d.id??''),title:String(d.title||d.name||'Untitled Material'),
+  subject:String(d.subject||d.subject_name||'Other'),
+  description:String(d.description||d.summary||''),
+  pdfUrl:String(d.pdf_url||d.pdfUrl||d.file_url||d.fileUrl||''),
+  className:String(d.class_name||d.className||''),chapter:String(d.chapter||d.chapter_name||''),
+  language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],
+  order:d.order!=null&&Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,
+  createdAt:schoolDate};
+}
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
 async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Supabase data is required.');return}if(what==='summary'){await summarizePdf(x);return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks(x);return;}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
@@ -2162,13 +2190,14 @@ function showAbout8aPDF(){
 }
 function nav(go){closeSettings();if(go==='tasks'){window.__8apdfOpenTasks?.();return}if(go==='zip'){window.__8apdfZipExport?.();return}if(go==='about'){showAbout8aPDF();return}if(go==='timetable'){showTimetable();return}if(go==='settings'){openSettings();return}if(go==='announcements'){showAnnouncements();return}if(go==='saved'){showLibrary();state.filter='All Subjects';state.query='';$('#searchInput').value='';state.visible=10000;const a=state.materials.filter(x=>state.saved.includes(x.id)&&termOfPdf(x)===state.term);$('#pdfGrid').innerHTML=a.length?a.map(card).join(''):'<div class="empty">No saved PDFs yet. Use the bookmark icon on a PDF card to save it.</div>';$('#libraryStatus').textContent='Saved PDFs · '+a.length;$('#moreWrap').style.display='none';scrollToSection('#library');return}if(go==='search'){openCommand();return}if(go==='latest'){state.filter='All Subjects';state.query='';$('#searchInput').value='';state.sort='new';$('#sortSelect').value='new';showLibrary();renderMaterials();scrollToSection('#library');return}if(go==='home'){showLibrary();scrollToSection('#home');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='home'));return}if(go==='library'){showLibrary();renderMaterials();scrollToSection('#library')}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;e.preventDefault();nav(b.dataset.go)});
-// Live Firestore announcements: same published / createdAt fields as in the existing 8aPDF code.
+// Published teacher announcements come from 8aPDF Supabase.
+function announcementTime(x){return dateMs(x.messageDate)||dateMs(x.eventDate)||dateMs(x.createdAt)||0}
 function aText(x){return [x.title,x.description,x.category,x.subject,x.message,x.fullMessage].join(' ').toLowerCase()}
 function renderAnnouncementFilters(){$('#announcementFilters').innerHTML=cats.map(c=>`<button class="chip ${c===state.annCategory?'active':''}" data-cat="${safe(c)}">${safe(c)}</button>`).join('')}
 function filteredAnnouncements(){return state.announcements.filter(x=>(state.annCategory==='All'||x.category===state.annCategory)&&(!state.query||aText(x).includes(state.query.toLowerCase())))}
-function renderAnnouncements(){if(state.annReady&&state.announcements.length){try{localStorage.setItem('8a_cache_messages',JSON.stringify(state.announcements.slice(0,150)))}catch{}}renderAnnouncementFilters();let a=filteredAnnouncements();$('#announcementCount').textContent=state.annReady?`${a.length} announcements loaded`:'Connecting…';$('#announcementGrid').innerHTML=state.annReady?(a.length?a.slice(0,state.annVisible).map(x=>`<article class="notice-card"><div class="pdf-top"><span class="doc-tile">${ico('megaphone')}</span><span class="tag">${safe(x.category||'General')}</span></div><h3>${safe(x.title||'School announcement')}</h3><p>${safe(x.description||x.message||'')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.eventDate||x.messageDate||x.createdAt))}</div><button class="action primary" data-ann="${safe(x.id)}">Read Announcement ${ico('arrow')}</button></article>`).join(''):'<div class="empty">No announcements in this category or search.</div>'):'<div class="empty">Loading latest school announcements…</div>';$('#moreAnnouncementsWrap').style.display=a.length>state.annVisible?'block':'none';renderAnnouncementsWidget();document.dispatchEvent(new CustomEvent("8apdf:teacher-data",{detail:state.announcements}))}
-function renderAnnouncementsWidget(){const a=state.announcements.slice(0,5);$('#announcementsWidget').innerHTML=a.length?a.map(x=>`<button class="list-row" data-ann="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(fmtDate(x.createdAt||x.messageDate))} · ${safe(x.category||'General')}</span></span></button>`).join(''):'<div class="list-row" style="color:var(--muted)">Latest announcements load from your existing Firestore library when connected.</div>'}
-function openAnnouncement(x){const text=x.message||x.fullMessage||x.description||'';const attachment=x.hasAttachment&&validURL(x.attachmentUrl);showModal(String(x.title||'Announcement'),`<p>${safe(text).replace(/\n/g,'<br>')}</p><p style="font-size:.72rem">${safe(x.category||'General')} · ${safe(fmtDate(x.eventDate||x.messageDate||x.createdAt))}</p>`,`<button class="solid" id="copyAnnouncement">Copy Message</button>${attachment?`<a class="solid" target="_blank" rel="noopener noreferrer" href="${safe(x.attachmentUrl)}" style="display:grid;place-items:center">Open Attachment</a>`:''}`);$('#copyAnnouncement').onclick=async()=>{try{await navigator.clipboard.writeText(text);toast('Announcement copied')}catch{window.prompt('Copy message:',text)}}}
+function renderAnnouncements(){if(state.annReady&&state.announcements.length){try{localStorage.setItem('8a_cache_messages',JSON.stringify(state.announcements.slice(0,150)))}catch{}}renderAnnouncementFilters();let a=filteredAnnouncements().sort((x,y)=>announcementTime(y)-announcementTime(x)||String(x.title||'').localeCompare(String(y.title||'')));$('#announcementCount').textContent=state.annReady?`${a.length} announcements loaded`:'Connecting…';$('#announcementGrid').innerHTML=state.annReady?(a.length?a.slice(0,state.annVisible).map(x=>`<article class="notice-card"><div class="pdf-top"><span class="doc-tile">${ico('megaphone')}</span><span class="tag">${safe(x.category||'General')}</span></div><h3>${safe(x.title||'School announcement')}</h3><p>${safe(x.description||x.message||'')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.messageDate||x.eventDate||x.createdAt))}</div><button class="action primary" data-ann="${safe(x.id)}">Read Announcement ${ico('arrow')}</button></article>`).join(''):'<div class="empty">No announcements in this category or search.</div>'):'<div class="empty">Loading latest school announcements…</div>';$('#moreAnnouncementsWrap').style.display=a.length>state.annVisible?'block':'none';renderAnnouncementsWidget();document.dispatchEvent(new CustomEvent("8apdf:teacher-data",{detail:state.announcements}))}
+function renderAnnouncementsWidget(){const a=state.announcements.slice(0,5);$('#announcementsWidget').innerHTML=a.length?a.map(x=>`<button class="list-row" data-ann="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(fmtDate(x.messageDate||x.createdAt))} · ${safe(x.category||'General')}</span></span></button>`).join(''):'<div class="list-row" style="color:var(--muted)">Latest announcements load from your existing Firestore library when connected.</div>'}
+function openAnnouncement(x){const text=x.message||x.fullMessage||x.description||'';const attachment=x.hasAttachment&&validURL(x.attachmentUrl);showModal(String(x.title||'Announcement'),`<p>${safe(text).replace(/\n/g,'<br>')}</p><p style="font-size:.72rem">${safe(x.category||'General')} · ${safe(fmtDate(x.messageDate||x.eventDate||x.createdAt))}</p>`,`<button class="solid" id="copyAnnouncement">Copy Message</button>${attachment?`<a class="solid" target="_blank" rel="noopener noreferrer" href="${safe(x.attachmentUrl)}" style="display:grid;place-items:center">Open Attachment</a>`:''}`);$('#copyAnnouncement').onclick=async()=>{try{await navigator.clipboard.writeText(text);toast('Announcement copied')}catch{window.prompt('Copy message:',text)}}}
 $('#announcementFilters').onclick=e=>{let b=e.target.closest('[data-cat]');if(!b)return;state.annCategory=b.dataset.cat;state.annVisible=9;renderAnnouncements()};$('#moreAnnouncements').onclick=()=>{state.annVisible+=9;renderAnnouncements()};
 for(const target of ['#announcementGrid','#announcementsWidget'])$(target).onclick=e=>{let b=e.target.closest('[data-ann]');if(!b)return;const x=state.announcements.find(a=>a.id===b.dataset.ann);if(x)openAnnouncement(x)};
 // Quick notes are local-only: no Firestore writes or hidden shared data.
@@ -2319,9 +2348,7 @@ if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
  },{passive:true});
 }
 
-// PDFs now load from the supplied Supabase study_materials REST table.
-// Teacher announcements remain on their existing Firestore collection until a
-// Supabase announcements table and access policy are configured.
+// PDFs and announcements load from the 8aPDF Supabase project.
 let pdfSyncInProgress=false;
 async function refreshSupabaseMaterials(){
  if(pdfSyncInProgress)return;
@@ -2329,8 +2356,9 @@ async function refreshSupabaseMaterials(){
  try{
   const {fetchAllStudyMaterials}=await import('/supabase-materials.js');
   const records=await fetchAllStudyMaterials();
-  state.materials=records.filter(d=>d&&d.published!==false).map(normalizeDoc)
-   .sort((a,b)=>(a.order-b.order)||(dateMs(b.createdAt)-dateMs(a.createdAt)));
+  state.materials=records.filter(d=>d&&d.published!==false&&d.pdf_url).map(normalizeDoc)
+   .sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt)||(a.order-b.order)||
+     a.title.localeCompare(b.title));
   state.live=true;state.error=false;
   try{localStorage.setItem('8a_cache_pdfs',JSON.stringify(state.materials.slice(0,150)))}catch{}
   $('#previewRibbon').classList.remove('show');
@@ -2350,7 +2378,8 @@ async function refreshSupabaseAnnouncements(){
   const rows=await fetchAllSupabaseAnnouncements();
   state.announcements=rows.filter(x=>x&&x.published===true)
    .map(normalizeSupabaseAnnouncement)
-   .sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt));
+   .sort((a,b)=>announcementTime(b)-announcementTime(a)||
+     String(a.title||'').localeCompare(String(b.title||'')));
   state.annReady=true;
   renderAnnouncements();
  }catch(e){
