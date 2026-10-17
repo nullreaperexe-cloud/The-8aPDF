@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/chat/style.css?v=6">
-<link rel="stylesheet" href="/chat/premium.css?v=20261017-airy">
+<link rel="stylesheet" href="/chat/premium.css?v=20261017-exact">
 <script>if(window.parent===window)location.replace("/chat"+location.search);</script><script defer src="/tool-theme.js"></script></head>
 <body>
 <svg class="sprites" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -30,54 +30,66 @@
 <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M10 2h4l.7 2.6 2 1.1 2.5-.8 2 3.5-1.9 1.9v2.4l1.9 1.9-2 3.5-2.5-.8-2 1.1L14 22h-4l-.7-2.6-2-1.1-2.5.8-2-3.5 1.9-1.9v-2.4L2.8 9.4l2-3.5 2.5.8 2-1.1L10 2Z"/></symbol>
 </svg>
 <div class="app-shell" id="chatApp">
-<aside class="app-rail" aria-label="Main navigation">
-<a class="rail-brand" href="/" aria-label="8aPDF Home" title="8aPDF Home">8<span>a</span></a>
-<span class="rail-label">SPACE</span><div class="rail-separator"></div>
-<a class="rail-button active" href="/chat" aria-current="page" aria-label="Friends Chat" title="Friends Chat"><svg><use href="#i-chat"></use></svg></a>
-<a class="rail-button" href="/" aria-label="Back to study library" title="Study Library"><svg><use href="#i-back"></use></svg></a>
-<div class="rail-spacer"></div><span class="rail-bottom-caption">8aPDF<br>SOCIAL</span><span class="rail-avatar" id="railAvatar">8</span>
+<aside class="app-rail" aria-label="8aPDF navigation">
+  <a class="rail-brand" href="/" aria-label="Back to 8aPDF" title="8aPDF Home">8<span>a</span></a>
+  <span class="rail-rule" aria-hidden="true"></span>
+  <nav class="rail-navigation" aria-label="Chat tools">
+    <a class="rail-button active" href="/chat" aria-label="Friends Chat" aria-current="page" title="Friends Chat"><svg aria-hidden="true"><use href="#i-chat"></use></svg></a>
+    <button type="button" class="rail-button" id="adminBtn" aria-label="Room management" title="Room management"><svg aria-hidden="true"><use href="#i-settings"></use></svg></button>
+  </nav>
+  <div class="rail-spacer"></div>
+  <button type="button" class="rail-profile" id="railProfileButton" aria-label="Your account" aria-expanded="false" aria-controls="railAccount"><span class="rail-avatar" id="railAvatar">8</span><span class="rail-online" aria-hidden="true"></span></button>
+  <div class="rail-account" id="railAccount" hidden><div class="mini-profile"><span class="mini-avatar" id="miniAvatar">8</span><span><strong id="sideName">Student</strong><small id="identityStatus">Connecting…</small></span></div><a class="account-home" href="/"><svg aria-hidden="true"><use href="#i-back"></use></svg> Back to 8aPDF</a></div>
 </aside>
 <aside class="chat-sidebar" id="chatSidebar" aria-label="Conversations">
-<div class="side-top">
-<div class="side-kicker"><span class="side-mark"></span> THE 8aPDF NETWORK <button id="closeRooms" class="icon-button mobile-only" type="button" aria-label="Close conversations"><svg><use href="#i-close"></use></svg></button></div>
-<div class="side-headline"><h1>Chats <span class="heading-star">✳</span></h1><p>Stay close. Stay connected.</p></div>
-<label class="room-search-field"><svg><use href="#i-search"></use></svg><input id="roomSearch" type="search" placeholder="Find a conversation..." aria-label="Search conversations" autocomplete="off" maxlength="70"><span>⌕</span></label>
-</div>
-<div class="side-controls">
-<button type="button" class="side-primary" data-action="create"><span class="primary-plus"><svg><use href="#i-plus"></use></svg></span>Create conversation <span class="action-arrow">↗</span></button>
-<div class="two-actions"><button type="button" data-action="join"><svg><use href="#i-link"></use></svg> Join a room</button><button type="button" data-action="private"><svg><use href="#i-lock"></use></svg> Private chat</button></div>
-</div>
-<div class="side-group-head"><span>YOUR CONVERSATIONS <b id="roomsTotal">0</b></span><button type="button" id="refreshRooms" title="Refresh conversations" aria-label="Refresh conversations"><svg><use href="#i-more"></use></svg></button></div>
-<div id="roomList" class="room-list"><div class="list-loading">Finding your conversations…</div></div>
-<div class="side-bottom">
-<button type="button" class="new-chat-link" data-action="new"><svg><use href="#i-plus"></use></svg> New group chat <span class="action-arrow">↗</span></button>
-<div class="mini-profile"><div class="mini-avatar" id="miniAvatar">8</div><span><strong id="sideName">Student</strong><small id="identityStatus">Connecting…</small></span><i class="profile-indicator"></i></div>
-<button type="button" id="adminBtn" class="bottom-action"><svg><use href="#i-crown"></use></svg><span>Room management</span><svg><use href="#i-chevron"></use></svg></button>
-</div>
+  <div class="side-top">
+    <div class="side-kicker"><span>8APDF</span><button type="button" id="closeRooms" class="icon-button mobile-only" aria-label="Close conversations"><svg aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+    <h1>Chats</h1>
+    <p>Stay close. Stay connected.</p>
+    <label class="room-search-field"><svg aria-hidden="true"><use href="#i-search"></use></svg><input id="roomSearch" type="search" placeholder="Search conversations…" aria-label="Search conversations" autocomplete="off" maxlength="70"></label>
+  </div>
+  <div class="rooms-heading"><span>ROOMS <span class="room-count" id="roomsTotal" aria-label="Room count">0</span></span><button id="roomActionsToggle" class="add-room-button" type="button" title="Room actions" aria-label="Room actions" aria-expanded="false" aria-controls="roomActionsMenu"><svg aria-hidden="true"><use href="#i-plus"></use></svg></button></div>
+  <div class="room-actions-menu" id="roomActionsMenu" hidden>
+    <button type="button" data-action="create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> Create a room</button>
+    <button type="button" data-action="join"><svg aria-hidden="true"><use href="#i-link"></use></svg> Join a room</button>
+    <button type="button" data-action="private"><svg aria-hidden="true"><use href="#i-lock"></use></svg> Private chat</button>
+    <button type="button" data-action="new"><svg aria-hidden="true"><use href="#i-users"></use></svg> New group chat</button>
+    <button type="button" id="refreshRooms"><svg aria-hidden="true"><use href="#i-more"></use></svg> Refresh conversations</button>
+  </div>
+  <div class="room-list" id="roomList"><div class="list-loading">Finding your conversations…</div></div>
 </aside>
 <main class="conversation" id="conversation">
-<header class="chat-topbar">
-<div class="chat-title-area"><button id="mobileOpenRooms" class="icon-button mobile-only" type="button" aria-label="Open conversations"><svg><use href="#i-menu"></use></svg></button><div class="topic-icon" id="topicIcon">#</div><div class="topic-text"><span class="chat-eyebrow">YOUR CURRENT ROOM</span><h2 id="roomTitle">General Chat</h2><p id="roomSubtitle">Connecting to your friends…</p></div></div>
-<div class="header-actions"><span id="connectionBadge" class="connection-badge"><span class="status-light"></span> Connecting</span><span class="header-divider"></span><button id="inviteBtn" class="icon-button" title="Invite friends" aria-label="Invite friends"><svg><use href="#i-link"></use></svg></button><button id="mobileOpenMembers" class="icon-button" title="Show members" aria-label="Show members"><svg><use href="#i-users"></use></svg></button><button id="headerMoreBtn" class="icon-button" title="Chat options" aria-label="Chat options"><svg><use href="#i-more"></use></svg></button></div>
-</header>
-<div class="conversation-stage">
-<div class="stage-topline"><span><i class="tiny-diamond"></i> 8aPDF / FRIENDS SPACE</span><span class="stage-security"><svg><use href="#i-lock"></use></svg> Your conversation</span></div>
-<section class="messages-area" id="messagesArea" aria-label="Conversation messages" aria-live="polite"><button class="load-older" id="loadOlder" hidden>Load older messages</button><div class="messages" id="messages"><div class="intro-space"><div class="intro-art" aria-hidden="true"><span class="orbit orbit-outer"></span><span class="orbit orbit-inner"></span><span class="art-main"><svg><use href="#i-chat"></use></svg></span><span class="art-detail art-one">✳</span><span class="art-detail art-two">✦</span></div><span class="intro-eyebrow">A SPACE FOR YOUR PEOPLE</span><h3>Every great conversation<br>starts somewhere<span>.</span></h3><p>A place to share ideas, photos and everything in between.<br>Say hello and make it yours.</p></div></div></section>
-<div id="typingStatus" class="typing-status" aria-live="polite"></div>
-<form class="composer-wrap" id="composerForm">
-<div class="reply-draft" id="replyDraft" hidden><span><small>Replying to <strong id="replyDraftAuthor">friend</strong></small><span id="replyDraftText"></span></span><button type="button" class="icon-button" id="cancelReply" aria-label="Cancel reply"><svg><use href="#i-close"></use></svg></button></div>
-<div class="composer"><label class="attach-button" for="mediaInput" title="Send file, photo, video or PDF"><svg><use href="#i-paperclip"></use></svg></label><input type="file" id="mediaInput" hidden accept="image/*,video/*,audio/*,application/pdf,text/plain,application/zip,application/octet-stream"><textarea id="messageInput" rows="1" maxlength="10000" placeholder="Write a message…" aria-label="Message" autocomplete="off"></textarea><button type="submit" id="sendButton" class="send-button" aria-label="Send message"><svg><use href="#i-send"></use></svg></button></div>
-<div class="composer-note"><span id="composerInfo">Enter to send · Shift + Enter for new line</span><span><svg><use href="#i-lock"></use></svg> Private storage · 8 MB after compression</span></div>
-</form></div>
+  <header class="chat-topbar"><div class="chat-title-area">
+    <button id="mobileOpenRooms" type="button" class="icon-button mobile-only" aria-label="Open conversations"><svg aria-hidden="true"><use href="#i-menu"></use></svg></button>
+    <div class="topic-icon" id="topicIcon">#</div>
+    <div class="topic-text"><h2 id="roomTitle">General Chat</h2><p id="roomSubtitle">Your friends are here</p></div>
+  </div>
+  <div class="header-actions"><span id="connectionBadge" class="connection-badge"><span class="status-light"></span> Connecting</span><span class="header-divider"></span>
+    <button id="inviteBtn" type="button" class="icon-button" title="Invite friends" aria-label="Invite friends"><svg aria-hidden="true"><use href="#i-link"></use></svg></button>
+    <button id="headerMoreBtn" type="button" class="icon-button" title="Chat options" aria-label="Chat options"><svg aria-hidden="true"><use href="#i-more"></use></svg></button>
+    <button id="mobileOpenMembers" type="button" class="icon-button" title="Show members" aria-label="Show members"><svg aria-hidden="true"><use href="#i-users"></use></svg></button>
+  </div></header>
+  <div class="conversation-stage">
+    <section class="messages-area" id="messagesArea" aria-label="Conversation messages" aria-live="polite"><button id="loadOlder" class="load-older" type="button" hidden>Load older messages</button><div class="messages" id="messages"><div class="intro-space"><div class="intro-icon"><svg aria-hidden="true"><use href="#i-chat"></use></svg></div><h3>A space for good conversations.</h3><p>Say hello, send a message, or share something with your friends.</p></div></div></section>
+    <div id="typingStatus" class="typing-status" aria-live="polite"></div>
+    <form class="composer-wrap" id="composerForm">
+      <div class="reply-draft" id="replyDraft" hidden><span><small>Replying to <strong id="replyDraftAuthor">friend</strong></small><span id="replyDraftText"></span></span><button type="button" class="icon-button" id="cancelReply" aria-label="Cancel reply"><svg aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+      <div class="composer"><label class="attach-button" for="mediaInput" title="Attach photo, video, audio or file"><svg aria-hidden="true"><use href="#i-paperclip"></use></svg></label><input type="file" id="mediaInput" hidden accept="image/*,video/*,audio/*,application/pdf,text/plain,application/zip,application/octet-stream"><textarea id="messageInput" rows="1" maxlength="10000" placeholder="Write a message…" aria-label="Message" autocomplete="off"></textarea><button class="send-button" id="sendButton" type="submit" aria-label="Send message"><svg aria-hidden="true"><use href="#i-send"></use></svg></button></div>
+      <div class="composer-note sr-only"><span id="composerInfo">Enter to send · Shift + Enter for new line</span><span>Private storage · 8 MB after compression</span></div>
+    </form>
+  </div>
 </main>
 <aside class="members-panel" id="membersPanel" aria-label="Room details and members">
-<div class="details-cover"><div class="details-cover-head">ROOM DETAILS <span class="status-light"></span><button id="closeMembers" type="button" class="mobile-only icon-button" aria-label="Close members"><svg><use href="#i-close"></use></svg></button></div><div class="details-crest"><svg><use href="#i-users"></use></svg></div><h2>Good company.</h2><p>The people behind the conversation.</p></div>
-<div class="members-top"><div><span class="members-caption">PEOPLE IN THIS SPACE</span><h3>Members <span id="memberCount">0</span></h3><p id="membersSummary">Profiles with saved names</p></div></div>
-<div class="members-search-wrap"><label class="member-search-box"><svg><use href="#i-search"></use></svg><input id="memberSearch" class="members-search" type="search" placeholder="Find someone…" aria-label="Search named members" autocomplete="off" maxlength="40"></label></div>
-<div id="membersList" class="members-list"><div class="list-loading">Looking for members…</div></div>
-<div class="presence-footer"><span class="presence-symbol"><span class="status-light"></span></span><span><strong>Live presence</strong><br><small>See who's around in real time</small></span></div>
+  <div class="details-top"><span>Room details</span><button type="button" class="icon-button details-close" id="closeMembers" aria-label="Close room details"><svg aria-hidden="true"><use href="#i-close"></use></svg></button></div>
+  <div class="details-cover"><div class="details-crest" id="detailRoomIcon">#</div><h2 id="detailRoomTitle">General Chat</h2><div class="details-live"><span class="status-light"></span><span id="detailsStatus">Connecting…</span></div><p id="detailRoomDescription">A place for friends to chat, share ideas and stay connected.</p></div>
+  <div class="details-divider" aria-hidden="true"></div>
+  <div class="members-top"><h3>Members <span id="memberCount">0</span></h3><p id="membersSummary" class="sr-only">Profiles with saved names</p></div>
+  <div class="members-search-wrap" id="membersSearchWrap" hidden><label class="member-search-box"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" class="members-search" id="memberSearch" placeholder="Search members…" aria-label="Search named members" autocomplete="off" maxlength="40"></label></div>
+  <div class="members-list" id="membersList"><div class="list-loading">Finding members…</div></div>
+  <button type="button" class="members-all-button" id="viewAllMembers" aria-expanded="false"><svg aria-hidden="true"><use href="#i-users"></use></svg> <span>See all members</span> <svg aria-hidden="true"><use href="#i-chevron"></use></svg></button>
 </aside>
 <div id="mobileBackdrop" class="mobile-backdrop" hidden aria-hidden="true"></div>
 </div>
