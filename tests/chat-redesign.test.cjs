@@ -60,3 +60,17 @@ test('database member query is non-destructive and security invoker',()=>{
  assert.match(sql,/grant execute on function public\.chat_named_members\(uuid\) to authenticated/i);
  assert.doesNotMatch(sql,/\bdelete\s+from\b/i);
 });
+
+test('full chat redesign updates layout but preserves backend controls',()=>{
+ for(const file of ['chat/index.html','chat-frame.html']){
+  const html=read(file);
+  for(const item of ['conversation-stage','side-headline','details-cover','intro-art','roomSearch','closeRooms','member-search-box','roomsTotal']){
+   assert.ok(html.includes(item),file+' missing '+item);
+  }
+  assert.match(html,/premium\\.css\\?v=20261017-full/);
+ }
+ assert.match(app,/roomSearch'\\)\\?\\.addEventListener\\('input',renderRooms\\)/);
+ assert.match(app,/message-day/);
+ assert.match(css,/\\.conversation-stage/);
+ assert.match(css,/@media\\s*\\(max-width:780px\\)/);
+});
