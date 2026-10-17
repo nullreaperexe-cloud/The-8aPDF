@@ -6,6 +6,7 @@ const OLD_ROOT='short-links/v1/';
 const VALID=/^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])$/;
 const clean=x=>typeof x==='string'?x.trim().toLowerCase():'';
 const blobConfigured=()=>Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const baseURL=req=>['8apdf.vercel.app','the-8apdf.vercel.app'].includes(String(req.headers.host||'').toLowerCase())?'https://'+req.headers.host:'https://the-8apdf.vercel.app';
 function respond(res,status,obj){
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
@@ -98,7 +99,9 @@ export default async function handler(req,res){
   if(!ownerHash(body.ownerKey))return respond(res,400,{error:'Browser ownership key missing.'});
   const result=await supabase('list',{ownerKey:body.ownerKey});
   if(result.status!==200)return respond(res,result.status,result.body);
-  const existing=Array.isArray(result.body.links)?result.body.links:[];
+  const existing=(Array.isArray(result.body.links)?result.body.links:[]).map(item=>({
+   ...item,shortUrl:baseURL(req)+'/'+item.slug
+  }));
   const previously=await oldLinks(body.ownerKey);
   const unique=new Map(existing.map(x=>[x.slug,x]));
   for(const old of previously){
@@ -139,5 +142,6 @@ export default async function handler(req,res){
  const result=await supabase('create',{
   slug,documentId:body.documentId,pdfUrl:body.pdfUrl,ownerKey:body.ownerKey
  });
+ if(result.status===201&&result.body?.slug)result.body.shortUrl=baseURL(req)+'/'+result.body.slug;
  return respond(res,result.status,result.body);
 }
