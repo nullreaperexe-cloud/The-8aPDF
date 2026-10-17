@@ -38,15 +38,15 @@ function start(){
 }
 const seq=s=>Array.from(s.api.getState().selectedTracks);
 const first=start();
-assert.deepEqual(seq(first),['tum-hi-ho','khairiyat','saiyaara']);
-assert.equal(first.audio.src,'/assets/bgm/tum-hi-ho.mp3');
+assert.deepEqual(seq(first),['saiyaara','tum-hi-ho','khairiyat']);
+assert.equal(first.audio.src,'/assets/bgm/saiyaara.mp3');
 assert.equal(first.audio.loop,false);
+first.audio.event('ended');
+assert.equal(first.audio.src,'/assets/bgm/tum-hi-ho.mp3');
 first.audio.event('ended');
 assert.equal(first.audio.src,'/assets/bgm/khairiyat.mp3');
 first.audio.event('ended');
 assert.equal(first.audio.src,'/assets/bgm/saiyaara.mp3');
-first.audio.event('ended');
-assert.equal(first.audio.src,'/assets/bgm/tum-hi-ho.mp3');
 first.api.select('khairiyat');
 assert.deepEqual(seq(first),['khairiyat']);
 assert.equal(first.audio.loop,true);
@@ -56,14 +56,19 @@ assert.deepEqual(seq(reload),['khairiyat']);
 assert.equal(reload.audio.loop,true);
 assert.equal(reload.audio.src,'/assets/bgm/khairiyat.mp3');
 reload.api.setSongs(['saiyaara','tum-hi-ho']);
-assert.deepEqual(seq(reload),['tum-hi-ho','saiyaara']);
+assert.deepEqual(seq(reload),['saiyaara','tum-hi-ho']);
 assert.equal(reload.audio.loop,false);
 reload.audio.event('ended');
-assert.equal(reload.audio.src,'/assets/bgm/saiyaara.mp3');
-reload.audio.event('ended');
 assert.equal(reload.audio.src,'/assets/bgm/tum-hi-ho.mp3');
+reload.audio.event('ended');
+assert.equal(reload.audio.src,'/assets/bgm/saiyaara.mp3');
 const again=start();
-assert.deepEqual(seq(again),['tum-hi-ho','saiyaara']);
+assert.deepEqual(seq(again),['saiyaara','tum-hi-ho']);
+// Existing saved selections from the old order must also follow the new order on refresh.
+storage.set('8apdf_background_music_v1',JSON.stringify({enabled:true,volume:18,selectedTracks:['tum-hi-ho','khairiyat','saiyaara']}));
+const migrated=start();
+assert.deepEqual(seq(migrated),['saiyaara','tum-hi-ho','khairiyat']);
+assert.equal(migrated.audio.src,'/assets/bgm/saiyaara.mp3');
 assert.equal(source.includes('meri-duniya-tu-hi-re'),false);
 for(const name of ['tum-hi-ho','khairiyat','saiyaara'])
  assert(fs.existsSync('assets/bgm/'+name+'.mp3'),'Original MP3 missing: '+name);

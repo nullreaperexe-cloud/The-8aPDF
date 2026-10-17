@@ -2,9 +2,9 @@
 (()=>{
 'use strict';
 const TRACKS=[
+ {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'},
  {id:'tum-hi-ho',title:'Tum Hi Ho',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/tum-hi-ho.mp3'},
- {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'},
- {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
+ {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'}
 ];
 const KEY='8apdf_background_music_v1',byId=id=>document.getElementById(id);
 const ordered=()=>TRACKS.map(x=>x.id);
@@ -105,7 +105,7 @@ function mount(){
  '<input type="range" min="0" max="100" step="1" id="eightapdfBgmVolume" aria-label="Background music volume">'+
  '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmTest" type="button">▶ Play music</button><button id="eightapdfBgmPlayAll" type="button">↺ Play all 3 in order</button></div>'+
  '<p id="eightapdfBgmStatus" role="status" aria-live="polite"></p>'+
- '<small class="eightapdf-bgm-note">Tum Hi Ho → Khairiyat → Saiyaara → repeat. Browsers may require a tap to allow audio.</small>';
+ '<small class="eightapdf-bgm-note">Saiyaara → Tum Hi Ho → Khairiyat → repeat. Browsers may require a tap to allow audio.</small>';
  const style=document.createElement('style');style.textContent='.eightapdf-bgm-heading,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-heading small,.eightapdf-bgm-note{color:var(--muted);font-size:.7rem}.eightapdf-bgm-list{display:grid;gap:9px;margin:16px 0}.eightapdf-bgm-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--surface-high);padding:10px;border-radius:12px}.eightapdf-bgm-item label{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer}.eightapdf-bgm-item input{width:17px;height:17px;accent-color:var(--button);flex:none}.eightapdf-bgm-number{border:1px solid var(--line-bold);border-radius:7px;padding:5px 8px;font-size:.7rem}.eightapdf-bgm-copy{display:flex;flex-direction:column;gap:4px;min-width:0}.eightapdf-bgm-copy strong{font-size:.8rem}.eightapdf-bgm-copy small,.eightapdf-bgm-current{font-size:.7rem;color:var(--muted)}.eightapdf-bgm-item button{flex:none}.eightapdf-bgm-item button,.eightapdf-bgm-actions button{border:1px solid var(--line-bold);border-radius:10px;background:var(--surface-soft);color:var(--text);padding:9px 11px;cursor:pointer;font:inherit;font-size:.75rem}.eightapdf-bgm-item button:disabled,.eightapdf-bgm-actions button:disabled{opacity:.45;cursor:not-allowed}.eightapdf-bgm-mode{font-size:.77rem;color:var(--text-soft);font-weight:650;line-height:1.5}.eightapdf-bgm-current{margin-bottom:18px}.eightapdf-bgm-current strong{color:var(--text)}.eightapdf-bgm-volume{font-size:.8rem}.eightapdf-settings-music input[type=range]{width:100%;accent-color:var(--button);margin:12px 0 18px}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:8px}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}#eightapdfBgmStatus{font-size:.76rem;color:var(--muted);margin:16px 0 8px}.eightapdf-bgm-note{display:block;line-height:1.5}@media(max-width:450px){.eightapdf-bgm-item{padding:8px}.eightapdf-bgm-item label{gap:6px}.eightapdf-bgm-item button{padding:8px}}';
  document.head.appendChild(style);
  byId('eightapdfBgmToggle').addEventListener('change',e=>enable(e.target.checked));

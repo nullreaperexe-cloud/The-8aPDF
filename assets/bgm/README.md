@@ -2,9 +2,9 @@
 
 The website serves three original MP3 assets (without re-encoding):
 
-1. `tum-hi-ho.mp3` — Tum Hi Ho (piano cover)
-2. `khairiyat.mp3` — Khairiyat (piano cover)
-3. `saiyaara.mp3` — Saiyaara (peaceful instrumental)
+1. `saiyaara.mp3` — Saiyaara (peaceful instrumental)
+2. `tum-hi-ho.mp3` — Tum Hi Ho (piano cover)
+3. `khairiyat.mp3` — Khairiyat (piano cover)
 
 ## Settings → Music
 
@@ -12,7 +12,7 @@ Select one, two or all three songs. The selection is saved in localStorage (`8ap
 
 - **One selected:** that song loops indefinitely.
 - **Two selected:** the selected songs play in the canonical order, then repeat.
-- **All three selected:** Tum Hi Ho → Khairiyat → Saiyaara → repeat.
+- **All three selected:** Saiyaara → Tum Hi Ho → Khairiyat → repeat.
 - **Only this:** choose a song for permanent single-track looping.
 - **Play all 3 in order:** resets to the full ordered playlist.
 - Music enable, pause and volume controls remain available.
