@@ -2857,7 +2857,7 @@ if(panel&&body){
  interface:['Interface & Layout','Fine-tune typography, spacing, shape and animations.'],
  study:['Study Experience','Personal productivity tools and focus preferences.'],
  accessibility:['Accessibility','Comfortable reading, text sizes and motion controls.'],
- music:['Music','Choose one of four background tracks, adjust volume or pause.']};
+ music:['Music','Select one song on loop or play three in order; adjust volume or pause.']};
  const groups=[...body.children].filter(x=>x.classList?.contains('setting-group'));
  // Existing groups in original page order; never remove or recreate any input or listener.
  const categories=['general','general','glass','glass','appearance','appearance','general','interface','study','accessibility','interface','interface','music'];
@@ -3503,8 +3503,8 @@ draw();
 <script defer src="/premium-workspace.js?v=20261013-3"></script>
 <script defer src="/workspace-pages.js?v=20261013-3"></script>
 <script defer src="/school-calendar-client.js?v=20261013-2"></script>
-<!-- Native MP3 background player: four tracks, refresh shuffle and settings controls. -->
-<script defer src="/bgm-howler.js?v=20261017-four-tracks-v2"></script>
+<!-- Native MP3 background player: saved song selection and ordered three-track playlist. -->
+<script defer src="/bgm-howler.js?v=20261017-ordered-three-v3"></script>
 
 </body>
 </html>
