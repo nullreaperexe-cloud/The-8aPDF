@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {canonicalURL,httpsURL,validSlug,metadata,validatePDF,duplicateGroups,MAX_PDF_BYTES} from '../admin/domain.js';
+import {canonicalURL,httpsURL,image2urlPDFURL,validSlug,metadata,validatePDF,duplicateGroups,MAX_PDF_BYTES} from '../admin/domain.js';
 import {normalizeSupabaseAnnouncement} from '../supabase-announcements.js';
 test('safe URL canonicalization preserves meaningful case and query parameters',()=>{
   assert.equal(canonicalURL('https://EXAMPLE.com/A.pdf?token=XYZ#page=2'),'https://example.com/A.pdf?token=XYZ');
@@ -12,6 +12,11 @@ test('safe URL canonicalization preserves meaningful case and query parameters',
 test('short names reject reserved routes and malformed names',()=>{
   assert.equal(validSlug('Science-Notes'),'science-notes');
   for(const value of ['admin','pdf-explorer','aa','science--notes','-hello','hello/there','hello?x=1'])assert.throws(()=>validSlug(value));
+});
+
+test('Image2URL entry accepts public HTTPS provider URLs and rejects lookalikes or private targets',()=>{
+  assert.equal(image2urlPDFURL('https://www.image2url.com/r2/default/documents/notes.pdf'),'https://www.image2url.com/r2/default/documents/notes.pdf');
+  for(const value of ['http://image2url.com/a.pdf','https://image2url.com.evil.example/a.pdf','https://127.0.0.1/a.pdf','https://user:secret@image2url.com/a.pdf','javascript:alert(1)','https://example.com/a.pdf'])assert.equal(image2urlPDFURL(value),null);
 });
 test('metadata validates server-side and excludes protected / legacy fields',()=>{
   const result=metadata('study_materials',{title:' Math ',subject:'Mathematics',pdf_url:'https://example.com/a.pdf',tags:[' revision '],source_date:'2026-10-17',published:true,raw:{secret:'untouched'},inserted_at:'1999-01-01',admin_edited_fields:['evil'],version:100});

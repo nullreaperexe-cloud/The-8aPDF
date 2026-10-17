@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.57.0';
-import { MAX_PDF_BYTES, PUBLIC_ORIGIN, fail, httpsURL, canonicalURL, validSlug, metadata, validatePDF, duplicateGroups } from '../../../admin/domain.js';
+import { MAX_PDF_BYTES, PUBLIC_ORIGIN, fail, httpsURL, canonicalURL, image2urlPDFURL, validSlug, metadata, validatePDF, duplicateGroups } from '../../../admin/domain.js';
 
 const project = Deno.env.get('SUPABASE_URL')!;
 const db = createClient(project, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false, autoRefreshToken: false },global:{fetch:(url,init)=>fetch(url,{...init,signal:AbortSignal.timeout(25000)})} });
@@ -63,17 +63,39 @@ function listQuery(arg: any) {
   } else q = q.order('created_at', { ascending: false }).order(table === 'short_links' ? 'slug' : 'id');
   return { q: q.range((page - 1) * size, page * size - 1), page, size };
 }
-async function boundedBody(req:Request,maximum:number){
+async function boundedBody(req:Pick<Request,'body'>,maximum:number){
   const reader=req.body?.getReader();if(!reader)fail('Request body is required.',400);
   const chunks:Uint8Array[]=[];let size=0;
   while(true){const {done,value}=await reader!.read();if(done)break;size+=value.length;if(size>maximum){await reader!.cancel();fail('Request is too large.',413);}chunks.push(value);}
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   return new Blob([bytes]);
 }
+async function image2urlFile(value:unknown):Promise<File>{
+  let url=image2urlPDFURL(value);if(!url)fail('Enter a public HTTPS PDF link from Image2URL.');
+  for(let redirect=0;redirect<4;redirect++){
+    const response:Response=await fetch(url!,{redirect:'manual',signal:AbortSignal.timeout(25000)});
+    if([301,302,303,307,308].includes(response.status)){
+      const location:string|null=response.headers.get('location');await response.body?.cancel();
+      url=location?image2urlPDFURL(new URL(location,url!).href):null;
+      if(!url)fail('The Image2URL redirect must stay on Image2URL.');continue;
+    }
+    if(!response.ok)fail('The Image2URL PDF could not be opened. Check that the link is public.');
+    if(Number(response.headers.get('content-length')||0)>MAX_PDF_BYTES){await response.body?.cancel();fail('PDF must be at most 20 MB.',413);}
+    const body=await boundedBody(response,MAX_PDF_BYTES);
+    let filename='image2url-document.pdf';try{const name=decodeURIComponent(new URL(url!).pathname.split('/').at(-1)||'');if(/\.pdf$/i.test(name))filename=name;}catch{}
+    return new File([body],filename,{type:'application/pdf'});
+  }
+  fail('The Image2URL link has too many redirects.');
+}
+async function uploadLinks(ctx:Context,record:any,target:string,input:any){
+  if(target!=='study_materials')return {shortLink:null,shortLinkError:null,reusedShortLink:false};
+  try{const result:any=check(await db.rpc('admin_upload_links',{p_actor:ctx.actor,p_session:ctx.session,p_record:record.id,p_slug:input.short_slug?validSlug(input.short_slug):null}));return {...result,shortLinkError:null,reusedShortLink:result.reused};}
+  catch(e){return {shortLink:null,shortLinkError:(e as Error).message,reusedShortLink:false};}
+}
 async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>{}) {
   if (Number(req.headers.get('content-length') || 0) > MAX_PDF_BYTES + 100000) fail('Upload exceeds 20 MB.', 413);
   const body=await boundedBody(req,MAX_PDF_BYTES+100000);
-  const form = await new Response(body,{headers:{'Content-Type':req.headers.get('content-type')!}}).formData(), file = form.get('file') as File;
+  const form = await new Response(body,{headers:{'Content-Type':req.headers.get('content-type')!}}).formData();
   const uid = uuidOf(form.get('uploadId')), target = String(form.get('table') || 'study_materials');
   const recordId = form.get('recordId') ? idOf(form.get('recordId')) : uid;
   const recordVersion = form.get('recordId') ? Number(form.get('recordVersion')) : null;
@@ -83,47 +105,52 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
   try { input = JSON.parse(String(form.get('metadata'))); } catch { fail('Upload metadata is invalid.'); }
   const details: any = metadata(target, input);
   stage('validating');
+  const externalURL=input.image2url_url?image2urlPDFURL(input.image2url_url):null;
+  if(input.image2url_url&&!externalURL)fail('Enter a public HTTPS PDF link from Image2URL.');
+  if(externalURL&&target!=='study_materials')fail('Image2URL links are available for PDF library entries.');
+  if(externalURL&&form.get('file') instanceof File)fail('Choose a PDF file or an Image2URL link.');
+  const file=externalURL?await image2urlFile(externalURL):form.get('file') as File;
   const verified = await validatePDF(file);
   if (input.short_slug) { validSlug(input.short_slug); if (!details.published || target !== 'study_materials') fail('Publish the PDF before creating its short link.'); }
   let job: any = check(await db.from('admin_uploads').select('*').eq('id', uid).maybeSingle());
   if (job && (job.actor_id !== ctx.actor || job.checksum !== verified.checksum || job.record_type !== target || job.record_id!==recordId)) fail('Upload ID is already in use.', 409);
-  if (job?.state === 'ready') return { record: await one(target, job.record_id), uploadId: uid, recovered: true };
-  if (job && ['deleting','deleted'].includes(job.state)) fail('This upload was cleaned up. Add the file again.', 409);
-  const path = `${ctx.actor}/${uid}.pdf`, publicURL = `${project}/storage/v1/object/public/study-pdfs/${path}`;
   if (!job) {
     const duplicates: any = check(await db.from('study_materials').select('id,title').eq('file_checksum', verified.checksum).is('archived_at', null).limit(1));
     if (target === 'study_materials' && duplicates.length && input.allow_duplicate !== true) fail(`Identical PDF already exists: ${duplicates[0].title}. Review duplicates or explicitly allow another entry.`, 409);
-    job = check(await db.from('admin_uploads').insert({ id: uid, actor_id: ctx.actor, storage_path: path, filename: verified.filename, size_bytes: file.size, checksum: verified.checksum, record_id: recordId, record_type: target }).select('*').single());
+    if(externalURL){const rows:any=check(await db.from('study_materials').select('id,title').eq('pdf_url',externalURL).limit(1));if(rows.length&&input.allow_duplicate!==true)fail(`This PDF URL already exists: ${rows[0].title}.`,409);}
   }
+  const proposedPath=externalURL?null:`${ctx.actor}/${uid}.pdf`;
+  const reservation:any=check(await db.rpc('admin_upload_prepare',{p_actor:ctx.actor,p_session:ctx.session,p_upload:uid,p_checksum:verified.checksum,p_filename:verified.filename,p_size:file.size,p_table:target,p_record:recordId,p_url:externalURL||`${project}/storage/v1/object/public/study-pdfs/${proposedPath}`,p_path:proposedPath}));
+  job=reservation.job;const path=reservation.asset.storage_path,publicURL=reservation.asset.pdf_url;
+  if(job.state==='ready'){const record=await one(target,job.record_id);return {record,publicURL,uploadId:uid,recovered:true,reusedAsset:true,...await uploadLinks(ctx,record,target,input)};}
   try {
     // Idempotent UUID path. Never upsert or overwrite an existing Storage object.
     stage('uploading');
-    const { error } = await db.storage.from('study-pdfs').upload(path, verified.bytes, { contentType: 'application/pdf', upsert: false, cacheControl: '3600' });
-    if (error && error.message !== 'The resource already exists' && error.message !== 'The resource already exists.' && (error as any).statusCode !== '409') throw error;
+    if(path){const { error } = await db.storage.from('study-pdfs').upload(path, verified.bytes, { contentType: 'application/pdf', upsert: false, cacheControl: '3600' });
+      if (error && error.message !== 'The resource already exists' && error.message !== 'The resource already exists.' && (error as any).statusCode !== '409') throw error;}
     stage('link');
-    const verify = await fetch(publicURL, { headers: { Range: 'bytes=0-7' }, signal: AbortSignal.timeout(15000) });
-    const signature = new Uint8Array(await verify.arrayBuffer());
-    if (!verify.ok || !new TextDecoder().decode(signature.subarray(0, 5)).startsWith('%PDF-')) fail('Storage verification failed. Keep this file queued and retry.', 503);
+    if(path){const verify = await fetch(publicURL, { headers: { Range: 'bytes=0-7' }, signal: AbortSignal.timeout(15000) });
+      const signature = new Uint8Array(await verify.arrayBuffer());
+      if (!verify.ok || !new TextDecoder().decode(signature.subarray(0, 5)).startsWith('%PDF-')) fail('Storage verification failed. Keep this file queued and retry.', 503);
+    }else if(publicURL!==externalURL){const retained=await validatePDF(await image2urlFile(publicURL));if(retained.checksum!==verified.checksum)fail('The retained Image2URL PDF has changed. Review its link before reusing it.',409);}
     stage('saving');
     const existing: any = check(await db.from(target).select('*').eq('id', recordId).maybeSingle());
     let record: any;
     if (existing && recordId===uid) record = await one(target, uid);
     else {
-      const data = target === 'study_materials' ? { ...details, pdf_url: publicURL, source: 'Admin Upload', storage_path: path, original_filename: verified.filename, file_checksum: verified.checksum, size_bytes: file.size } : { ...details, attachment_url: publicURL, has_attachment: true, storage_path: path, source: 'Admin Upload' };
+      let recordURL=publicURL;
+      if(target==='study_materials'){const used:any=check(await db.from(target).select('id').eq('pdf_url',publicURL).limit(1));if(used.length)recordURL=publicURL+'#8apdf-copy='+uid;}
+      const data = target === 'study_materials' ? { ...details, pdf_url: recordURL, source: path?'Admin Upload':'Image2URL', storage_path: path, original_filename: verified.filename, file_checksum: verified.checksum, size_bytes: file.size } : { ...details, attachment_url: publicURL, has_attachment: true, storage_path: path, source: path?'Admin Upload':'Image2URL' };
       record = await mutate(ctx, target,recordId===uid?'create':'edit', recordId, recordVersion, data);
     }
     check(await db.from('admin_uploads').update({ state: 'ready', error: null, updated_at: new Date().toISOString() }).eq('id', uid));
     stage('publishing');
     const confirmed: any=await one(target,recordId);
-    if (confirmed.storage_path!==path) fail('Upload recovery needs review: saved file does not match.',409);
+    if (confirmed.storage_path!==path||canonicalURL(confirmed.pdf_url||confirmed.attachment_url)!==canonicalURL(publicURL)) fail('Upload recovery needs review: saved file does not match.',409);
     record=confirmed;
-    let shortLink = null, shortLinkError = null;
-    if (input.short_slug) {
-      try { shortLink = await mutate(ctx, 'short_links', 'create', validSlug(input.short_slug), null, { document_id: record.id, url: record.pdf_url, title: record.title }); }
-      catch (e) { shortLinkError = (e as Error).message; }
-    }
+    const links=await uploadLinks(ctx,record,target,input);
     stage('ready');
-    return { record, publicURL, uploadId: uid, shortLink, shortLinkError };
+    return { record, publicURL, uploadId: uid, ...links, reusedAsset:reservation.reused };
   } catch (e) {
     // Durable recovery record retains the object for retry. No delete after an
     // ambiguous DB response, which could otherwise remove a committed PDF.
@@ -140,14 +167,14 @@ async function perform(arg: any, ctx: Context) {
     const start = new Date(today + 'T00:00:00+05:30').toISOString();
     const [pdfs, announcements, links, uploads, activity, recent, notices, pdfToday, annToday, edited, failed] = await Promise.all([
       db.from('study_materials').select('id', { head: true, count: 'exact' }).is('archived_at', null), db.from('announcements').select('id', { head: true, count: 'exact' }).is('archived_at', null), db.from('short_links').select('slug', { head: true, count: 'exact' }),
-      allRows('admin_uploads', 'id,size_bytes,state'), db.from('admin_audit_logs').select('*').order('created_at', { ascending: false }).limit(8),
+      allRows('admin_uploads', 'id,size_bytes,state,storage_path'), db.from('admin_audit_logs').select('*').order('created_at', { ascending: false }).limit(8),
       db.from('study_materials').select('*').is('archived_at', null).order('inserted_at', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false }).limit(6),
       db.from('announcements').select('*').is('archived_at', null).order('message_date', { ascending: false, nullsFirst: false }).limit(4),
       db.from('study_materials').select('id', { head: true, count: 'exact' }).gte('inserted_at', start), db.from('announcements').select('id', { head: true, count: 'exact' }).gte('inserted_at', start),
       db.from('admin_audit_logs').select('*').eq('action','updated').order('created_at',{ascending:false}).limit(5), db.from('admin_uploads').select('*').eq('state','failed').order('created_at',{ascending:false}).limit(5)
     ]);
     for (const result of [pdfs, announcements, links, activity, recent, notices, pdfToday, annToday, edited, failed]) check(result);
-    return { pdfs: pdfs.count, announcements: announcements.count, links: links.count, pdfsToday: pdfToday.count, announcementsToday: annToday.count, storageBytes: (uploads as any[]).filter(u => u.state !== 'deleted').reduce((sum,u) => sum + Number(u.size_bytes),0), recent: recent.data, notices: notices.data, activity: activity.data, edited:edited.data, failed:failed.data, latestUpload: recent.data?.[0]?.inserted_at || null, syncErrors: null };
+    return { pdfs: pdfs.count, announcements: announcements.count, links: links.count, pdfsToday: pdfToday.count, announcementsToday: annToday.count, storageBytes: [...new Map((uploads as any[]).filter(u=>u.storage_path&&u.state!=='deleted').map(u=>[u.storage_path,Number(u.size_bytes)])).values()].reduce((sum,size)=>sum+size,0), recent: recent.data, notices: notices.data, activity: activity.data, edited:edited.data, failed:failed.data, latestUpload: recent.data?.[0]?.inserted_at || null, syncErrors: null };
   }
   if (action === 'save') {
     const table = tableOf(arg.table); if (!['study_materials', 'announcements'].includes(table)) fail('Unsupported editor.');

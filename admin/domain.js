@@ -16,6 +16,11 @@ export function canonicalURL(value) {
   const u = new URL(valid); u.hash = ''; // Path case and query parameters remain significant.
   return u.href;
 }
+export function image2urlPDFURL(value) {
+  const url=httpsURL(value);if(!url)return null;
+  const host=new URL(url).hostname;
+  return host==='image2url.com'||host.endsWith('.image2url.com')?url:null;
+}
 export function validSlug(value) {
   const slug = String(value || '').trim().toLowerCase();
   if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(slug) || slug.includes('--') || RESERVED_SLUGS.has(slug)) fail('Use an available name with 3–32 letters, numbers or single hyphens.');

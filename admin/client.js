@@ -49,7 +49,7 @@ export async function api(action,payload={},signal) {
 }
 export async function uploadFile(job,metadata,callbacks) {
   const token=await accessToken(),form=new FormData();
-  form.set('file',job.file); form.set('uploadId',job.id);form.set('table',job.table||'study_materials');form.set('metadata',JSON.stringify(metadata));
+  if(job.file)form.set('file',job.file); form.set('uploadId',job.id);form.set('table',job.table||'study_materials');form.set('metadata',JSON.stringify(metadata));
   if(job.recordId){form.set('recordId',job.recordId);form.set('recordVersion',String(job.version));}
   return new Promise((resolve,reject)=>{
     const xhr=new XMLHttpRequest();callbacks.controller(xhr);
