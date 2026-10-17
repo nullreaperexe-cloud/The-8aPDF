@@ -15,7 +15,7 @@ function check<T>(result: { data: T; error: any }): T {
   return result.data;
 }
 type Context = { actor: string; session: string; role: string };
-async function authorize(req: Request): Promise<Context> {
+async function authorize(req: Request, statusOnly=false): Promise<Context> {
   const token = req.headers.get('Authorization')?.match(/^Bearer (.+)$/i)?.[1];
   if (!token) fail('Sign in to the admin panel.', 401);
   const { data, error } = await db.auth.getUser(token);
@@ -23,6 +23,7 @@ async function authorize(req: Request): Promise<Context> {
   let session = '';
   try { session = JSON.parse(atob(token!.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).session_id; } catch { fail('Invalid session.', 401); }
   if (!/^[a-f0-9-]{36}$/i.test(session)) fail('Invalid session.', 401);
+  if(statusOnly){check(await db.rpc('admin_session_identity',{p_actor:data.user.id,p_session:session}));return {actor:data.user.id,session,role:'status_only'};}
   const role = check(await db.rpc('admin_gate', { p_actor: data.user.id, p_session: session, p_write: false }));
   return { actor: data.user.id, session, role };
 }
@@ -169,7 +170,23 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
 }
 async function perform(arg: any, ctx: Context) {
   const action = String(arg.action || 'session');
-  if(ctx.role==='viewer'&&!['session','list','overview','export','duplicates','link_candidates','link_health','preferences'].includes(action))fail('View-only access. A Super Admin must make this change.',403);
+  if(action==='access_status')return check(await db.rpc('admin_access_status',{p_actor:ctx.actor,p_session:ctx.session}));
+  if(action==='notice_ack'){
+    if(!Array.isArray(arg.ids)||arg.ids.length>100||arg.ids.some((n:any)=>!Number.isSafeInteger(n)||n<1))fail('Choose valid notices.');
+    check(await db.rpc('admin_notice_ack',{p_actor:ctx.actor,p_session:ctx.session,p_ids:arg.ids}));return {acknowledged:true};
+  }
+  if(ctx.role!=='super_admin'&&!['session','list','overview','duplicates','link_health','request_access'].includes(action))fail('View-only access. You can browse the panel or request Super Admin access.',403);
+  if(action==='request_access')return {request:check(await db.rpc('admin_request_access',{p_actor:ctx.actor,p_session:ctx.session}))};
+  if(action==='account_ban'){
+    const email=String(arg.email||'').trim().toLowerCase();
+    if(typeof arg.banned!=='boolean'||arg.confirm!==(arg.banned?'BAN ':'UNBAN ')+email)fail('Confirm this account change.');
+    return {record:check(await db.rpc('admin_account_ban',{p_actor:ctx.actor,p_session:ctx.session,p_email:email,p_banned:arg.banned}))};
+  }
+  if(action==='access_review'){
+    const email=String(arg.email||'').trim().toLowerCase();
+    if(!['approve','reject','ban'].includes(arg.decision)||arg.confirm!==String(arg.decision).toUpperCase()+' '+email)fail('Confirm the access request decision.');
+    return {record:check(await db.rpc('admin_access_review',{p_actor:ctx.actor,p_session:ctx.session,p_user:uuidOf(arg.userId),p_decision:arg.decision,p_email:email}))};
+  }
   if(action==='access_list')return check(await db.rpc('admin_access_list',{p_actor:ctx.actor,p_session:ctx.session}));
   if(action==='access_set'){
     if(!['super_admin','viewer'].includes(arg.role))fail('Choose Super Admin or Viewer access.');
@@ -310,9 +327,12 @@ export async function handler(req: Request) {
   if (req.method === 'OPTIONS') return new Response(null,{status:204,headers:cors(origin)});
   if (req.method !== 'POST') return answer(405,{error:'POST required.'},origin);
   try {
-    const ctx = await authorize(req);
+    const multipart=(req.headers.get('content-type')||'').startsWith('multipart/form-data');
+    let input:any;
+    if(!multipart){const raw=await(await boundedBody(req,100000)).text();try{input=JSON.parse(raw);}catch{fail('Invalid JSON.',400);}if(!input||typeof input!=='object'||Array.isArray(input))fail('JSON object required.',400);}
+    const ctx = await authorize(req,!multipart&&['access_status','notice_ack'].includes(input.action));
     if ((req.headers.get('content-type') || '').startsWith('multipart/form-data')) {
-      if(ctx.role==='viewer')fail('View-only access. A Super Admin must upload PDFs.',403);
+      if(ctx.role!=='super_admin')fail('View-only access. A Super Admin must upload PDFs.',403);
       const encoder=new TextEncoder();
       const stream=new ReadableStream({async start(controller){
         const emit=(value:unknown)=>{try{controller.enqueue(encoder.encode(JSON.stringify(value)+'\n'));}catch{/* disconnected client; durable upload recovery remains available */}};
@@ -322,9 +342,7 @@ export async function handler(req: Request) {
       }});
       return new Response(stream,{headers:{...cors(origin),'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
     }
-    const raw = await (await boundedBody(req,100000)).text();
-    let input: any; try { input = JSON.parse(raw); } catch { fail('Invalid JSON.',400); }
-    if (!input || typeof input !== 'object' || Array.isArray(input)) fail('JSON object required.',400);
+
     return answer(200,{ok:true,...await perform(input,ctx)},origin);
   } catch (e) {
     const ex = e as any, status = ex.status || 500;
