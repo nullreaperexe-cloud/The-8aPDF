@@ -6,11 +6,13 @@ Entry point: **https://the-8apdf.vercel.app/admin**. The existing `8apdf.vercel.
 
 `nullreaper.exe@gmail.com` is reserved for the first **Super Admin** in a private database allowlist. At `/admin`, choose **First-time setup**, create a strong password, confirm the email, then sign in. Enrollment checks the verified email in `auth.users` on the server and consumes the pending invitation. User-editable metadata never grants a role. Passwords are not supplied or stored in this repository.
 
-Supabase Auth URL configuration must include the production callback before verification/recovery email redirects can be considered verified:
+Supabase Auth URL configuration was saved and verified in the signed-in dashboard:
 
 - Site URL: `https://the-8apdf.vercel.app/admin`
 - Allowed redirect URLs: `https://the-8apdf.vercel.app/admin` and `https://8apdf.vercel.app/admin`
 - Dashboard: https://supabase.com/dashboard/project/xudhjwojgxblbsebkzso/auth/url-configuration
+
+The server-side minimum password length is set to 12 characters. Mail delivery and the owner’s first verification interaction still require the owner’s mailbox.
 
 Only the project owner can add other administrators. Create/verify their Supabase Auth account, then insert the approved UUID into `public.admin_users` with `role='admin'` or `role='super_admin'`. Setting `enabled=false` takes effect on the next API request. No public self-promotion or browser write policies exist.
 

@@ -44,7 +44,8 @@ test('similar titles never prove identical content and imported priority is infe
 test('admin edits override raw fields while original legacy timestamp data is preserved',()=>{
   const raw={title:'Legacy title',category:'Homework',originalMessage:'Old message',messageDate:{seconds:123},createdAt:{seconds:456}};
   const r=normalizeSupabaseAnnouncement({id:'test',title:'Edited title',category:'Exam',original_message:'New message',message_date:'2026-10-17',published:false,admin_edited_fields:['title','category','original_message','message_date'],raw});
-  assert.equal(r.title,'Edited title');assert.equal(r.category,'Exam');assert.equal(r.originalMessage,'New message');assert.equal(r.messageDate,'2026-10-17');assert.equal(r.published,false);assert.deepEqual(r.createdAt,{seconds:456});assert.equal(raw.title,'Legacy title');
+  assert.equal(r.title,'Edited title');assert.equal(r.category,'Exam');assert.equal(r.originalMessage,'New message');assert.equal(r.message,'New message');assert.equal(r.messageDate,'2026-10-17');assert.equal(r.published,false);assert.deepEqual(r.createdAt,{seconds:456});assert.equal(raw.title,'Legacy title');
+  const attachment=normalizeSupabaseAnnouncement({id:'attachment',title:'A',attachment_url:'https://example.com/a.pdf',has_attachment:true,admin_edited_fields:['has_attachment','attachment_url'],raw:{hasAttachment:false}});assert.equal(attachment.hasAttachment,true);
 });
 test('admin route wins before short-link rewrite; bundle contains no server secrets',()=>{
   const config=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url)));

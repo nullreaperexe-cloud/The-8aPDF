@@ -68,7 +68,11 @@ export function normalizeSupabaseAnnouncement(row){
   createdAt:original.createdAt??row.created_at??null,
   messageDate:pick('message_date','messageDate',null),
   originalMessage:pick('original_message','originalMessage',''),
+  // The existing student announcement reader consumes `message` and
+  // `hasAttachment`; keep its contract when content comes from the admin API.
+  message:pick('original_message','originalMessage',original.message??original.fullMessage??row.description??''),
   attachmentUrl:pick('attachment_url','attachmentUrl',''),
+  hasAttachment:Boolean(pick('has_attachment','hasAttachment',Boolean(row.attachment_url||original.attachmentUrl))),
   sourceMessageId:original.sourceMessageId??row.source_message_id??String(row.id),
   priority:pick('priority','priority','normal')
  };
