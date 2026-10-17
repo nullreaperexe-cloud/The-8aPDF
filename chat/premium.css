@@ -378,3 +378,110 @@ button,input,textarea{font-family:inherit}
 @media(max-width:410px){.topic-text h2{max-width:125px}.stage-security{display:none}.header-actions .icon-button{width:32px}.intro-space h3{font-size:25px}}
 @media(max-height:600px){.side-headline{margin-top:12px}.side-headline p{margin-bottom:12px}.side-top{padding-top:13px;padding-bottom:9px}.side-controls{padding-bottom:9px}.details-crest{margin:9px 0}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+
+/* v20261017-airy — spatial refinement based on desktop feedback.
+   Give the actual conversation space to breathe, not four competing cards.
+   No backend, selectors, or chat actions have changed. */
+@media (min-width:1331px){
+  .app-shell{
+    grid-template-columns:58px minmax(246px,270px) minmax(0,1fr) minmax(215px,248px);
+    gap:9px;
+    padding:9px;
+  }
+}
+@media (min-width:781px) and (max-width:1330px){
+  .app-shell{
+    grid-template-columns:56px minmax(230px,260px) minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+  }
+  .members-panel{top:8px;right:8px;bottom:8px}
+}
+@media (min-width:781px){
+  .app-rail,.chat-sidebar,.conversation,.members-panel{border-radius:16px}
+  .app-rail{padding-inline:5px}
+  .rail-brand{width:42px;height:42px}
+  .rail-button{width:42px;height:42px}
+  .chat-sidebar{min-width:0}
+  .side-top{padding:25px 19px 18px}
+  .side-headline{margin-top:22px}
+  .side-headline h1{font-size:34px}
+  .side-headline p{margin-bottom:22px}
+  .side-controls{padding:0 15px 23px}
+  .side-group-head{padding:7px 15px 12px 19px}
+  .room-item{padding:13px 10px;margin:4px 0 8px}
+  .room-list{padding-inline:8px}
+  .side-bottom{padding:13px 12px 15px}
+  .mini-profile{padding:12px 10px}
+  .chat-topbar{height:77px;padding:0 clamp(19px,2.1vw,34px)}
+  .topic-icon{width:45px;height:45px}
+  .conversation-stage{
+    margin:0;
+    border:0;
+    border-radius:0;
+    flex:1;
+    min-height:0;
+    background:var(--bg);
+  }
+  .stage-topline{
+    padding:16px clamp(24px,3vw,48px) 6px;
+    font-size:9px;
+  }
+  .messages-area{
+    padding:20px clamp(24px,3.4vw,56px) 24px;
+  }
+  .messages{
+    width:100%;
+    max-width:1060px;
+    gap:23px;
+  }
+  .message-row{max-width:min(78%,760px);gap:13px}
+  .msg-content{max-width:min(670px,100%)}
+  .msg-bubble{font-size:14px;line-height:1.7;padding:14px 18px}
+  .msg-meta{margin-bottom:9px}
+  .msg-avatar{width:36px;height:36px}
+  .message-actions{margin-top:9px}
+  .typing-status{width:100%;max-width:1060px;padding-inline:28px}
+  .composer-wrap{
+    padding:18px clamp(22px,3.4vw,56px) 20px;
+    border-top:1px solid var(--border);
+  }
+  .composer{max-width:1060px;min-height:64px;padding:9px 12px}
+  .composer textarea{font-size:14px;padding:11px 4px}
+  .composer-note{max-width:1036px;margin-top:11px}
+  .reply-draft{max-width:1060px}
+  .intro-space{padding-bottom:55px}
+  .details-cover{padding:19px 17px 17px}
+  .details-crest{width:48px;height:48px;border-radius:14px;margin:16px 0 12px}
+  .details-crest svg{width:22px;height:22px}
+  .details-cover h2{font-size:19px}
+  .details-cover p{margin-top:5px}
+  .members-top{padding:20px 17px 7px}
+  .members-search-wrap{padding:12px 12px 13px}
+  .members-list{padding-inline:7px}
+  .member-row{gap:10px;padding:11px 7px}
+}
+@media (min-width:1331px) and (max-width:1500px){
+  .app-shell{grid-template-columns:54px 250px minmax(0,1fr) 218px}
+  .side-top{padding-inline:16px}
+  .side-controls{padding-inline:11px}
+  .side-headline h1{font-size:32px}
+  .two-actions button{font-size:10px}
+  .members-top{padding-inline:13px}
+  .details-cover{padding-inline:13px}
+}
+@media (max-width:780px){
+  /* Preserve the full-bleed mobile chat and use the space above the keyboard. */
+  .conversation-stage{margin:0;border:0;border-radius:0}
+  .stage-topline{padding-block:12px 5px}
+  .messages-area{padding:15px 15px 15px}
+  .messages{gap:16px}
+  .composer-wrap{padding:11px 12px max(14px,env(safe-area-inset-bottom))}
+  .composer{min-height:56px;padding:7px}
+  .details-cover{padding-bottom:19px}
+  .details-crest{margin:15px 0 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .app-shell,.conversation-stage,.messages-area,.composer,.members-panel{scroll-behavior:auto}
+}
