@@ -275,7 +275,7 @@ async function perform(arg: any, ctx: Context) {
   if (action === 'storage_delete') {
     if (arg.confirm !== 'DELETE FILE') fail('Confirm permanent file cleanup.');
     if(arg.storagePath!==undefined&&(typeof arg.storagePath!=='string'||!arg.storagePath||arg.storagePath.length>1024))fail('Choose a valid hosted PDF file.');
-    const path = arg.storagePath!==undefined?check(await db.rpc('admin_file_claim',{p_actor:ctx.actor,p_session:ctx.session,p_path:arg.storagePath})):check(await db.rpc('admin_storage_claim', { p_actor:ctx.actor,p_session:ctx.session,p_upload:uuidOf(arg.uploadId) }));
+    const path = check(await db.rpc('admin_file_remove_claim', { p_actor:ctx.actor,p_session:ctx.session,p_path:arg.storagePath??null,p_upload:arg.storagePath===undefined?uuidOf(arg.uploadId):null,p_allow_referenced:arg.deleteReferenced===true }));
     const result = await db.storage.from('study-pdfs').remove([path]); check(result);
     check(await db.from('admin_uploads').update({state:'deleted',updated_at:new Date().toISOString()}).eq('storage_path',path)); return {deleted:true};
   }
