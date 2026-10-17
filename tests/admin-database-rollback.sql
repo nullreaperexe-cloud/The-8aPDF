@@ -5,7 +5,7 @@ set local role service_role;
 do $$
 declare actor uuid; sid uuid; rec jsonb; clone jsonb; result jsonb; test_id text:='admin-rollback-'||gen_random_uuid(); copy_id text:='admin-rollback-'||gen_random_uuid();
   original_created text; alias text:='rollback-'||substr(gen_random_uuid()::text,1,8); original_url text:='https://example.invalid/'||gen_random_uuid()||'.pdf'; blocked boolean;
-  target text; direct_id text; direct_row jsonb;
+  target text; direct_id text; direct_row jsonb; original_alias jsonb;
 begin
   select u.id,s.id into actor,sid from auth.users u join auth.sessions s on s.user_id=u.id
     where u.email like '8apdf-integration-super_admin-%@example.invalid' and (s.not_after is null or s.not_after>now()) limit 1;
@@ -45,10 +45,13 @@ begin
   perform public.admin_mutate(actor,sid,'study_materials','delete',test_id,(rec->>'version')::integer);
   if not exists(select 1 from public.short_links where slug=alias and document_id=copy_id and url=original_url) then raise exception 'Shared link was lost during duplicate cleanup'; end if;
 
-  -- A linked PDF remains protected even when it has not been archived.
-  blocked:=false;
-  begin perform public.admin_mutate(actor,sid,'study_materials','delete',copy_id,(clone->>'version')::integer); exception when check_violation then blocked:=true; end;
-  if not blocked then raise exception 'A linked active PDF was deleted'; end if;
+  -- Removing a record preserves its alias, owner and exact destination.
+  update public.short_links set owner_hash=repeat('a',64) where slug=alias;
+  select to_jsonb(l) into original_alias from public.short_links l where slug=alias;
+  perform public.admin_mutate(actor,sid,'study_materials','delete',copy_id,(clone->>'version')::integer);
+  if not exists(select 1 from public.short_links where slug=alias and document_id is null and url=original_url) then raise exception 'Record deletion lost its independent short URL'; end if;
+  if not exists(select 1 from public.short_links l where slug=alias and to_jsonb(l)-'document_id'=original_alias-'document_id') then raise exception 'Record deletion changed alias ownership or metadata'; end if;
+  if admin_private.pdf_file_path('https://xudhjwojgxblbsebkzso.supabase.co/storage/v1/object/public/study-pdfs/notes%20Hindi%23one.pdf?download=1#page=2')<>'notes Hindi#one.pdf' then raise exception 'Encoded storage references were not recognized'; end if;
 
   foreach target in array array['study_materials','announcements'] loop
     direct_id:='admin-direct-delete-'||gen_random_uuid();
@@ -76,4 +79,4 @@ begin
   if not blocked then raise exception 'Rate limit was bypassed'; end if;
 end $$;
 rollback;
-select 'PASS: role, session revocation, sync preservation, timestamps, draft restore, repeated actions, direct active PDF/announcement deletion, recovery snapshots, audits, stale-version rejection, protected links, destination-preserving link transfer, and rate limits. All fixture changes rolled back.' result;
+select 'PASS: role, session revocation, sync preservation, timestamps, direct PDF/announcement deletion, snapshots, audits, stale versions, retained independent short URLs, encoded file references, link transfer and rate limits. All fixture changes rolled back.' result;

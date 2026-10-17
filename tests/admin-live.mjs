@@ -80,10 +80,10 @@ try{
     const transferred=await good('link_transfer',{slug,documentId:copyRecord.id,confirm:'TRANSFER'});assert.equal(transferred.record.url,pdf.pdf_url);assert.equal(transferred.record.document_id,copyRecord.id);
     await good('link_transfer',{slug,documentId:pdf.id,confirm:'TRANSFER'});
   });
-  await step('archive hides public records, restore recovers them, and active aliases block permanent deletion',async()=>{
+  await step('archive hides public records, restore recovers them, and referenced files cannot be removed',async()=>{
     let r=await good('bulk',{table:'study_materials',operation:'archive',items:[{id:pdf.id,version:pdf.version}],confirm:'ARCHIVE 1'});assert(r.results[0].ok,r.results[0].error);pdf=r.results[0].record;
     assert.equal((await publicRows('study_materials',pdf.id)).length,0);
-    r=await good('bulk',{table:'study_materials',operation:'delete',items:[{id:pdf.id,version:pdf.version}],confirm:'DELETE 1'});assert.equal(r.results[0].ok,false);assert.match(r.results[0].error,/short links/);
+    assert.equal((await call('storage_delete',{uploadId,confirm:'DELETE FILE'})).http,422);
     r=await good('bulk',{table:'study_materials',operation:'restore',items:[{id:pdf.id,version:pdf.version}]});assert(r.results[0].ok,r.results[0].error);pdf=r.results[0].record;assert.equal(pdf.published,true);assert.equal((await publicRows('study_materials',pdf.id)).length,1);
   });
   await step('announcement create/edit/publish, attachment upload and replacement, archive/restore',async()=>{

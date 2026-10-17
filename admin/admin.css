@@ -23,4 +23,5 @@
 .row-title{font-size:12px}
 .cell-sub{font-size:10px}
 .subject-chip{font-size:10px}
+.link-manager-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.link-manager-tabs button{display:flex;align-items:center;gap:8px;padding:11px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--muted);cursor:pointer}.link-manager-tabs button[aria-selected=true]{color:var(--text);border-color:var(--gold);background:var(--gold-dark)}.link-manager-tabs svg{width:16px;height:16px}.link-manager-help{color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 22px;max-width:860px}.library-panel td>.url-text{display:block;margin-top:7px;max-width:420px;overflow-wrap:anywhere}.row-actions button:disabled{opacity:.35;cursor:not-allowed}
 @media(max-width:760px){.stat-card>p{font-size:9px}.recent-title a{font-size:12px}.recent-title>span{font-size:10px}.timeline-item strong,.timeline-item p{font-size:11px}.timeline-item small{font-size:9px}}

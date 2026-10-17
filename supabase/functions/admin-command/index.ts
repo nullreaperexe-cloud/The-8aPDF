@@ -26,7 +26,7 @@ async function authorize(req: Request): Promise<Context> {
   const role = check(await db.rpc('admin_gate', { p_actor: data.user.id, p_session: session, p_write: true }));
   return { actor: data.user.id, session, role };
 }
-const tableOf = (value: unknown) => { if (!['study_materials', 'announcements', 'short_links', 'admin_audit_logs', 'admin_uploads'].includes(String(value))) fail('Unknown collection.'); return String(value); };
+const tableOf = (value: unknown) => { if (!['study_materials', 'announcements', 'short_links', 'admin_audit_logs', 'admin_uploads', 'admin_file_links'].includes(String(value))) fail('Unknown collection.'); return String(value); };
 const idOf = (value: unknown) => { if (typeof value !== 'string' || !/^[\w-]{1,200}$/.test(value)) fail('Invalid record ID.'); return value; };
 const uuidOf = (value: unknown) => { if (typeof value !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(value)) fail('Invalid upload ID.'); return value; };
 async function mutate(ctx: Context, table: string, action: string, id: string, version: number | null, data: unknown = {}) {
@@ -48,7 +48,7 @@ function listQuery(arg: any) {
   let q = db.from(source).select(selection, { count: 'exact' });
   const search = String(arg.search || '').slice(0, 160).replace(/[,()."*%_\\]/g, ' ').trim();
   if (search) {
-    const cols = table === 'short_links' ? ['slug', 'title', 'url'] : table === 'admin_audit_logs' ? ['action', 'record_id', 'record_type'] : table === 'admin_uploads' ? ['filename', 'storage_path', 'error'] : ['title', 'description', 'subject', ...(table === 'study_materials' ? ['chapter'] : ['original_message', 'category'])];
+    const cols = table === 'short_links' ? ['slug', 'title', 'url'] : table === 'admin_audit_logs' ? ['action', 'record_id', 'record_type'] : table === 'admin_file_links' ? ['filename','storage_path'] : table === 'admin_uploads' ? ['filename', 'storage_path', 'error'] : ['title', 'description', 'subject', ...(table === 'study_materials' ? ['chapter'] : ['original_message', 'category'])];
     q = q.or(cols.map(k => `${k}.ilike.%${search}%`).join(','));
   }
   if (['study_materials', 'announcements'].includes(table)) {
@@ -134,7 +134,7 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
 async function perform(arg: any, ctx: Context) {
   const action = String(arg.action || 'session');
   if (action === 'session') return { role: ctx.role, userId: ctx.actor, maxPdfBytes: MAX_PDF_BYTES, preferences: check(await db.from('admin_preferences').select('preferences').eq('user_id', ctx.actor).maybeSingle())?.preferences || {} };
-  if (action === 'list') { const { q, page, size } = listQuery(arg); const result = await q; check(result); return { records: result.data, total: result.count, page, pageSize: size }; }
+  if (action === 'list') { const { q, page, size } = listQuery(arg); const result = await q; check(result); const records=arg.table==='admin_file_links'?result.data?.map((r:any)=>({...r,public_url:db.storage.from('study-pdfs').getPublicUrl(r.storage_path).data.publicUrl})):result.data; return { records, total: result.count, page, pageSize: size }; }
   if (action === 'overview') {
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
     const start = new Date(today + 'T00:00:00+05:30').toISOString();
@@ -243,13 +243,14 @@ async function perform(arg: any, ctx: Context) {
     const row: any = link.document_id ? check(await db.from('study_materials').select('id,pdf_url,published,archived_at').eq('id',link.document_id).maybeSingle()) : null;
     let accessible = null;
     if (link.url.startsWith(project + '/storage/v1/object/public/study-pdfs/')) { const r = await fetch(link.url,{method:'HEAD',signal:AbortSignal.timeout(10000)}); accessible = r.ok; }
-    return { verifiedRecord: !!row && row.pdf_url === link.url, published: !!row?.published && !row?.archived_at, accessible, message: accessible === false ? 'Storage file is missing or inaccessible.' : !row ? 'Historical link: linked record is missing. Destination preserved.' : row.pdf_url !== link.url ? 'Saved destination differs from the library record. Review manually.' : accessible === true ? 'Storage PDF is accessible.' : 'Library destination matches. External host availability is unverified; open the PDF to check.' };
+    return { verifiedRecord: !!row && row.pdf_url === link.url, published: !!row?.published && !row?.archived_at, accessible, message: accessible === false ? 'Storage file is missing or inaccessible.' : !row ? 'Standalone short URL. Its original destination is preserved independently of the library record.' : row.pdf_url !== link.url ? 'Saved destination differs from the library record. Review manually.' : accessible === true ? 'Storage PDF is accessible.' : 'Library destination matches. External host availability is unverified; open the PDF to check.' };
   }
   if (action === 'storage_delete') {
     if (arg.confirm !== 'DELETE FILE') fail('Confirm permanent file cleanup.');
-    const path = check(await db.rpc('admin_storage_claim', { p_actor:ctx.actor,p_session:ctx.session,p_upload:uuidOf(arg.uploadId) }));
+    if(arg.storagePath!==undefined&&(typeof arg.storagePath!=='string'||!arg.storagePath||arg.storagePath.length>1024))fail('Choose a valid hosted PDF file.');
+    const path = arg.storagePath!==undefined?check(await db.rpc('admin_file_claim',{p_actor:ctx.actor,p_session:ctx.session,p_path:arg.storagePath})):check(await db.rpc('admin_storage_claim', { p_actor:ctx.actor,p_session:ctx.session,p_upload:uuidOf(arg.uploadId) }));
     const result = await db.storage.from('study-pdfs').remove([path]); check(result);
-    check(await db.from('admin_uploads').update({state:'deleted',updated_at:new Date().toISOString()}).eq('id',arg.uploadId)); return {deleted:true};
+    check(await db.from('admin_uploads').update({state:'deleted',updated_at:new Date().toISOString()}).eq('storage_path',path)); return {deleted:true};
   }
   if (action === 'preferences') {
     const p = arg.preferences || {}, safe: any = {};
