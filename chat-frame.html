@@ -51,13 +51,14 @@
     <p>Stay close. Stay connected.</p>
     <label class="room-search-field"><svg aria-hidden="true"><use href="#i-search"></use></svg><input id="roomSearch" type="search" placeholder="Search conversations…" aria-label="Search conversations" autocomplete="off" maxlength="70"></label>
   </div>
-  <div class="rooms-heading"><span>ROOMS <span class="room-count" id="roomsTotal" aria-label="Room count">0</span></span><button id="roomActionsToggle" class="add-room-button" type="button" title="Room actions" aria-label="Room actions" aria-expanded="false" aria-controls="roomActionsMenu"><svg aria-hidden="true"><use href="#i-plus"></use></svg></button></div>
-  <div class="room-actions-menu" id="roomActionsMenu" hidden>
+  <div class="rooms-heading"><span>ROOMS <span class="room-count" id="roomsTotal" aria-label="Room count">0</span></span><button id="roomActionsToggle" class="add-room-button" type="button" title="Room actions" aria-label="Room actions" aria-expanded="false" aria-controls="roomActionsMenu"><svg aria-hidden="true"><use href="#i-plus"></use></svg></button>
+    <div class="room-actions-menu" id="roomActionsMenu" hidden>
     <button type="button" data-action="create"><svg aria-hidden="true"><use href="#i-plus"></use></svg> Create a room</button>
     <button type="button" data-action="join"><svg aria-hidden="true"><use href="#i-link"></use></svg> Join a room</button>
     <button type="button" data-action="private"><svg aria-hidden="true"><use href="#i-lock"></use></svg> Private chat</button>
     <button type="button" data-action="new"><svg aria-hidden="true"><use href="#i-users"></use></svg> New group chat</button>
     <button type="button" id="refreshRooms"><svg aria-hidden="true"><use href="#i-more"></use></svg> Refresh conversations</button>
+    </div>
   </div>
   <div class="room-list" id="roomList"><div class="list-loading">Finding your conversations…</div></div>
 </aside>
