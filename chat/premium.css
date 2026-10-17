@@ -438,3 +438,106 @@ button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{
 }
 /* Keep emoji pickers and hidden controls truly hidden after the old base CSS. */
 .emoji-picker[hidden],.room-actions-menu[hidden],.members-search-wrap[hidden]{display:none!important}
+
+/* 8aPDF compact 20261017 — match the attached screenshot, preserving graphite glow. */
+@media (min-width:781px){
+  .app-shell{
+    grid-template-columns:72px minmax(230px,270px) minmax(0,1fr) minmax(236px,285px);
+    gap:12px;padding:12px;font-family:inherit;font-size:12px;
+  }
+  .app-shell.details-collapsed{grid-template-columns:72px minmax(230px,270px) minmax(0,1fr)}
+  .app-rail,.chat-sidebar,.conversation,.members-panel{border-radius:18px}
+  .app-rail{padding:12px 6px;border-radius:20px}
+  .rail-brand{width:46px;height:46px;border-radius:13px;font-size:22px}
+  .rail-brand span{font-size:13px}
+  .rail-rule{margin:19px 0 13px}
+  .rail-navigation{gap:9px}
+  .rail-button{width:43px;height:43px;border-radius:13px}
+  .rail-button svg{width:18px;height:18px}
+  .rail-profile,.rail-avatar{width:44px;height:44px}
+  .rail-avatar{font-size:14px}
+  .side-top{padding:26px 19px 0}
+  .side-kicker{font-size:9.5px}
+  .side-top h1{font-size:28px;line-height:1.12;margin:8px 0 5px;letter-spacing:-.05em}
+  .side-top p{font-size:11.5px;line-height:1.45;margin:0 0 23px}
+  .room-search-field{height:46px;padding:0 13px;gap:10px;border-radius:12px}
+  .room-search-field svg{width:16px;height:16px}
+  .room-search-field input{font-size:11px}
+  .rooms-heading{padding:24px 17px 11px;font-size:10px}
+  .room-count{font-size:9px}
+  .add-room-button{width:31px;height:31px}
+  .add-room-button svg{width:17px;height:17px}
+  .room-list{padding:0 9px 16px}
+  .room-item{gap:11px;padding:11px 10px;margin:0 0 6px;border-radius:12px}
+  .room-icon{width:43px;height:43px;border-radius:12px;font-size:20px}
+  .room-text strong{font-size:11.5px}
+  .room-text small{font-size:10px;margin-top:4px}
+  .room-item.selected::after{width:7px;height:7px}
+  .chat-topbar{height:90px;padding:0 24px}
+  .chat-title-area{gap:14px}
+  .header-actions{gap:8px}
+  .topic-icon{width:54px;height:54px;border-radius:15px;font-size:28px}
+  .topic-text h2{font-size:19px;letter-spacing:-.035em}
+  .topic-text p{font-size:11.5px;margin-top:4px}
+  .connection-badge{font-size:11px;padding:7px 11px;gap:8px}
+  .connection-badge .status-light{width:7px;height:7px}
+  .icon-button{width:35px;height:35px}
+  .icon-button svg{width:18px;height:18px}
+  .messages-area{padding:23px clamp(18px,2.6vw,42px) 11px}
+  .messages{max-width:1120px;gap:18px}
+  .message-row{max-width:min(79%,700px);gap:10px;align-items:flex-start}
+  .msg-content{max-width:min(550px,100%)}
+  .msg-avatar{width:39px;height:39px;font-size:13px;margin-top:2px}
+  .msg-meta{font-size:10px;gap:10px;margin:0 0 7px 2px}
+  .msg-meta strong{font-size:11px}
+  .msg-bubble{font-size:13px;line-height:1.55;padding:12px 17px;border-radius:15px}
+  .message-row.mine .msg-bubble{border-radius:15px}
+  .message-actions{margin:6px 1px 0}
+  .message-day{font-size:10px;padding:8px 16px;margin:7px 0 8px}
+  .msg-attachment{max-width:min(380px,67vw);border-radius:12px;padding:4px}
+  .msg-attachment img{max-height:320px;border-radius:9px}
+  .msg-attachment video{max-height:320px}
+  .composer-wrap{padding:10px 19px 17px}
+  .composer{max-width:1120px;min-height:72px;gap:12px;padding:11px 13px;border-radius:17px}
+  .composer textarea{font-size:13px;min-height:44px;max-height:150px;padding:11px 0 9px;line-height:1.45}
+  .attach-button{width:48px;height:48px;border-radius:13px}
+  .send-button{width:49px;height:49px;border-radius:13px}
+  .attach-button svg,.send-button svg{width:19px;height:19px}
+  .reply-draft{max-width:1120px}
+  .members-panel{padding:19px 20px 17px}
+  .details-top{font-size:11px}
+  .details-cover{padding:25px 0 0}
+  .details-crest{width:64px;height:64px;border-radius:17px;margin:0 0 17px;font-size:35px}
+  .details-cover h2{font-size:22px;margin-bottom:9px}
+  .details-live{font-size:11.5px;gap:8px}
+  .details-cover p{font-size:11.5px;line-height:1.6;margin-top:17px}
+  .details-divider{margin:23px 0 22px}
+  .members-top h3{font-size:14px;gap:10px}
+  .members-top h3 span{min-width:28px;height:24px;font-size:10px}
+  .member-row{gap:11px;padding:8px 0}
+  .member-avatar{width:43px;height:43px;font-size:13px}
+  .member-avatar i{width:10px;height:10px}
+  .member-info strong{font-size:11px}
+  .member-info small{font-size:10px;margin-top:3px}
+  .members-all-button{min-height:53px;margin-top:10px;padding:0 12px;font-size:11px;gap:11px;border-radius:12px}
+  .members-all-button svg{width:17px;height:17px}
+}
+@media (min-width:781px) and (max-width:1550px){
+  .app-shell{grid-template-columns:62px minmax(224px,252px) minmax(0,1fr);gap:10px;padding:10px}
+  .members-panel{top:10px;right:10px;bottom:10px;width:min(306px,90vw)}
+}
+@media (min-width:781px) and (max-width:980px){
+  .app-shell{grid-template-columns:54px minmax(192px,230px) minmax(0,1fr);gap:8px;padding:8px}
+  .side-top{padding:22px 13px 0}
+  .side-top h1{font-size:26px}
+  .rooms-heading{padding-inline:12px}
+  .chat-topbar{height:78px;padding:0 16px}
+  .topic-icon{width:43px;height:43px;font-size:24px}
+  .topic-text h2{font-size:17px}
+  .messages-area{padding-inline:16px}
+  .composer-wrap{padding:9px 13px 14px}
+  .composer{min-height:64px;padding:8px}
+  .attach-button,.send-button{width:43px;height:43px}
+}
+/* Mobile remains legible; 16px inputs avoid unwanted Safari auto-zoom. */
+@media (max-width:780px){.app-shell{font-family:inherit}}
