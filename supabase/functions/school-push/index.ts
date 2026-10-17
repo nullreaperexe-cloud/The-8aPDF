@@ -2,6 +2,7 @@ import {createClient} from 'npm:@supabase/supabase-js@2.58.0';
 import webpush from 'npm:web-push@3.6.7';
 import {sourceEvents,FEED_ID,INTERVAL_MINUTES} from './school-feed.js';
 import {validPushSubscription,preferenceAllows,allowedPushOrigin,notificationPath,retryState} from './push-policy.js';
+import {signReceipt,verifyReceipt} from './receipt-policy.js';
 const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(input,init)=>fetch(input,{...init,signal:AbortSignal.timeout(10000)})}});
 const sha=async(s:string)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(n=>n.toString(16).padStart(2,'0')).join('');
 function json(data:unknown,status=200,origin=''){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store',...(origin?{'Access-Control-Allow-Origin':origin,'Vary':'Origin','Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'}:{})}})}
@@ -19,7 +20,7 @@ async function syncAuthorized(req:Request){
  return !!account&&!account.disabled&&account.email?.toLowerCase()===(Deno.env.get('FIREBASE_SYNC_EMAIL')||'nullreaper.exe@gmail.com').toLowerCase();
 }
 async function send(sub:any,payload:any,cfg:any){
- const req=webpush.generateRequestDetails(sub.subscription,JSON.stringify(payload),{vapidDetails:{subject:'https://8apdf.vercel.app/',publicKey:cfg.vapid_public_key,privateKey:cfg.vapid_private_key},contentEncoding:'aes128gcm',TTL:86400,urgency:'normal',topic:String(payload.tag).slice(0,32)});
+ const req=webpush.generateRequestDetails(sub.subscription,JSON.stringify(payload),{vapidDetails:{subject:'https://8apdf.vercel.app/',publicKey:cfg.vapid_public_key,privateKey:cfg.vapid_private_key},contentEncoding:'aes128gcm',TTL:86400,urgency:'high',topic:String(payload.tag).slice(0,32)});
  const response=await fetch(req.endpoint,{method:req.method,headers:req.headers,body:new Uint8Array(req.body),redirect:'error',signal:AbortSignal.timeout(8000)});
  const result={status:response.status,retryAfter:response.headers.get('Retry-After')};
  await response.body?.cancel();return result;
@@ -61,9 +62,14 @@ async function poll(cfg:any,dryRun=false){
      if(!events.length){value(await db.from('school_push_deliveries').update({status:'skipped'}).eq('subscription_id',sub.id).in('event_id',ids));continue;}
      const first=events[0],tag=(await sha(ids.slice().sort().join('|'))).slice(0,32);
      const payload={title:events.length>1?events.length+' new 8aPDF updates':first.source==='device-test'?first.title:first.source==='pdf'?(first.is_test?'New test PDF':'New PDF'):'School announcement',body:events.length>1?events.slice(0,3).map((e:any)=>e.title).join(' · ').slice(0,220):first.source==='device-test'?first.body:first.title,url:notificationPath(first.path,sub.origin),tag};
+     // Persist the attempt identity before sending: a fast device may acknowledge
+     // display before the push service's response has reached this worker.
+     const receiptId=crypto.randomUUID();
+     value(await db.from('school_push_deliveries').update({receipt_id:receiptId,push_received_at:null,notification_shown_at:null,receipt_error:null,worker_version:null}).eq('subscription_id',sub.id).in('event_id',ids));
+     const receiptToken=await signReceipt(sub.id,receiptId,cfg.worker_secret);
      let response={status:0,retryAfter:null as string|null};
-     try{response=await send(sub,payload,cfg);}catch(error){console.error('Push transport failed:',error instanceof Error?error.name:'UnknownError');}
-     if(response.status>=200&&response.status<300){value(await db.from('school_push_deliveries').update({status:'sent',last_error:null}).eq('subscription_id',sub.id).in('event_id',ids));results.sent++;}
+     try{response=await send(sub,{...payload,receiptToken},cfg);}catch(error){console.error('Push transport failed:',error instanceof Error?error.name:'UnknownError');}
+     if(response.status>=200&&response.status<300){value(await db.from('school_push_deliveries').update({status:'sent',provider_accepted_at:new Date().toISOString(),last_error:null}).eq('subscription_id',sub.id).in('event_id',ids));results.sent++;}
      else if(response.status===404||response.status===410){value(await db.from('school_push_subscriptions').delete().eq('id',sub.id));results.expired++;}
      else{
       // One write per batch prevents twelve sequential database timeouts
@@ -99,8 +105,24 @@ Deno.serve(async(req:Request)=>{
    const result=await poll(cfg,body.action==='dry-run');return json(result,result.ok?200:503);
   }
   if(!allowed)return json({error:'Origin not allowed'},403);
+  if(body.action==='receipt'){
+   const claims=await verifyReceipt(body.token,cfg.worker_secret);
+   if(!claims||!['shown','error'].includes(body.stage))return json({error:'Invalid delivery receipt'},401,cors);
+   const now=new Date().toISOString(),patch:any={push_received_at:now,worker_version:'lockscreen-v2'};
+   if(body.stage==='shown'){patch.notification_shown_at=now;patch.receipt_error=null;}
+   else patch.receipt_error=String(body.error||'Notification display failed').slice(0,100);
+   // An error/replayed receipt must never erase a successful display receipt.
+   value(await db.from('school_push_deliveries').update(patch).eq('subscription_id',claims.device).eq('receipt_id',claims.delivery).is('notification_shown_at',null));
+   return json({recorded:true},200,cors);
+  }
   const token=(req.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');const auth=await db.auth.getUser(token);if(auth.error||!auth.data.user)return json({error:'Valid user session required'},401,cors);const uid=auth.data.user.id;
-  if(body.action==='status'){const count=await db.from('school_push_subscriptions').select('id,preferences').eq('user_id',uid);if(count.error)throw count.error;return json({subscriptions:count.data},200,cors)}
+  if(body.action==='status'){
+   const subscriptions=value(await db.from('school_push_subscriptions').select('id,preferences').eq('user_id',uid));
+   let latestDelivery=null;
+   const deviceId=validPushSubscription(body.subscription)?await sha(body.subscription.endpoint):null;
+   if(deviceId&&subscriptions.some((s:any)=>s.id===deviceId))latestDelivery=value(await db.from('school_push_deliveries').select('status,attempts,next_attempt_at,provider_accepted_at,push_received_at,notification_shown_at,receipt_error,worker_version,receipt_id').eq('subscription_id',deviceId).order('next_attempt_at',{ascending:false}).limit(1).maybeSingle());
+   return json({subscriptions,latestDelivery},200,cors);
+  }
   if(!validPushSubscription(body.subscription))return json({error:'Invalid push subscription'},400,cors);const id=await sha(body.subscription.endpoint);
   if(body.action==='unsubscribe'){const removed=await db.from('school_push_subscriptions').delete().eq('id',id).eq('user_id',uid);if(removed.error)throw removed.error;return json({unsubscribed:true},200,cors)}
   if(body.action==='subscribe'){

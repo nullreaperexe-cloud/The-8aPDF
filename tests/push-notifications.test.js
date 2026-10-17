@@ -9,17 +9,29 @@ assert.equal(notificationPath('//evil.test','https://the-8apdf.vercel.app'),'/')
 assert.equal(notificationPath('/tests?x=1#paper','https://the-8apdf.vercel.app'),'/tests?x=1#paper');
 assert.equal(retryState(5,null,0).status,'failed');
 assert.equal(retryState(0,'120',0).next_attempt_at,new Date(120000).toISOString());
-const events={},notifications=[],opened=[];
+const events={},notifications=[],opened=[],receipts=[];
 const self={location:{origin:'https://the-8apdf.vercel.app'},addEventListener:(name,handler)=>events[name]=handler,
  registration:{showNotification:async(title,options)=>notifications.push({title,options})},
  clients:{matchAll:async()=>[],openWindow:async path=>opened.push(path)},skipWaiting:async()=>{}};
-vm.runInNewContext(fs.readFileSync('sw.js','utf8'),{self,URL});
+vm.runInNewContext(fs.readFileSync('sw.js','utf8'),{self,URL,AbortSignal,fetch:async(url,options)=>{receipts.push({url,body:JSON.parse(options.body)});return {body:{cancel:async()=>{}}};}});
 async function push(data){let promise;events.push({data,waitUntil:p=>promise=p});await promise;}
 await push({json:()=>({title:'New PDF',url:'http://[',tag:'one'})});
 assert.equal(notifications.at(-1).options.data.path,'/');
 await push({json:()=>null});await push({json:()=>17});
 await push({json:()=>{throw Error()},text:()=> 'Plain school update'});
 assert.equal(notifications.at(-1).options.body,'Plain school update');
+await push({json:()=>({title:'Locked phone',receiptToken:'signed-token',tag:'locked'})});
+assert.equal(notifications.at(-1).options.silent,false);
+assert.equal(notifications.at(-1).options.renotify,true);
+assert.equal(receipts.at(-1).body.stage,'shown');
+assert.equal(receipts.at(-1).body.token,'signed-token');
+const showNotification=self.registration.showNotification;
+self.registration.showNotification=async(title,options)=>{if(options.vibrate)throw Error('Unsupported optional setting');return showNotification(title,options);};
+await push({json:()=>({title:'Fallback',receiptToken:'fallback-token'})});
+assert.equal(notifications.at(-1).title,'Fallback');assert.equal(receipts.at(-1).body.stage,'shown');
+self.registration.showNotification=async()=>{const error=Error('Blocked');error.name='NotAllowedError';throw error;};
+await push({json:()=>({receiptToken:'blocked-token'})});assert.equal(receipts.at(-1).body.stage,'error');assert.equal(receipts.at(-1).body.error,'NotAllowedError');
+self.registration.showNotification=showNotification;
 let completion;events.notificationclick({notification:{close(){},data:{path:'/tests'}},waitUntil:p=>completion=p});await completion;
 assert.deepEqual(opened,['/tests']);
 let navigated,focused=false;
@@ -32,8 +44,10 @@ assert.equal(navigated,'/school-reminders?message=one');assert(focused);
 async function client({optIn=null,existing=null}={}){
  const storage=new Map(optIn===null?[]:[['8apdf_phone_notifications_v1_enabled',optIn]]);
  let creates=0,fetches=0;const requests=[];
- const subscription=existing||{endpoint:'https://fcm.googleapis.com/fcm/send/device',toJSON:()=>({}),unsubscribe:async()=>true};
- const reg={pushManager:{getSubscription:async()=>existing,subscribe:async()=>{creates++;return subscription;}}};
+ let active;
+ const subscription={endpoint:'https://fcm.googleapis.com/fcm/send/device',toJSON:()=>({}),...existing,unsubscribe:async()=>{active=null;return true;}};
+ active=existing?subscription:null;
+ const reg={update:async()=>{},pushManager:{getSubscription:async()=>active,subscribe:async()=>{creates++;active=subscription;return subscription;}}};
  const context={window:{isSecureContext:true,PushManager:{},Notification:{},__8apdfGetSocialClient:async()=>({db:{auth:{getSession:async()=>({data:{session:{access_token:'session'}}})}}})},
   navigator:{serviceWorker:{register:async()=>reg,ready:Promise.resolve(reg),addEventListener(){}}},
   Notification:{permission:'granted'},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
@@ -50,4 +64,8 @@ state=await client();await state.context.window.__8apdfPush.disable();assert.equ
 state=await client({optIn:'true',existing:{endpoint:'https://fcm.googleapis.com/fcm/send/device',toJSON:()=>({})}});
 assert.equal((await state.context.window.__8apdfPush.testClosed()).queued,true);
 assert.equal(JSON.parse(state.requests.at(-1).body).action,'test-closed');
+state=await client({optIn:'true'});assert.equal(state.creates(),1,'Previously opted-in devices renew missing browser subscriptions');
+state=await client({optIn:'true',existing:{endpoint:'https://fcm.googleapis.com/fcm/send/device'}});
+await state.context.window.__8apdfPush.repair();assert.equal(state.creates(),1,'Explicit repair renews stale subscription keys');
+assert(state.requests.some(r=>r.body&&JSON.parse(r.body).action==='unsubscribe'));
 console.log('PASS native push payloads, safe click navigation, retry budget, current-origin CORS and persistent opt-out');

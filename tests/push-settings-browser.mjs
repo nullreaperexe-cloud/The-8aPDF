@@ -8,7 +8,7 @@ const errors=[];
 const fixture=`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0}iframe{width:100%;height:1450px;border:0;display:block}</style><script>
 window.deviceState={supported:true,subscribed:false,permission:'default',preferences:{pdfs:true,announcements:true,testsOnly:false},lastChecked:new Date().toISOString()};
 window.calls=[];
-window.__8apdfPush={status:async()=>deviceState,enable:async()=>{deviceState.subscribed=true;return deviceState},disable:async()=>{deviceState.subscribed=false;return deviceState},test:async()=>({sent:true}),testClosed:async()=>{calls.push('test-closed');return {queued:true}},savePreferences:async p=>{deviceState.preferences=p;return deviceState}};
+window.__8apdfPush={status:async()=>deviceState,enable:async()=>{deviceState.subscribed=true;return deviceState},disable:async()=>{deviceState.subscribed=false;return deviceState},repair:async()=>{calls.push('repair');return deviceState},test:async()=>({sent:true}),testClosed:async()=>{calls.push('test-closed');return {queued:true}},savePreferences:async p=>{deviceState.preferences=p;return deviceState}};
 window.__8apdfSocial={markAllRead:async()=>{}};
 </script><iframe src="/notification-settings.html"></iframe>`;
 try{
@@ -25,8 +25,17 @@ try{
   await frame.getByText('Enabled on this device',{exact:false}).waitFor();
   assert(await frame.locator('#pushTestClosed').isEnabled());
   await frame.locator('#pushTestClosed').click();
-  await frame.getByText('Test scheduled. Close all 8aPDF tabs now',{exact:false}).waitFor();
+  await frame.getByText('Test scheduled. Close all 8aPDF tabs and lock your phone now.',{exact:false}).waitFor();
   assert.deepEqual(await page.evaluate(()=>window.calls),['test-closed']);
+  await page.evaluate(()=>{deviceState.latestDelivery={status:'sent',receipt_id:'test',provider_accepted_at:new Date().toISOString()}});
+  await frame.locator('#pushRefresh').click();
+  await frame.getByText('Browser display is not confirmed yet.',{exact:false}).waitFor();
+  await page.evaluate(()=>{deviceState.latestDelivery.notification_shown_at=new Date().toISOString()});
+  await frame.locator('#pushRefresh').click();
+  await frame.getByText('Browser confirmed notification display at',{exact:false}).waitFor();
+  await frame.locator('#pushRepair').click();
+  await frame.getByText('Device renewed.',{exact:false}).waitFor();
+  assert.deepEqual(await page.evaluate(()=>window.calls),['test-closed','repair']);
   assert.equal(await frame.locator('html').evaluate(el=>el.scrollWidth>innerWidth),false,'No horizontal overflow at '+width);
   await page.screenshot({path:'.admin-test/push-settings-'+width+'.png',fullPage:true});
   await frame.locator('#pushPdfs').uncheck();

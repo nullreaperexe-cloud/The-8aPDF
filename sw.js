@@ -1,5 +1,17 @@
 /* Native Web Push. No app-shell cache, so new deployments remain visible. */
 'use strict';
+const PUSH_WORKER_VERSION = 'lockscreen-v2';
+async function reportDisplay(token, stage, error) {
+  if (typeof token !== 'string' || token.length > 1200) return;
+  try {
+    const response = await fetch('https://uumqvvsfqwpwtwerdylv.supabase.co/functions/v1/school-push', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'receipt', token, stage, error, workerVersion: PUSH_WORKER_VERSION }),
+      signal: AbortSignal.timeout(8000)
+    });
+    await response.body?.cancel();
+  } catch { /* Reporting must never prevent the notification from appearing. */ }
+}
 function safePath(value) {
   try {
     const url = new URL(value || '/', self.location.origin);
@@ -15,12 +27,23 @@ self.addEventListener('push', event => {
     catch { payload = { body: event.data?.text() || 'A new school update is available.' }; }
     if (typeof payload !== 'object' || Array.isArray(payload)) payload = {};
     const chatRelated = /^\/chat(?:\/|$)/.test(safePath(payload.url)) || String(payload.type || payload.kind || payload.tag || '').toLowerCase().includes('chat');
-    await self.registration.showNotification(chatRelated ? '8aPDF · New message' : String(payload.title || '8aPDF school update').slice(0, 180), {
+    const title = chatRelated ? '8aPDF · New message' : String(payload.title || '8aPDF school update').slice(0, 180);
+    const options = {
       body: chatRelated ? 'Unlock Friends Chat to read your message.' : String(payload.body || 'New PDFs or school messages are ready.').slice(0, 250),
       icon: '/assets/app-icon-192.png', badge: '/assets/app-icon-192.png',
       tag: String(payload.tag || '8apdf-school-update').slice(0, 100),
-      renotify: false, data: { path: safePath(payload.url) }
-    });
+      renotify: true, silent: false, vibrate: [200, 100, 200], requireInteraction: true,
+      data: { path: safePath(payload.url) }
+    };
+    try {
+      await self.registration.showNotification(title, options);
+    } catch {
+      // Older browsers may reject an optional presentation setting. Still show
+      // the native notification with the universally supported options.
+      try { await self.registration.showNotification(title, { body: options.body, tag: options.tag, data: options.data }); }
+      catch (error) { await reportDisplay(payload.receiptToken, 'error', error?.name || 'NotificationError'); return; }
+    }
+    await reportDisplay(payload.receiptToken, 'shown');
   })());
 });
 self.addEventListener('notificationclick', event => {

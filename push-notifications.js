@@ -58,9 +58,10 @@
   async function status() {
     if (!supported()) return { supported: false, subscribed: false, permission: 'unsupported', preferences };
     const reg = await worker(), subscription = await reg.pushManager.getSubscription();
-    let subscribed = false;
+    let subscribed = false, latestDelivery = null;
     if (subscription && Notification.permission === 'granted' && stored(optInKey) !== 'false') {
       const server = await request('status', subscription);
+      latestDelivery = server.latestDelivery || null;
       const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(subscription.endpoint));
       const id = [...new Uint8Array(digest)].map(n => n.toString(16).padStart(2, '0')).join('');
       const own = server.subscriptions?.find(item => item.id === id);
@@ -69,7 +70,7 @@
     }
     // Fetch fresh health: caching config forever hid stalled school ingestion.
     const config = await fetchJSON();
-    return { supported: true, subscribed, pendingUnsubscribe: !!subscription && stored(optInKey) === 'false', permission: Notification.permission, preferences, lastChecked: config.lastChecked, intervalMinutes: config.intervalMinutes };
+    return { supported: true, subscribed, pendingUnsubscribe: !!subscription && stored(optInKey) === 'false', permission: Notification.permission, preferences, lastChecked: config.lastChecked, intervalMinutes: config.intervalMinutes, latestDelivery };
   }
   async function enable() {
     if (!supported()) throw Error('Background notifications are unavailable here. On iPhone, open 8aPDF from your Home Screen.');
@@ -108,11 +109,26 @@
     if (!subscription || stored(optInKey) === 'false') throw Error('Enable notifications first.');
     return request(closed ? 'test-closed' : 'test', subscription);
   }
-  window.__8apdfPush = { status, enable, disable, savePreferences, test, testClosed: () => test(true) };
+  async function repair() {
+    if (!supported() || Notification.permission !== 'granted') return enable();
+    const reg = await worker();
+    await reg.update();
+    // A repair is an explicit user action. Replace stale endpoint/key material
+    // while retaining the user's saved content preferences.
+    generation++;
+    const old = await reg.pushManager.getSubscription();
+    if (old) {
+      await request('unsubscribe', old);
+      if (!await old.unsubscribe()) throw Error('The old subscription could not be renewed. Please retry.');
+    }
+    await subscribe();
+    return status();
+  }
+  window.__8apdfPush = { status, enable, disable, repair, savePreferences, test, testClosed: () => test(true) };
   if (supported()) {
     worker().then(() => {
       // Permission alone is not a subscription or consent to re-enable it.
-      if (Notification.permission === 'granted' && stored(optInKey) !== 'false') return subscribe(false);
+      if (Notification.permission === 'granted' && stored(optInKey) !== 'false') return subscribe(stored(optInKey) === 'true');
     }).catch(error => console.warn('Background notifications:', error.message));
     navigator.serviceWorker.addEventListener('message', event => {
       if (event.data?.type === '8apdf:push-subscription-changed' && stored(optInKey) === 'true') {

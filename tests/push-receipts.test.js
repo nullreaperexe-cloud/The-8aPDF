@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {signReceipt, verifyReceipt} from '../supabase/functions/school-push/receipt-policy.js';
+const device='a'.repeat(64), delivery=crypto.randomUUID(), secret='test-only-worker-secret', now=Date.now();
+const token=await signReceipt(device,delivery,secret,now);
+assert.deepEqual(await verifyReceipt(token,secret,now),{device,delivery,expires:now+172800000});
+assert.equal(await verifyReceipt(token,'wrong-secret',now),null);
+assert.equal(await verifyReceipt(token,secret,now+172800001),null);
+assert.equal(await verifyReceipt(token+'x',secret,now),null);
+assert.equal(await verifyReceipt(token.split('.')[0]+'.bad',secret,now),null);
+assert.equal(await verifyReceipt('x'.repeat(1201),secret,now),null);
+assert.equal(await verifyReceipt(await signReceipt('not-a-device',delivery,secret,now),secret,now),null);
+console.log('PASS scoped, expiring, tamper-resistant background notification receipts');

@@ -61,6 +61,32 @@ settings and push-service availability. A successful transport response means
 the push service accepted the message, not proof a phone displayed it. Settings
 reports a feed delay after five minutes without a successful catalogue check.
 
+## Lock-screen delivery and receipts
+
+Apply `db/school-push-receipts.sql` in the push project before deploying the
+updated function. User-visible pushes request **high** urgency so a sleeping
+phone need not wait for normal-priority maintenance windows. `sw.js` requests
+non-silent alerts and retries with basic notification options if a browser
+rejects optional vibration/presentation settings.
+
+Queue rows distinguish `provider_accepted_at` from `push_received_at` and
+`notification_shown_at`. A short, HMAC-signed token scopes the worker's
+acknowledgement to one device and one delivery attempt for 48 hours. It works
+without an open page or a login token and grants no subscription-management
+access. Display acknowledgements reflect the browser notification API; phone
+settings still determine lock-screen visibility. Failed reporting does not
+prevent display. Settings never treats provider acceptance as proof of display.
+
+After downloading the updated site once, **Repair this device** updates the
+service worker and renews stale subscription material. Previously opted-in
+devices with missing subscriptions also renew on their next visit. Explicit
+opt-out and content preferences remain preserved.
+
+On iPhone, allow Lock Screen alerts for the installed Home Screen app in iOS
+notification settings. On Android, allow browser/site notifications on the
+lock screen. Focus/Do Not Disturb, force-stopping the browser and device battery
+restrictions are OS controls that website code cannot override.
+
 ## Checks
 
 - `npm test`: client opt-out, closed-window service worker, current catalogue

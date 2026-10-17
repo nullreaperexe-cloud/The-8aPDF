@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import webpush from 'npm:web-push@3.6.7';
 import {createECDH,randomBytes} from 'node:crypto';
+import {signReceipt} from './receipt-policy.js';
 Deno.env.set('SUPABASE_URL','https://example.supabase.co');
 Deno.env.set('SUPABASE_SERVICE_ROLE_KEY','test-service-key');
 let handler:(req:Request)=>Promise<Response>;
@@ -13,7 +14,7 @@ const calls:any[]=[];let page=0,pending:any[]=[],failIngest=false,pushStatus=201
 function json(data:any,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});}
 globalThis.fetch=(async(input:any,init:any={})=>{
  const url=String(input),body=init.body?JSON.parse(typeof init.body==='string'?init.body:'{}'):null;
- calls.push({url,method:init.method||'GET',body});
+ calls.push({url,method:init.method||'GET',body,headers:init.headers});
  if(url.includes('/school_push_config')&&(init.method||'GET')==='GET')return json({id:1,vapid_public_key:vapid.publicKey,vapid_private_key:vapid.privateKey,worker_secret:'worker-secret'});
  if(url.includes('/rpc/school_push_claim_run_v2'))return json('00000000-0000-0000-0000-000000000001');
  if(url.startsWith('https://xudhjwojgxblbsebkzso.supabase.co/rest/v1/')){
@@ -29,7 +30,7 @@ globalThis.fetch=(async(input:any,init:any={})=>{
  if(url.includes('/rpc/school_push_queue_device_test')){assert.equal(body.owner_id,'device-owner');return json({queued:true,withinSeconds:90});}
  if(url.includes('/school_push_subscriptions')&&(init.method||'GET')==='GET')return json(authorizedDevice?{id:'device',user_id:'device-owner',subscription}:null);
  if(url.includes('/school_push_deliveries')&&(init.method||'GET')==='GET')return json(pending);
- if(url.startsWith('https://fcm.googleapis.com/'))return new Response('',{status:pushStatus,headers:{'Retry-After':'120'}});
+ if(url.startsWith('https://fcm.googleapis.com/')){assert.equal(new Headers(init.headers).get('Urgency'),'high','Locked-phone delivery must request high urgency');return new Response('',{status:pushStatus,headers:{'Retry-After':'120'}});}
  if(url.includes('identitytoolkit'))return lookupEmail?json({users:[{email:lookupEmail,disabled:false}]}):json({error:{message:'INVALID_ID_TOKEN'}},400);
  if(url.includes('/auth/v1/user'))return authorizedDevice?json({id:'device-owner'}):json({msg:'Invalid JWT'},401);
  if(url.includes('/rest/v1/'))return json([]);
@@ -60,7 +61,7 @@ Deno.test('Real encryption, accepted send, rate-limit retry and expired endpoint
  for(const status of [201,429,410]){
   calls.length=0;page=0;pending=[row];pushStatus=status;
   const response=await handler(req('poll')),result=await response.json();
-  if(status===201){assert.equal(result.sent,1);assert(calls.some(c=>c.method==='PATCH'&&c.body?.status==='sent'));}
+  if(status===201){assert.equal(result.sent,1);assert(calls.some(c=>c.method==='PATCH'&&c.body?.status==='sent'&&c.body?.provider_accepted_at));assert(calls.some(c=>c.method==='PATCH'&&c.body?.receipt_id),'Receipt identity must be persisted before the push is sent');}
   if(status===429){assert.equal(response.status,503);const retry=calls.find(c=>c.method==='POST'&&Array.isArray(c.body)&&c.body[0]?.attempts===1);assert(retry);assert.equal(retry.body[0].status,'pending');}
   if(status===410){assert.equal(result.expired,1);assert(calls.some(c=>c.method==='DELETE'&&c.url.includes('school_push_subscriptions')));}
  }
@@ -91,4 +92,19 @@ Deno.test('Scheduled device tests are delivered even with all content categories
   school_push_events:{source:'device-test',title:'Background test',body:'The server sent this',path:'/notification-settings'},
   school_push_subscriptions:{id:'device',origin:'https://the-8apdf.vercel.app',subscription,preferences:{pdfs:false,announcements:false,testsOnly:true}}}];
  try{const result=await (await handler(req('poll'))).json();assert.equal(result.sent,1);}finally{pending=[];}
+});
+
+Deno.test('Browser receipts need a valid scoped signature, not an open page or login session',async()=>{
+ const deviceId='a'.repeat(64),receiptId=crypto.randomUUID();
+ const token=await signReceipt(deviceId,receiptId,'worker-secret');
+ const receipt=(value:string,origin='https://8apdf.vercel.app',stage='shown')=>new Request('https://example.test',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({action:'receipt',token:value,stage})});
+ assert.equal((await handler(receipt('forged'))).status,401);
+ assert.equal((await handler(receipt(token,'https://evil.test'))).status,403);
+ assert.equal((await handler(receipt(token,'https://8apdf.vercel.app','unknown'))).status,401);
+ calls.length=0;assert.equal((await handler(receipt(token))).status,200);
+ const update=calls.find(c=>c.method==='PATCH'&&c.body?.notification_shown_at);assert(update);
+ assert.equal(update.body.worker_version,'lockscreen-v2');
+ assert(update.url.includes('subscription_id=eq.'+deviceId));assert(update.url.includes('receipt_id=eq.'+receiptId));
+ assert(update.url.includes('notification_shown_at=is.null'),'Late errors cannot erase confirmed display');
+ assert(!calls.some(c=>c.url.includes('/auth/v1/user')),'Background receipts must work without a page session');
 });
