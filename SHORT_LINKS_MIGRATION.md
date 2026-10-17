@@ -9,7 +9,7 @@ The 8aPDF short-link backend uses **the new 8aPDF Supabase project**
 - `POST /api/short-links`, `action=create`: validate the original PDF against `study_materials`, insert a permanent alias, and return the site's live URL.
 - `POST /api/short-links`, `action=list`: list aliases owned by the browser's 64-hex secret, plus recoverable aliases in an available legacy Blob store.
 - `POST /api/short-links`, `action=delete`: delete only an alias whose SHA-256 owner matches that browser secret.
-- `GET /:slug`: redirect to the school's original PDF. **Supabase first**, then legacy Vercel Blob as a compatibility fallback.
+- `GET /:slug`: redirect to the school's original PDF. **Original Vercel Blob first when connected**, then permanent Supabase, so existing old slugs cannot be hijacked.
 
 `public.short_links` has unique slugs and RLS enabled, with **no public table read/write permissions**. The `apdf_short_links` Edge Function performs narrow validated operations with a server-held service-role credential. Never put a service-role key in browser JavaScript or GitHub source.
 
