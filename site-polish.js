@@ -34,9 +34,10 @@ function mountSettings(){
  notices.checked=enabled(NOTICES_KEY);sound.checked=enabled(SOUND_KEY);
  notices.addEventListener('change',()=>put(NOTICES_KEY,notices.checked?'on':'off'));
  sound.addEventListener('change',()=>put(SOUND_KEY,sound.checked?'on':'off'));
- const music=document.createElement('div');music.className='eightapdf-settings-music';music.id='eightapdfSettingsMusic';
- music.innerHTML='<h4>Background Music</h4><p>Music stays connected while you browse PDFs and Friends Chat. Your browser may need one tap on Play.</p>';
- container.append(music);
+ if(!$('eightapdfSettingsMusic')){
+  const music=document.createElement('div');music.className='eightapdf-settings-music';music.id='eightapdfSettingsMusic';
+  container.append(music);
+ }
 
 
 
