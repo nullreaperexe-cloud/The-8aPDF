@@ -97,8 +97,11 @@ async function loadRooms(){
  state.rooms=entries;renderRooms();
 }
 function renderRooms(){
- const list=$('roomList');if(!state.rooms.length){list.innerHTML='<div class="list-loading">No conversations yet. Create one!</div>';return}
- list.innerHTML=state.rooms.map(r=>'<button class="room-item '+(r.id===state.room?.id?'selected':'')+'" data-room="'+esc(r.slug)+'" type="button"><span class="room-icon">'+(r.kind==='private'?icon('lock'):'#')+'</span><span class="room-text"><strong>'+esc(r.name)+'</strong><small>'+esc(r.kind==='private'?'Private conversation':'# '+r.slug)+'</small></span>'+icon('chevron')+'</button>').join('');
+ const list=$('roomList'),term=($('roomSearch')?.value||'').trim().toLowerCase();
+ const found=term?state.rooms.filter(r=>(r.name+' '+r.slug).toLowerCase().includes(term)):state.rooms;
+ if($('roomsTotal'))$('roomsTotal').textContent=String(state.rooms.length);
+ if(!found.length){list.innerHTML='<div class="list-loading">'+(term?'No matching conversations.':'No conversations yet. Create one!')+'</div>';return}
+ list.innerHTML=found.map(r=>'<button class="room-item '+(r.id===state.room?.id?'selected':'')+'" data-room="'+esc(r.slug)+'" type="button"><span class="room-icon">'+(r.kind==='private'?icon('lock'):'#')+'</span><span class="room-text"><strong>'+esc(r.name)+'</strong><small>'+esc(r.kind==='private'?'Private conversation':'# '+r.slug)+'</small></span>'+icon('chevron')+'</button>').join('');
  list.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>openRoom(b.dataset.room)));
 }
 async function openRoom(slug,token=null,changeUrl=true){
@@ -219,8 +222,11 @@ function renderMessages(keepPosition=false){
  const combined=state.messages.concat(state.pending.filter(p=>!state.messages.find(m=>m.id===p.id)));
  const signature=combined.map(m=>m.id+(m.pending?'p':'')+String(m.body)+(m.reply_to||'')).join('|');
  if(signature===state.lastSignature)return;state.lastSignature=signature;
- if(!combined.length){el.innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('chat')+'</div><h3>Good conversations start here.</h3><p>Say hi, share a photo, or send a video. Everything stays saved.</p></div>';return}
- el.innerHTML=combined.map(m=>{
+ if(!combined.length){el.innerHTML='<div class="intro-space"><div class="intro-art" aria-hidden="true"><span class="orbit orbit-outer"></span><span class="orbit orbit-inner"></span><span class="art-main">'+icon('chat')+'</span><span class="art-detail art-one">✳</span><span class="art-detail art-two">✦</span></div><span class="intro-eyebrow">A SPACE FOR YOUR PEOPLE</span><h3>Every great conversation<br>starts somewhere<span>.</span></h3><p>A place to share ideas, photos and everything in between.<br>Say hello and make it yours.</p></div>';return}
+ let previousDay='';
+  el.innerHTML=combined.map(m=>{
+   const date=new Date(m.created_at).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+   const dayLine=date===previousDay?'':'<div class="message-day">'+esc(date)+'</div>';previousDay=date;
   const mine=m.sender_id===state.user.id;
   const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Unknown sender');
    const firstAppearance=state.messageInitialized&&!state.seenMessageIds.has(m.id);
@@ -229,7 +235,7 @@ function renderMessages(keepPosition=false){
   const original=state.messages.find(x=>x.id===m.reply_to);
   const quote=m.reply_to?'<div class="msg-reply-quote"><strong>'+esc(original?(state.profiles.get(original.sender_id)?.display_name||'Unknown sender'):'Replied message')+'</strong>'+esc((original?.body||original?.attachment_name||'Original message').slice(0,180))+'</div>':'';
   const body=m.body?'<div class="msg-bubble">'+quote+esc(m.body)+'</div>':quote;
-  return '<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+(firstAppearance?' is-new':'')+'" data-message-id="'+esc(m.id)+'">'+
+  return dayLine+'<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+(firstAppearance?' is-new':'')+'" data-message-id="'+esc(m.id)+'">'+
    '<div class="msg-avatar">'+esc(who.slice(0,1).toUpperCase())+'</div><div class="msg-content"><div class="msg-meta"><strong>'+esc(mine?'You':who)+'</strong><span>'+esc(when(m.created_at))+'</span></div>'+
    body+(m.attachment_path?'<div class="msg-attachment" data-media-path="'+esc(m.attachment_path)+'" data-media-type="'+esc(m.attachment_type||'')+'" data-media-name="'+esc(m.attachment_name||'File')+'"><div class="media-open">'+icon('file')+' '+esc(m.attachment_name||'Loading file…')+'</div></div>':'')+
    (m.pending?'<div class="msg-options">Sending…</div>':
@@ -568,6 +574,8 @@ function installEvents(){
  $('closeDialog').onclick=closeDialog;$('previewClose').onclick=()=>{$('mediaDialog').close();$('previewContent').replaceChildren()};
  $('mediaDialog').addEventListener('close',()=>$('previewContent').replaceChildren());
  $('memberSearch')?.addEventListener('input',renderMembers);
+  $('roomSearch')?.addEventListener('input',renderRooms);
+  $('closeRooms')?.addEventListener('click',hideMobile);
  $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');$('mobileOpenMembers').onclick=()=>toggleMobile('membersPanel');
  $('closeMembers').onclick=hideMobile;$('mobileBackdrop').onclick=hideMobile;
  window.addEventListener('popstate',()=>{const slug=location.pathname.match(/\/chat\/([^/?]+)/)?.[1]||'general';if(state.user)openRoom(slug,new URLSearchParams(location.search).get('invite'),false).catch(e=>notify(e.message,true))});
