@@ -45,8 +45,11 @@ export default async function handler(req,res){
  }
  const slug=typeof req.query.slug==='string'?req.query.slug.trim().toLowerCase():'';
  if(!VALID.test(slug)||slug.includes('--'))return res.status(404).send('8aPDF short link not found.');
- const current=await fromSupabase(slug);
- const url=current.url||await fromOldBlob(slug);
+ // A historical alias must retain its original target if its old Blob
+ // store is reconnected: never silently hijack an already-shared old URL.
+ const historic=await fromOldBlob(slug);
+ const current=historic?{status:200,url:null}:await fromSupabase(slug);
+ const url=historic||current.url;
  if(!url){
   if(current.status!==404)return res.status(503).send('Short link is temporarily unavailable. Try again later.');
   return res.status(404).send('8aPDF short link not found.');
