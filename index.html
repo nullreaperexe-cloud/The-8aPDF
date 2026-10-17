@@ -1455,7 +1455,23 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <link rel="stylesheet" href="/site-polish.css?v=settings-music-contained-20261012" />
 <link rel="preload" as="image" href="/assets/study-landscape.webp" media="(min-width:811px)"/>
 <link rel="preload" as="image" href="/assets/study-landscape-mobile.webp" media="(max-width:810px)"/>
-<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/app-icon-192.png"></head>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/app-icon-192.png"><style id="8apdf-all-pdf-mobile-polish">
+/* All dates + term filters must fit narrower phones without clipping. */
+@media(max-width:600px){
+ html #schoolTermBar.school-term-toolbar{
+  box-sizing:border-box;width:100%;max-width:100%;
+  justify-content:flex-start;flex-wrap:wrap
+ }
+ html #schoolTermBar .school-term-segment{
+  box-sizing:border-box;max-width:100%;min-width:0;flex:1 1 100%;
+  display:flex;flex-wrap:wrap
+ }
+ html #schoolTermBar .school-term-segment button{
+  flex:1 1 auto;min-width:65px;padding:8px 9px;font-size:.69rem
+ }
+}
+</style>
+</head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
 <h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
@@ -1592,7 +1608,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <section class="section" id="library"><div class="shell"><div class="section-heading"><div><div class="heading-kicker">EXPLORE STUDY MATERIAL</div><h2>Browse Our PDF Library</h2><p>Find notes, worksheets, previous year papers, practical files and more.</p></div><span class="count-text" id="pdfCount">Connecting to live PDFs…</span></div>
 <div class="school-term-toolbar" id="schoolTermBar" aria-label="Filter PDFs by school term">
   <div class="school-term-title"><span class="school-term-kicker">YOUR MATERIALS</span><strong>Term</strong><span id="termContext">From 29 Sep 2026</span></div>
-  <div class="school-term-segment" role="group" aria-label="School term"><button data-school-term="all" type="button" aria-pressed="true">All PDFs</button><button data-school-term="term1" type="button" aria-pressed="false">Term 1</button><button data-school-term="term2" type="button" aria-pressed="true">Term 2</button><button data-school-term="undated" type="button" aria-pressed="false" hidden>Undated</button></div>
+  <div class="school-term-segment" role="group" aria-label="School term"><button data-school-term="all" type="button" aria-pressed="true">All PDFs</button><button data-school-term="term1" type="button" aria-pressed="false">Term 1</button><button data-school-term="term2" type="button" aria-pressed="false">Term 2</button><button data-school-term="undated" type="button" aria-pressed="false" hidden>Undated</button></div>
 </div>
 <div aria-label="Subject filters" class="filters" id="subjectFilters"><button class="chip active" data-subject="All Subjects">All Subjects</button></div>
 <div class="filter-foot"><span class="small-status" id="libraryStatus"><span class="dot"></span> Connecting to school library</span><button type="button" id="zipExport" class="solid" style="min-height:36px;padding:7px 12px;font-size:.72rem">↓ Download ZIP</button><select aria-label="Sort PDFs" class="sort-select" id="sortSelect"><option value="new" selected>Latest First</option><option value="default">Original Order</option><option value="old">Oldest First</option><option value="az">Title A–Z</option></select><div aria-label="Change view" class="mini-tabs"><button aria-label="Grid view" class="active" id="gridBtn" title="Grid view"><svg><use href="#i-grid"></use></svg></button><button aria-label="List view" id="listBtn" title="List view"><svg><use href="#i-list"></use></svg></button></div></div>
