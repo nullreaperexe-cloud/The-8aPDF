@@ -5,6 +5,7 @@ set local role service_role;
 do $$
 declare actor uuid; sid uuid; rec jsonb; clone jsonb; result jsonb; test_id text:='admin-rollback-'||gen_random_uuid(); copy_id text:='admin-rollback-'||gen_random_uuid();
   original_created text; alias text:='rollback-'||substr(gen_random_uuid()::text,1,8); original_url text:='https://example.invalid/'||gen_random_uuid()||'.pdf'; blocked boolean;
+  target text; direct_id text; direct_row jsonb;
 begin
   select u.id,s.id into actor,sid from auth.users u join auth.sessions s on s.user_id=u.id
     where u.email like '8apdf-integration-super_admin-%@example.invalid' and (s.not_after is null or s.not_after>now()) limit 1;
@@ -44,10 +45,35 @@ begin
   perform public.admin_mutate(actor,sid,'study_materials','delete',test_id,(rec->>'version')::integer);
   if not exists(select 1 from public.short_links where slug=alias and document_id=copy_id and url=original_url) then raise exception 'Shared link was lost during duplicate cleanup'; end if;
 
+  -- A linked PDF remains protected even when it has not been archived.
+  blocked:=false;
+  begin perform public.admin_mutate(actor,sid,'study_materials','delete',copy_id,(clone->>'version')::integer); exception when check_violation then blocked:=true; end;
+  if not blocked then raise exception 'A linked active PDF was deleted'; end if;
+
+  foreach target in array array['study_materials','announcements'] loop
+    direct_id:='admin-direct-delete-'||gen_random_uuid();
+    direct_row:=public.admin_mutate(actor,sid,target,'create',direct_id,null,
+      case when target='study_materials' then jsonb_build_object('title','Direct delete rollback','pdf_url','https://example.invalid/'||gen_random_uuid()||'.pdf','published',true)
+      else jsonb_build_object('title','Direct delete rollback','original_message','Retain this message in the recovery snapshot','published',true) end);
+    if direct_row->>'archived_at' is not null then raise exception 'Direct deletion fixture was archived'; end if;
+    update public.admin_users set role='admin' where user_id=actor;
+    blocked:=false;
+    begin perform public.admin_mutate(actor,sid,target,'delete',direct_id,(direct_row->>'version')::integer); exception when insufficient_privilege then blocked:=true; end;
+    if not blocked then raise exception 'Regular admin deleted active %',target; end if;
+    update public.admin_users set role='super_admin' where user_id=actor;
+    blocked:=false;
+    begin perform public.admin_mutate(actor,sid,target,'delete',direct_id,0); exception when sqlstate 'PT409' then blocked:=true; end;
+    if not blocked then raise exception 'Stale version deleted active %',target; end if;
+    result:=public.admin_mutate(actor,sid,target,'delete',direct_id,(direct_row->>'version')::integer);
+    if result->>'deleted'<>'true' then raise exception 'Direct deletion failed for %',target; end if;
+    if not exists(select 1 from public.admin_deleted_records where record_id=direct_id and record_type=target and data->>'title'='Direct delete rollback' and data->>'published'='true') then raise exception 'Recovery snapshot missing for %',target; end if;
+    if not exists(select 1 from public.admin_audit_logs where record_id=direct_id and record_type=target and action='deleted' and before_data->>'title'='Direct delete rollback') then raise exception 'Deletion audit missing for %',target; end if;
+  end loop;
+
   insert into admin_private.rate_limits values(actor,date_trunc('minute',now()),90) on conflict(actor_id,window_start) do update set hits=90;
   blocked:=false;
   begin perform public.admin_gate(actor,sid,true); exception when sqlstate '54000' then blocked:=true; end;
   if not blocked then raise exception 'Rate limit was bypassed'; end if;
 end $$;
 rollback;
-select 'PASS: role, session revocation, sync preservation, timestamps, draft restore, repeated actions, Super Admin deletion, destination-preserving link transfer, and rate limits. All fixture changes rolled back.' result;
+select 'PASS: role, session revocation, sync preservation, timestamps, draft restore, repeated actions, direct active PDF/announcement deletion, recovery snapshots, audits, stale-version rejection, protected links, destination-preserving link transfer, and rate limits. All fixture changes rolled back.' result;

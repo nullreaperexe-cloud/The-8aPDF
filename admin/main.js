@@ -133,11 +133,19 @@ function modal(title,content,cls=''){
 function requestModalClose(){if(modalDirty&&!window.confirm('Discard unsaved changes?'))return;modalDirty=false;$('#modal').close();}
 async function confirmDialog(title,description,phrase){
   const d=modal(esc(title),`<div class="confirmation-icon">${icon('alert-triangle')}</div><p>${esc(description)}</p><label>Type <strong>${esc(phrase)}</strong> to confirm<input id="confirmation-text" autocomplete="off" spellcheck="false"></label><div class="modal-actions"><button class="btn secondary" id="confirm-cancel">Cancel</button><button class="btn danger-btn" id="confirm-ok" disabled>Confirm</button></div>`);
-  return new Promise(resolve=>{let resolved=false;const done=value=>{if(resolved)return;resolved=true;modalDirty=false;d.close();resolve(value);};$('#confirmation-text').oninput=e=>$('#confirm-ok').disabled=e.target.value!==phrase;$('#confirm-ok').onclick=()=>done(true);$('#confirm-cancel').onclick=()=>done(false);d.addEventListener('close',()=>done(false),{once:true});});
+  return new Promise(resolve=>{
+    let resolved=false;
+    // A close event from the previous dialog can arrive after this one opens.
+    const onClose=()=>{if(!d.open)done(false);};
+    const done=value=>{if(resolved)return;resolved=true;d.removeEventListener('close',onClose);modalDirty=false;if(d.open)d.close();resolve(value);};
+    $('#confirmation-text').oninput=e=>$('#confirm-ok').disabled=e.target.value!==phrase;
+    $('#confirm-ok').onclick=()=>done(true);$('#confirm-cancel').onclick=()=>done(false);
+    d.addEventListener('close',onClose);
+  });
 }
 function recordMenu(r,table){
   const pdf=table==='study_materials';
-  modal('Document actions',`<h3 class="record-menu-title">${esc(r.title)}</h3>${pill(r)}<div class="menu-grid">${[['edit','Edit details','settings'],...(pdf?[['preview','Preview PDF','eye'],['copy','Copy original URL','copy'],['download','Download PDF','arrow-down-to-line'],['short','Create short link','link']]:[['message','Read / copy full message','file-text']]),[r.archived_at?'restore':'archive',r.archived_at?'Restore record':'Archive record',r.archived_at?'rotate-ccw':'archive'],['publish',r.published?'Unpublish':'Publish','check'],['duplicate','Create intentional duplicate','copy'],...(state.role==='super_admin'&&r.archived_at?[['delete','Permanently delete','trash-2']]:[])].map(([a,t,i])=>`<button class="menu-action" data-menu="${a}">${icon(i)}${t}${icon('chevron-right')}</button>`).join('')}</div><dl class="record-details"><dt>Record ID</dt><dd>${esc(r.id)}</dd><dt>Source</dt><dd>${esc(r.source||'Imported')}</dd><dt>Original insertion</dt><dd>${fmtDate(r.inserted_at||r.created_at,true)} ${r.inserted_at?'':'(inferred)'}</dd><dt>Last update</dt><dd>${fmtDate(r.updated_at,true)}</dd>${pdf?`<dt>Original URL</dt><dd>${link(r.pdf_url,esc(r.pdf_url),'url-text')}</dd><dt>SHA-256</dt><dd class="break-all">${esc(r.file_checksum||'Unavailable for this record')}</dd>`:`<dt>Source message ID</dt><dd>${esc(r.source_message_id||'Not recorded')}</dd>`}</dl>`);
+  modal('Document actions',`<h3 class="record-menu-title">${esc(r.title)}</h3>${pill(r)}<div class="menu-grid">${[['edit','Edit details','settings'],...(pdf?[['preview','Preview PDF','eye'],['copy','Copy original URL','copy'],['download','Download PDF','arrow-down-to-line'],['short','Create short link','link']]:[['message','Read / copy full message','file-text']]),[r.archived_at?'restore':'archive',r.archived_at?'Restore record':'Archive record',r.archived_at?'rotate-ccw':'archive'],['publish',r.published?'Unpublish':'Publish','check'],['duplicate','Create intentional duplicate','copy'],...(state.role==='super_admin'?[['delete','Permanently delete','trash-2']]:[])].map(([a,t,i])=>`<button class="menu-action" data-menu="${a}">${icon(i)}${t}${icon('chevron-right')}</button>`).join('')}</div><dl class="record-details"><dt>Record ID</dt><dd>${esc(r.id)}</dd><dt>Source</dt><dd>${esc(r.source||'Imported')}</dd><dt>Original insertion</dt><dd>${fmtDate(r.inserted_at||r.created_at,true)} ${r.inserted_at?'':'(inferred)'}</dd><dt>Last update</dt><dd>${fmtDate(r.updated_at,true)}</dd>${pdf?`<dt>Original URL</dt><dd>${link(r.pdf_url,esc(r.pdf_url),'url-text')}</dd><dt>SHA-256</dt><dd class="break-all">${esc(r.file_checksum||'Unavailable for this record')}</dd>`:`<dt>Source message ID</dt><dd>${esc(r.source_message_id||'Not recorded')}</dd>`}</dl>`);
   document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=async()=>{try{const action=b.dataset.menu;modalDirty=false;$('#modal').close();
     if(action==='edit')return editRecord(r,table);
     if(action==='preview')return preview(r.pdf_url,r.title);
@@ -174,7 +182,7 @@ async function bulk(operation,table=currentTable()){
   const phrase=operation.toUpperCase()+' '+items.length;
   if(['archive','delete'].includes(operation)){
     const list=items.slice(0,8).map(r=>r.title).join(' • ')+(items.length>8?' …':'');
-    if(!await confirmDialog(`${operation==='delete'?'Permanently delete':'Archive'} ${items.length} record(s)?`,`${list}. ${operation==='delete'?'Active short links block deletion. Files are retained; deleted metadata is kept in a server recovery snapshot.':'Records will leave public listings and remain recoverable. Existing permanent short links keep their original destination.'}`,phrase))return;
+    if(!await confirmDialog(`${operation==='delete'?'Permanently delete':'Archive'} ${items.length} record(s)?`,`${list}. ${operation==='delete'?'Selected records will be deleted immediately; archiving first is not required. Active short links block deletion. Files are retained; deleted metadata is kept in a server recovery snapshot.':'Records will leave public listings and remain recoverable. Existing permanent short links keep their original destination.'}`,phrase))return;
   }
   setBusy(true);const results=[];
   try{

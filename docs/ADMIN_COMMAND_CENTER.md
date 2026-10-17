@@ -50,7 +50,7 @@ Original PDF/announcement IDs, timestamps and `raw` metadata are retained. New r
 - Each admin is limited to 90 requests/minute. Supabase Auth also supplies its own sign-in/email rate limits.
 - PDFs require `.pdf`, `application/pdf`, a PDF signature, an EOF marker and at most **20 MB** on the server. Document bytes are preserved; names appearing in PDF text, metadata or streams do not cause rejection. No malware-scanner certification is claimed.
 - Uploads use UUID paths without upserts, SHA-256 checksums, a real public-file verification request, and durable upload records. A failed DB/Storage operation retains recovery information; retries reuse the same UUID. Announcement create requests and attachment retries also have stable request IDs.
-- Archive is reversible and retains the prior publication state. Permanent deletion requires Super Admin, prior archival, typed confirmation, and no dependent short links. Deleted metadata is retained in a server-only recovery snapshot. Files are retained until explicit, unreferenced-file cleanup.
+- Archive is reversible and retains the prior publication state. Permanent deletion works directly for active or archived PDFs and announcements, requiring Super Admin, typed confirmation, and no dependent short links. Deleted metadata is retained in a server-only recovery snapshot. Files are retained until explicit, unreferenced-file cleanup.
 - Link transfers preserve the exact shared destination; only a compatible record association changes. A file cannot be removed while any PDF (including archived PDFs), announcement or short link still references it.
 - Source automation cannot overwrite protected admin-edited fields, original creation time or legacy `raw` keys. No automation credentials or code were changed.
 
@@ -69,6 +69,7 @@ Live tests are **opt-in**, use isolated authentication identities, and clean up 
 
 - `tests/prepare-admin-live.mjs`: generates private, git-ignored fixture credentials and owner-applied SQL.
 - `tests/admin-live.mjs`: real Auth/RLS, PDF upload/public URL, retry, duplicate warnings, source-independent links, browser ownership, destination-preserving transfers, edits/concurrency, announcements/attachments, archive/restore/delete, batch results and file-reference guards.
+- `tests/admin-delete-browser.mjs`: real row-menu and batch deletion of active PDFs and announcements, typed confirmation, cancellation and removal from public listings. Uses isolated fixtures and retains shared files.
 - `tests/admin-browser.mjs`: actual browser login and forms, all nine sections, responsive 1440/820/390px layouts, search/sort, upload/publication/custom slug, announcements, themes, reduced motion, logout and Access Denied. `ADMIN_BASE_URL` selects the target; default is local.
 - `tests/admin-database-rollback.sql`: service-role permissions, revoked sessions, rate limits, draft restoration, idempotent archive/restore, sync preservation and safe transfer/deletion, rolled back in PostgreSQL.
 - `tests/cleanup-admin-live.mjs`: recovery cleanup scoped to the isolated fixture identity and unique suffix after a network interruption.
