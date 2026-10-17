@@ -13,7 +13,7 @@ const shortAgo=d=>{if(!d)return 'Offline';const n=Math.max(0,Math.floor((Date.no
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const state={sb:null,user:null,displayName:'Student',room:null,rooms:[],members:[],profiles:new Map(),messages:[],pending:[],oldest:null,more:false,loadingOlder:false,refreshing:false,channel:null,presence:null,onlineIds:new Set(),fileUrls:new Map(),lastSignature:'',currentRoomChange:0,invitesShown:new Set(),initError:null,replyTo:null,reactions:new Map(),reactionsLoaded:false,messageInitialized:false,siteAdmin:false,lastInbound:new Map(),namedMembers:[],membersRoom:null,memberLastFull:0,seenMessageIds:new Set()};
 function notify(message,bad=false){const holder=$('toastStack');const n=document.createElement('div');n.className='toast'+(bad?' error':'');n.textContent=message;holder.append(n);setTimeout(()=>n.remove(),5000)}
-function showConnection(text,ready=false){$('connectionBadge').innerHTML='<span class="status-light '+(ready?'':'off')+'"></span> '+esc(text);$('identityStatus').textContent=ready?'Connected privately':'Connection issue'}
+function showConnection(text,ready=false){$('connectionBadge').innerHTML='<span class="status-light '+(ready?'':'off')+'"></span> '+esc(text);$('identityStatus').textContent=ready?'Connected privately':'Connection issue';const status=$('detailsStatus');if(status){status.textContent=ready?'Live now':text;const dot=status.previousElementSibling;if(dot?.classList)dot.classList.toggle('off',!ready)}}
 function nameFromSite(){try{return (localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim().slice(0,40)||'Student'}catch{return 'Student'}}
 function hideMobile(){ $('chatSidebar').classList.remove('open');$('membersPanel').classList.remove('open');$('mobileBackdrop').hidden=true }
 function toggleMobile(which){const el=$(which);const opening=!el.classList.contains('open');hideMobile();if(opening){el.classList.add('open');$('mobileBackdrop').hidden=false}}
@@ -114,6 +114,9 @@ async function openRoom(slug,token=null,changeUrl=true){
  state.room=room;state.messages=[];state.pending=[];state.members=[];state.namedMembers=[];state.membersRoom=null;state.memberLastFull=0;state.seenMessageIds.clear();state.oldest=null;state.more=false;state.lastSignature='';state.onlineIds.clear();state.replyTo=null;state.reactions=new Map();state.reactionsLoaded=false;state.messageInitialized=false;updateReplyDraft();
  $('roomTitle').textContent=room.name;$('roomSubtitle').textContent=room.kind==='private'?'Private conversation · Invite-only':'# '+room.slug+' · Your friends are here';
  $('topicIcon').innerHTML=room.kind==='private'?icon('lock'):'#';
+ $('detailRoomTitle').textContent=room.name;
+ $('detailRoomIcon').innerHTML=room.kind==='private'?icon('lock'):'#';
+ $('detailRoomDescription').textContent=room.kind==='private'?'A private, invite-only place to talk with your friends.':'A place for friends to chat, share ideas and stay connected.';
  $('messages').innerHTML='';$('loadOlder').hidden=true;hideMobile();
  if(changeUrl){if(window.parent!==window)history.replaceState({room:slug},'','/chat-frame.html?embedded=1&room='+encodeURIComponent(slug));else history.pushState({room:slug},'',urlForRoom(slug));}if(window.parent!==window)parent.postMessage({type:'8apdf:chat-route',path:'/chat/'+encodeURIComponent(slug),roomId:room.id},location.origin);document.title=room.name+' · 8aPDF';
  renderRooms();
@@ -329,6 +332,7 @@ function renderMembers(){
  const term=($('memberSearch')?.value||'').trim().toLowerCase();
  const members=term?all.filter(m=>m.profile.display_name.toLowerCase().includes(term)):all;
  $('memberCount').textContent=String(all.length);
+ const allButton=$('viewAllMembers');if(allButton)allButton.hidden=all.length<=4;
  const unnamed=Math.max(0,state.members.length-all.length),summary=$('membersSummary');
  if(summary)summary.textContent=all.length+' named '+(all.length===1?'profile':'profiles')+(unnamed?' · '+unnamed+' unnamed memberships not listed':'');
  $('membersList').innerHTML=members.map(m=>{
@@ -550,7 +554,11 @@ async function markVisibleRead(){
 }
 window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==window.parent)return;if(e.data?.type==='8apdf:tool-visible'&&e.data.visible)requestAnimationFrame(markVisibleRead);if(e.data?.type==='8apdf:open-chat-room'&&state.user&&state.room?.slug!==e.data.room)openRoom(e.data.room,e.data.invite||null,false).catch(err=>notify(err.message,true));});
 function installEvents(){
+ const actionsMenu=$('roomActionsMenu'),actionsToggle=$('roomActionsToggle');
+ const closeActions=()=>{actionsMenu.hidden=true;actionsToggle.setAttribute('aria-expanded','false')};
+ actionsToggle.onclick=()=>{const next=actionsMenu.hidden;actionsMenu.hidden=!next;actionsToggle.setAttribute('aria-expanded',String(next))};
  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>{
+  closeActions();
   const actions={create:()=>makeRoom('group'),join:joinRoom,private:()=>makeRoom('private'),new:()=>makeRoom('group')};
   Promise.resolve(actions[b.dataset.action]?.()).catch(e=>notify(e.message,true));
  });
@@ -576,8 +584,16 @@ function installEvents(){
  $('memberSearch')?.addEventListener('input',renderMembers);
   $('roomSearch')?.addEventListener('input',renderRooms);
   $('closeRooms')?.addEventListener('click',hideMobile);
- $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');$('mobileOpenMembers').onclick=()=>toggleMobile('membersPanel');
- $('closeMembers').onclick=hideMobile;$('mobileBackdrop').onclick=hideMobile;
+ $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');
+ $('closeMembers').onclick=()=>{if(window.innerWidth>1550){$('chatApp').classList.add('details-collapsed');$('membersPanel').classList.remove('open')}else hideMobile()};
+ $('mobileBackdrop').onclick=hideMobile;
+ $('mobileOpenMembers').onclick=()=>{if(window.innerWidth>1550){$('chatApp').classList.remove('details-collapsed')}else toggleMobile('membersPanel')};
+ const allButton=$('viewAllMembers'),panel=$('membersPanel');
+ allButton.onclick=()=>{const expanded=panel.classList.toggle('show-all');allButton.setAttribute('aria-expanded',String(expanded));allButton.querySelector('span').textContent=expanded?'Show fewer members':'See all members';$('membersSearchWrap').hidden=!expanded;if(!expanded){$('memberSearch').value='';renderMembers()}else $('memberSearch').focus()};
+ const account=$('railAccount'),accountButton=$('railProfileButton');
+ accountButton.onclick=()=>{const open=account.hidden;account.hidden=!open;accountButton.setAttribute('aria-expanded',String(open))};
+ document.addEventListener('click',e=>{if(!actionsMenu.hidden&&!actionsMenu.contains(e.target)&&!actionsToggle.contains(e.target))closeActions();if(!account.hidden&&!account.contains(e.target)&&!accountButton.contains(e.target)){account.hidden=true;accountButton.setAttribute('aria-expanded','false')}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeActions();account.hidden=true;accountButton.setAttribute('aria-expanded','false');hideMobile()}});
  window.addEventListener('popstate',()=>{const slug=location.pathname.match(/\/chat\/([^/?]+)/)?.[1]||'general';if(state.user)openRoom(slug,new URLSearchParams(location.search).get('invite'),false).catch(e=>notify(e.message,true))});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){heartbeat().catch(()=>{});markVisibleRead()}});$('messagesArea').addEventListener('scroll',()=>{clearTimeout(readTimer);readTimer=setTimeout(markVisibleRead,150)},{passive:true});
 }
