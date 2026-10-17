@@ -1,231 +1,148 @@
-/* 8aPDF background music — original local MP3s, no audio conversion.
-   First visit: Tum Hi Ho. Following page loads: random different song.
-   A temporary legacy fallback prevents a silent site until all four MP3s are uploaded. */
+/* 8aPDF — original MP3 background playlist: fixed order, persistent selection, single-song loop. */
 (()=>{
 'use strict';
 const TRACKS=[
  {id:'tum-hi-ho',title:'Tum Hi Ho',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/tum-hi-ho.mp3'},
- {id:'meri-duniya',title:'Meri Duniya Tu Hi Re',detail:'Heyy Babyy · Lyrical',url:'/assets/bgm/meri-duniya-tu-hi-re.mp3'},
  {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'},
  {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
 ];
-const OLD_AUDIO='/assets/8apdf-background-music.mp3';
-const ZIP_ARCHIVE='/8apdf-four-original-bg-tracks.zip';
-// While GitHub Actions extracts the ZIP, these exact MP3 bytes can play
-// directly from its uncompressed ZIP entries, without any re-encoding.
-let zipContentsPromise=null,activeBlobUrl=null,zipAttempted=false;
-function originalZipTracks(){
- if(!zipContentsPromise)zipContentsPromise=fetch(ZIP_ARCHIVE,{cache:'force-cache'}).then(async r=>{
-  if(!r.ok)throw Error('Music archive unavailable (HTTP '+r.status+')');
-  const bytes=await r.arrayBuffer(),view=new DataView(bytes),tracks=new Map(),decoder=new TextDecoder();
-  let pos=0;
-  while(pos+30<=bytes.byteLength&&view.getUint32(pos,true)===0x04034b50){
-   const flags=view.getUint16(pos+6,true),method=view.getUint16(pos+8,true);
-   const size=view.getUint32(pos+18,true),nameLength=view.getUint16(pos+26,true),extra=view.getUint16(pos+28,true);
-   const start=pos+30+nameLength+extra,end=start+size;
-   if(method!==0||(flags&8)||end>bytes.byteLength)throw Error('Unsupported MP3 archive format');
-   const name='/'+decoder.decode(new Uint8Array(bytes,pos+30,nameLength));
-   tracks.set(name,new Uint8Array(bytes.slice(start,end)));
-   pos=end;
-  }
-  if(tracks.size!==4)throw Error('Expected four original MP3 tracks in archive');
-  return tracks;
- }).catch(error=>{zipContentsPromise=null;throw error});
- return zipContentsPromise;
-}
-async function urlFromZip(path){
- const tracks=await originalZipTracks(),bytes=tracks.get(path);
- if(!bytes)throw Error('Track is missing from music archive');
- return URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
-}
-const SETTINGS_KEY='8apdf_background_music_v1';
-const VISITED_KEY='8apdf_music_four_tracks_seen_v2';
-const LAST_KEY='8apdf_music_four_tracks_last_v2';
-const get=(k)=>{try{return localStorage.getItem(k)}catch{return null}};
-const put=(k,v)=>{try{localStorage.setItem(k,String(v))}catch{}};
-const $=id=>document.getElementById(id);
-const saved=(()=>{try{return JSON.parse(get(SETTINGS_KEY)||'null')}catch{return null}})();
-const pref={
- enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,
- volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):18
+const KEY='8apdf_background_music_v1',byId=id=>document.getElementById(id);
+const ordered=()=>TRACKS.map(x=>x.id);
+const normalize=value=>{
+ const selected=new Set(Array.isArray(value)?value:[]);
+ const valid=ordered().filter(id=>selected.has(id));
+ return valid.length?valid:ordered();
 };
-function persist(){put(SETTINGS_KEY,JSON.stringify(pref))}
-function chooseInitial(){
- const first=get(VISITED_KEY)!=='yes',last=get(LAST_KEY);
- let chosen=TRACKS[0];
- if(!first){
-  const options=TRACKS.filter(t=>t.id!==last);
-  chosen=options[Math.floor(Math.random()*options.length)];
- }
- put(VISITED_KEY,'yes');put(LAST_KEY,chosen.id);
- return chosen;
-}
-let selected=chooseInitial(),audio=null,playing=false,pending=false,blocked=false;
-let manuallyPaused=false,usingLegacy=false,sourceFailed=false,retryId=0;
-const current=()=>selected.title;
-const status=message=>{const e=$('eightapdfBgmStatus');if(e)e.textContent=message};
+const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
+const saved=read();
+const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):18,selectedTracks:normalize(saved?.selectedTracks)};
+const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
+const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
+let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
+const track=()=>TRACKS.find(t=>t.id===active)||playlist()[0];
+const status=s=>{const e=byId('eightapdfBgmStatus');if(e)e.textContent=s};
 function sync(){
- const on=$('eightapdfBgmToggle'),volume=$('eightapdfBgmVolume'),percent=$('eightapdfBgmVolumeLabel');
- const choose=$('eightapdfBgmTrack'),button=$('eightapdfBgmTest'),shuffle=$('eightapdfBgmShuffle');
- const now=$('eightapdfBgmNow');
- if(on)on.checked=pref.enabled;
- if(volume){volume.value=String(pref.volume);volume.disabled=!pref.enabled}
- if(percent)percent.textContent=pref.volume+'%';
- if(choose){choose.value=selected.id;choose.disabled=!pref.enabled}
- if(button){button.disabled=!pref.enabled;button.textContent=playing?'❚❚ Pause music':'▶ Play music'}
- if(shuffle)shuffle.disabled=!pref.enabled;
- if(now)now.textContent=usingLegacy?'New MP3s pending upload':current()+' · '+selected.detail;
+ const toggle=byId('eightapdfBgmToggle'),vol=byId('eightapdfBgmVolume'),label=byId('eightapdfBgmVolumeLabel');
+ const button=byId('eightapdfBgmTest'),current=byId('eightapdfBgmNow'),mode=byId('eightapdfBgmMode'),all=byId('eightapdfBgmPlayAll');
+ if(toggle)toggle.checked=prefs.enabled;
+ if(vol){vol.value=String(prefs.volume);vol.disabled=!prefs.enabled}
+ if(label)label.textContent=prefs.volume+'%';
+ if(button){button.disabled=!prefs.enabled;button.textContent=playing?'❚❚ Pause music':'▶ Play music'}
+ if(current)current.textContent=track().title;
+ if(mode)mode.textContent=prefs.selectedTracks.length===1?'Repeat one — '+track().title:playlist().map(t=>t.title).join(' → ')+' → repeat';
+ if(all)all.disabled=!prefs.enabled||prefs.selectedTracks.length===3;
+ TRACKS.forEach(t=>{
+  const cb=byId('eightapdfBgmChoice-'+t.id),solo=byId('eightapdfBgmSolo-'+t.id);
+  if(cb){cb.checked=prefs.selectedTracks.includes(t.id);cb.disabled=!prefs.enabled}
+  if(solo)solo.disabled=!prefs.enabled||(prefs.selectedTracks.length===1&&active===t.id);
+ });
 }
-function begin(){
- if(!pref.enabled||!audio||playing||pending||sourceFailed)return;
- pending=true;blocked=false;
- status('Starting '+(usingLegacy?'temporary backup music':current())+'…');
- const source=audio.currentSrc||audio.src;
+function play(){
+ if(!audio||!prefs.enabled||pausedByUser||playing||pending||error)return;
+ const id=generation;
+ pending=true;blocked=false;status('Starting '+track().title+'…');
  try{
-  const promise=audio.play();
-  if(promise&&typeof promise.catch==='function')promise.catch(e=>{
-   if(source!==(audio.currentSrc||audio.src))return;
+  const result=audio.play();
+  if(result&&typeof result.catch==='function')result.catch(e=>{
+   if(id!==generation||!prefs.enabled||pausedByUser)return;
    pending=false;playing=false;
-   if(e?.name==='NotAllowedError'){blocked=true;status('Browser blocked autoplay. Tap anywhere once or press Play music.')}
-   else if(!sourceFailed)status('Unable to start audio. Check your connection or press Play music.');
+   if(e?.name==='NotAllowedError'){blocked=true;status('Autoplay blocked. Tap the page once or press Play music.')}
+   else{error=true;status('Cannot play '+track().title+'. Please retry.')}
    sync();
   });
-  else pending=false;
- }catch(e){pending=false;blocked=true;status('Audio could not start. Press Play music.');sync()}
+ }catch(e){pending=false;error=true;status('Audio could not start. Please retry.');sync()}
 }
-function loadCurrent(){
- if(!audio)return;
- retryId++;sourceFailed=false;usingLegacy=false;pending=false;playing=false;blocked=false;zipAttempted=false;
+function load(id){
+ if(!TRACKS.some(t=>t.id===id))return;
+ active=id;generation++;playing=false;pending=false;blocked=false;error=false;
+ if(!audio){sync();return}
  audio.pause();
- if(activeBlobUrl){URL.revokeObjectURL(activeBlobUrl);activeBlobUrl=null;}
- audio.src=selected.url;audio.load();sync();
- if(pref.enabled&&!manuallyPaused)begin();
+ audio.loop=prefs.selectedTracks.length===1;
+ audio.src=track().url;audio.load();sync();
+ if(prefs.enabled&&!pausedByUser)play();
 }
-function pickTrack(id){
- const track=TRACKS.find(t=>t.id===id);
- if(!track)return;
- selected=track;put(LAST_KEY,selected.id);
- manuallyPaused=false;
- loadCurrent();
+function next(){
+ if(!prefs.enabled||pausedByUser||prefs.selectedTracks.length<2)return;
+ const list=playlist(),idx=list.findIndex(t=>t.id===active);
+ load(list[(idx+1)%list.length].id);
 }
-function randomNext(){
- const choices=TRACKS.filter(t=>t.id!==selected.id);
- pickTrack(choices[Math.floor(Math.random()*choices.length)].id);
+function choose(ids,fromStart=false){
+ const selected=normalize(ids),included=selected.includes(active);
+ prefs.selectedTracks=selected;write();
+ if(fromStart||!included){pausedByUser=false;load(selected[0]);return}
+ if(audio)audio.loop=selected.length===1;
+ sync();status(selected.length===1?'Repeating '+track().title:playlist().map(t=>t.title).join(' → ')+' → repeat');
 }
-function pause(){
- manuallyPaused=true;
- if(audio)audio.pause();
- playing=false;pending=false;blocked=false;
- status('Music paused. Press Play music to resume.');sync();
+function check(id,on){
+ if(!ordered().includes(id))return;
+ const set=new Set(prefs.selectedTracks);
+ if(on)set.add(id);
+ else if(set.size>1)set.delete(id);
+ else{status('Choose at least one song.');sync();return}
+ choose([...set]);
 }
-function setEnabled(value){
- pref.enabled=!!value;persist();
- if(!pref.enabled){manuallyPaused=true;audio?.pause();playing=false;pending=false;status('Background music is off.');sync();return}
- manuallyPaused=false;sourceFailed=false;
- if(audio?.error)loadCurrent();else begin();
+function only(id){if(ordered().includes(id))choose([id],true)}
+function all(){choose(ordered(),true)}
+function pause(){pausedByUser=true;generation++;audio?.pause();playing=false;pending=false;blocked=false;status('Paused. Your music selection is saved.');sync()}
+function enable(v){
+ prefs.enabled=!!v;write();
+ if(!prefs.enabled){pause();status('Background music is off.');return}
+ pausedByUser=false;error=false;
+ if(audio?.error)load(active);else play();
  sync();
 }
-function setVolume(value){
- pref.volume=Math.max(0,Math.min(100,Math.round(Number(value)||0)));
- if(audio)audio.volume=pref.volume/100;
- persist();sync();
-}
-function togglePlayback(){
- if(!pref.enabled)return;
- if(playing){pause();return}
- manuallyPaused=false;pending=false;blocked=false;sourceFailed=false;
- if(audio?.error)loadCurrent();else begin();
-}
+function volume(v){prefs.volume=Math.max(0,Math.min(100,Math.round(Number(v)||0)));if(audio)audio.volume=prefs.volume/100;write();sync()}
+function toggle(){if(!prefs.enabled)return;if(playing){pause();return}pausedByUser=false;pending=false;blocked=false;error=false;if(audio?.error)load(active);else play()}
 function mount(){
- const host=$('eightapdfSettingsMusic');
- if(!host)return;
- host.innerHTML='<div class="eightapdf-bgm-header"><span class="setting-label">♫ Background Music</span><small>ORIGINAL MP3 · 4 TRACKS</small></div>'+
- '<p class="setting-explainer">First visit plays Tum Hi Ho. On every refresh, a different random track is chosen. Your manual selection plays immediately.</p>'+
- '<label class="setting-row"><span><strong>Enable background music</strong><small style="display:block;color:var(--muted)">Keep playing while browsing the website</small></span><input id="eightapdfBgmToggle" class="toggle" type="checkbox"></label>'+
- '<label for="eightapdfBgmTrack" class="eightapdf-bgm-label">Choose a song</label>'+
- '<select id="eightapdfBgmTrack" aria-label="Choose background song">'+TRACKS.map(t=>'<option value="'+t.id+'">'+t.title+'</option>').join('')+'</select>'+
- '<div class="eightapdf-bgm-now">Selected: <strong id="eightapdfBgmNow"></strong></div>'+
+ const host=byId('eightapdfSettingsMusic');if(!host)return;
+ host.innerHTML='<div class="eightapdf-bgm-heading"><span class="setting-label">♫ Background Music</span><small>3 ORIGINAL TRACKS</small></div>'+
+ '<p class="setting-explainer">Select one song to repeat it forever, or select several for a continuous playlist in the order below. Saved even after refresh.</p>'+
+ '<label class="setting-row"><span><strong>Enable background music</strong></span><input id="eightapdfBgmToggle" class="toggle" type="checkbox"></label>'+
+ '<div class="eightapdf-bgm-list">'+TRACKS.map((t,i)=>'<div class="eightapdf-bgm-item"><label for="eightapdfBgmChoice-'+t.id+'"><input id="eightapdfBgmChoice-'+t.id+'" type="checkbox"><span class="eightapdf-bgm-number">'+(i+1)+'</span><span class="eightapdf-bgm-copy"><strong>'+t.title+'</strong><small>'+t.detail+'</small></span></label><button type="button" id="eightapdfBgmSolo-'+t.id+'">Only this</button></div>').join('')+'</div>'+
+ '<p id="eightapdfBgmMode" class="eightapdf-bgm-mode"></p>'+
+ '<p class="eightapdf-bgm-current">Now playing: <strong id="eightapdfBgmNow"></strong></p>'+
  '<div class="eightapdf-bgm-volume"><label for="eightapdfBgmVolume">Volume</label><strong id="eightapdfBgmVolumeLabel"></strong></div>'+
- '<input id="eightapdfBgmVolume" type="range" min="0" max="100" step="1" aria-label="Background music volume">'+
- '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmTest" type="button">▶ Play music</button><button id="eightapdfBgmShuffle" type="button">⇄ Shuffle now</button></div>'+
- '<p id="eightapdfBgmStatus" aria-live="polite" role="status">Ready to play.</p>'+
- '<small class="eightapdf-bgm-help">Autoplay depends on browser permissions. If blocked, one tap anywhere starts your selected track. Audio files remain unmodified.</small>';
- const style=document.createElement('style');
- style.textContent='.eightapdf-bgm-header,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-header small,.eightapdf-bgm-now,.eightapdf-bgm-help{font-size:.72rem;color:var(--muted)}.eightapdf-bgm-label{display:block;font-weight:650;margin:18px 0 7px;font-size:.83rem}.eightapdf-settings-music select{width:100%;min-height:45px;padding:10px 12px;border:1px solid var(--line-bold);border-radius:11px;color:var(--text);background:var(--surface-high);font:inherit}.eightapdf-bgm-now{margin:10px 0 20px}.eightapdf-bgm-now strong{color:var(--text-soft)}.eightapdf-bgm-volume{font-size:.82rem}.eightapdf-settings-music input[type=range]{width:100%;margin:11px 0 19px;accent-color:var(--button)}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:9px}.eightapdf-bgm-actions button{padding:11px 15px;border:1px solid var(--line-bold);background:var(--surface-high);border-radius:11px;color:var(--text);cursor:pointer;font:inherit;font-size:.82rem}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}.eightapdf-bgm-actions button:disabled{opacity:.48;cursor:not-allowed}#eightapdfBgmStatus{font-size:.78rem;color:var(--muted);margin:17px 0 9px;line-height:1.6}.eightapdf-bgm-help{display:block;line-height:1.6}';
- document.head.append(style);
- $('eightapdfBgmToggle').addEventListener('change',e=>setEnabled(e.target.checked));
- $('eightapdfBgmVolume').addEventListener('input',e=>setVolume(e.target.value));
- $('eightapdfBgmTrack').addEventListener('change',e=>pickTrack(e.target.value));
- $('eightapdfBgmTest').addEventListener('click',togglePlayback);
- $('eightapdfBgmShuffle').addEventListener('click',randomNext);
+ '<input type="range" min="0" max="100" step="1" id="eightapdfBgmVolume" aria-label="Background music volume">'+
+ '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmTest" type="button">▶ Play music</button><button id="eightapdfBgmPlayAll" type="button">↺ Play all 3 in order</button></div>'+
+ '<p id="eightapdfBgmStatus" role="status" aria-live="polite"></p>'+
+ '<small class="eightapdf-bgm-note">Tum Hi Ho → Khairiyat → Saiyaara → repeat. Browsers may require a tap to allow audio.</small>';
+ const style=document.createElement('style');style.textContent='.eightapdf-bgm-heading,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-heading small,.eightapdf-bgm-note{color:var(--muted);font-size:.7rem}.eightapdf-bgm-list{display:grid;gap:9px;margin:16px 0}.eightapdf-bgm-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--surface-high);padding:10px;border-radius:12px}.eightapdf-bgm-item label{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer}.eightapdf-bgm-item input{width:17px;height:17px;accent-color:var(--button);flex:none}.eightapdf-bgm-number{border:1px solid var(--line-bold);border-radius:7px;padding:5px 8px;font-size:.7rem}.eightapdf-bgm-copy{display:flex;flex-direction:column;gap:4px;min-width:0}.eightapdf-bgm-copy strong{font-size:.8rem}.eightapdf-bgm-copy small,.eightapdf-bgm-current{font-size:.7rem;color:var(--muted)}.eightapdf-bgm-item button{flex:none}.eightapdf-bgm-item button,.eightapdf-bgm-actions button{border:1px solid var(--line-bold);border-radius:10px;background:var(--surface-soft);color:var(--text);padding:9px 11px;cursor:pointer;font:inherit;font-size:.75rem}.eightapdf-bgm-item button:disabled,.eightapdf-bgm-actions button:disabled{opacity:.45;cursor:not-allowed}.eightapdf-bgm-mode{font-size:.77rem;color:var(--text-soft);font-weight:650;line-height:1.5}.eightapdf-bgm-current{margin-bottom:18px}.eightapdf-bgm-current strong{color:var(--text)}.eightapdf-bgm-volume{font-size:.8rem}.eightapdf-settings-music input[type=range]{width:100%;accent-color:var(--button);margin:12px 0 18px}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:8px}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}#eightapdfBgmStatus{font-size:.76rem;color:var(--muted);margin:16px 0 8px}.eightapdf-bgm-note{display:block;line-height:1.5}@media(max-width:450px){.eightapdf-bgm-item{padding:8px}.eightapdf-bgm-item label{gap:6px}.eightapdf-bgm-item button{padding:8px}}';
+ document.head.appendChild(style);
+ byId('eightapdfBgmToggle').addEventListener('change',e=>enable(e.target.checked));
+ byId('eightapdfBgmVolume').addEventListener('input',e=>volume(e.target.value));
+ byId('eightapdfBgmTest').addEventListener('click',toggle);
+ byId('eightapdfBgmPlayAll').addEventListener('click',all);
+ TRACKS.forEach(t=>{
+  byId('eightapdfBgmChoice-'+t.id).addEventListener('change',e=>check(t.id,e.target.checked));
+  byId('eightapdfBgmSolo-'+t.id).addEventListener('click',()=>only(t.id));
+ });
  sync();
 }
 function init(){
- mount();
- audio=document.createElement('audio');
- audio.id='eightapdfBgmEngine';audio.preload='metadata';audio.loop=true;audio.style.display='none';
- audio.volume=pref.volume/100;audio.setAttribute('playsinline','');
- audio.addEventListener('playing',()=>{
-  playing=true;pending=false;blocked=false;sourceFailed=false;
-  status(usingLegacy?'New tracks still need uploading — old background music is temporarily playing.':'Playing '+current()+' ✓');sync();
- });
+ mount();audio=document.createElement('audio');audio.id='eightapdfBgmEngine';audio.style.display='none';audio.preload='metadata';audio.volume=prefs.volume/100;audio.setAttribute('playsinline','');
+ audio.addEventListener('playing',()=>{playing=true;pending=false;blocked=false;error=false;status('Playing '+track().title+' ✓');sync()});
  audio.addEventListener('pause',()=>{playing=false;pending=false;sync()});
- audio.addEventListener('waiting',()=>{if(pref.enabled&&!blocked)status('Buffering '+current()+'…')});
- audio.addEventListener('error',async()=>{
-  playing=false;pending=false;
-  if(!usingLegacy&&!zipAttempted){
-   zipAttempted=true;
-   const requestedId=selected.id;
-   try{
-    status('Loading original '+current()+' from the uploaded music archive…');
-    const url=await urlFromZip(selected.url);
-    if(requestedId!==selected.id){URL.revokeObjectURL(url);return;}
-    activeBlobUrl=url;
-    audio.src=url;audio.load();
-    if(pref.enabled&&!manuallyPaused)begin();
-    return;
-   }catch(error){
-    if(requestedId!==selected.id)return;
-    console.warn('8aPDF: music ZIP fallback unavailable:',error);
-   }
-  }
-  if(!usingLegacy){
-   // Preserve the previous working soundtrack until the user uploads the new 4 files.
-   usingLegacy=true;retryId++;audio.src=OLD_AUDIO;audio.load();
-   status('Four original MP3 files have not been uploaded to GitHub yet. Trying the temporary old track…');
-   sync();if(pref.enabled&&!manuallyPaused)begin();
-  }else{
-   sourceFailed=true;
-   status('Music files unavailable. Upload the four MP3s to /assets/bgm/ in GitHub.');
-   sync();
-  }
- });
- document.body.appendChild(audio);
- loadCurrent();
- for(const event of ['pointerdown','keydown','touchstart']){
-  document.addEventListener(event,e=>{
-   if(!e.isTrusted||!pref.enabled||manuallyPaused||playing||pending||!blocked||sourceFailed)return;
-   if(e.target?.closest?.('#eightapdfBgmTest,#eightapdfBgmToggle,#eightapdfBgmTrack,#eightapdfBgmShuffle'))return;
-   blocked=false;begin();
-  },{capture:true,passive:true});
- }
+ audio.addEventListener('ended',()=>{playing=false;pending=false;next()});
+ audio.addEventListener('error',()=>{playing=false;pending=false;error=true;status('Failed to load '+track().title+'. Check the MP3 file.');sync()});
+ document.body.appendChild(audio);load(active);
+ for(const name of ['pointerdown','keydown','touchstart'])document.addEventListener(name,e=>{
+  if(!e.isTrusted||!prefs.enabled||pausedByUser||playing||pending||!blocked||error)return;
+  if(e.target?.closest?.('#eightapdfBgmTest,#eightapdfBgmToggle,#eightapdfBgmPlayAll,.eightapdf-bgm-item'))return;
+  blocked=false;play();
+ },{capture:true,passive:true});
  window.addEventListener('storage',e=>{
-  if(e.key!==SETTINGS_KEY)return;
-  try{const updated=JSON.parse(e.newValue||'null');if(!updated)return;
-   if(typeof updated.enabled==='boolean'&&updated.enabled!==pref.enabled){
-    pref.enabled=updated.enabled;
-    if(!pref.enabled){manuallyPaused=true;audio?.pause();playing=false;pending=false;status('Background music is off.');}
-    else {manuallyPaused=false;if(audio?.error)loadCurrent();else begin();}
-   }
-   if(Number.isFinite(updated.volume)){pref.volume=Math.max(0,Math.min(100,Math.round(updated.volume)));if(audio)audio.volume=pref.volume/100;}
-   sync();
-  }catch{}
+  if(e.key!==KEY)return;
+  const n=read();if(!n)return;
+  const songs=normalize(n.selectedTracks),changed=songs.join(',')!==prefs.selectedTracks.join(',');
+  prefs.selectedTracks=songs;
+  if(Number.isFinite(n.volume)){prefs.volume=Math.max(0,Math.min(100,Math.round(n.volume)));if(audio)audio.volume=prefs.volume/100}
+  if(typeof n.enabled==='boolean')prefs.enabled=n.enabled;
+  if(!prefs.enabled){pausedByUser=true;audio?.pause();playing=false;pending=false;status('Background music is off.')}
+  else if(changed){pausedByUser=false;load(songs[0])}
+  else{if(audio)audio.loop=songs.length===1;if(!pausedByUser)play()}
+  sync();
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-window.__8apdfBackgroundAudio={
- play:()=>setEnabled(true),stop:()=>setEnabled(false),setVolume,
- select:pickTrack,shuffle:randomNext,retry:togglePlayback,
- getState:()=>({...pref,selected:selected.id,playing,pending,blocked,usingLegacy,sourceFailed,tracks:TRACKS.map(t=>({...t}))})
-};
+window.__8apdfBackgroundAudio={play:()=>enable(true),stop:()=>enable(false),pause,setVolume:volume,select:only,setSongs:choose,playAll:all,next,retry:toggle,getState:()=>({...prefs,selectedTracks:[...prefs.selectedTracks],current:active,playing,pending,blocked,loop:audio?.loop,tracks:TRACKS.map(x=>({...x}))})};
 })();
