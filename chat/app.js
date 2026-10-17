@@ -564,6 +564,7 @@ function installEvents(){
  });
  $('refreshRooms').onclick=()=>loadRooms().then(()=>notify('Conversations refreshed'));
  $('adminBtn').onclick=()=>roomManagement().catch(e=>notify(e.message,true));
+ $('roomManagementMobile').onclick=()=>{closeActions();roomManagement().catch(e=>notify(e.message,true))};
  $('inviteBtn').onclick=()=>inviteFriend().catch(e=>notify(e.message,true));
  $('headerMoreBtn').onclick=()=>showDialog('Chat options','<p>Share a link to this room, invite a friend, or manage participants.</p>',[
   {label:'Share room',act:async()=>{await shareRoom();closeDialog()}},{label:'Invite friends',act:()=>{closeDialog();inviteFriend()}}]);
