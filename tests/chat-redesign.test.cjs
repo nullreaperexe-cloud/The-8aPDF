@@ -67,10 +67,14 @@ test('full chat redesign updates layout but preserves backend controls',()=>{
   for(const item of ['conversation-stage','side-headline','details-cover','intro-art','roomSearch','closeRooms','member-search-box','roomsTotal']){
    assert.ok(html.includes(item),file+' missing '+item);
   }
-  assert.ok(html.includes('/chat/premium.css?v=20261017-full'));
+  assert.ok(html.includes('/chat/premium.css?v=20261017-airy'));
  }
  assert.ok(app.includes("('roomSearch')?.addEventListener('input',renderRooms)"));
  assert.ok(app.includes('message-day'));
  assert.ok(css.includes('.conversation-stage'));
  assert.ok(css.includes('max-width:780px'));
+ assert.ok(css.includes('v20261017-airy'));
+ assert.ok(css.includes('max-width:1060px'));
+ assert.ok(css.includes('grid-template-columns:58px'));
+ assert.ok(css.includes('.conversation-stage{'));
 });
