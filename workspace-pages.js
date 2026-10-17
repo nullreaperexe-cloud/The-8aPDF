@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);let layer=null,frames=new Map(),current=
 const pageFor=path=>/^\/chat(?:\/|$)/.test(path)?'chat':path.startsWith('/pdf-explorer')?'pdf-explorer':path.startsWith('/tests')?'tests':path.startsWith('/important-messages')?'important-messages':path.startsWith('/school-reminders')?'school-reminders':path.startsWith('/notification-settings')?'notification-settings':path.startsWith('/school-calendar')?'school-calendar':'';
 function build(){if(layer)return;layer=document.createElement('section');layer.id='workspacePage';layer.className='workspace-page';layer.hidden=true;layer.innerHTML='<header class="workspace-page-header"><button type="button" id="workspacePageBack">← Back to 8aPDF</button><strong id="workspacePageTitle"></strong><span></span></header><div id="workspacePageFrames"></div>';document.body.append(layer);$('workspacePageBack').onclick=()=>{if(history.state?.eightapdfTool)history.back();else openPage('/',true)};}
 function activate(path){
- build();const kind=pageFor(path);current=kind;window.__8apdfPersistentPage=kind;
+ build();const kind=pageFor(path);current=kind;window.__8apdfPersistentPage=kind;layer.classList.toggle('chat-page-active',kind==='chat');
  frames.forEach((frame,key)=>{if(key==='chat'&&key!==kind)frame.contentWindow?.postMessage({type:'8apdf:chat-lock'},location.origin);frame.hidden=key!==kind;frame.contentWindow?.postMessage({type:'8apdf:tool-visible',visible:key===kind},location.origin)});
  if(!kind){document.title='8aPDF — Student Workspace';layer.hidden=true;document.body.classList.remove('tool-page-open');firstFocus?.focus?.({preventScroll:true});return;}
  firstFocus=document.activeElement;layer.hidden=false;document.body.classList.add('tool-page-open');
