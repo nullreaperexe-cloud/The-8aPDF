@@ -1632,6 +1632,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
  <button class="setting-nav-item" type="button" data-settings-page="interface"><span>▦</span> Interface & Layout</button>
  <button class="setting-nav-item" type="button" data-settings-page="study"><span>◷</span> Study Experience</button>
  <button class="setting-nav-item" type="button" data-settings-page="accessibility"><span>◉</span> Accessibility</button>
+ <button class="setting-nav-item" type="button" data-settings-page="music"><span>♫</span> Music</button>
  <p class="setting-nav-footnote">Changes apply to your entire 8aPDF interface and stay saved in this browser.</p>
 </nav>
 <div class="setting-page-main"><div class="setting-heading"><div class="settings-page-title"><small>8aPDF / Personal</small><strong id="settingsPageTitle">General</strong><p id="settingsPageSubtitle">Choose your preferred workspace and everyday layout.</p></div><button aria-label="Close settings" class="round-btn" id="closeSettings"><svg><use href="#i-x"></use></svg></button></div><div class="setting-body">
@@ -1705,6 +1706,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <div class="setting-group"><span class="setting-label">Accessibility &amp; Motion</span><label class="setting-row"><span>Reduce Motion</span><input class="toggle" id="motionToggle" type="checkbox"/></label><label class="setting-row"><span>Larger Text</span><input class="toggle" id="largeTextToggle" type="checkbox"/></label><label class="setting-row"><span>High Contrast</span><input class="toggle" id="contrastToggle" type="checkbox"/></label></div>
 <div class="setting-group"><span class="setting-label">Content Density</span><div class="segmented" id="densityGroup"><button class="active" data-density-choice="comfortable">Comfortable</button><button data-density-choice="compact">Compact</button><button data-density-choice="spacious">Spacious</button></div></div>
 <div class="setting-group"><span class="setting-label">Font Size</span><div class="font-row"><span>A</span><input aria-label="Font size" id="fontRange" max="120" min="90" step="5" type="range" value="100"/><span style="font-size:1.08rem">A</span></div></div>
+<div class="setting-group" id="eightapdfMusicGroup" data-settings-category="music"><div id="eightapdfSettingsMusic" class="eightapdf-settings-music"><span class="setting-label">Background Music</span></div></div>
 <div class="setting-foot"><button class="solid" id="resetSettings">Reset Default</button><button class="solid" id="saveSettings" style="background:var(--button);color:var(--button-text)">Done</button></div>
 </div></div></aside>
 <div aria-hidden="true" aria-modal="true" class="sheet" id="modal" role="dialog"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button aria-label="Close dialog" class="round-btn" id="modalClose"><svg><use href="#i-x"></use></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
@@ -2854,10 +2856,11 @@ if(panel&&body){
  glass:['Liquid Glass','Control glass depth, ambient light and fluid motion.'],
  interface:['Interface & Layout','Fine-tune typography, spacing, shape and animations.'],
  study:['Study Experience','Personal productivity tools and focus preferences.'],
- accessibility:['Accessibility','Comfortable reading, text sizes and motion controls.']};
+ accessibility:['Accessibility','Comfortable reading, text sizes and motion controls.'],
+ music:['Music','Choose one of four background tracks, adjust volume or pause.']};
  const groups=[...body.children].filter(x=>x.classList?.contains('setting-group'));
  // Existing groups in original page order; never remove or recreate any input or listener.
- const categories=['general','general','glass','glass','appearance','appearance','general','interface','study','accessibility','interface','interface'];
+ const categories=['general','general','glass','glass','appearance','appearance','general','interface','study','accessibility','interface','interface','music'];
  if(groups.length===categories.length){groups.forEach((g,i)=>{g.dataset.settingsCategory=categories[i]});
    function pick(page){if(!names[page])return;for(const g of groups)g.hidden=(g.dataset.settingsCategory!==page);
      panel.querySelectorAll('[data-settings-page]').forEach(b=>{const active=b.dataset.settingsPage===page;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')});
@@ -3500,9 +3503,8 @@ draw();
 <script defer src="/premium-workspace.js?v=20261013-3"></script>
 <script defer src="/workspace-pages.js?v=20261013-3"></script>
 <script defer src="/school-calendar-client.js?v=20261013-2"></script>
-<!-- Settings-only, invisible external background audio; autoplay follows browser policy. -->
-<script defer src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
-<script defer src="/bgm-howler.js?v=20261016-local-mp3"></script>
+<!-- Native MP3 background player: four tracks, refresh shuffle and settings controls. -->
+<script defer src="/bgm-howler.js?v=20261017-four-tracks-v2"></script>
 
 </body>
 </html>
