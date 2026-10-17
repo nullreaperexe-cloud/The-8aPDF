@@ -11,7 +11,7 @@ const icon=n=>'<svg aria-hidden="true"><use href="#i-'+n+'"></use></svg>';
 const when=d=>{const t=new Date(d);return t.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
 const shortAgo=d=>{if(!d)return 'Offline';const n=Math.max(0,Math.floor((Date.now()-new Date(d).getTime())/60000));return n<1?'Just now':n<60?n+' min ago':n<1440?Math.floor(n/60)+'h ago':Math.floor(n/1440)+'d ago'};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const state={sb:null,user:null,displayName:'Student',room:null,rooms:[],members:[],profiles:new Map(),messages:[],pending:[],oldest:null,more:false,loadingOlder:false,refreshing:false,channel:null,presence:null,onlineIds:new Set(),fileUrls:new Map(),lastSignature:'',currentRoomChange:0,invitesShown:new Set(),initError:null,replyTo:null,reactions:new Map(),reactionsLoaded:false,messageInitialized:false,siteAdmin:false,lastInbound:new Map()};
+const state={sb:null,user:null,displayName:'Student',room:null,rooms:[],members:[],profiles:new Map(),messages:[],pending:[],oldest:null,more:false,loadingOlder:false,refreshing:false,channel:null,presence:null,onlineIds:new Set(),fileUrls:new Map(),lastSignature:'',currentRoomChange:0,invitesShown:new Set(),initError:null,replyTo:null,reactions:new Map(),reactionsLoaded:false,messageInitialized:false,siteAdmin:false,lastInbound:new Map(),namedMembers:[],membersRoom:null,memberLastFull:0,seenMessageIds:new Set()};
 function notify(message,bad=false){const holder=$('toastStack');const n=document.createElement('div');n.className='toast'+(bad?' error':'');n.textContent=message;holder.append(n);setTimeout(()=>n.remove(),5000)}
 function showConnection(text,ready=false){$('connectionBadge').innerHTML='<span class="status-light '+(ready?'':'off')+'"></span> '+esc(text);$('identityStatus').textContent=ready?'Connected privately':'Connection issue'}
 function nameFromSite(){try{return (localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim().slice(0,40)||'Student'}catch{return 'Student'}}
@@ -108,7 +108,7 @@ async function openRoom(slug,token=null,changeUrl=true){
  if(run!==state.currentRoomChange)return;
  if(state.channel)await state.sb.removeChannel(state.channel);
  if(state.presence)await state.sb.removeChannel(state.presence);
- state.room=room;state.messages=[];state.pending=[];state.oldest=null;state.more=false;state.lastSignature='';state.onlineIds.clear();state.replyTo=null;state.reactions=new Map();state.reactionsLoaded=false;state.messageInitialized=false;updateReplyDraft();
+ state.room=room;state.messages=[];state.pending=[];state.members=[];state.namedMembers=[];state.membersRoom=null;state.memberLastFull=0;state.seenMessageIds.clear();state.oldest=null;state.more=false;state.lastSignature='';state.onlineIds.clear();state.replyTo=null;state.reactions=new Map();state.reactionsLoaded=false;state.messageInitialized=false;updateReplyDraft();
  $('roomTitle').textContent=room.name;$('roomSubtitle').textContent=room.kind==='private'?'Private conversation · Invite-only':'# '+room.slug+' · Your friends are here';
  $('topicIcon').innerHTML=room.kind==='private'?icon('lock'):'#';
  $('messages').innerHTML='';$('loadOlder').hidden=true;hideMobile();
@@ -222,12 +222,14 @@ function renderMessages(keepPosition=false){
  if(!combined.length){el.innerHTML='<div class="intro-space"><div class="intro-icon">'+icon('chat')+'</div><h3>Good conversations start here.</h3><p>Say hi, share a photo, or send a video. Everything stays saved.</p></div>';return}
  el.innerHTML=combined.map(m=>{
   const mine=m.sender_id===state.user.id;
-  const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Friend');
+  const who=state.profiles.get(m.sender_id)?.display_name|| (mine?state.displayName:'Unknown sender');
+   const firstAppearance=state.messageInitialized&&!state.seenMessageIds.has(m.id);
+   state.seenMessageIds.add(m.id);
   const canDelete=mine||(state.siteAdmin&&state.room?.kind==='group')||state.members.some(x=>x.user_id===state.user.id&&['owner','admin'].includes(x.role));
   const original=state.messages.find(x=>x.id===m.reply_to);
-  const quote=m.reply_to?'<div class="msg-reply-quote"><strong>'+esc(original?(state.profiles.get(original.sender_id)?.display_name||'Friend'):'Replied message')+'</strong>'+esc((original?.body||original?.attachment_name||'Original message').slice(0,180))+'</div>':'';
+  const quote=m.reply_to?'<div class="msg-reply-quote"><strong>'+esc(original?(state.profiles.get(original.sender_id)?.display_name||'Unknown sender'):'Replied message')+'</strong>'+esc((original?.body||original?.attachment_name||'Original message').slice(0,180))+'</div>':'';
   const body=m.body?'<div class="msg-bubble">'+quote+esc(m.body)+'</div>':quote;
-  return '<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+'" data-message-id="'+esc(m.id)+'">'+
+  return '<div class="message-row '+(mine?'mine ':'')+(m.pending?'pending':'')+(firstAppearance?' is-new':'')+'" data-message-id="'+esc(m.id)+'">'+
    '<div class="msg-avatar">'+esc(who.slice(0,1).toUpperCase())+'</div><div class="msg-content"><div class="msg-meta"><strong>'+esc(mine?'You':who)+'</strong><span>'+esc(when(m.created_at))+'</span></div>'+
    body+(m.attachment_path?'<div class="msg-attachment" data-media-path="'+esc(m.attachment_path)+'" data-media-type="'+esc(m.attachment_type||'')+'" data-media-name="'+esc(m.attachment_name||'File')+'"><div class="media-open">'+icon('file')+' '+esc(m.attachment_name||'Loading file…')+'</div></div>':'')+
    (m.pending?'<div class="msg-options">Sending…</div>':
@@ -280,20 +282,52 @@ async function deleteMessage(id){
  if(error){notify('Cannot delete: '+error.message,true);return}
  state.messages=state.messages.filter(m=>m.id!==id);state.lastSignature='';renderMessages();notify('Message deleted');
 }
-async function loadMembers(){
+/* Complete membership records remain available for moderation; named-member RPC is lightweight. */
+async function loadMembers(forceFull=false){
  if(!state.room)return;const roomId=state.room.id;
- const {data,error}=await state.sb.from('chat_members').select('user_id,role,joined_at').eq('room_id',roomId);
- if(error){console.warn('Members:',error.message);return}if(roomId!==state.room?.id)return;
- state.members=data||[];await loadProfiles(state.members.map(m=>m.user_id));renderMembers();
+ if(forceFull||state.membersRoom!==roomId||Date.now()-state.memberLastFull>90000){
+  const all=[];let offset=0;
+  while(true){
+   const {data,error}=await state.sb.from('chat_members').select('user_id,role,joined_at').eq('room_id',roomId).order('joined_at',{ascending:true}).range(offset,offset+499);
+   if(error){console.warn('Members:',error.message);return}
+   if(roomId!==state.room?.id)return;
+   all.push(...(data||[]));if(!data||data.length<500)break;offset+=500;
+  }
+  state.members=[...new Map(all.map(m=>[m.user_id,m])).values()];
+  state.membersRoom=roomId;state.memberLastFull=Date.now();
+ }
+ const {data:named,error:namedError}=await state.sb.rpc('chat_named_members',{p_room:roomId});
+ if(roomId!==state.room?.id)return;
+ if(namedError){
+  console.warn('Named-member lookup:',namedError.message);
+  const ids=state.members.map(m=>m.user_id);
+  for(let i=0;i<ids.length;i+=120){
+   const {data,error}=await state.sb.from('chat_profiles').select('id,display_name,last_seen').in('id',ids.slice(i,i+120));
+   if(roomId!==state.room?.id)return;
+   if(error){console.warn('Profile fallback:',error.message);break}
+   (data||[]).forEach(p=>state.profiles.set(p.id,p));
+  }
+  state.namedMembers=state.members.filter(m=>isNamedProfile(state.profiles.get(m.user_id)?.display_name)).map(m=>({...m,profile:state.profiles.get(m.user_id)}));
+ }else{
+  const validIds=new Set(state.members.map(m=>m.user_id));
+  state.namedMembers=[...new Map((named||[]).filter(m=>validIds.has(m.user_id)).map(m=>[m.user_id,m])).values()]
+   .filter(m=>isNamedProfile(m.display_name))
+   .map(m=>{const profile={id:m.user_id,display_name:m.display_name,last_seen:m.last_seen};state.profiles.set(m.user_id,profile);return {...m,profile}});
+ }
+ renderMembers();
 }
+function isNamedProfile(name){return typeof name==='string'&&name.trim().length>0&&!['friend','student'].includes(name.trim().toLowerCase())}
 function renderMembers(){
- const members=state.members.map(m=>({...m,profile:state.profiles.get(m.user_id)}));
- members.sort((a,b)=>Number(isOnline(b))-Number(isOnline(a)));
- $('memberCount').textContent=members.length;
+ const all=state.namedMembers.slice().sort((a,b)=>Number(isOnline(b))-Number(isOnline(a))||a.profile.display_name.localeCompare(b.profile.display_name));
+ const term=($('memberSearch')?.value||'').trim().toLowerCase();
+ const members=term?all.filter(m=>m.profile.display_name.toLowerCase().includes(term)):all;
+ $('memberCount').textContent=String(all.length);
+ const unnamed=Math.max(0,state.members.length-all.length),summary=$('membersSummary');
+ if(summary)summary.textContent=all.length+' named '+(all.length===1?'profile':'profiles')+(unnamed?' · '+unnamed+' unnamed memberships not listed':'');
  $('membersList').innerHTML=members.map(m=>{
-  const name=m.profile?.display_name||'Friend';const online=isOnline(m);
-  return '<div class="member-row"><div class="member-avatar">'+esc(name.slice(0,1).toUpperCase())+'<i class="'+(online?'online':'')+'"></i></div><span class="member-info"><strong>'+esc(name)+(m.user_id===state.user?.id?' (you)':'')+'</strong><small>'+esc(m.role==='owner'?'Room owner · ':m.role==='admin'?'Admin · ':'')+esc(online?'Online now':shortAgo(m.profile?.last_seen))+'</small></span></div>';
- }).join('') || '<div class="list-loading">No members found</div>';
+  const name=m.profile.display_name.trim(),online=isOnline(m);
+  return '<div class="member-row"><div class="member-avatar">'+esc(name.slice(0,1).toUpperCase())+'<i class="'+(online?'online':'')+'"></i></div><span class="member-info"><strong title="'+esc(name)+'">'+esc(name)+(m.user_id===state.user?.id?' (you)':'')+'</strong><small>'+esc(m.role==='owner'?'Room owner · ':m.role==='admin'?'Admin · ':'')+esc(online?'Online now':shortAgo(m.profile?.last_seen))+'</small></span></div>';
+ }).join('')||'<div class="list-loading">'+(term?'No matching members':'No named members yet')+'</div>';
 }
 function isOnline(m){return state.onlineIds.has(m.user_id)||!!m.profile?.last_seen&&(Date.now()-new Date(m.profile.last_seen).getTime()<60000)}
 async function sendMessage(body='',attachment=null){
@@ -307,10 +341,14 @@ async function sendMessage(body='',attachment=null){
  if(error){state.lastSignature='';renderMessages();throw error}
  state.messages.push({...msg,pending:false});state.replyTo=null;updateReplyDraft();state.lastSignature='';renderMessages();loadMessages(false).catch(()=>{});
 }
+let sendingText=false;
 async function sendText(e){
- e.preventDefault();const box=$('messageInput');const text=box.value.trim();if(!text)return;
- box.value='';box.style.height='35px';
- try{await sendMessage(text)}catch(err){box.value=text;notify('Failed to send: '+err.message,true)}
+ e.preventDefault();if(sendingText)return;
+ const box=$('messageInput'),value=box.value.trim();if(!value)return;
+ sendingText=true;box.value='';box.style.height='35px';
+ try{await sendMessage(value)}
+ catch(err){box.value=value;notify('Failed to send: '+err.message,true)}
+ finally{sendingText=false}
 }
 function resizeTextarea(){const el=$('messageInput');el.style.height='35px';el.style.height=Math.min(150,el.scrollHeight)+'px'}
 async function imageCompress(file){
@@ -442,14 +480,14 @@ async function refreshSiteAdmin(){
 }
 async function roomManagement(){
  ensureReady();if(!state.room)return;
- await loadMembers();
+ await loadMembers(true);
  const mine=state.members.find(m=>m.user_id===state.user.id);
  const globalModerator=state.siteAdmin&&state.room.kind==='group';
  const manager=mine?.role==='owner'||mine?.role==='admin'||globalModerator;const owner=mine?.role==='owner'||globalModerator;
  const content='<p>'+esc(state.room.name)+' · '+esc(state.siteAdmin?'Site admin':mine?.role||'member')+'</p>'+(!state.siteAdmin?'<label for="chatAdminPassword">Admin access key</label><input type="password" id="chatAdminPassword" autocomplete="off" placeholder="Enter admin access key"><button type="button" id="verifySiteAdmin" class="connection-setup-button" style="margin-top:9px">Verify admin access</button><p class="help">Verified securely on the server. The key is never stored in your browser.</p>':'')+(manager?'<p>Manage members or remove inappropriate messages. Only room owners can promote other admins.</p>':'<p>This room is managed by its owner. Only owners and admins can moderate other members.</p>')+
  state.members.map(m=>{
   const prof=state.profiles.get(m.user_id);const canManage=manager&&m.user_id!==state.user.id&&m.role!=='owner';
-  return '<div class="inline-member"><strong>'+esc(prof?.display_name||'Friend')+' <small style="color:#888">· '+esc(m.role)+'</small></strong>'+
+  return '<div class="inline-member"><strong>'+esc(isNamedProfile(prof?.display_name)?prof.display_name:'Unnamed account · '+m.user_id.slice(0,8))+' <small style="color:#888">· '+esc(m.role)+'</small></strong>'+
   (canManage&&owner?'<button data-make-admin="'+esc(m.user_id)+'">'+(m.role==='admin'?'Demote':'Make admin')+'</button>':'')+
   (canManage&&(owner||m.role!=='admin')?'<button class="danger" data-ban="'+esc(m.user_id)+'">Ban</button>':'')+'</div>';
  }).join('');
@@ -528,6 +566,7 @@ function installEvents(){
  });
  $('closeDialog').onclick=closeDialog;$('previewClose').onclick=()=>{$('mediaDialog').close();$('previewContent').replaceChildren()};
  $('mediaDialog').addEventListener('close',()=>$('previewContent').replaceChildren());
+ $('memberSearch')?.addEventListener('input',renderMembers);
  $('mobileOpenRooms').onclick=()=>toggleMobile('chatSidebar');$('mobileOpenMembers').onclick=()=>toggleMobile('membersPanel');
  $('closeMembers').onclick=hideMobile;$('mobileBackdrop').onclick=hideMobile;
  window.addEventListener('popstate',()=>{const slug=location.pathname.match(/\/chat\/([^/?]+)/)?.[1]||'general';if(state.user)openRoom(slug,new URLSearchParams(location.search).get('invite'),false).catch(e=>notify(e.message,true))});
