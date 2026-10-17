@@ -41,6 +41,7 @@
   const body=mask.querySelector('#slBody');
   let current=null, timer=0, checkedSlug='', available=false, lastFocus=null;
   const OWNER_STORAGE='8apdf_short_links_owner_v1';
+  const SHORT_HOST=(location.host==='8apdf.vercel.app'?'8apdf.vercel.app':'the-8apdf.vercel.app');
   function ownerKey(){
     try {
       let token=localStorage.getItem(OWNER_STORAGE);
@@ -77,8 +78,8 @@
       const data=await apiAction('list');
       if(ticket!==loadSerial)return;
       const links=Array.isArray(data.links)?data.links:[];
-      if(!links.length){managerList.innerHTML='<div class="sl-manager-empty">No managed links yet. Share a PDF → Create Custom Short Link to add one. Links created before the ownership feature cannot be automatically claimed.</div>';return}
-      managerList.innerHTML=links.map(link=>`<article class="sl-manager-card" data-link-slug="${esc(link.slug)}"><strong>${esc(link.title||'School PDF')}</strong><a class="sl-manager-url" href="${esc(link.shortUrl)}" target="_blank" rel="noopener noreferrer">${esc(link.shortUrl)}</a><small>Created ${esc(link.createdAt?new Date(link.createdAt).toLocaleDateString('en-IN'):'recently')}</small><div class="sl-manager-actions"><button type="button" data-link-action="copy">Copy</button><button type="button" data-link-action="share">Share</button><button type="button" data-link-action="open">Open ↗</button><button type="button" class="sl-remove" data-link-action="delete">Delete</button></div></article>`).join('');
+      if(!links.length){managerList.innerHTML='<div class="sl-manager-empty">No managed links yet. Share a PDF → Create Custom Short Link to add one. Previously created Blob links are recovered when their original storage is accessible and this browser owns them.</div>';return}
+      managerList.innerHTML=links.map(link=>`<article class="sl-manager-card" data-link-slug="${esc(link.slug)}" data-link-url="${esc(link.shortUrl)}"><strong>${esc(link.title||'School PDF')}</strong><a class="sl-manager-url" href="${esc(link.shortUrl)}" target="_blank" rel="noopener noreferrer">${esc(link.shortUrl)}</a><small>Created ${esc(link.createdAt?new Date(link.createdAt).toLocaleDateString('en-IN'):'recently')}</small><div class="sl-manager-actions"><button type="button" data-link-action="copy">Copy</button><button type="button" data-link-action="share">Share</button><button type="button" data-link-action="open">Open ↗</button><button type="button" class="sl-remove" data-link-action="delete">Delete</button></div></article>`).join('');
       say(links.length+' owned link'+(links.length===1?'':'s')+' · Links are public; management stays with this browser.');
     }catch(e){if(ticket!==loadSerial)return;managerList.innerHTML='<div class="sl-manager-empty">Could not load your links right now.</div>';say(e.message)}
   }
@@ -86,7 +87,7 @@
   managerList.addEventListener('click',async e=>{
     const button=e.target.closest('[data-link-action]'),card=e.target.closest('[data-link-slug]');
     if(!button||!card)return;
-    const slug=card.dataset.linkSlug,url='https://8apdf.vercel.app/'+slug,action=button.dataset.linkAction;
+    const slug=card.dataset.linkSlug,url=card.dataset.linkUrl||'https://the-8apdf.vercel.app/'+slug,action=button.dataset.linkAction;
     if(action==='open'){window.open(url,'_blank','noopener,noreferrer');return}
     if(action==='share'){await shareNative(url,slug+' · 8aPDF');return}
     if(action==='copy'){try{await navigator.clipboard.writeText(url);say('Copied '+url)}catch{window.prompt('Copy link:',url)}return}
@@ -111,7 +112,7 @@
     try{await navigator.clipboard.writeText(url);setMessage('Link copied to clipboard','good');return true}
     catch{window.prompt('Copy the PDF link:',url);return false}
   }
-  function choices(){setBody(`<p class="sl-sub">${esc(current.title)}</p><button type="button" class="sl-option" id="slOriginal"><span><strong>Original PDF Link</strong><small>Open your phone’s native share sheet, or copy the original PDF URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slSendActual"><span><strong>Send Entire PDF File</strong><small>Share the full downloadable PDF via your phone’s share sheet, not just its URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slCustom"><span><strong>Create Custom Short Link</strong><small>Choose your own name, like <b>8apdf.vercel.app/goku</b>.</small></span><span class="sl-arrow">→</span></button>`);
+  function choices(){setBody(`<p class="sl-sub">${esc(current.title)}</p><button type="button" class="sl-option" id="slOriginal"><span><strong>Original PDF Link</strong><small>Open your phone’s native share sheet, or copy the original PDF URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slSendActual"><span><strong>Send Entire PDF File</strong><small>Share the full downloadable PDF via your phone’s share sheet, not just its URL.</small></span><span class="sl-arrow">↗</span></button><button type="button" class="sl-option" id="slCustom"><span><strong>Create Custom Short Link</strong><small>Choose your own name, like <b>${SHORT_HOST}/goku</b>.</small></span><span class="sl-arrow">→</span></button>`);
     body.querySelector('#slOriginal').addEventListener('click',()=>shareNative(current.pdfUrl,current.title));
     body.querySelector('#slCustom').addEventListener('click',nameForm);
     body.querySelector('#slSendActual').addEventListener('click',sendEntirePdf);
@@ -141,7 +142,7 @@
       body.querySelector('#slBack').textContent='Back to sharing';
     }catch(e){setMessage('Could not share full PDF: '+e.message,'bad')}
   }
-  function nameForm(){available=false;checkedSlug='';setBody(`<p class="sl-sub">Choose a unique short name for <strong>${esc(current.title)}</strong>.</p><label class="sl-label" for="slSlug">Your custom link name</label><div class="sl-slugbox"><span class="sl-domain">8apdf.vercel.app/</span><input id="slSlug" class="sl-field" maxlength="32" placeholder="goku" autocomplete="off" autocapitalize="off" spellcheck="false"/></div><p id="slAvailability" class="sl-info" aria-live="polite">3–32 characters · letters, numbers and hyphens.</p><div class="sl-actions"><button type="button" class="sl-cta sl-outline" id="slBack">Back</button><button type="button" class="sl-cta" id="slCreate" disabled>Create Short Link</button></div><p class="sl-slow">Names are public and permanently reserved after creation. Links point only to PDFs in the school library.</p>`);
+  function nameForm(){available=false;checkedSlug='';setBody(`<p class="sl-sub">Choose a unique short name for <strong>${esc(current.title)}</strong>.</p><label class="sl-label" for="slSlug">Your custom link name</label><div class="sl-slugbox"><span class="sl-domain">${SHORT_HOST}/</span><input id="slSlug" class="sl-field" maxlength="32" placeholder="goku" autocomplete="off" autocapitalize="off" spellcheck="false"/></div><p id="slAvailability" class="sl-info" aria-live="polite">3–32 characters · letters, numbers and hyphens.</p><div class="sl-actions"><button type="button" class="sl-cta sl-outline" id="slBack">Back</button><button type="button" class="sl-cta" id="slCreate" disabled>Create Short Link</button></div><p class="sl-slow">Names are public and permanently reserved after creation. Links point only to PDFs in the school library.</p>`);
     const input=body.querySelector('#slSlug'),button=body.querySelector('#slCreate');
     body.querySelector('#slBack').onclick=choices;
     input.addEventListener('input',()=>{clearTimeout(timer);available=false;checkedSlug='';button.disabled=true;const slug=normalize(input.value);if(!valid(slug)){setMessage('Use 3–32 characters: letters, numbers and single hyphens.');return}
