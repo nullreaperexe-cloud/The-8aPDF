@@ -16,7 +16,7 @@
   --curve:cubic-bezier(.22,1,.36,1);
 }
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-body{font-family:inherit;color:var(--ink);background:var(--bg)}
+body{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
 button,input,textarea{font-family:inherit}
 .app-shell{height:100%;height:100dvh;overflow:hidden;min-width:0;grid-template-columns:62px minmax(255px,283px) minmax(0,1fr) minmax(235px,260px);background:var(--bg)}
 .app-rail{display:flex!important;padding:23px 8px 17px;background:var(--bg);border-color:var(--chat-divider);gap:12px}
