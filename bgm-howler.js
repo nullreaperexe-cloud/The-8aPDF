@@ -1,146 +1,180 @@
-/* 8aPDF invisible music: external stream only; controls live in website Settings. */
+/* 8aPDF background music — original local MP3s, no audio conversion.
+   First visit: Tum Hi Ho. Following page loads: random different song.
+   A temporary legacy fallback prevents a silent site until all four MP3s are uploaded. */
 (()=>{
 'use strict';
-const URL_AUDIO='/assets/8apdf-background-music.mp3';
-const PREF_KEY='8apdf_background_music_v1';
-let pref={enabled:true,volume:18};
-try{const v=JSON.parse(localStorage.getItem(PREF_KEY)||'null');if(v&&typeof v==='object'){if(typeof v.enabled==='boolean')pref.enabled=v.enabled;if(Number.isFinite(v.volume))pref.volume=Math.max(0,Math.min(100,Math.round(v.volume)));}}catch{}
-const persist=()=>{try{localStorage.setItem(PREF_KEY,JSON.stringify(pref));}catch{}};
+const TRACKS=[
+ {id:'tum-hi-ho',title:'Tum Hi Ho',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/tum-hi-ho.mp3'},
+ {id:'meri-duniya',title:'Meri Duniya Tu Hi Re',detail:'Heyy Babyy · Lyrical',url:'/assets/bgm/meri-duniya-tu-hi-re.mp3'},
+ {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'},
+ {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
+];
+const OLD_AUDIO='/assets/8apdf-background-music.mp3';
+const SETTINGS_KEY='8apdf_background_music_v1';
+const VISITED_KEY='8apdf_music_four_tracks_seen_v2';
+const LAST_KEY='8apdf_music_four_tracks_last_v2';
+const get=(k)=>{try{return localStorage.getItem(k)}catch{return null}};
+const put=(k,v)=>{try{localStorage.setItem(k,String(v))}catch{}};
 const $=id=>document.getElementById(id);
-let music=null,engine='',playing=false,pending=false,blocked=false,sourceError='',playedId=null;
-const status=s=>{const e=$('eightapdfBgmStatus');if(e)e.textContent=s;};
+const saved=(()=>{try{return JSON.parse(get(SETTINGS_KEY)||'null')}catch{return null}})();
+const pref={
+ enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,
+ volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):18
+};
+function persist(){put(SETTINGS_KEY,JSON.stringify(pref))}
+function chooseInitial(){
+ const first=get(VISITED_KEY)!=='yes',last=get(LAST_KEY);
+ let chosen=TRACKS[0];
+ if(!first){
+  const options=TRACKS.filter(t=>t.id!==last);
+  chosen=options[Math.floor(Math.random()*options.length)];
+ }
+ put(VISITED_KEY,'yes');put(LAST_KEY,chosen.id);
+ return chosen;
+}
+let selected=chooseInitial(),audio=null,playing=false,pending=false,blocked=false;
+let manuallyPaused=false,usingLegacy=false,sourceFailed=false,retryId=0;
+const current=()=>selected.title;
+const status=message=>{const e=$('eightapdfBgmStatus');if(e)e.textContent=message};
 function sync(){
- const toggle=$('eightapdfBgmToggle'),range=$('eightapdfBgmVolume'),value=$('eightapdfBgmVolumeLabel'),button=$('eightapdfBgmTest');
- if(toggle)toggle.checked=pref.enabled;
- if(range){range.disabled=!pref.enabled;range.value=String(pref.volume);}
- if(value)value.textContent=pref.volume+'%';
- if(button){button.disabled=!pref.enabled;button.textContent=playing?'❚❚ Pause music':'▶ Play / Test music';}
+ const on=$('eightapdfBgmToggle'),volume=$('eightapdfBgmVolume'),percent=$('eightapdfBgmVolumeLabel');
+ const choose=$('eightapdfBgmTrack'),button=$('eightapdfBgmTest'),shuffle=$('eightapdfBgmShuffle');
+ const now=$('eightapdfBgmNow');
+ if(on)on.checked=pref.enabled;
+ if(volume){volume.value=String(pref.volume);volume.disabled=!pref.enabled}
+ if(percent)percent.textContent=pref.volume+'%';
+ if(choose){choose.value=selected.id;choose.disabled=!pref.enabled}
+ if(button){button.disabled=!pref.enabled;button.textContent=playing?'❚❚ Pause music':'▶ Play music'}
+ if(shuffle)shuffle.disabled=!pref.enabled;
+ if(now)now.textContent=usingLegacy?'New MP3s pending upload':current()+' · '+selected.detail;
 }
-function reportMediaError(prefix,e){
- const n=(engine==='native'?music?.error?.code:e);
- return prefix+' (media error '+String(n??'unknown')+'). Upload /assets/8apdf-background-music.mp3 to the website repository.';
-}
-function clearPlayer(){
- if(!music)return;
- try{engine==='howler'?music.unload():(music.pause(),music.removeAttribute('src'),music.load());}catch{}
- music=null;playing=false;pending=false;playedId=null;
-}
-function makeNative(){
- clearPlayer();
- engine='native';
- music=document.createElement('audio');
- music.src=URL_AUDIO;
- music.loop=true;
- music.preload='none';
- music.volume=pref.volume/100;
- music.addEventListener('playing',()=>{playing=true;pending=false;blocked=false;sourceError='';status('Playing in the background ✓');sync();});
- music.addEventListener('pause',()=>{playing=false;pending=false;sync();if(!pref.enabled)status('Music is off.');});
- music.addEventListener('waiting',()=>{status('Buffering external music…');});
- music.addEventListener('error',()=>{playing=false;pending=false;sourceError=reportMediaError('Could not load the audio',null);status(sourceError);sync();console.warn('8aPDF BGM: remote audio failed. Check browser Network tab for a missing or invalid /assets/8apdf-background-music.mp3 file.');});
- sync();
-}
-function makeHowler(){
- if(music)return;
- if(typeof window.Howl!=='function'){makeNative();return;}
- engine='howler';
- music=new window.Howl({
-  src:[URL_AUDIO],format:['mp3'],html5:true,preload:'metadata',
-  loop:true,volume:pref.volume/100,
-  onplay(){playing=true;pending=false;blocked=false;sourceError='';status('Playing in the background ✓');sync();},
-  onpause(){playing=false;pending=false;sync();if(!pref.enabled)status('Music is off.');},
-  onstop(){playing=false;pending=false;sync();},
-  onplayerror(id,error){
-   pending=false;playing=false;blocked=true;
-   status('Browser blocked autoplay. Click Play / Test music, or tap the page once.');
-   sync();console.info('8aPDF BGM: autoplay denied',error);
-   if(music&&engine==='howler')music.once('unlock',()=>{if(pref.enabled&&!playing)start();});
-  },
-  onloaderror(id,error){
-   pending=false;playing=false;sourceError=reportMediaError('Howler could not load the audio',error);
-   console.warn('8aPDF BGM:',sourceError,'Trying native HTML5 audio.');
-   status('Howler could not load local MP3. Trying browser audio engine…');
-   const retry=pref.enabled&&!blocked;
-   makeNative();
-   if(retry)start();
-  }
- });
-}
-function start(){
- if(!pref.enabled||playing||pending)return;
- if(!music)makeHowler();
- if(!music)return;
- pending=true;sourceError='';
- status('Connecting to background music…');
+function begin(){
+ if(!pref.enabled||!audio||playing||pending||sourceFailed)return;
+ pending=true;blocked=false;
+ status('Starting '+(usingLegacy?'temporary backup music':current())+'…');
+ const source=audio.currentSrc||audio.src;
  try{
-  if(engine==='howler'){
-   const id=music.play();
-   if(typeof id==='number')playedId=id;
-   // Await onplay/onplayerror; do not claim music has started before the event.
-  }else{
-   const promise=music.play();
-   if(promise&&typeof promise.then==='function'){
-    promise.then(()=>{pending=false;}).catch(e=>{
-      pending=false;playing=false;
-      if(e?.name==='NotAllowedError'){blocked=true;status('Browser blocked autoplay. Click Play / Test music.');}
-      else {sourceError=reportMediaError('Could not play this MP3',e?.name);status(sourceError);}
-      sync();console.warn('8aPDF BGM: audio play failed',e?.name||e);
-    });
-   }else pending=false;
-  }
- }catch(e){pending=false;blocked=true;status('Playback failed. Click Play / Test music again.');console.warn('8aPDF BGM:',e);}
+  const promise=audio.play();
+  if(promise&&typeof promise.catch==='function')promise.catch(e=>{
+   if(source!==(audio.currentSrc||audio.src))return;
+   pending=false;playing=false;
+   if(e?.name==='NotAllowedError'){blocked=true;status('Browser blocked autoplay. Tap anywhere once or press Play music.')}
+   else if(!sourceFailed)status('Unable to start audio. Check your connection or press Play music.');
+   sync();
+  });
+  else pending=false;
+ }catch(e){pending=false;blocked=true;status('Audio could not start. Press Play music.');sync()}
+}
+function loadCurrent(){
+ if(!audio)return;
+ retryId++;sourceFailed=false;usingLegacy=false;pending=false;playing=false;blocked=false;
+ audio.pause();audio.src=selected.url;audio.load();sync();
+ if(pref.enabled&&!manuallyPaused)begin();
+}
+function pickTrack(id){
+ const track=TRACKS.find(t=>t.id===id);
+ if(!track)return;
+ selected=track;put(LAST_KEY,selected.id);
+ manuallyPaused=false;
+ loadCurrent();
+}
+function randomNext(){
+ const choices=TRACKS.filter(t=>t.id!==selected.id);
+ pickTrack(choices[Math.floor(Math.random()*choices.length)].id);
 }
 function pause(){
- if(music)try{music.pause();}catch{}
- pending=false;playing=false;sync();
+ manuallyPaused=true;
+ if(audio)audio.pause();
+ playing=false;pending=false;blocked=false;
+ status('Music paused. Press Play music to resume.');sync();
 }
-function setEnabled(on){
- pref.enabled=!!on;persist();sync();
- if(!pref.enabled){pause();status('Music is off.');return;}
- status('Music enabled — preparing playback…');
- start();
+function setEnabled(value){
+ pref.enabled=!!value;persist();
+ if(!pref.enabled){manuallyPaused=true;audio?.pause();playing=false;pending=false;status('Background music is off.');sync();return}
+ manuallyPaused=false;sourceFailed=false;
+ if(audio?.error)loadCurrent();else begin();
+ sync();
 }
-function setVolume(n){
- pref.volume=Math.max(0,Math.min(100,Math.round(Number(n)||0)));
- if(music)try{if(engine==='howler')music.volume(pref.volume/100);else music.volume=pref.volume/100;}catch{}
+function setVolume(value){
+ pref.volume=Math.max(0,Math.min(100,Math.round(Number(value)||0)));
+ if(audio)audio.volume=pref.volume/100;
  persist();sync();
 }
-function manualPlay(){
+function togglePlayback(){
  if(!pref.enabled)return;
- if(playing){pause();status('Paused — music stays enabled.');return;}
- // A fresh playback attempt is allowed even if a previous attempt failed.
- pending=false;blocked=false;sourceError='';
- if(engine==='native'&&music?.error)makeNative();
- start();
+ if(playing){pause();return}
+ manuallyPaused=false;pending=false;blocked=false;sourceFailed=false;
+ if(audio?.error)loadCurrent();else begin();
 }
 function mount(){
- let host=$('eightapdfSettingsMusic');
- if(!host){const parent=$('studioUiSetting')||document.querySelector('#settingsPanel .setting-body');if(!parent)return;host=document.createElement('div');host.id='eightapdfSettingsMusic';host.className='eightapdf-settings-music';parent.appendChild(host);}
- host.innerHTML='<h4>Background Music</h4>'+
- '<p>The website plays its own MP3 invisibly in a continuous loop. No floating widget.</p>'+
- '<label class="eightapdf-setting-toggle" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0"><span>Enable background music</span><input id="eightapdfBgmToggle" type="checkbox" aria-label="Enable background music"></label>'+
- '<label for="eightapdfBgmVolume" style="display:flex;justify-content:space-between;gap:12px;margin:14px 0 6px"><span>Music volume</span><strong id="eightapdfBgmVolumeLabel">18%</strong></label>'+
- '<input id="eightapdfBgmVolume" type="range" min="0" max="100" step="1" aria-label="Background music volume" style="width:100%;accent-color:var(--button,#ddd)">'+
- '<button id="eightapdfBgmTest" type="button" style="margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--surface-high,#222);color:var(--text,#fff);border:1px solid var(--line,#555)">▶ Play / Test music</button>'+
- '<p id="eightapdfBgmStatus" role="status" aria-live="polite" style="font-size:12px;color:var(--muted,#999);margin-top:10px">Music not started yet.</p>';
+ const host=$('eightapdfSettingsMusic');
+ if(!host)return;
+ host.innerHTML='<div class="eightapdf-bgm-header"><span class="setting-label">♫ Background Music</span><small>ORIGINAL MP3 · 4 TRACKS</small></div>'+
+ '<p class="setting-explainer">First visit plays Tum Hi Ho. On every refresh, a different random track is chosen. Your manual selection plays immediately.</p>'+
+ '<label class="setting-row"><span><strong>Enable background music</strong><small style="display:block;color:var(--muted)">Keep playing while browsing the website</small></span><input id="eightapdfBgmToggle" class="toggle" type="checkbox"></label>'+
+ '<label for="eightapdfBgmTrack" class="eightapdf-bgm-label">Choose a song</label>'+
+ '<select id="eightapdfBgmTrack" aria-label="Choose background song">'+TRACKS.map(t=>'<option value="'+t.id+'">'+t.title+'</option>').join('')+'</select>'+
+ '<div class="eightapdf-bgm-now">Selected: <strong id="eightapdfBgmNow"></strong></div>'+
+ '<div class="eightapdf-bgm-volume"><label for="eightapdfBgmVolume">Volume</label><strong id="eightapdfBgmVolumeLabel"></strong></div>'+
+ '<input id="eightapdfBgmVolume" type="range" min="0" max="100" step="1" aria-label="Background music volume">'+
+ '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmTest" type="button">▶ Play music</button><button id="eightapdfBgmShuffle" type="button">⇄ Shuffle now</button></div>'+
+ '<p id="eightapdfBgmStatus" aria-live="polite" role="status">Ready to play.</p>'+
+ '<small class="eightapdf-bgm-help">Autoplay depends on browser permissions. If blocked, one tap anywhere starts your selected track. Audio files remain unmodified.</small>';
+ const style=document.createElement('style');
+ style.textContent='.eightapdf-bgm-header,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-header small,.eightapdf-bgm-now,.eightapdf-bgm-help{font-size:.72rem;color:var(--muted)}.eightapdf-bgm-label{display:block;font-weight:650;margin:18px 0 7px;font-size:.83rem}.eightapdf-settings-music select{width:100%;min-height:45px;padding:10px 12px;border:1px solid var(--line-bold);border-radius:11px;color:var(--text);background:var(--surface-high);font:inherit}.eightapdf-bgm-now{margin:10px 0 20px}.eightapdf-bgm-now strong{color:var(--text-soft)}.eightapdf-bgm-volume{font-size:.82rem}.eightapdf-settings-music input[type=range]{width:100%;margin:11px 0 19px;accent-color:var(--button)}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:9px}.eightapdf-bgm-actions button{padding:11px 15px;border:1px solid var(--line-bold);background:var(--surface-high);border-radius:11px;color:var(--text);cursor:pointer;font:inherit;font-size:.82rem}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}.eightapdf-bgm-actions button:disabled{opacity:.48;cursor:not-allowed}#eightapdfBgmStatus{font-size:.78rem;color:var(--muted);margin:17px 0 9px;line-height:1.6}.eightapdf-bgm-help{display:block;line-height:1.6}';
+ document.head.append(style);
  $('eightapdfBgmToggle').addEventListener('change',e=>setEnabled(e.target.checked));
  $('eightapdfBgmVolume').addEventListener('input',e=>setVolume(e.target.value));
- $('eightapdfBgmTest').addEventListener('click',manualPlay);
- sync();status(pref.enabled?'Ready. Browser may require Play / Test music.':'Music is off.');
+ $('eightapdfBgmTrack').addEventListener('change',e=>pickTrack(e.target.value));
+ $('eightapdfBgmTest').addEventListener('click',togglePlayback);
+ $('eightapdfBgmShuffle').addEventListener('click',randomNext);
+ sync();
 }
 function init(){
  mount();
- // Try genuine autoplay when allowed; retry within an actual trusted gesture otherwise.
- if(pref.enabled)start();
- for(const evt of ['pointerdown','keydown','touchend']){
-  document.addEventListener(evt,e=>{
-   if(!e.isTrusted||!pref.enabled||playing||pending||sourceError)return;
-   if(e.target?.closest?.('#eightapdfBgmTest,#eightapdfBgmToggle'))return;
-   // Prevent another attempt until the browser has actually blocked autoplay.
-   if(!blocked&&music)return;
-   blocked=false;start();
+ audio=document.createElement('audio');
+ audio.id='eightapdfBgmEngine';audio.preload='metadata';audio.loop=true;audio.style.display='none';
+ audio.volume=pref.volume/100;audio.setAttribute('playsinline','');
+ audio.addEventListener('playing',()=>{
+  playing=true;pending=false;blocked=false;sourceFailed=false;
+  status(usingLegacy?'New tracks still need uploading — old background music is temporarily playing.':'Playing '+current()+' ✓');sync();
+ });
+ audio.addEventListener('pause',()=>{playing=false;pending=false;sync()});
+ audio.addEventListener('waiting',()=>{if(pref.enabled&&!blocked)status('Buffering '+current()+'…')});
+ audio.addEventListener('error',()=>{
+  playing=false;pending=false;
+  if(!usingLegacy){
+   // Preserve the previous working soundtrack until the user uploads the new 4 files.
+   usingLegacy=true;retryId++;audio.src=OLD_AUDIO;audio.load();
+   status('Four original MP3 files have not been uploaded to GitHub yet. Trying the temporary old track…');
+   sync();if(pref.enabled&&!manuallyPaused)begin();
+  }else{
+   sourceFailed=true;
+   status('Music files unavailable. Upload the four MP3s to /assets/bgm/ in GitHub.');
+   sync();
+  }
+ });
+ document.body.appendChild(audio);
+ loadCurrent();
+ for(const event of ['pointerdown','keydown','touchstart']){
+  document.addEventListener(event,e=>{
+   if(!e.isTrusted||!pref.enabled||manuallyPaused||playing||pending||!blocked||sourceFailed)return;
+   if(e.target?.closest?.('#eightapdfBgmTest,#eightapdfBgmToggle,#eightapdfBgmTrack,#eightapdfBgmShuffle'))return;
+   blocked=false;begin();
   },{capture:true,passive:true});
  }
+ window.addEventListener('storage',e=>{
+  if(e.key!==SETTINGS_KEY)return;
+  try{const updated=JSON.parse(e.newValue||'null');if(!updated)return;
+   if(typeof updated.enabled==='boolean'&&updated.enabled!==pref.enabled)setEnabled(updated.enabled);
+   if(Number.isFinite(updated.volume))setVolume(updated.volume);
+  }catch{}
+ });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-window.__8apdfBackgroundAudio={play:()=>setEnabled(true),stop:()=>setEnabled(false),setVolume,retry:manualPlay,getState:()=>({...pref,playing,pending,engine,blocked,sourceError})};
+window.__8apdfBackgroundAudio={
+ play:()=>setEnabled(true),stop:()=>setEnabled(false),setVolume,
+ select:pickTrack,shuffle:randomNext,retry:togglePlayback,
+ getState:()=>({...pref,selected:selected.id,playing,pending,blocked,usingLegacy,sourceFailed,tracks:TRACKS.map(t=>({...t}))})
+};
 })();
