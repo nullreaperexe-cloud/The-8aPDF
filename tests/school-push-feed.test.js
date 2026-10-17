@@ -5,7 +5,8 @@ import {SUPABASE_PROJECT_URL, SUPABASE_PUBLISHABLE_KEY} from '../supabase-materi
 import {preferenceAllows} from '../shared/push-policy.js';
 
 for (const name of ['supabase-materials.js', 'supabase-announcements.js']) {
-  assert.equal(fs.readFileSync(name, 'utf8'), fs.readFileSync('supabase/functions/school-push/' + name, 'utf8'), name + ' deployed copy must match the website');
+  const normalizeEol = value => value.replace(/\r\n/g, '\n');
+  assert.equal(normalizeEol(fs.readFileSync(name, 'utf8')), normalizeEol(fs.readFileSync('supabase/functions/school-push/' + name, 'utf8')), name + ' deployed copy must match the website');
 }
 assert.equal(FEED_ID, 'supabase:xudhjwojgxblbsebkzso');
 assert.equal(INTERVAL_MINUTES, 1);
