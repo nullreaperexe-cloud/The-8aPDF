@@ -44,15 +44,20 @@ test('sending, attachments and original actions remain wired',()=>{
  assert.match(app,/addEventListener\('input',renderMembers\)/);
 });
 
-test('motion and responsive design respect site tokens',()=>{
- assert.match(css,/--panel:var\(--surface/);
- assert.match(css,/--ink:var\(--text/);
- assert.match(css,/@media\s*\(max-width:780px\)/);
- assert.match(css,/@media\s*\(prefers-reduced-motion:reduce\)/);
+
+test('approved high-fidelity graphite and glow theme is installed',()=>{
+ assert.match(css,/--chat-bg:#07090c/);
+ assert.match(css,/--chat-green:#28da88/);
+ assert.match(css,/radial-gradient/);
+ assert.match(css,/linear-gradient/);
+ assert.match(css,/grid-template-columns:80px/);
+ assert.match(css,/\.composer/);
  assert.match(css,/@keyframes chatNewMessage/);
+ assert.match(css,/@media\(max-width:780px\)/);
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 });
 
-test('database member query is non-destructive and security invoker',()=>{
+test('database named member query remains non-destructive and invoker-scoped',()=>{
  const sql=read('db/chat-named-members.sql');
  assert.match(sql,/security invoker/i);
  assert.match(sql,/join public\.chat_profiles/i);
@@ -61,20 +66,34 @@ test('database member query is non-destructive and security invoker',()=>{
  assert.doesNotMatch(sql,/\bdelete\s+from\b/i);
 });
 
-test('full chat redesign updates layout but preserves backend controls',()=>{
- for(const file of ['chat/index.html','chat-frame.html']){
+for(const file of ['chat/index.html','chat-frame.html']){
+ test(file+' reproduces approved luxury chat layout without losing controls',()=>{
   const html=read(file);
-  for(const item of ['conversation-stage','side-headline','details-cover','intro-art','roomSearch','closeRooms','member-search-box','roomsTotal']){
+  assert.ok(html.includes('/chat/premium.css?v=20261017-exact'));
+  for(const item of ['app-rail','chat-sidebar','conversation-stage','room-actions-menu','roomActionsToggle','viewAllMembers','details-cover','detailRoomTitle','detailsStatus','detailRoomDescription','roomSearch','membersList','roomTitle','messageInput','composerForm','mediaInput','sendButton','privacy-lock.js']){
    assert.ok(html.includes(item),file+' missing '+item);
   }
-  assert.ok(html.includes('/chat/premium.css?v=20261017-airy'));
+  const ids=[...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
+  assert.equal(new Set(ids).size,ids.length,'Duplicate HTML IDs are not allowed');
+  for(const action of ['create','join','private','new'])assert.ok(html.includes('data-action="'+action+'"'));
+  assert.ok(html.includes('id="adminBtn"'));
+  assert.ok(html.includes('id="mobileOpenRooms"'));
+  assert.ok(html.includes('id="mobileOpenMembers"'));
+  assert.ok(html.includes('id="closeMembers"'));
+  assert.ok(html.includes('id="railProfileButton"'));
+ });
+}
+
+test('premium UI controls remain real, not mock-only',()=>{
+ for(const name of ['openRoom','loadRooms','renderRooms','renderMembers','loadMembers','sendText','sendMessage','uploadFile','toggleReaction','roomManagement','joinRoom','makeRoom','inviteFriend']){
+  assert.ok(app.includes(name+'('),name+' missing');
  }
- assert.ok(app.includes("('roomSearch')?.addEventListener('input',renderRooms)"));
- assert.ok(app.includes('message-day'));
- assert.ok(css.includes('.conversation-stage'));
- assert.ok(css.includes('max-width:780px'));
- assert.ok(css.includes('v20261017-airy'));
- assert.ok(css.includes('max-width:1060px'));
- assert.ok(css.includes('grid-template-columns:58px'));
- assert.ok(css.includes('.conversation-stage{'));
+ assert.ok(app.includes("'detailRoomTitle').textContent=room.name"));
+ assert.ok(app.includes("'detailsStatus'"));
+ assert.ok(app.includes("'roomActionsToggle'"));
+ assert.ok(app.includes("'viewAllMembers'"));
+ assert.ok(app.includes("'railProfileButton'"));
+ assert.ok(app.includes('state.rooms.filter'));
+ assert.ok(app.includes('state.namedMembers'));
+ assert.ok(!app.includes('Announcements</strong>'));
 });
