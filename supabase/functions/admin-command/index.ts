@@ -23,7 +23,7 @@ async function authorize(req: Request): Promise<Context> {
   let session = '';
   try { session = JSON.parse(atob(token!.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).session_id; } catch { fail('Invalid session.', 401); }
   if (!/^[a-f0-9-]{36}$/i.test(session)) fail('Invalid session.', 401);
-  const role = check(await db.rpc('admin_gate', { p_actor: data.user.id, p_session: session, p_write: true }));
+  const role = check(await db.rpc('admin_gate', { p_actor: data.user.id, p_session: session, p_write: false }));
   return { actor: data.user.id, session, role };
 }
 const tableOf = (value: unknown) => { if (!['study_materials', 'announcements', 'short_links', 'admin_audit_logs', 'admin_uploads', 'admin_file_links'].includes(String(value))) fail('Unknown collection.'); return String(value); };
@@ -97,7 +97,7 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
   const body=await boundedBody(req,MAX_PDF_BYTES+100000);
   const form = await new Response(body,{headers:{'Content-Type':req.headers.get('content-type')!}}).formData();
   const uid = uuidOf(form.get('uploadId')), target = String(form.get('table') || 'study_materials');
-  const recordId = form.get('recordId') ? idOf(form.get('recordId')) : uid;
+  let recordId = form.get('recordId') ? idOf(form.get('recordId')) : uid;
   const recordVersion = form.get('recordId') ? Number(form.get('recordVersion')) : null;
   if(recordId!==uid && target!=='announcements') fail('Only announcement attachments can be replaced.');
   if (!['study_materials', 'announcements'].includes(target)) fail('Unsupported upload target.');
@@ -113,16 +113,25 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
   const verified = await validatePDF(file);
   if (input.short_slug) { validSlug(input.short_slug); if (!details.published || target !== 'study_materials') fail('Publish the PDF before creating its short link.'); }
   let job: any = check(await db.from('admin_uploads').select('*').eq('id', uid).maybeSingle());
-  if (job && (job.actor_id !== ctx.actor || job.checksum !== verified.checksum || job.record_type !== target || job.record_id!==recordId)) fail('Upload ID is already in use.', 409);
-  if (!job) {
-    const duplicates: any = check(await db.from('study_materials').select('id,title').eq('file_checksum', verified.checksum).is('archived_at', null).limit(1));
-    if (target === 'study_materials' && duplicates.length && input.allow_duplicate !== true) fail(`Identical PDF already exists: ${duplicates[0].title}. Review duplicates or explicitly allow another entry.`, 409);
-    if(externalURL){const rows:any=check(await db.from('study_materials').select('id,title').eq('pdf_url',externalURL).limit(1));if(rows.length&&input.allow_duplicate!==true)fail(`This PDF URL already exists: ${rows[0].title}.`,409);}
+  if (job && (job.actor_id !== ctx.actor || job.checksum !== verified.checksum || job.record_type !== target || (target==='announcements' && job.record_id!==recordId))) fail('Upload ID is already in use.', 409);
+  let reusedRecord=false;
+  if(target==='study_materials'){
+    if(job)recordId=job.record_id;
+    else if(input.allow_duplicate!==true){
+      const asset:any=check(await db.from('admin_pdf_assets').select('pdf_url').eq('checksum',verified.checksum).maybeSingle());
+      const matches:any=check(await db.from('study_materials').select('id,pdf_url').eq('file_checksum',verified.checksum).is('archived_at',null).order('inserted_at',{ascending:true,nullsFirst:false}).order('id'));
+      const match=matches.find((row:any)=>!asset||canonicalURL(row.pdf_url)===canonicalURL(asset.pdf_url));
+      if(match){recordId=match.id;reusedRecord=true;}
+      else if(externalURL){
+        const row:any=check(await db.from('study_materials').select('id,file_checksum').eq('pdf_url',asset?.pdf_url||externalURL).is('archived_at',null).maybeSingle());
+        if(row&&(!row.file_checksum||row.file_checksum===verified.checksum)){recordId=row.id;reusedRecord=true;}
+      }
+    }
   }
   const proposedPath=externalURL?null:`${ctx.actor}/${uid}.pdf`;
   const reservation:any=check(await db.rpc('admin_upload_prepare',{p_actor:ctx.actor,p_session:ctx.session,p_upload:uid,p_checksum:verified.checksum,p_filename:verified.filename,p_size:file.size,p_table:target,p_record:recordId,p_url:externalURL||`${project}/storage/v1/object/public/study-pdfs/${proposedPath}`,p_path:proposedPath}));
   job=reservation.job;const path=reservation.asset.storage_path,publicURL=reservation.asset.pdf_url;
-  if(job.state==='ready'){const record=await one(target,job.record_id);return {record,publicURL,uploadId:uid,recovered:true,reusedAsset:true,...await uploadLinks(ctx,record,target,input)};}
+  if(job.state==='ready'){const record=await one(target,job.record_id);return {record,publicURL,uploadId:uid,recovered:true,reusedRecord:reusedRecord||recordId!==uid,reusedAsset:true,...await uploadLinks(ctx,record,target,input)};}
   try {
     // Idempotent UUID path. Never upsert or overwrite an existing Storage object.
     stage('uploading');
@@ -136,12 +145,12 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
     stage('saving');
     const existing: any = check(await db.from(target).select('*').eq('id', recordId).maybeSingle());
     let record: any;
-    if (existing && recordId===uid) record = await one(target, uid);
+    if (existing && (target==='study_materials'||recordId===uid)) {record=existing;reusedRecord=target==='study_materials';}
     else {
       let recordURL=publicURL;
       if(target==='study_materials'){const used:any=check(await db.from(target).select('id').eq('pdf_url',publicURL).limit(1));if(used.length)recordURL=publicURL+'#8apdf-copy='+uid;}
       const data = target === 'study_materials' ? { ...details, pdf_url: recordURL, source: path?'Admin Upload':'Image2URL', storage_path: path, original_filename: verified.filename, file_checksum: verified.checksum, size_bytes: file.size } : { ...details, attachment_url: publicURL, has_attachment: true, storage_path: path, source: path?'Admin Upload':'Image2URL' };
-      record = await mutate(ctx, target,recordId===uid?'create':'edit', recordId, recordVersion, data);
+      record = await mutate(ctx, target,target==='study_materials'||recordId===uid?'create':'edit', recordId, recordVersion, data);
     }
     check(await db.from('admin_uploads').update({ state: 'ready', error: null, updated_at: new Date().toISOString() }).eq('id', uid));
     stage('publishing');
@@ -150,7 +159,7 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
     record=confirmed;
     const links=await uploadLinks(ctx,record,target,input);
     stage('ready');
-    return { record, publicURL, uploadId: uid, ...links, reusedAsset:reservation.reused };
+    return { record, publicURL, uploadId: uid, ...links, reusedRecord, reusedAsset:reservation.reused };
   } catch (e) {
     // Durable recovery record retains the object for retry. No delete after an
     // ambiguous DB response, which could otherwise remove a committed PDF.
@@ -160,6 +169,14 @@ async function upload(req: Request, ctx: Context, stage: (s:string)=>void = ()=>
 }
 async function perform(arg: any, ctx: Context) {
   const action = String(arg.action || 'session');
+  if(ctx.role==='viewer'&&!['session','list','overview','export','duplicates','link_candidates','link_health','preferences'].includes(action))fail('View-only access. A Super Admin must make this change.',403);
+  if(action==='access_list')return check(await db.rpc('admin_access_list',{p_actor:ctx.actor,p_session:ctx.session}));
+  if(action==='access_set'){
+    if(!['super_admin','viewer'].includes(arg.role))fail('Choose Super Admin or Viewer access.');
+    const email=String(arg.email||'').trim().toLowerCase();
+    if(arg.confirm!==(arg.role==='super_admin'?'GRANT ':'VIEW ONLY ')+email)fail('Confirm this access change.');
+    return {record:check(await db.rpc('admin_access_set',{p_actor:ctx.actor,p_session:ctx.session,p_email:email,p_role:arg.role}))};
+  }
   if (action === 'session') return { role: ctx.role, userId: ctx.actor, maxPdfBytes: MAX_PDF_BYTES, preferences: check(await db.from('admin_preferences').select('preferences').eq('user_id', ctx.actor).maybeSingle())?.preferences || {} };
   if (action === 'list') { const { q, page, size } = listQuery(arg); const result = await q; check(result); const records=arg.table==='admin_file_links'?result.data?.map((r:any)=>({...r,public_url:db.storage.from('study-pdfs').getPublicUrl(r.storage_path).data.publicUrl})):result.data; return { records, total: result.count, page, pageSize: size }; }
   if (action === 'overview') {
@@ -295,6 +312,7 @@ export async function handler(req: Request) {
   try {
     const ctx = await authorize(req);
     if ((req.headers.get('content-type') || '').startsWith('multipart/form-data')) {
+      if(ctx.role==='viewer')fail('View-only access. A Super Admin must upload PDFs.',403);
       const encoder=new TextEncoder();
       const stream=new ReadableStream({async start(controller){
         const emit=(value:unknown)=>{try{controller.enqueue(encoder.encode(JSON.stringify(value)+'\n'));}catch{/* disconnected client; durable upload recovery remains available */}};

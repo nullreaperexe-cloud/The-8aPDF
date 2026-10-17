@@ -42,9 +42,9 @@ try{
     assert.deepEqual(result.stages,['validating','uploading','link','saving','publishing','ready']);assert.equal(pdf.pdf_url,origin+'/storage/v1/object/public/study-pdfs/'+pdf.storage_path);assert(pdf.inserted_at);assert.equal(pdf.file_checksum.length,64);
     const file=await fetch(pdf.pdf_url);assert.equal(file.status,200);assert((await file.text()).startsWith('%PDF-'));assert.equal((await publicRows('study_materials',pdf.id)).length,1);
   });
-  await step('retry is idempotent and identical-content duplicate uploads require explicit opt-in',async()=>{
+  await step('retry is idempotent and identical PDFs reuse their existing library record',async()=>{
     const retry=await upload(uploadId,pdfBytes());assert.equal(retry.ok,true,retry.error);assert.equal(retry.record.id,pdf.id);
-    const dup=await upload(randomUUID(),pdfBytes());assert.equal(dup.ok,false);assert.match(dup.error,/Identical PDF/);
+    const dup=await upload(randomUUID(),pdfBytes());assert.equal(dup.ok,true,dup.error);assert.equal(dup.record.id,pdf.id);assert.equal(dup.reusedRecord,true);created.uploads.add(dup.uploadId);
   });
   await step('Storage, EduSecure and Image2URL PDFs use the same record validation; slug collisions rejected',async()=>{
     const slug='verify-'+fixture.suffix;created.links.add(slug);
