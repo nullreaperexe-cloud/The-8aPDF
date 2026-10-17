@@ -166,8 +166,13 @@ function init(){
  window.addEventListener('storage',e=>{
   if(e.key!==SETTINGS_KEY)return;
   try{const updated=JSON.parse(e.newValue||'null');if(!updated)return;
-   if(typeof updated.enabled==='boolean'&&updated.enabled!==pref.enabled)setEnabled(updated.enabled);
-   if(Number.isFinite(updated.volume))setVolume(updated.volume);
+   if(typeof updated.enabled==='boolean'&&updated.enabled!==pref.enabled){
+    pref.enabled=updated.enabled;
+    if(!pref.enabled){manuallyPaused=true;audio?.pause();playing=false;pending=false;status('Background music is off.');}
+    else {manuallyPaused=false;if(audio?.error)loadCurrent();else begin();}
+   }
+   if(Number.isFinite(updated.volume)){pref.volume=Math.max(0,Math.min(100,Math.round(updated.volume)));if(audio)audio.volume=pref.volume/100;}
+   sync();
   }catch{}
  });
 }
