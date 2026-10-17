@@ -69,7 +69,7 @@ test('database named member query remains non-destructive and invoker-scoped',()
 for(const file of ['chat/index.html','chat-frame.html']){
  test(file+' reproduces approved luxury chat layout without losing controls',()=>{
   const html=read(file);
-  assert.ok(html.includes('/chat/premium.css?v=20261017-exact'));
+  assert.ok(html.includes('/chat/premium.css?v=20261017-compact'));
   for(const item of ['app-rail','chat-sidebar','conversation-stage','room-actions-menu','roomActionsToggle','viewAllMembers','details-cover','detailRoomTitle','detailsStatus','detailRoomDescription','roomSearch','membersList','roomTitle','messageInput','composerForm','mediaInput','sendButton','privacy-lock.js']){
    assert.ok(html.includes(item),file+' missing '+item);
   }
@@ -96,4 +96,19 @@ test('premium UI controls remain real, not mock-only',()=>{
  assert.ok(app.includes('state.rooms.filter'));
  assert.ok(app.includes('state.namedMembers'));
  assert.ok(!app.includes('Announcements</strong>'));
+});
+
+test('compact 8aPDF-size desktop layout retains the approved black glow and wide chat',()=>{
+ assert.match(css,/8aPDF compact 20261017/);
+ assert.match(css,/--chat-bg:#07090c/);
+ assert.match(css,/--chat-green:#28da88/);
+ assert.match(css,/grid-template-columns:72px minmax\(230px,270px\) minmax\(0,1fr\) minmax\(236px,285px\)/);
+ assert.match(css,/\.side-top h1\{font-size:28px/);
+ assert.match(css,/\.topic-text h2\{font-size:19px/);
+ assert.match(css,/\.msg-bubble\{font-size:13px/);
+ assert.match(css,/\.composer\{max-width:1120px;min-height:72px/);
+ assert.match(css,/\.details-cover h2\{font-size:22px/);
+ assert.match(css,/@media \(max-width:780px\)/);
+ assert.match(css,/font-family:inherit/);
+ assert.match(css,/max-width:min\(380px,67vw\)/);
 });
