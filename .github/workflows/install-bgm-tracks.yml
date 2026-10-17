@@ -1,10 +1,12 @@
 name: Install original 8aPDF background music
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '8apdf-four-original-bg-tracks.zip'
+      - '.github/workflows/install-bgm-tracks.yml'
 
 permissions:
   contents: write
@@ -24,6 +26,10 @@ jobs:
 
       - name: Verify and install unmodified MP3 files
         run: |
+          if [ ! -f 8apdf-four-original-bg-tracks.zip ]; then
+            echo "Audio ZIP already installed; nothing to extract."
+            exit 0
+          fi
           python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
