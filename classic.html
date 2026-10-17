@@ -1321,21 +1321,33 @@ html[data-ui-mode="studio"] .pdf-card {
   #pdfAiLayer[data-ai-keyboard="open"] .pdf-ai-feed{padding-bottom:12px!important}
 }
 </style>
+<link rel="stylesheet" href="/name-onboarding.css?v=1"/>
+<script src="/name-onboarding.js?v=1"></script>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
 <h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
 <p class="welcome-subtitle">Opening your PDF study library...</p>
 </div>
-</section><section aria-hidden="true" aria-labelledby="nameModalTitle" class="name-modal" id="nameModal">
-<form class="name-card" id="nameForm">
+</section><section aria-hidden="true" aria-labelledby="nameModalTitle" aria-describedby="nameFeedback" aria-modal="true" role="dialog" tabindex="-1" class="name-modal" id="nameModal">
+<div class="name-stage">
+<div class="name-masthead"><div class="name-wordmark"><svg aria-hidden="true"><use href="#i-book"></use></svg><span>8aPDF</span></div><span class="name-edition">A little space. A lot of possibility.</span></div>
+<div class="name-composition">
+<div class="name-story"><p class="name-kicker">Your next chapter</p><p class="name-headline" aria-label="Every great journey begins with a name."><span aria-hidden="true"><i>Every great</i></span><span aria-hidden="true"><i>journey begins</i></span><span aria-hidden="true"><i>with a name.</i></span></p><p class="name-story-detail">A place to learn, find your focus,<br>and make progress. Yours.</p></div>
+<form class="name-card" id="nameForm" novalidate>
+<p class="name-step">01 / Make it yours</p>
 <h2 id="nameModalTitle">What should we call you?</h2>
-<p>Enter your name once. Next time, 8aPDF will welcome you automatically.</p>
 <div class="name-form">
-<input autocomplete="name" class="name-input" id="nameInput" maxlength="32" placeholder="Write your name" required="" type="text"/>
-<button class="btn btn-primary" type="submit">Continue</button>
+<label class="name-label" for="nameInput">Your name</label>
+<input autocomplete="name" class="name-input" id="nameInput" maxlength="80" placeholder="Your name" required type="text" aria-describedby="nameFeedback"/>
+<p class="name-feedback" id="nameFeedback" aria-live="polite">Just your name. Make yourself at home.</p>
+<button class="name-continue" type="submit" disabled><span>Continue</span><svg aria-hidden="true"><use href="#i-arrow"></use></svg></button>
 </div>
 </form>
+</div>
+<div class="name-welcome" role="status" aria-live="polite" aria-atomic="true"><div><span class="name-kicker" style="justify-content:center">Make room for what's next</span><h2 id="nameWelcomeTitle"></h2><p id="nameWelcomeDetail"></p></div></div>
+<div class="name-footer"><span>Your name stays in this browser.</span><span>Your space to move forward.</span></div>
+</div>
 </section>
 <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
 <symbol id="i-book" viewbox="0 0 24 24"><path d="M12 7c-3-2-6-2.5-10-1.5v14c4-1 7-.5 10 1.5 3-2 6-2.5 10-1.5v-14C18 4.5 15 5 12 7Zm0 0v14"></path></symbol>
@@ -1881,25 +1893,20 @@ function originalShowWelcome(name,notifyAfter=false){
   clearTimeout(welcomeTimer);
   welcomeTimer=setTimeout(()=>{closeOriginalWelcome();if(notifyAfter)offerNotificationAfterWelcome()},2350);
 }
-function openOriginalName(){
-  document.body.classList.add('locked');
-  originalNameModal.classList.add('show');originalNameModal.setAttribute('aria-hidden','false');
-  setTimeout(()=>$('#nameInput').focus({preventScroll:true}),200);
-}
-$('#nameForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const name=$('#nameInput').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,32);
-  if(!name){toast('Please enter your name');$('#nameInput').focus();return}
-  state.name=name;
-  try{localStorage.setItem('eightapdf_user_name_v2',name);localStorage.setItem('eightapdf_user_name',name)}catch{}
-  $('#profileBtn').textContent=name.charAt(0).toUpperCase();
-  originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
-  originalShowWelcome(name,true);
+const premiumOnboardingOpen=window.initNameOnboarding({
+  onConfirm(name){
+    state.name=name;
+    $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
+    document.dispatchEvent(new Event('8apdf:profile-changed'));
+  },
+  onFinish:offerNotificationAfterWelcome
 });
 // Same welcome animation on every reload and every new website open.
 const previousName=existingUserName().trim();
-if(previousName && previousName!=='Student')originalShowWelcome(previousName);
-else openOriginalName();
+if(premiumOnboardingOpen){
+  // The versioned name experience owns this visit's welcome transition.
+}else if(previousName && previousName!=='Student')originalShowWelcome(previousName);
+else closeOriginalWelcome();
 
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
 window.__8apdfStudyBridge={
