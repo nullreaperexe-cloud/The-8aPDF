@@ -10,6 +10,34 @@ const TRACKS=[
  {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
 ];
 const OLD_AUDIO='/assets/8apdf-background-music.mp3';
+const ZIP_ARCHIVE='/8apdf-four-original-bg-tracks.zip';
+// While GitHub Actions extracts the ZIP, these exact MP3 bytes can play
+// directly from its uncompressed ZIP entries, without any re-encoding.
+let zipContentsPromise=null,activeBlobUrl=null,zipAttempted=false;
+function originalZipTracks(){
+ if(!zipContentsPromise)zipContentsPromise=fetch(ZIP_ARCHIVE,{cache:'force-cache'}).then(async r=>{
+  if(!r.ok)throw Error('Music archive unavailable (HTTP '+r.status+')');
+  const bytes=await r.arrayBuffer(),view=new DataView(bytes),tracks=new Map(),decoder=new TextDecoder();
+  let pos=0;
+  while(pos+30<=bytes.byteLength&&view.getUint32(pos,true)===0x04034b50){
+   const flags=view.getUint16(pos+6,true),method=view.getUint16(pos+8,true);
+   const size=view.getUint32(pos+18,true),nameLength=view.getUint16(pos+26,true),extra=view.getUint16(pos+28,true);
+   const start=pos+30+nameLength+extra,end=start+size;
+   if(method!==0||(flags&8)||end>bytes.byteLength)throw Error('Unsupported MP3 archive format');
+   const name='/'+decoder.decode(new Uint8Array(bytes,pos+30,nameLength));
+   tracks.set(name,new Uint8Array(bytes.slice(start,end)));
+   pos=end;
+  }
+  if(tracks.size!==4)throw Error('Expected four original MP3 tracks in archive');
+  return tracks;
+ }).catch(error=>{zipContentsPromise=null;throw error});
+ return zipContentsPromise;
+}
+async function urlFromZip(path){
+ const tracks=await originalZipTracks(),bytes=tracks.get(path);
+ if(!bytes)throw Error('Track is missing from music archive');
+ return URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
+}
 const SETTINGS_KEY='8apdf_background_music_v1';
 const VISITED_KEY='8apdf_music_four_tracks_seen_v2';
 const LAST_KEY='8apdf_music_four_tracks_last_v2';
@@ -67,8 +95,10 @@ function begin(){
 }
 function loadCurrent(){
  if(!audio)return;
- retryId++;sourceFailed=false;usingLegacy=false;pending=false;playing=false;blocked=false;
- audio.pause();audio.src=selected.url;audio.load();sync();
+ retryId++;sourceFailed=false;usingLegacy=false;pending=false;playing=false;blocked=false;zipAttempted=false;
+ audio.pause();
+ if(activeBlobUrl){URL.revokeObjectURL(activeBlobUrl);activeBlobUrl=null;}
+ audio.src=selected.url;audio.load();sync();
  if(pref.enabled&&!manuallyPaused)begin();
 }
 function pickTrack(id){
@@ -141,8 +171,24 @@ function init(){
  });
  audio.addEventListener('pause',()=>{playing=false;pending=false;sync()});
  audio.addEventListener('waiting',()=>{if(pref.enabled&&!blocked)status('Buffering '+current()+'…')});
- audio.addEventListener('error',()=>{
+ audio.addEventListener('error',async()=>{
   playing=false;pending=false;
+  if(!usingLegacy&&!zipAttempted){
+   zipAttempted=true;
+   const requestedId=selected.id;
+   try{
+    status('Loading original '+current()+' from the uploaded music archive…');
+    const url=await urlFromZip(selected.url);
+    if(requestedId!==selected.id){URL.revokeObjectURL(url);return;}
+    activeBlobUrl=url;
+    audio.src=url;audio.load();
+    if(pref.enabled&&!manuallyPaused)begin();
+    return;
+   }catch(error){
+    if(requestedId!==selected.id)return;
+    console.warn('8aPDF: music ZIP fallback unavailable:',error);
+   }
+  }
   if(!usingLegacy){
    // Preserve the previous working soundtrack until the user uploads the new 4 files.
    usingLegacy=true;retryId++;audio.src=OLD_AUDIO;audio.load();
