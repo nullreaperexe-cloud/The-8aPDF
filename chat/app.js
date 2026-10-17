@@ -319,14 +319,15 @@ async function loadMembers(forceFull=false){
 function isNamedProfile(name){return typeof name==='string'&&name.trim().length>0&&!['friend','student'].includes(name.trim().toLowerCase())}
 function renderMembers(){
  const all=state.namedMembers.slice().sort((a,b)=>Number(isOnline(b))-Number(isOnline(a))||a.profile.display_name.localeCompare(b.profile.display_name));
+ const repeatedNames=new Map();all.forEach(m=>{const key=m.profile.display_name.trim().toLowerCase();repeatedNames.set(key,(repeatedNames.get(key)||0)+1)});
  const term=($('memberSearch')?.value||'').trim().toLowerCase();
  const members=term?all.filter(m=>m.profile.display_name.toLowerCase().includes(term)):all;
  $('memberCount').textContent=String(all.length);
  const unnamed=Math.max(0,state.members.length-all.length),summary=$('membersSummary');
  if(summary)summary.textContent=all.length+' named '+(all.length===1?'profile':'profiles')+(unnamed?' · '+unnamed+' unnamed memberships not listed':'');
  $('membersList').innerHTML=members.map(m=>{
-  const name=m.profile.display_name.trim(),online=isOnline(m);
-  return '<div class="member-row"><div class="member-avatar">'+esc(name.slice(0,1).toUpperCase())+'<i class="'+(online?'online':'')+'"></i></div><span class="member-info"><strong title="'+esc(name)+'">'+esc(name)+(m.user_id===state.user?.id?' (you)':'')+'</strong><small>'+esc(m.role==='owner'?'Room owner · ':m.role==='admin'?'Admin · ':'')+esc(online?'Online now':shortAgo(m.profile?.last_seen))+'</small></span></div>';
+  const name=m.profile.display_name.trim(),online=isOnline(m),discriminator=(repeatedNames.get(name.toLowerCase())||0)>1?'<span class="member-discriminator"> · '+esc(m.user_id.slice(0,6))+'</span>':'';
+  return '<div class="member-row"><div class="member-avatar">'+esc(name.slice(0,1).toUpperCase())+'<i class="'+(online?'online':'')+'"></i></div><span class="member-info"><strong title="'+esc(name)+'">'+esc(name)+discriminator+(m.user_id===state.user?.id?' (you)':'')+'</strong><small>'+esc(m.role==='owner'?'Room owner · ':m.role==='admin'?'Admin · ':'')+esc(online?'Online now':shortAgo(m.profile?.last_seen))+'</small></span></div>';
  }).join('')||'<div class="list-loading">'+(term?'No matching members':'No named members yet')+'</div>';
 }
 function isOnline(m){return state.onlineIds.has(m.user_id)||!!m.profile?.last_seen&&(Date.now()-new Date(m.profile.last_seen).getTime()<60000)}
