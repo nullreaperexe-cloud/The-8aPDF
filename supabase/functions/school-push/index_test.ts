@@ -9,24 +9,29 @@ const originalServe=Deno.serve;
 Deno.serve=((callback:any)=>{handler=callback;return {};}) as any;
 const vapid=webpush.generateVAPIDKeys(),device=createECDH('prime256v1');device.generateKeys();
 const subscription={endpoint:'https://fcm.googleapis.com/fcm/send/test',keys:{p256dh:device.getPublicKey().toString('base64url'),auth:randomBytes(16).toString('base64url')}};
-const calls:any[]=[];let page=0,pending:any[]=[],failIngest=false,pushStatus=201,lookupEmail="";
+const calls:any[]=[];let page=0,pending:any[]=[],failIngest=false,pushStatus=201,lookupEmail="",authorizedDevice=false;
 function json(data:any,status=200){return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});}
 globalThis.fetch=(async(input:any,init:any={})=>{
  const url=String(input),body=init.body?JSON.parse(typeof init.body==='string'?init.body:'{}'):null;
  calls.push({url,method:init.method||'GET',body});
  if(url.includes('/school_push_config')&&(init.method||'GET')==='GET')return json({id:1,vapid_public_key:vapid.publicKey,vapid_private_key:vapid.privateKey,worker_secret:'worker-secret'});
  if(url.includes('/rpc/school_push_claim_run_v2'))return json('00000000-0000-0000-0000-000000000001');
- if(url.includes('documents:runQuery')){
-  if(body.structuredQuery.from[0].collectionId==='announcements')return json([]);
+ if(url.startsWith('https://xudhjwojgxblbsebkzso.supabase.co/rest/v1/')){
+  const query=new URL(url).searchParams;
+  assert.equal(init.headers.apikey,'sb_publishable_fVH-3bHJHdIlCpiL31f1rw_tqWhgTP1');
+  assert.equal(query.get('published'),'eq.true');assert.equal(query.get('archived_at'),'is.null');
+  if(url.includes('/announcements'))return json([]);
   const start=page++*500,count=Math.min(500,1001-start);
-  if(start>0)assert.equal(body.structuredQuery.startAt.before,false);
-  return json(Array.from({length:Math.max(0,count)},(_,i)=>({document:{name:'projects/test/databases/(default)/documents/study_materials/'+(start+i),fields:{title:{stringValue:'Science Notes '+(start+i)}}}})));
+  if(start>0)assert.equal(query.get('id'),'gt.'+JSON.stringify(String(start-1)));
+  return json(Array.from({length:Math.max(0,count)},(_,i)=>({id:String(start+i),published:true,pdf_url:'https://example.test/paper.pdf',title:'Science Notes '+(start+i)})));
  }
- if(url.includes('/rpc/school_push_ingest'))return failIngest?json({message:'Atomic fan-out failed'},500):json({records:body.records.length,new:0,queued:0,baseline:false});
+ if(url.includes('/rpc/school_push_ingest_v2')){assert.equal(body.feed_name,'supabase:xudhjwojgxblbsebkzso');return failIngest?json({message:'Atomic fan-out failed'},500):json({records:body.records.length,new:0,queued:0,baseline:false});}
+ if(url.includes('/rpc/school_push_queue_device_test')){assert.equal(body.owner_id,'device-owner');return json({queued:true,withinSeconds:90});}
+ if(url.includes('/school_push_subscriptions')&&(init.method||'GET')==='GET')return json(authorizedDevice?{id:'device',user_id:'device-owner',subscription}:null);
  if(url.includes('/school_push_deliveries')&&(init.method||'GET')==='GET')return json(pending);
  if(url.startsWith('https://fcm.googleapis.com/'))return new Response('',{status:pushStatus,headers:{'Retry-After':'120'}});
  if(url.includes('identitytoolkit'))return lookupEmail?json({users:[{email:lookupEmail,disabled:false}]}):json({error:{message:'INVALID_ID_TOKEN'}},400);
- if(url.includes('/auth/v1/user'))return json({msg:'Invalid JWT'},401);
+ if(url.includes('/auth/v1/user'))return authorizedDevice?json({id:'device-owner'}):json({msg:'Invalid JWT'},401);
  if(url.includes('/rest/v1/'))return json([]);
  throw Error('Unexpected HTTP boundary: '+url);
 }) as any;
@@ -67,4 +72,23 @@ Deno.test('Sync wake-up accepts only the validated Firebase administrator',async
  lookupEmail='another@example.test';assert.equal((await handler(trigger())).status,401);
  lookupEmail='nullreaper.exe@gmail.com';page=0;pending=[];assert.equal((await handler(trigger())).status,200);
  lookupEmail='';assert.equal((await handler(trigger())).status,401);
+});
+
+Deno.test('Closed-site test is authenticated and persisted without a page timer or immediate push',async()=>{
+ const trigger=()=>new Request('https://example.test',{method:'POST',headers:{Origin:'https://the-8apdf.vercel.app',Authorization:'Bearer device-session'},body:JSON.stringify({action:'test-closed',subscription})});
+ authorizedDevice=false;assert.equal((await handler(trigger())).status,401);
+ authorizedDevice=true;calls.length=0;
+ try{
+  const response=await handler(trigger());assert.equal(response.status,200);assert.equal((await response.json()).queued,true);
+  assert(calls.some(c=>c.url.includes('/rpc/school_push_queue_device_test')));
+  assert(!calls.some(c=>c.url.startsWith('https://fcm.googleapis.com/')),'The server scheduler, not this request, must deliver the test');
+ }finally{authorizedDevice=false;}
+});
+
+Deno.test('Scheduled device tests are delivered even with all content categories disabled',async()=>{
+ calls.length=0;page=0;pushStatus=201;
+ pending=[{subscription_id:'device',event_id:'test:one',attempts:0,
+  school_push_events:{source:'device-test',title:'Background test',body:'The server sent this',path:'/notification-settings'},
+  school_push_subscriptions:{id:'device',origin:'https://the-8apdf.vercel.app',subscription,preferences:{pdfs:false,announcements:false,testsOnly:true}}}];
+ try{const result=await (await handler(req('poll'))).json();assert.equal(result.sent,1);}finally{pending=[];}
 });

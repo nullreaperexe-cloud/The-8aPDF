@@ -1,23 +1,73 @@
 # School background notifications
 
-`school-push` runs in the existing Supabase project. A database Cron job invokes it every ten minutes, even when no browser is open. It reads the existing public Firestore school feeds. Initial records become a baseline and are never broadcast as new content; later records and content changes create deduplicated delivery entries.
+The `school-push` Edge Function and its durable queue remain in AcademyVault
+(`uumqvvsfqwpwtwerdylv`), alongside existing phone subscriptions and chat
+identities. It reads the **current** website catalogue in the 8aPDF project
+(`xudhjwojgxblbsebkzso`), using its public, read-only RLS policies. Firestore is
+no longer a school notification source.
 
-Subscriptions are opt-in and bound to the verified Supabase user session. Only the owning session can test or remove its subscription. Endpoint hosts and encryption keys are validated. The public GET response contains the VAPID public key and last-check time. All mutation routes validate the user's JWT; the scheduled polling route requires a separate secret stored in Vault. The function intentionally performs its own authentication with gateway JWT verification disabled.
+Database Cron calls the worker **every minute**, whether or not anyone has the
+website open. It reads published, unarchived PDFs and announcements with keyset
+pagination, normalizes announcement edits like the website, and atomically
+creates deduplicated events and per-device deliveries. Content edits can notify;
+display-order and timestamp changes alone do not.
 
-The five `school_push_*` tables have RLS enabled and no browser-role privileges. The service-role function alone reads configuration, subscriptions and delivery records. The VAPID private key and worker secret are backend configuration and must never be committed. Preserve the existing VAPID key pair when deploying a new function version, otherwise existing subscriptions need to be renewed.
+## Deployment
 
-Deploy `supabase/functions/school-push/index.ts` with its `deno.json` and two shared-module copies. The test suite verifies the copies remain identical to `shared/`. Apply the schema and configure one stable VAPID key pair plus a random worker secret in `school_push_config`; store that worker secret in Vault as `8apdf_school_push_worker`. `db/school-push-cron.sql` installs or updates the scheduled job.
+1. Apply `db/school-push-supabase.sql` in the **push/AcademyVault project** after
+   the existing `db/school-push.sql` and `db/school-push-reliability.sql` schema.
+2. Deploy `supabase/functions/school-push/index.ts` with `deno.json`, `deno.lock`
+   and every sibling JavaScript dependency. Catalogue-module copies must match
+   their repository-root originals; `npm test` enforces this.
+3. Invoke one authenticated poll to baseline the migrated catalogue. Each source
+   tracks its feed revision, so migration never alerts users about historical
+   content. Later publications and content changes enter the queue.
+4. Apply `db/school-push-cron.sql` to update the existing named Cron job to one
+   minute. Its worker secret stays in Vault as `8apdf_school_push_worker`.
 
-Successful pushes mark delivery rows sent; temporary failures retry with bounded backoff. Expired 404/410 endpoints are removed. Groups of updates are combined into a compact notification with a stable tag. `school-worker.js` displays the OS notification and opens the appropriate test/PDF/message view. It does not cache the app shell, so deploys cannot be trapped behind stale HTML.
+Preserve the installed VAPID key pair, worker secret, subscriptions and delivery
+history. Never commit private keys or service-role credentials. Gateway JWT
+verification stays disabled because the function authenticates each action:
+scheduler calls require the worker secret, and device actions require a verified
+Supabase user session plus an allowed site origin. The legacy `sync` wake-up
+verifies the existing Firebase administrator; scheduled delivery does not depend
+on that administrator or an open admin panel.
 
-The phone user must allow notifications once. On iPhone/iPad, install the site on the Home Screen and enable from that installed app. Browser/OS permission, connectivity and battery settings determine actual device delivery. No chat messages are sent by this school notification worker.
+Backend tables have RLS enabled and no browser-role privileges. Worker RPCs are
+service-role-only and use invoker security. An owned lease excludes overlapping
+workers. Temporary failures retry with bounded backoff and Retry-After support;
+expired 404/410 subscriptions are removed. Content preferences and explicit
+per-device opt-out are preserved.
 
-## Feed availability
+## Phone setup and verification
 
-School push depends on the existing AcademyVault Firestore feed being available. HTTP 429 RESOURCE_EXHAUSTED pauses new-event ingestion; the scheduled worker keeps retrying every ten minutes and preserves its deduplication baseline and pending deliveries. The notification settings show a delayed-feed notice after 25 minutes without a successful source check. No billing or upstream quota settings are changed automatically. The existing source currently returned quota-exceeded responses during final verification; native phone receipt still requires permission and the device test button.
+Open `/notification-settings` once on each phone, choose **Enable on this device**
+and grant permission. Android uses a supported browser. On iPhone/iPad with
+iOS/iPadOS 16.4 or later, add 8aPDF to the Home Screen, open that installed app
+and enable notifications there.
 
-## Reliability upgrade (2026-10-15)
+**Test after closing the website** stores a device-only test in the server queue
+with a 30-second delay. Close all 8aPDF tabs; the next Cron run normally delivers
+it in about 30–90 seconds. It needs no page timer or active tab. Explicit tests
+bypass content-category filters, but disabling the device deletes its queued
+deliveries. The ordinary test button still sends immediately.
 
-Apply `db/school-push-reliability.sql` before deploying the updated function. It adds an owned lease and the service-role-only `school_push_ingest` RPC for atomic baseline/event/delivery ingestion. The `sync` action verifies the existing Firebase sync administrator's ID token; `FIREBASE_SYNC_EMAIL` optionally overrides the existing default email. The ten-minute Cron poll remains the fallback.
+`sw.js` displays the notification even with no open window and opens the relevant
+PDF/test/announcement page when tapped. `school-worker.js` keeps old registrations
+compatible. No app-shell caching is used.
 
-The active service worker is `sw.js`; `school-worker.js` loads it for old registrations. The frontend preserves explicit device opt-out. The backend uses cursor-pagination, joins each due row to its subscription, checks mutation errors, respects Retry-After and persists terminal failures. See `docs/cross-repo-audit.md` for evidence and limits. Run backend tests with `deno test --allow-env --config deno.json index_test.ts` from the function directory; HTTP dependencies are mocked, so no live push is sent.
+Actual receipt depends on OS/browser permission, connectivity, Focus/battery
+settings and push-service availability. A successful transport response means
+the push service accepted the message, not proof a phone displayed it. Settings
+reports a feed delay after five minutes without a successful catalogue check.
+
+## Checks
+
+- `npm test`: client opt-out, closed-window service worker, current catalogue
+  pagination, normalization, filtering, fingerprint stability and shared copies.
+- `deno test --allow-env --config supabase/functions/school-push/deno.json supabase/functions/school-push/index_test.ts`:
+  actual handler with mocked HTTP, encryption, retry, endpoint cleanup, ownership
+  and delayed device-test delivery. No live phone receives test notifications.
+- `tests/push-supabase-rollback.sql`: real database migration baseline, PDF and
+  announcement fan-out, dedupe, atomic rollback, owner-only delayed tests and
+  restricted RPC privileges. All test writes are rolled back.

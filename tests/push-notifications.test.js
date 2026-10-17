@@ -31,20 +31,23 @@ assert.equal(navigated,'/school-reminders?message=one');assert(focused);
 // create one on page load, and disabling must persist across a reload.
 async function client({optIn=null,existing=null}={}){
  const storage=new Map(optIn===null?[]:[['8apdf_phone_notifications_v1_enabled',optIn]]);
- let creates=0,fetches=0;
+ let creates=0,fetches=0;const requests=[];
  const subscription=existing||{endpoint:'https://fcm.googleapis.com/fcm/send/device',toJSON:()=>({}),unsubscribe:async()=>true};
  const reg={pushManager:{getSubscription:async()=>existing,subscribe:async()=>{creates++;return subscription;}}};
  const context={window:{isSecureContext:true,PushManager:{},Notification:{},__8apdfGetSocialClient:async()=>({db:{auth:{getSession:async()=>({data:{session:{access_token:'session'}}})}}})},
   navigator:{serviceWorker:{register:async()=>reg,ready:Promise.resolve(reg),addEventListener(){}}},
   Notification:{permission:'granted'},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
   document:{dispatchEvent(){}},Event:class{},AbortSignal,TextEncoder,crypto:globalThis.crypto,atob,
-  fetch:async()=>{fetches++;return {ok:true,json:async()=>({publicKey:'AQID',subscriptions:[]})}},
+  fetch:async(url,options)=>{fetches++;requests.push(options);return {ok:true,json:async()=>({publicKey:'AQID',subscriptions:[],queued:true})}},
   setTimeout:()=>0,clearTimeout(){},console};
  vm.runInNewContext(fs.readFileSync('push-notifications.js','utf8'),context);
  await new Promise(setImmediate);
- return {context,storage,creates:()=>creates,fetches:()=>fetches};
+ return {context,storage,requests,creates:()=>creates,fetches:()=>fetches};
 }
 let state=await client();assert.equal(state.creates(),0);
 state=await client({optIn:'false',existing:{endpoint:'x'}});assert.equal(state.fetches(),0,'Opted-out subscriptions cannot be automatically registered');
 state=await client();await state.context.window.__8apdfPush.disable();assert.equal(state.storage.get('8apdf_phone_notifications_v1_enabled'),'false');
+state=await client({optIn:'true',existing:{endpoint:'https://fcm.googleapis.com/fcm/send/device',toJSON:()=>({})}});
+assert.equal((await state.context.window.__8apdfPush.testClosed()).queued,true);
+assert.equal(JSON.parse(state.requests.at(-1).body).action,'test-closed');
 console.log('PASS native push payloads, safe click navigation, retry budget, current-origin CORS and persistent opt-out');

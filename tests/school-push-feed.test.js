@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {sourceEvents, FEED_ID, INTERVAL_MINUTES} from '../supabase/functions/school-push/school-feed.js';
+import {SUPABASE_PROJECT_URL, SUPABASE_PUBLISHABLE_KEY} from '../supabase-materials.js';
+import {preferenceAllows} from '../shared/push-policy.js';
+
+for (const name of ['supabase-materials.js', 'supabase-announcements.js']) {
+  assert.equal(fs.readFileSync(name, 'utf8'), fs.readFileSync('supabase/functions/school-push/' + name, 'utf8'), name + ' deployed copy must match the website');
+}
+assert.equal(FEED_ID, 'supabase:xudhjwojgxblbsebkzso');
+assert.equal(INTERVAL_MINUTES, 1);
+const material = (id, extra = {}) => ({id, title: 'Science Notes', published: true, pdf_url: 'https://example.org/notes.pdf', ...extra});
+const responses = [];
+const fetchImpl = async (input, options) => {
+  const url = new URL(input);
+  assert.equal(url.origin, SUPABASE_PROJECT_URL);
+  assert.equal(options.headers.apikey, SUPABASE_PUBLISHABLE_KEY);
+  assert.equal(url.searchParams.get('published'), 'eq.true');
+  assert.equal(url.searchParams.get('archived_at'), 'is.null');
+  assert.equal(url.searchParams.get('order'), 'id.asc');
+  const cursor = url.searchParams.get('id');
+  const offset = cursor ? Number(JSON.parse(cursor.slice(3))) + 1 : 0;
+  responses.push(url);
+  return Response.json(Array.from({length: Math.max(0, Math.min(500, 1001 - offset))}, (_, i) => material(String(offset + i))));
+};
+const events = await sourceEvents('study_materials', Date.now() + 30000, fetchImpl);
+assert.equal(events.length, 1001);
+assert.equal(responses.length, 3);
+assert.equal(responses[1].searchParams.get('id'), 'gt."499"');
+assert.equal(events[0].path, '/pdf-explorer');
+assert.equal(events[0].source, 'pdf');
+const read = (rows, collection = 'study_materials') => sourceEvents(collection, Date.now() + 30000, async () => Response.json(rows));
+const filtered = await read([material('draft', {published: false}), material('archived', {archived_at: '2026-10-17'}), material('no-file', {pdf_url: ''}), material('test', {title: 'Class test paper'})]);
+assert.equal(filtered.length, 1);
+assert.equal(filtered[0].is_test, true);
+assert.equal(filtered[0].path, '/tests');
+const one = (await read([material('one')]))[0];
+assert.equal((await read([material('one', {order: 999, updated_at: 'tomorrow'})]))[0].id, one.id, 'Display-order edits must not re-alert');
+assert.notEqual((await read([material('one', {title: 'Updated Science Notes'})]))[0].id, one.id);
+const announcements = await read([{id: 'notice/1', published: true, title: 'Edited notice', original_message: 'Edited text', admin_edited_fields: ['title', 'original_message'], raw: {title: 'Old notice', originalMessage: 'Old text'}}], 'announcements');
+assert.equal(announcements[0].title, 'Edited notice');
+assert.equal(announcements[0].body, 'Edited text');
+assert.equal(announcements[0].path, '/school-reminders?message=notice%2F1');
+await assert.rejects(() => sourceEvents('unknown', Date.now() + 1000), /Unknown/);
+await assert.rejects(() => sourceEvents('study_materials', 0), /time budget/);
+await assert.rejects(() => sourceEvents('study_materials', Date.now() + 1000, async () => new Response('', {status: 503})), /HTTP 503/);
+await assert.rejects(() => sourceEvents('study_materials', Date.now() + 1000, async () => Response.json({error: 'bad'})), /invalid response/);
+assert(preferenceAllows({pdfs: false, announcements: false, testsOnly: true}, {source: 'device-test'}), 'Explicit device tests bypass content filters');
+assert(!preferenceAllows({pdfs: false}, {source: 'pdf'}));
+console.log('PASS current Supabase feed, keyset pagination, publication filters, normalization and stable event fingerprints');

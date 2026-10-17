@@ -69,7 +69,7 @@
     }
     // Fetch fresh health: caching config forever hid stalled school ingestion.
     const config = await fetchJSON();
-    return { supported: true, subscribed, pendingUnsubscribe: !!subscription && stored(optInKey) === 'false', permission: Notification.permission, preferences, lastChecked: config.lastChecked };
+    return { supported: true, subscribed, pendingUnsubscribe: !!subscription && stored(optInKey) === 'false', permission: Notification.permission, preferences, lastChecked: config.lastChecked, intervalMinutes: config.intervalMinutes };
   }
   async function enable() {
     if (!supported()) throw Error('Background notifications are unavailable here. On iPhone, open 8aPDF from your Home Screen.');
@@ -103,12 +103,12 @@
     }
     preferences = updated; persist(key, JSON.stringify(preferences)); return status();
   }
-  async function test() {
+  async function test(closed = false) {
     const reg = await worker(), subscription = await reg.pushManager.getSubscription();
     if (!subscription || stored(optInKey) === 'false') throw Error('Enable notifications first.');
-    return request('test', subscription);
+    return request(closed ? 'test-closed' : 'test', subscription);
   }
-  window.__8apdfPush = { status, enable, disable, savePreferences, test };
+  window.__8apdfPush = { status, enable, disable, savePreferences, test, testClosed: () => test(true) };
   if (supported()) {
     worker().then(() => {
       // Permission alone is not a subscription or consent to re-enable it.
