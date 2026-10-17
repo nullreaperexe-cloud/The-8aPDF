@@ -26,8 +26,8 @@ const code=[
 const state={
  materials:[],filter:'All Subjects',term:'all',query:'',sort:'new'
 };
-const {normalizeDoc,sortedDocs,dateMs,announcementTime}=new Function(
- 'state','termOfPdf','keywords',code+'\nreturn {normalizeDoc,sortedDocs,dateMs,announcementTime};'
+const {normalizeDoc,sortedDocs,dateMs,pdfUploadMs,announcementTime}=new Function(
+ 'state','termOfPdf','keywords',code+'\nreturn {normalizeDoc,sortedDocs,dateMs,pdfUploadMs,announcementTime};'
 )(state,()=>'term1',x=>(x.title+' '+x.subject).toLowerCase());
 
 state.materials=[
@@ -38,14 +38,38 @@ state.materials=[
  normalizeDoc({id:'middle',title:'Oct 12',subject:'Hindi',pdf_url:'https://example.org/mid.pdf',
   date_iso:'2026-10-12',created_at:'2026-10-18T12:00:00Z'})
 ];
-assert.deepEqual(sortedDocs().map(x=>x.id),['new','middle','old'],
- 'Original school date must outrank data-import date');
+assert.deepEqual(sortedDocs().map(x=>x.id),['middle','old','new'],
+ 'Upload time must outrank the school date');
+assert.equal(state.materials[0].createdAt,'2026-10-09','School dates remain available for display and term filters');
 assert.equal(sortedDocs().length,3,'All PDFs default should not filter out old terms');
 state.sort='old';
-assert.deepEqual(sortedDocs().map(x=>x.id),['old','middle','new']);
+assert.deepEqual(sortedDocs().map(x=>x.id),['new','old','middle']);
 state.sort='new';
+state.materials.push(normalizeDoc({id:'admin-upload',title:'Backdated school notes',subject:'Math',
+ pdf_url:'https://example.org/admin.pdf',source_date:'2026-09-01',
+ inserted_at:'2026-10-18T13:30:00Z',created_at:'2026-10-17T00:00:00Z',order:999}));
+assert.equal(sortedDocs()[0].id,'admin-upload','Verified insertion time wins even for a backdated PDF');
+assert.equal(pdfUploadMs(state.materials.at(-1)),Date.parse('2026-10-18T13:30:00Z'));
+state.materials.push(normalizeDoc({id:'edited-old',title:'Edited older PDF',subject:'Math',
+ pdf_url:'https://example.org/edited.pdf',source_date:'2026-12-01',
+ inserted_at:'2026-10-17T01:00:00Z',updated_at:'2026-10-20T18:00:00Z',order:-999}));
+assert.equal(sortedDocs()[0].id,'admin-upload','An edit or future school date must not promote an older upload');
+assert.deepEqual(sortedDocs().map(x=>x.id),['admin-upload','middle','old','new','edited-old']);
+state.filter='Math';
+assert.deepEqual(sortedDocs().map(x=>x.id),['admin-upload','old','edited-old'],'Subject filters retain upload order');
+state.filter='All Subjects';
+const fallback=normalizeDoc({id:'fallback',source_date:'2026-09-01',inserted_at:'invalid',created_at:'2026-10-01T12:00:00Z'});
+assert.equal(pdfUploadMs(fallback),Date.parse('2026-10-01T12:00:00Z'),'Invalid or missing insertion times use a valid creation timestamp');
+assert.equal(pdfUploadMs(normalizeDoc({id:'legacy',date_iso:'2026-08-05'})),Date.parse('2026-08-05'),'School date is the fallback when no upload timestamp exists');
+const sameDay=[
+ normalizeDoc({id:'morning',source_date:'2026-10-17',inserted_at:'2026-10-17T08:00:00Z',order:-20}),
+ normalizeDoc({id:'afternoon',source_date:'2026-10-17',inserted_at:'2026-10-17T12:00:00Z',order:20})
+];
+state.materials=sameDay;
+assert.deepEqual(sortedDocs().map(x=>x.id),['afternoon','morning'],'Same-day uploads sort by time rather than legacy order');
+state.sort='old';assert.deepEqual(sortedDocs().map(x=>x.id),['morning','afternoon']);
 assert.equal(dateMs({seconds:1792195200,nanoseconds:0}),1792195200000);
 assert.equal(announcementTime({
  messageDate:'2026-10-17T00:00:00Z',createdAt:'2026-10-09T00:00:00Z'
 }),dateMs('2026-10-17T00:00:00Z'));
-console.log('PASS no maintenance; all Supabase documents; school date latest-first');
+console.log('PASS newest uploads first, insertion/legacy timestamp fallbacks, same-day order, filters and original school dates');

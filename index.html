@@ -2028,8 +2028,7 @@ function sortedDocs(){
  let a=state.materials.filter(x=>(state.term==='all'||termOfPdf(x)===state.term)&&
  (state.filter==='All Subjects'||x.subject.toLowerCase()===state.filter.toLowerCase())&&
  (!state.query||keywords(x).includes(state.query.toLowerCase())));
- const chrono=(x,y)=>dateMs(y.createdAt)-dateMs(x.createdAt)||
-  (x.order-y.order)||x.title.localeCompare(y.title);
+ const chrono=comparePdfUploads;
  if(state.sort==='old')a.sort((x,y)=>-chrono(x,y));
  else if(state.sort==='az')a.sort((x,y)=>x.title.localeCompare(y.title));
  else if(state.sort==='default')a.sort((x,y)=>x.order-y.order||chrono(x,y));
@@ -2046,6 +2045,10 @@ function dateMs(v){try{if(v==null||v==='')return 0;
   const dt=v?.toDate?v.toDate():new Date(v);
   const ms=dt.getTime();return Number.isFinite(ms)?ms:0;
 }catch{return 0}}
+function pdfUploadMs(x){return dateMs(x.uploadedAt)||dateMs(x.createdAt)}
+function comparePdfUploads(x,y){return pdfUploadMs(y)-pdfUploadMs(x)||
+ dateMs(y.createdAt)-dateMs(x.createdAt)||(x.order-y.order)||
+ x.title.localeCompare(y.title)||x.id.localeCompare(y.id)}
 function pdfDateYMD(v){
  try{
   if(v==null||v==='')return '';
@@ -2082,6 +2085,9 @@ function normalizeDoc(d){
  const schoolDate=d.source_date||d.date_iso||d.date_display||
   d.raw?.source_date||d.raw?.date_iso||d.raw?.createdAt||d.raw?.date||
   d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null;
+ const uploadedAt=[d.inserted_at,d.uploaded_at,d.uploadedAt,d.uploadDate,
+  d.created_at,d.createdAt,d.raw?.uploadedAt,d.raw?.createdAt]
+  .find(value=>dateMs(value)>0)||schoolDate;
  return{id:String(d.id??''),title:String(d.title||d.name||'Untitled Material'),
   subject:String(d.subject||d.subject_name||'Other'),
   description:String(d.description||d.summary||''),
@@ -2089,7 +2095,7 @@ function normalizeDoc(d){
   className:String(d.class_name||d.className||''),chapter:String(d.chapter||d.chapter_name||''),
   language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],
   order:d.order!=null&&Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,
-  createdAt:schoolDate};
+  createdAt:schoolDate,uploadedAt};
 }
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
@@ -2169,7 +2175,7 @@ $('#subjectFilters').onclick=e=>{let b=e.target.closest('[data-subject]');if(!b)
 function setLayout(l){settings.layout=l;setSettings()}$('#gridBtn').onclick=()=>setLayout('grid');$('#listBtn').onclick=()=>setLayout('list');
 $('#searchInput').oninput=e=>{state.query=e.target.value.trim();state.visible=12;renderMaterials();if($('#announcements').style.display!=='none')renderAnnouncements()};$('#searchForm').onsubmit=e=>{e.preventDefault();showLibrary();scrollToSection('#library')};
 $$('[data-search]').forEach(el=>el.onclick=()=>{$('#searchInput').value=el.dataset.search;$('#searchInput').dispatchEvent(new Event('input'));showLibrary();scrollToSection('#library')});
-function renderRecent(){const list=termDocuments().slice().sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt)).slice(0,4);$('#recentWidget').innerHTML=list.slice(0,4).map(x=>`<button class="list-row" data-openpdf="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(x.subject)} · ${safe(fmtDate(x.createdAt))}</span></span></button>`).join('')||'<div class="load-state">No recent PDFs yet.</div>'}
+function renderRecent(){const list=termDocuments().slice().sort(comparePdfUploads).slice(0,4);$('#recentWidget').innerHTML=list.slice(0,4).map(x=>`<button class="list-row" data-openpdf="${safe(x.id)}"><span class="small-icon">${ico('file')}</span><span class="item-body"><strong>${safe(x.title)}</strong><span>${safe(x.subject)} · ${safe(fmtDate(x.createdAt))}</span></span></button>`).join('')||'<div class="load-state">No recent PDFs yet.</div>'}
 $('#recentWidget').onclick=e=>{let b=e.target.closest('[data-openpdf]');if(!b)return;const x=state.materials.find(i=>i.id===b.dataset.openpdf);if(x)pdfAction(x,'preview')};
 function showLibrary(){ $('#library').style.display='';$('#announcements').style.display='none';$$('[data-go]').forEach(x=>{if(x.classList.contains('nav-link'))x.classList.toggle('active',x.dataset.go==='library')}) }
 function showAnnouncements(){ $('#announcements').style.display='';$('#library').style.display='none';renderAnnouncements();scrollToSection('#announcements');$$('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.go==='announcements')) }
@@ -2292,7 +2298,7 @@ else openOriginalName();
 
 renderTimetable();renderNotes();renderMaterials();renderAnnouncements();
 window.__8apdfStudyBridge={
- documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
+ documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),uploadedAtMs:pdfUploadMs(x),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
  announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:String(a.title||''),description:String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
  recents:()=>[...state.recent],bookmarks:()=>[...state.saved],toggleBookmark:(id)=>{state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();document.dispatchEvent(new Event('8apdf:bookmarks-changed'));},
  openAnnouncement:(id)=>{const n=state.announcements.find(n=>String(n.id)===String(id));if(n)openAnnouncement(n);},
@@ -2373,8 +2379,7 @@ async function refreshSupabaseMaterials(){
   const {fetchAllStudyMaterials}=await import('/supabase-materials.js');
   const records=await fetchAllStudyMaterials();
   state.materials=records.filter(d=>d&&d.published!==false&&d.pdf_url).map(normalizeDoc)
-   .sort((a,b)=>dateMs(b.createdAt)-dateMs(a.createdAt)||(a.order-b.order)||
-     a.title.localeCompare(b.title));
+   .sort(comparePdfUploads);
   state.live=true;state.error=false;
   try{localStorage.setItem('8a_cache_pdfs',JSON.stringify(state.materials.slice(0,150)))}catch{}
   $('#previewRibbon').classList.remove('show');
