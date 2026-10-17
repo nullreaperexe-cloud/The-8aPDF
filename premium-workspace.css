@@ -226,3 +226,11 @@ html[data-tone="light"] .premium-hero-note,html[data-tone="light"] .hero .eyebro
 .settings-music-only .persistent-music-panel.open{pointer-events:auto}
 @media(max-width:810px){html[data-ui-mode="studio"][data-tone="light"]:not([data-nova-ui="on"]) .premium-hero-scene{background-position:68% center!important}.settings-music-only,.tool-page-open .settings-music-only{inset:0}}
 html[data-ui-mode="studio"][data-theme="light"]:not([data-nova-ui="on"]){--bg:#f6f7fa!important;--bg-alt:#fff!important;--surface:#fff!important;--surface-high:#edf0f4!important;--surface-soft:#f3f5f8!important;--text:#111820!important;--text-soft:#424d5a!important;--muted:#66717f!important;--line:#17263824!important;--line-bold:#17263840!important;--button:#161b22!important;--button-text:#fff!important;--hover:#e6ebf1!important;color-scheme:light}
+
+/* 8aPDF Friends Chat only: remove duplicate desktop tool banner to match
+   the approved full-height chat UI. Other workspace pages are unaffected.
+   Mobile retains the site back button because the chat icon rail is hidden. */
+@media(min-width:781px){
+ .workspace-page.chat-page-active > .workspace-page-header{display:none!important}
+ .workspace-page.chat-page-active #workspacePageFrames{flex:1;min-height:0}
+}
