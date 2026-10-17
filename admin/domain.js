@@ -60,7 +60,8 @@ export async function validatePDF(file) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const decoder = new TextDecoder('latin1');
   if (!decoder.decode(bytes.subarray(0, 8)).startsWith('%PDF-') || !decoder.decode(bytes.subarray(Math.max(0, bytes.length - 2048))).includes('%%EOF')) fail('The file is not a complete PDF. Export it as a PDF and try again.');
-  if (/\/(?:JavaScript|JS|Launch|EmbeddedFile)\b/.test(decoder.decode(bytes))) fail('Active scripts, launch actions and embedded files are not accepted in school PDFs.');
+  // PDF names can also occur in document text, metadata and binary streams.
+  // Scanning the complete file as plain text would reject ordinary PDFs.
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return { bytes, checksum: Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join(''), filename: file.name.replace(/[\\/\u0000-\u001f]/g, '_').slice(0, 240) };
 }

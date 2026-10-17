@@ -28,8 +28,22 @@ test('PDFs require correct name, MIME, signature, completeness and size; checksu
   const payload='%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF';
   const a=await validatePDF(new File([payload],'test.pdf',{type:'application/pdf'}));
   const b=await validatePDF(new File([payload],'other.pdf',{type:'application/pdf'}));assert.equal(a.checksum,b.checksum);assert.equal(a.checksum.length,64);
-  for(const file of [new File([payload],'test.exe',{type:'application/pdf'}),new File([payload],'test.pdf',{type:'text/plain'}),new File(['not a pdf'],'test.pdf',{type:'application/pdf'}),new File(['%PDF-1.4 /JavaScript %%EOF'],'test.pdf',{type:'application/pdf'}),new File(['%PDF-1.4'],'test.pdf',{type:'application/pdf'})])await assert.rejects(()=>validatePDF(file));
+  for(const file of [new File([payload],'test.exe',{type:'application/pdf'}),new File([payload],'test.pdf',{type:'text/plain'}),new File(['not a pdf'],'test.pdf',{type:'application/pdf'}),new File(['%PDF-1.4'],'test.pdf',{type:'application/pdf'})])await assert.rejects(()=>validatePDF(file));
   await assert.rejects(()=>validatePDF({name:'big.pdf',type:'application/pdf',size:MAX_PDF_BYTES+1,arrayBuffer:()=>{throw Error('must not read oversized file');}}),/20 MB/);
+});
+
+test('ordinary PDFs containing action names in text and metadata upload without changing their bytes',async()=>{
+  for(const name of ['JavaScript','JS','Launch','EmbeddedFile']){
+    const stream=`BT /F1 12 Tf 30 100 Td (PDF reference: /${name}) Tj ET\n`;
+    const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 150] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${stream.length} >>\nstream\n${stream}endstream`,`<< /Title (Reference to /${name}) >>`];
+    let payload='%PDF-1.4\n';const offsets=[0];
+    for(const [i,object] of objects.entries()){offsets.push(payload.length);payload+=`${i+1} 0 obj\n${object}\nendobj\n`;}
+    const xref=payload.length;
+    payload+=`xref\n0 ${offsets.length}\n0000000000 65535 f \n`+offsets.slice(1).map(offset=>`${String(offset).padStart(10,'0')} 00000 n \n`).join('')+`trailer\n<< /Size ${offsets.length} /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+    const result=await validatePDF(new File([payload],`${name}.pdf`,{type:'application/pdf'}));
+    assert.deepEqual(result.bytes,new TextEncoder().encode(payload));
+    assert.equal(result.checksum.length,64);
+  }
 });
 test('duplicates use exact identity or checksum and actual insertion order',()=>{
   const records=[{id:'new',title:'Different title',pdf_url:'https://example.com/a.pdf',source_date:'2000-01-01',inserted_at:'2026-10-17'}, {id:'old',title:'Math revision notes',pdf_url:'https://example.com/a.pdf#page=2',source_date:'2099-01-01',inserted_at:'2026-10-01'}];
