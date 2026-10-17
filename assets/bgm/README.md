@@ -1,23 +1,22 @@
-# 8aPDF · Background music (original MP3 files)
+# 8aPDF — Original-quality three-song background music
 
-## One-ZIP automatic installation
+The website serves three original MP3 assets (without re-encoding):
 
-1. Upload **8apdf-four-original-bg-tracks.zip** to the **repository ROOT** (beside `index.html`), **not inside this folder**.
-2. Commit to `main`.
-3. GitHub Actions workflow `.github/workflows/install-bgm-tracks.yml` verifies the SHA-256 of all four original MP3s, extracts them to this folder **without changing one audio byte**, deletes the old `assets/8apdf-background-music.mp3`, deletes the ZIP and commits the result.
-4. Vercel automatically deploys the changes when GitHub integration is enabled.
+1. `tum-hi-ho.mp3` — Tum Hi Ho (piano cover)
+2. `khairiyat.mp3` — Khairiyat (piano cover)
+3. `saiyaara.mp3` — Saiyaara (peaceful instrumental)
 
-If the action cannot push (for example, due to branch protection), extract the ZIP on your computer and upload its four files directly to `assets/bgm/`, and delete the previous MP3 manually after verifying playback.
+## Settings → Music
 
-## Exact filenames
+Select one, two or all three songs. The selection is saved in localStorage (`8apdf_background_music_v1`) and restored on refresh.
 
-- `tum-hi-ho.mp3` — Tum Hi Ho (piano cover, first visit)
-- `meri-duniya-tu-hi-re.mp3` — Meri Duniya Tu Hi Re (lyrical)
-- `khairiyat.mp3` — Khairiyat (piano cover)
-- `saiyaara.mp3` — Saiyaara (peaceful instrumental)
+- **One selected:** that song loops indefinitely.
+- **Two selected:** the selected songs play in the canonical order, then repeat.
+- **All three selected:** Tum Hi Ho → Khairiyat → Saiyaara → repeat.
+- **Only this:** choose a song for permanent single-track looping.
+- **Play all 3 in order:** resets to the full ordered playlist.
+- Music enable, pause and volume controls remain available.
 
-First visit: Tum Hi Ho. Each later refresh: a random song different from the last. Site Settings → Music provides selection, shuffle, pause, on/off and volume.
+Song source bytes are not modified. Browser autoplay policies can still require a user gesture before playback.
 
-Modern browsers may block sound before the first user gesture. The website attempts autoplay and starts on the first tap/click when required.
-
-**Licensing:** Only publicly distribute audio recordings when you have the necessary rights.
+The older four-song ZIP importer has been retired because it referenced a track intentionally removed from the site. Only publish recordings when you have appropriate distribution rights.
