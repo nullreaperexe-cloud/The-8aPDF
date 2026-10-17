@@ -16,7 +16,7 @@ function start(){
   return elements.get(id);
  };
  const audio={
-  src:'',loop:false,volume:1,listeners:{},paused:true,
+  src:'',loop:false,volume:1,style:{},listeners:{},paused:true,
   addEventListener(name,callback){this.listeners[name]=callback},
   event(name){this.listeners[name]?.()},
   setAttribute(){},load(){},
