@@ -10,7 +10,9 @@ const sandbox={
  URL,URLSearchParams,window:{},document:{addEventListener(){}},
  localStorage:{getItem(){return null}},
 };
-vm.runInNewContext(src+'\nthis.__clean=cleanUrl;',sandbox);
+const instrumented=src.replace(/\}\)\(\);\s*$/, 'globalThis.__clean=cleanUrl;})();');
+assert.notEqual(instrumented,src,'Expected to expose URL validator inside module scope');
+vm.runInNewContext(instrumented,sandbox);
 const clean=sandbox.__clean;
 assert.equal(clean('https://soundcloud.com/artist/song'),'https://soundcloud.com/artist/song');
 assert.equal(clean('https://m.soundcloud.com/artist/song?si=tracking'),'https://soundcloud.com/artist/song');
