@@ -75,6 +75,10 @@ async function listTracks(config,force=false){
  const now=Date.now();
  if(!force&&libraryCache.folder===config.folder&&libraryCache.items&&now<libraryCache.expires)return libraryCache.items;
  const token=await tokenFor(config.service),found=[],seen=new Set();
+ // Validate the actual folder instead of treating an incorrect folder ID as an empty playlist.
+ const folderResponse=await driveGet(ROOT+'/'+encodeURIComponent(config.folder)+'?fields=id,name,mimeType&supportsAllDrives=true',token);
+ const folderMetadata=await folderResponse.json();
+ if(folderMetadata.mimeType!=='application/vnd.google-apps.folder')throw error('DRIVE_FOLDER_INVALID',400,'The configured Google Drive ID is not a folder.');
  let nextPage='';
  do{
   const params=new URLSearchParams({
@@ -93,7 +97,7 @@ async function listTracks(config,force=false){
   nextPage=typeof json.nextPageToken==='string'?json.nextPageToken:'';
  }while(nextPage&&found.length<MAX_RESULTS);
  const items=found.sort((a,b)=>a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true}));
- libraryCache={folder:config.folder,items,expires:now+70000};
+ libraryCache={folder:config.folder,folderName:String(folderMetadata.name||'Google Drive Music').slice(0,120),items,expires:now+70000};
  return items;
 }
 function readRange(value,total){
@@ -176,7 +180,7 @@ export default async function handler(req,res){
   if(action==='tracks'||action==='status'){
    const tracks=await listTracks(conf,String(req.query?.refresh||'')==='1');
    res.setHeader('Cache-Control','private, max-age=0, must-revalidate');
-   if(action==='status')return res.status(200).json({ok:true,source:'Google Drive',count:tracks.length,folderConnected:true});
+   if(action==='status')return res.status(200).json({ok:true,source:'Google Drive',count:tracks.length,folderConnected:true,folderName:libraryCache.folderName});
    return res.status(200).json({tracks,count:tracks.length,source:'Google Drive',maxRangeBytes:MAX_CHUNK});
   }
   if(action==='stream')return await stream(req,res,conf,String(req.query?.id||''));
