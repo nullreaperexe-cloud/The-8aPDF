@@ -87,7 +87,7 @@ body.sc-music-expanded .sc-widget-wrap,body.sc-music-expanded .sc-widget-wrap if
  .sc-add-form,.sc-find-form{padding:12px}
  .sc-add-field button{font-size:.66rem;padding:0 9px}
  .sc-add-field input{font-size:.72rem;padding:10px 8px}
- .sc-dock{bottom:max(5px,env(safe-area-inset-bottom));width:calc(100vw - 12px);padding:6px 9px 4px;border-radius:10px}
+ .sc-dock{bottom:calc(65px + env(safe-area-inset-bottom));width:calc(100vw - 12px);padding:6px 9px 4px;border-radius:10px}
  .sc-dock-top{gap:6px}
  .sc-now strong{font-size:.66rem}
  .sc-now small{font-size:.57rem}
