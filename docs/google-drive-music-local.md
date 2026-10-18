@@ -6,21 +6,15 @@ This site has a browser UI plus a Google Drive serverless API. **VS Code Live Se
 
 1. Open the newest GitHub `main` branch. If already cloned, run `git pull origin main` in VS Code Terminal.
 2. Install [Node.js 22 LTS](https://nodejs.org/) or newer and run `npm install` if needed.
-3. Link your **existing** Vercel project and pull its Production environment settings securely into a locally ignored file:
+3. **Recommended: avoid Vercel's [SENSITIVE] placeholders.** Your existing Vercel project has the secrets, but `vercel env pull` does not export sensitive values. Locate the *original* Google service-account JSON key file on your PC; keep it **outside this repo**.
+
+4. Start the local music server with the local key file path and Drive folder ID (paste your actual JSON file path, not the literal example):
 
 ```powershell
-npx vercel login
-npx vercel link
-npx vercel env pull .env.local --environment=production
+npm run dev:music -- "C:\Users\Kanish\Downloads\YOUR-SERVICE-ACCOUNT-KEY.json" "1GiJCrqQ-WYt-013sy37UJVkK9H2cGWDm"
 ```
 
-When prompted, select your existing project **the-8apdf** and existing team. Do not create a new Vercel project.
-
-4. Start a local music-API-enabled server:
-
-```powershell
-npm run dev:music
-```
+If you prefer to use local environment variables instead, `npm run dev:music` still supports a complete, valid `.env.local` file; Vercel's `[SENSITIVE]` placeholders are **not** sufficient.
 
 5. Open **http://localhost:4173** (not the Go Live / Live Server port 5500). Use **Music Library** in the left sidebar or **More → Music Library** on mobile.
 6. Test the Drive backend at these URLs:
