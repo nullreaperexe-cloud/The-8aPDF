@@ -242,6 +242,8 @@ function toggle(){
 function open(){
  if(!document.body){document.addEventListener('DOMContentLoaded',open,{once:true});return}
  mount();if(state.open)return;
+ // Prevent the legacy 3-track background player from mixing with Drive music.
+ window.__8apdfBackgroundAudio?.pause?.();
  focusBefore=document.activeElement;scrollBefore=document.body.style.overflow;
  state.open=true;panel.hidden=false;overlay.hidden=false;document.body.style.overflow='hidden';
  if(state.current)dock.hidden=false;
