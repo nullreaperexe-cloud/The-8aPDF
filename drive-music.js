@@ -262,6 +262,16 @@ function minimize(){
  if(focusBefore?.isConnected)focusBefore.focus({preventScroll:true});
  // Do not call pause/remove/src here. Audio must continue while minimized.
 }
+function setupClassicLauncher(){
+ // Studio has its own Music Library nav. Classic mode needs a visible entry too.
+ const launch=button('♫ Music Library','dm-classic-launcher',open,'Open 8aPDF Music Library');
+ launch.id='dmClassicLauncher';
+ document.body.append(launch);
+ const update=()=>{launch.hidden=document.documentElement.dataset.uiMode==='studio'};
+ update();
+ if(typeof MutationObserver!=='undefined')new MutationObserver(update).observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-mode']});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupClassicLauncher,{once:true});else setupClassicLauncher();
 document.addEventListener('click',e=>{
  const target=e.target instanceof Element?e.target.closest('#studioDriveMusic,#studioMobileDriveMusic'):null;
  if(target){e.preventDefault();open()}
