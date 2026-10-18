@@ -21,15 +21,19 @@ const validTrack=x=>x&&typeof x==='object'&&cleanUrl(x.url)&&typeof x.title==='s
 const uniqueTracks=arr=>{
  const known=new Set();return (Array.isArray(arr)?arr:[]).filter(x=>{
   if(!validTrack(x)||known.has(x.url))return false;known.add(x.url);return true
- }).slice(0,80).map(x=>({url:cleanUrl(x.url),title:escapeTitle(x.title),artist:escapeTitle(x.artist||'SoundCloud'),art:typeof x.art==='string'&&/^https:\/\//i.test(x.art)?x.art:''}));
+ }).slice(0,240).map(x=>({url:cleanUrl(x.url),title:escapeTitle(x.title),artist:escapeTitle(x.artist||'SoundCloud'),category:['hindi','punjabi','english'].includes(x.category)?x.category:'custom',art:typeof x.art==='string'&&/^https:\/\//i.test(x.art)?x.art:''}));
 };
+const CATALOG_VERSION='featured-20261018-54';
+const catalog=uniqueTracks(window.__8apdfSoundCloudCatalog||[]);
+const existing=uniqueTracks(saved.queue);
+const initialQueue=saved.curatedVersion===CATALOG_VERSION?existing:uniqueTracks([...catalog,...existing]);
 const state={
- opened:false,queue:uniqueTracks(saved.queue),current:cleanUrl(saved.current)||'',
+ opened:false,queue:initialQueue,filter:'all',current:cleanUrl(saved.current)||'',
  playing:false,ready:false,loading:false,volume:Math.max(0,Math.min(100,Number.isFinite(saved.volume)?saved.volume:55)),
  query:'',position:0,duration:0
 };
 let overlay, panel, dock, frame,widget,widgetPromise,prevFocus,prevOverflow='',mounted=false;
-const persist=()=>{try{localStorage.setItem(STORE,JSON.stringify({queue:state.queue,current:state.current,volume:state.volume}))}catch{}};
+const persist=()=>{try{localStorage.setItem(STORE,JSON.stringify({queue:state.queue,current:state.current,volume:state.volume,curatedVersion:CATALOG_VERSION}))}catch{}};
 function status(value){const e=ID('scMusicStatus');if(e)e.textContent=value}
 function button(text,cls,click,label){
  const b=document.createElement('button');b.type='button';b.textContent=text;b.className=cls||'';
@@ -51,8 +55,8 @@ function build(){
  '<main class="sc-content"><div class="sc-section-heading"><div><small>YOUR COLLECTION</small><h3>Listen while you study</h3></div><span id="scTrackCount">0 saved</span></div>'+
  '<form id="scAddForm" class="sc-add-form"><label for="scUrlInput">Add a public SoundCloud song or playlist URL</label><div class="sc-add-field"><input id="scUrlInput" type="url" inputmode="url" placeholder="https://soundcloud.com/artist/song" autocomplete="off" required><button type="submit">＋ Add</button></div></form>'+
  '<form class="sc-find-form" id="scFindForm"><label for="scFindQuery">Find songs</label><div class="sc-add-field"><input id="scFindQuery" type="search" placeholder="Arijit Singh, AP Dhillon, English hits…" autocomplete="off"><button type="submit">Search SoundCloud ↗</button></div><small>Free widget access needs no login. SoundCloud search opens in a new tab; copy a song link to add it here.</small></form>'+
- '<div class="sc-section-heading sc-section-heading-sub"><div><small>QUEUE / PLAYLIST</small><h3>Saved tracks</h3></div><button id="scClearQueue" type="button" class="sc-clear-btn">Clear</button></div>'+
- '<div id="scTrackList" class="sc-track-list" aria-live="polite"></div>'+
+ '<div class="sc-section-heading sc-section-heading-sub"><div><small>QUEUE / PLAYLIST</small><h3>Saved tracks</h3></div><span class="sc-track-tools"><button id="scRestoreFeatured" type="button" class="sc-clear-btn">Restore popular songs</button><button id="scClearQueue" type="button" class="sc-clear-btn">Clear</button></span></div>'+
+ '<div class="sc-category-tabs" id="scCategoryTabs" role="group" aria-label="Music language"><button type="button" data-sc-category="all" aria-pressed="true">All music</button><button type="button" data-sc-category="punjabi">Punjabi</button><button type="button" data-sc-category="hindi">Hindi / Indie</button><button type="button" data-sc-category="english">English</button><button type="button" data-sc-category="custom">My adds</button></div><div id="scTrackList" class="sc-track-list" aria-live="polite"></div>'+
  '<p id="scMusicStatus" class="sc-status" role="status" aria-live="polite">Ready to add music.</p>'+
  '<p class="sc-note">Tracks are hosted by their creators on SoundCloud. Availability and playback restrictions depend on the creator and region.</p>'+
  '</main></div>';
@@ -71,7 +75,9 @@ function build(){
  ID('scMusicMinimize').addEventListener('click',minimize);
  ID('scExpand').addEventListener('click',open);
  ID('scStop').addEventListener('click',stopAndHide);
- ID('scShowSaved').addEventListener('click',()=>{ID('scFindQuery').value='';renderList()});
+ ID('scShowSaved').addEventListener('click',()=>{state.filter='all';ID('scFindQuery').value='';renderList()});
+ ID('scCategoryTabs').addEventListener('click',event=>{const btn=event.target.closest('[data-sc-category]');if(!btn)return;state.filter=btn.dataset.scCategory;renderList()});
+ ID('scRestoreFeatured').addEventListener('click',()=>{state.queue=uniqueTracks([...catalog,...state.queue]);persist();renderList();renderDock();status('Popular songs restored to your collection.')});
  ID('scExploreSoundcloud').addEventListener('click',()=>openBrowse(''));
  panel.querySelectorAll('[data-sc-search]').forEach(b=>b.addEventListener('click',()=>openBrowse(b.dataset.scSearch)));
  ID('scFindForm').addEventListener('submit',e=>{e.preventDefault();openBrowse(ID('scFindQuery').value)});
@@ -84,7 +90,7 @@ function build(){
  ID('scVolume').addEventListener('input',e=>{state.volume=Number(e.target.value);persist();widget?.setVolume(state.volume)});
  ID('scSeek').addEventListener('change',e=>{if(state.duration>0)widget?.seekTo(state.duration*Number(e.target.value)/100)});
  document.addEventListener('keydown',e=>{if(state.opened&&e.key==='Escape')minimize()});
- renderList();renderDock();
+ persist();renderList();renderDock();
 }
 function openBrowse(query){
  const q=String(query||'').trim().slice(0,110);
@@ -112,8 +118,8 @@ async function add(value){
  if(old){ID('scUrlInput').value='';return play(url)}
  status('Adding track…');
  const info=await oembed(url);
- const track={url,...info};
- state.queue.unshift(track);state.queue=state.queue.slice(0,80);
+ const track={url,...info,category:'custom'};
+ state.queue.unshift(track);state.queue=state.queue.slice(0,240);
  ID('scUrlInput').value='';persist();renderList();
  play(url);
 }
@@ -122,7 +128,7 @@ function newRow(track,index){
  const idx=document.createElement('span');idx.className='sc-track-number';idx.textContent=String(index+1).padStart(2,'0');
  const info=document.createElement('button');info.type='button';info.className='sc-track-name';info.addEventListener('click',()=>play(track.url));
  const strong=document.createElement('strong');strong.textContent=track.title;
- const small=document.createElement('small');small.textContent=track.artist;
+ const small=document.createElement('small');small.textContent=track.artist+(track.category&&track.category!=='custom'?' · '+track.category.charAt(0).toUpperCase()+track.category.slice(1):'');
  info.append(strong,small);item.append(idx,info);
  const link=document.createElement('a');link.href=track.url;link.target='_blank';link.rel='noopener noreferrer';link.className='sc-track-external';link.textContent='↗';link.setAttribute('aria-label','View '+track.title+' on SoundCloud');item.append(link);
  for(const [delta,symbol,label] of [[-1,'↑','Move up'],[1,'↓','Move down']]){
@@ -145,11 +151,12 @@ function renderList(){
  if(!mounted)return;
  const parent=ID('scTrackList');parent.replaceChildren();
  const q=ID('scFindQuery')?.value.trim().toLowerCase()||'';
- const tracks=state.queue.filter(x=>!q||(x.title+' '+x.artist).toLowerCase().includes(q));
- ID('scTrackCount').textContent=state.queue.length+' saved';
+ const tracks=state.queue.filter(x=>(state.filter==='all'||x.category===state.filter)&&(!q||(x.title+' '+x.artist).toLowerCase().includes(q)));
+ ID('scCategoryTabs').querySelectorAll('[data-sc-category]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.scCategory===state.filter)));
+ ID('scTrackCount').textContent=tracks.length+' shown / '+state.queue.length+' total';
  if(!tracks.length){
   const msg=document.createElement('p');msg.className='sc-empty';
-  msg.textContent=q?'No saved matches. Use Search SoundCloud to discover more.':'Your playlist is empty. Discover a track on SoundCloud and paste its share link above.';
+  msg.textContent=q||state.filter!=='all'?'No matching songs in this category. Try All music.':'Your collection is empty. Restore popular songs or add a SoundCloud link.';
   parent.append(msg);
  }else tracks.forEach(t=>parent.append(newRow(t,state.queue.indexOf(t))));
 }
