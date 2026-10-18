@@ -26,6 +26,7 @@ const {resolve}=require('node:path');
  globalThis.fetch=async(uri,options={})=>{
   const url=String(uri);calls.push(url);
   if(url.startsWith('https://oauth2.googleapis.com/token'))return new Response(JSON.stringify({access_token:'unit-test-access-token',expires_in:3600}),{status:200});
+  if(url.includes('/drive/v3/files/folder12345ABCDE?'))return new Response(JSON.stringify({id:'folder12345ABCDE',name:'8aPDF Music',mimeType:'application/vnd.google-apps.folder'}),{status:200});
   if(url.startsWith('https://www.googleapis.com/drive/v3/files?')){
    assert.match(decodeURIComponent(url),/folder12345ABCDE/);
    return new Response(JSON.stringify({files:[
@@ -56,6 +57,9 @@ const {resolve}=require('node:path');
   assert.equal(listed.statusCode,200);
   assert.equal(listed.data.count,1);
   assert.equal(listed.data.tracks[0].title,'Punjabi Hit');
+  const status=new FakeResponse();
+  await handler({method:'GET',query:{action:'status'},headers:{}},status);
+  assert.equal(status.data.folderName,'8aPDF Music');
   assert.ok(!JSON.stringify(listed.data).includes('unit-test-access-token'));
   const streamed=new FakeResponse();
   await handler({method:'GET',query:{action:'stream',id:'song123456789ABC'},headers:{range:'bytes=1024-3071'}},streamed);
