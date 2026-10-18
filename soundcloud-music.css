@@ -109,3 +109,12 @@ body.sc-music-expanded .sc-widget-wrap,body.sc-music-expanded .sc-widget-wrap if
  .sc-dock{animation:sc-dock-pop .2s ease-out}
  @keyframes sc-dock-pop{from{opacity:.6;translate:0 9px}to{opacity:1;translate:0 0}}
 }
+
+/* Featured collection category tabs and restored-library controls. */
+.sc-category-tabs{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:thin;padding:2px 0 13px;margin-top:4px}
+.sc-category-tabs button{flex:none;white-space:nowrap;border:1px solid var(--line,#414037);background:var(--surface-high,#252520);color:var(--text,#eee);border-radius:24px;padding:8px 13px;font-size:.72rem;font-weight:620;min-height:35px}
+.sc-category-tabs button[aria-pressed="true"]{background:#d9b76c;color:#14120d;border-color:#d9b76c;font-weight:760}
+.sc-track-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.sc-track-tools .sc-clear-btn{font-size:.69rem}
+.sc-track-tools #scRestoreFeatured{color:#d9b76c}
+@media(max-width:750px){.sc-category-tabs{margin:3px -2px 4px;padding-bottom:11px;gap:6px}.sc-category-tabs button{padding:7px 10px;font-size:.66rem;min-height:31px}.sc-track-tools{gap:8px}.sc-track-tools .sc-clear-btn{font-size:.63rem}}
