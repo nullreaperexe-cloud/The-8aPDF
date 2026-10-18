@@ -13,8 +13,8 @@ const {resolve}=require('node:path');
  new Function(src);
  assert.match(home,/id="studioDriveMusic"/);
  assert.match(home,/id="studioMobileDriveMusic"/);
- assert.match(home,/src="\/drive-music\.js\?v=1"/);
- assert.match(home,/href="\/drive-music\.css\?v=1"/);
+ assert.match(home,/src="\/drive-music\.js\?v=2"/);
+ assert.match(home,/href="\/drive-music\.css\?v=2"/);
  const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});
  const previous={json:process.env.GOOGLE_SERVICE_ACCOUNT_JSON,folder:process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID,fetch:globalThis.fetch};
  process.env.GOOGLE_SERVICE_ACCOUNT_JSON=JSON.stringify({
