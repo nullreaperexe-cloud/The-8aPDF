@@ -1,7 +1,7 @@
 /* 8aPDF Music: original 8aPDF UI, streamed Audius tracks. No hosted audio or API secrets. */
 (()=>{
 'use strict';
-const ROOT='/api/audius-music';
+const ROOT='/api/music-search';
 const STORE='8apdf_audius_music_v1';
 const byId=id=>document.getElementById(id);
 const limited=(value,max)=>String(value||'').slice(0,max);
@@ -130,7 +130,7 @@ async function fetchTracks(more=false){
  state.loading=true;if(!more){state.results=[];state.offset=0}
  if(elements)renderResults();
  const controller=new AbortController();pending=controller;
- const params=new URLSearchParams({limit:'20',offset:String(offset)});
+ const params=new URLSearchParams({provider:'audius',limit:'20',offset:String(offset)});
  if(state.query)params.set('q',state.query);
  try {
   const response=await fetch(ROOT+'?'+params.toString(),{signal:controller.signal,headers:{Accept:'application/json'}});
