@@ -1,0 +1,2 @@
+# OpenTune-style metadata search for 8aPDF Music (no downloaded audio)
+ytmusicapi>=1.12.0,<2
