@@ -123,10 +123,14 @@ async function fetchSongs(refresh=false){
  const currentRequest=++requestToken;
  try{
   const response=await fetch(API+'?provider=drive&action=tracks'+(refresh?'&refresh=1':''),{headers:{Accept:'application/json'},cache:'no-store'});
-  const payload=await response.json().catch(()=>({}));
-  if(!response.ok)throw Error(payload.error||'Google Drive request failed ('+response.status+')');
+  const payload=await response.json().catch(()=>null);
+  if(!response.ok)throw Error(payload?.error||'Google Drive request failed (HTTP '+response.status+').');
+  if(!payload||!Array.isArray(payload.tracks)||payload.source!=='Google Drive'){
+   const local=['localhost','127.0.0.1'].includes(location.hostname);
+   throw Error(local?'VS Code Live Server does not run Vercel APIs. Use npm run dev:music at http://localhost:4173 instead.':'The Google Drive music backend is not deployed yet. Please check Vercel deployment.');
+  }
   if(currentRequest!==requestToken)return;
-  const tracks=(Array.isArray(payload.tracks)?payload.tracks:[]).filter(x=>key(x.id)&&typeof x.title==='string'&&Number(x.size)>0);
+  const tracks=payload.tracks.filter(x=>key(x.id)&&typeof x.title==='string'&&Number(x.size)>0);
   state.tracks=tracks;state.queue=renderQueueOrder(tracks);state.savedOrder=state.queue.map(t=>t.id);
   state.hasLoaded=true;persist();
   if(state.current){
@@ -245,7 +249,7 @@ function open(){
  // Prevent the legacy 3-track background player from mixing with Drive music.
  window.__8apdfBackgroundAudio?.pause?.();
  focusBefore=document.activeElement;scrollBefore=document.body.style.overflow;
- state.open=true;panel.hidden=false;overlay.hidden=false;document.body.style.overflow='hidden';
+ state.open=true;panel.hidden=false;overlay.hidden=false;document.body.style.overflow='hidden';document.body.classList.add('dm-open');
  if(state.current)dock.hidden=false;
  if(!state.hasLoaded)fetchSongs();
  else renderAll();
@@ -253,13 +257,13 @@ function open(){
 }
 function minimize(){
  if(!state.open)return;
- state.open=false;panel.hidden=true;overlay.hidden=true;document.body.style.overflow=scrollBefore;
+ state.open=false;panel.hidden=true;overlay.hidden=true;document.body.style.overflow=scrollBefore;document.body.classList.remove('dm-open');
  if(state.current)dock.hidden=false;
  if(focusBefore?.isConnected)focusBefore.focus({preventScroll:true});
  // Do not call pause/remove/src here. Audio must continue while minimized.
 }
 document.addEventListener('click',e=>{
- const target=e.target.closest('#studioDriveMusic,#studioMobileDriveMusic');
+ const target=e.target instanceof Element?e.target.closest('#studioDriveMusic,#studioMobileDriveMusic'):null;
  if(target){e.preventDefault();open()}
 });
 window.__8apdfDriveMusic={open,minimize,reload:()=>fetchSongs(true),getState:()=>({
