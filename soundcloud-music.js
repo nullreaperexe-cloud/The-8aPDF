@@ -255,7 +255,7 @@ function stopAndHide(){
  widget?.pause();state.playing=false;dock.hidden=true;renderDock();
 }
 document.addEventListener('click',e=>{
- if(e.target.closest('#studioOpenTuneMusic,#studioAudiusMusicLink,#studioMobileAudiusMusic')){e.preventDefault();open()}
+ if(e.target.closest('#studioSoundCloudMusic,#studioOpenTuneMusic,#studioAudiusMusicLink,#studioMobileAudiusMusic')){e.preventDefault();open()}
 });
 window.__8apdfSoundCloudMusic={open,minimize,play,add,getState:()=>({opened:state.opened,playing:state.playing,queue:state.queue.map(t=>t.url),current:state.current})};
 })();
