@@ -1,17 +1,45 @@
 /* 8aPDF local music development server.
  * VS Code Live Server serves HTML/CSS/JS but cannot execute /api/music-search.
- * Run "npm run dev:music" after pulling .env.local from Vercel.
- * Uses Node core only; credentials stay in .env.local, never delivered to browsers.
+ * Run "npm run dev:music -- <path-to-key-json> <drive-folder-id>" without
+ * pulling sensitive Vercel variables. Credentials remain outside the repository.
+ * Uses Node core only; credentials never reach the browser.
  */
 import {createServer} from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
-import {existsSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import {resolve,extname,sep} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 
 const ROOT=resolve(fileURLToPath(new URL('..',import.meta.url)));
 const ENV=resolve(ROOT,'.env.local');
 if(existsSync(ENV)&&typeof process.loadEnvFile==='function')process.loadEnvFile(ENV);
+const credentialsPath=process.argv[2];
+const folderFromCli=process.argv[3];
+if(credentialsPath){
+ const path=resolve(credentialsPath);
+ if(path===ROOT||path.startsWith(ROOT+sep)){
+  console.error('For safety, keep the Google service account JSON OUTSIDE the website/repository folder.');
+  process.exit(1);
+ }
+ try{
+  const data=JSON.parse(readFileSync(path,'utf8'));
+  if(!data.client_email||!data.private_key)throw Error('not a service-account key');
+  process.env.GOOGLE_SERVICE_ACCOUNT_JSON=JSON.stringify(data);
+ }catch{
+  console.error('Cannot read Google service-account JSON key file. Check the path and use the ORIGINAL downloaded key JSON file.');
+  process.exit(1);
+ }
+}
+if(folderFromCli){
+ if(!/^[A-Za-z0-9_-]{10,180}$/.test(folderFromCli)){
+  console.error('Invalid Google Drive folder ID (copy only the part after /folders/).');
+  process.exit(1);
+ }
+ process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID=folderFromCli;
+}
+const validConfig=()=>{
+ try{const j=JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON||'');return Boolean(j.client_email&&j.private_key)&&/^[A-Za-z0-9_-]{10,180}$/.test(process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID||'')}catch{return false}
+};
 const PORT=Number(process.env.PORT)||4173;
 const types={
  '.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8',
@@ -65,8 +93,8 @@ const server=createServer(async(req,res)=>{
  }catch{json(res,404,{error:'File not found'})}
 });
 server.listen(PORT,'127.0.0.1',()=>{
- const ready=Boolean(process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID)&&Boolean(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+ const ready=validConfig();
  console.log('\n🎵 8aPDF local Drive music dev server: http://localhost:'+PORT);
- console.log('   Google Drive credentials: '+(ready?'PRESENT ✓':'MISSING — run npx vercel env pull .env.local --environment=production'));
+ console.log('   Google Drive credentials: '+(ready?'VALID FORMAT ✓':'NOT AVAILABLE — pass local key JSON path and folder ID as arguments'));
  console.log('   Test: http://localhost:'+PORT+'/api/music-search?action=status\n');
 });
