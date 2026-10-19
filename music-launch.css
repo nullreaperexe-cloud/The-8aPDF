@@ -1,0 +1,190 @@
+/* 8aPDF Music Catalog launch announcement — inherits site Settings palette.
+ * Uses only existing website theme tokens; no fixed dark-only colours.
+ */
+.music-launch-backdrop{
+ --ml-bg:var(--bg,#090909);
+ --ml-surface:var(--surface,#151515);
+ --ml-raised:var(--surface-high,#1c1c1c);
+ --ml-soft:var(--surface-soft,#181818);
+ --ml-text:var(--text,#fff);
+ --ml-secondary:var(--text-soft,#dedede);
+ --ml-muted:var(--muted,#929292);
+ --ml-line:var(--line,rgba(150,150,150,.17));
+ --ml-line-strong:var(--line-bold,rgba(150,150,150,.32));
+ --ml-button:var(--button,#f5f5f5);
+ --ml-button-text:var(--button-text,#090909);
+ position:fixed;inset:0;z-index:24000;
+ display:flex;align-items:center;justify-content:center;
+ box-sizing:border-box;
+ padding:calc(15px + env(safe-area-inset-top,0px)) 14px calc(15px + env(safe-area-inset-bottom,0px));
+ background:rgba(0,0,0,.73);
+ -webkit-backdrop-filter:blur(10px);
+ backdrop-filter:blur(10px);
+ font-family:inherit;
+}
+.music-launch-backdrop *, .music-launch-backdrop *::before,.music-launch-backdrop *::after{box-sizing:border-box}
+.music-launch-backdrop button{font:inherit;cursor:pointer;touch-action:manipulation}
+.music-launch-backdrop button:focus-visible{outline:2px solid var(--ml-button);outline-offset:3px}
+.music-launch-card{
+ position:relative;isolation:isolate;
+ width:min(478px,100%);
+ max-height:calc(100dvh - 30px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+ overflow-y:auto;overscroll-behavior:contain;
+ border-radius:20px;border:1px solid var(--ml-line-strong);
+ background:var(--ml-bg);color:var(--ml-text);
+ box-shadow:0 30px 110px rgba(0,0,0,.46);
+ scrollbar-width:thin;scrollbar-color:var(--ml-line-strong) transparent;
+}
+.music-launch-topline{
+ display:flex;align-items:center;justify-content:space-between;gap:14px;
+ min-height:48px;padding:10px 22px;
+ border-bottom:1px solid var(--ml-line);
+}
+.music-launch-brand{
+ display:inline-flex;align-items:center;gap:7px;
+ color:var(--ml-secondary);font-size:10px;
+ font-weight:820;letter-spacing:.16em;
+}
+.music-launch-brand-mark{
+ display:grid;place-items:center;width:25px;height:25px;border:1px solid var(--ml-line-strong);
+ border-radius:8px;background:var(--ml-raised);color:var(--ml-text);
+ font-size:15px;letter-spacing:0
+}
+.music-launch-slash{color:var(--ml-muted);padding:0 4px}
+.music-launch-x{
+ width:28px;height:28px;flex:none;display:grid;place-items:center;
+ border:1px solid var(--ml-line);border-radius:9px;
+ background:var(--ml-surface);color:var(--ml-secondary);
+ font-size:20px;line-height:1
+}
+.music-launch-x:hover{background:var(--ml-raised);color:var(--ml-text)}
+.music-launch-art{
+ display:flex;align-items:center;justify-content:center;
+ position:relative;overflow:hidden;
+ height:163px;margin:13px 17px 0;
+ border:1px solid var(--ml-line);border-radius:13px;
+ background:radial-gradient(ellipse at 50% 18%,color-mix(in srgb,var(--ml-text) 9%,transparent),transparent 62%),var(--ml-surface);
+}
+.music-launch-art::before,.music-launch-art::after{
+ content:"";position:absolute;inset:auto;border:1px solid var(--ml-line);border-radius:50%;
+ width:235px;height:235px;opacity:.36;
+}
+.music-launch-art::before{left:-95px;bottom:-153px}
+.music-launch-art::after{right:-99px;top:-163px}
+.music-launch-disc{
+ position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+ width:129px;height:129px;border-radius:50%;border:1px solid var(--ml-line-strong);
+ background:repeating-radial-gradient(circle at center,transparent 0,transparent 6px,var(--ml-line) 6.5px,var(--ml-line) 7px);
+ box-shadow:0 0 0 7px color-mix(in srgb,var(--ml-text) 4%,transparent),0 7px 22px rgba(0,0,0,.06);
+ opacity:.91;
+}
+.music-launch-disc::before{
+ content:"";position:absolute;inset:37%;border:1px solid var(--ml-line-strong);border-radius:50%;
+ background:var(--ml-bg);
+}
+.music-launch-disc-center{
+ position:absolute;inset:calc(50% - 4px);
+ border-radius:50%;background:var(--ml-text)
+}
+.music-launch-art-label{
+ position:absolute;z-index:1;left:14px;top:12px;
+ font-size:9px;letter-spacing:.19em;color:var(--ml-muted);font-weight:820
+}
+.music-launch-wave{
+ position:absolute;right:15px;bottom:13px;display:flex;align-items:center;gap:3px;height:22px
+}
+.music-launch-wave i{
+ display:block;width:3px;height:8px;border-radius:3px;background:var(--ml-secondary);opacity:.75
+}
+.music-launch-wave i:nth-child(3n){height:17px}
+.music-launch-wave i:nth-child(4n){height:12px}
+.music-launch-wave i:nth-child(5n){height:21px}
+.music-launch-copy{padding:17px 24px 16px}
+.music-launch-kicker{
+ display:flex;align-items:center;gap:8px;
+ color:var(--ml-muted);font-size:9px;letter-spacing:.16em;
+ font-weight:820;white-space:nowrap
+}
+.music-launch-live-dot{
+ width:6px;height:6px;flex:none;border-radius:100%;
+ background:var(--ml-text);
+ box-shadow:0 0 0 3px color-mix(in srgb,var(--ml-text) 10%,transparent)
+}
+.music-launch-kicker-rule{width:17px;height:1px;background:var(--ml-line-strong)}
+.music-launch-copy h2{
+ margin:11px 0 11px;font-size:clamp(26px,5.6vw,34px);
+ line-height:1.07;letter-spacing:-.065em;font-weight:800;
+ color:var(--ml-text)
+}
+.music-launch-copy h2 em{font-style:normal;opacity:.57}
+.music-launch-copy p{margin:0;color:var(--ml-muted);font-size:12.5px;line-height:1.7}
+.music-launch-copy p strong{color:var(--ml-text);font-weight:740}
+.music-launch-features{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:16px
+}
+.music-launch-feature{
+ display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;
+ min-height:77px;min-width:0;padding:10px 11px;
+ border:1px solid var(--ml-line);border-radius:10px;
+ background:var(--ml-surface)
+}
+.music-launch-feature strong{
+ font-size:19px;line-height:1;font-weight:780;
+ color:var(--ml-text);letter-spacing:-.04em
+}
+.music-launch-feature span{font-size:10.2px;line-height:1.34;color:var(--ml-muted)}
+.music-launch-theme-note{
+ margin:13px 0 15px;text-align:center;font-size:10.5px;
+ letter-spacing:.015em;color:var(--ml-muted)
+}
+.music-launch-explore{
+ display:flex;align-items:center;justify-content:space-between;gap:15px;
+ width:100%;min-height:45px;
+ padding:10px 16px;border:1px solid var(--ml-button);border-radius:11px;
+ background:var(--ml-button);color:var(--ml-button-text);
+ font-size:12.5px;font-weight:800;
+ box-shadow:0 9px 23px color-mix(in srgb,var(--ml-button) 12%,transparent);
+ transition:transform .16s ease,filter .16s ease
+}
+.music-launch-explore:hover{filter:brightness(.94);transform:translateY(-1px)}
+.music-launch-explore>span:first-child{display:flex;align-items:center;gap:9px}
+.music-launch-play{font-size:11px;color:var(--ml-button-text)}
+.music-launch-footer{
+ display:flex;align-items:center;justify-content:center;gap:18px;
+ padding:12px 0 0;
+}
+.music-launch-footer button{
+ padding:6px 9px;border:0;border-radius:6px;
+ background:transparent;color:var(--ml-muted);
+ font-size:11.4px;font-weight:650
+}
+.music-launch-footer button:hover{color:var(--ml-text);background:var(--ml-raised)}
+.music-launch-footer-divider{height:14px;width:1px;background:var(--ml-line-strong)}
+@media(max-width:440px){
+ .music-launch-card{border-radius:16px}
+ .music-launch-topline{min-height:42px;padding:8px 15px}
+ .music-launch-art{height:130px;margin:10px 12px 0}
+ .music-launch-disc{width:106px;height:106px}
+ .music-launch-copy{padding:15px 17px 11px}
+ .music-launch-copy h2{font-size:clamp(24px,7.4vw,30px);margin:8px 0}
+ .music-launch-copy p{font-size:12px}
+ .music-launch-features{gap:5px;margin-top:11px}
+ .music-launch-feature{min-height:66px;padding:8px;gap:4px}
+ .music-launch-feature strong{font-size:17px}
+ .music-launch-feature span{font-size:9.5px}
+ .music-launch-theme-note{font-size:9.8px;margin:10px 0 12px}
+ .music-launch-explore{min-height:43px}
+ .music-launch-footer{padding-top:8px}
+}
+@media(max-height:625px){
+ .music-launch-art{height:85px}
+ .music-launch-disc{width:75px;height:75px}
+ .music-launch-copy h2{font-size:25px}
+ .music-launch-feature{min-height:53px}
+ .music-launch-copy{padding-top:10px}
+ .music-launch-feature span br{display:none}
+}
+@media(prefers-reduced-motion: no-preference){
+ .music-launch-card{animation:musicLaunchEnter .3s cubic-bezier(.16,1,.3,1) both}
+ @keyframes musicLaunchEnter{from{opacity:0;transform:translateY(15px) scale(.976)}to{opacity:1;transform:translateY(0) scale(1)}}
+}
