@@ -18,10 +18,26 @@ let libraryCache={folder:null,items:null,expires:0};
 const error=(code,status,message)=>Object.assign(new Error(message),{code,status});
 const safeError=(e)=>{if(e?.status)return e;return error('DRIVE_UNAVAILABLE',502,'Google Drive could not be reached. Try again shortly.')};
 function config(){
+ // Music folder ID is not secret. Use the owner-confirmed location if a
+ // Production Environment Variable is missing or pasted as a full Drive URL.
+ const verifiedFolder='1GiJCrqQ-WYt-013sy37UJVkK9H2cGWDm';
+ const configuredFolder=String(process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID||'').trim();
+ const folderUrlMatch=configuredFolder.match(/\/folders\/([A-Za-z0-9_-]{10,180})/);
+ const candidate=folderUrlMatch?.[1]||configuredFolder;
+ const folder=ID_RE.test(candidate)?candidate:verifiedFolder;
+ const raw=String(process.env.GOOGLE_SERVICE_ACCOUNT_JSON||'').trim();
+ if(!raw||raw==='null'||raw==='{}'||raw==='[SENSITIVE]')throw error('DRIVE_KEY_MISSING',503,'Google Drive service account key is missing in Vercel Production. Re-save the original JSON key as GOOGLE_SERVICE_ACCOUNT_JSON, then redeploy.');
  let service;
- try{service=JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON||'')}catch{throw error('DRIVE_CREDENTIAL_INVALID',503,'Google Drive service account JSON is not valid. Check Vercel environment variables.')}
- const folder=String(process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID||'').trim();
- if(!service?.client_email||!service?.private_key||!ID_RE.test(folder))throw error('DRIVE_NOT_CONFIGURED',503,'Google Drive music configuration is missing or invalid.');
+ try{
+  service=JSON.parse(raw);
+  // Vercel values sometimes contain a double-encoded JSON string.
+  if(typeof service==='string')service=JSON.parse(service);
+  if(service&&typeof service==='object'&&!service.private_key&&service.credentials?.private_key)service=service.credentials;
+ }catch{throw error('DRIVE_CREDENTIAL_INVALID',503,'GOOGLE_SERVICE_ACCOUNT_JSON in Vercel Production is not valid JSON. Re-save the original service-account key file and redeploy.')}
+ if(typeof service?.client_email!=='string'||!service.client_email.trim()||
+    typeof service?.private_key!=='string'||!service.private_key.includes('BEGIN PRIVATE KEY')){
+  throw error('DRIVE_KEY_MISSING_FIELDS',503,'GOOGLE_SERVICE_ACCOUNT_JSON is present but missing client_email/private_key. Upload the complete original Google Cloud service-account JSON to Vercel Production and redeploy.');
+ }
  return {service,folder};
 }
 function base64url(value){return Buffer.from(value).toString('base64url')}
