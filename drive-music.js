@@ -33,6 +33,11 @@ function button(text,cls,action,label){
  if(action)el.addEventListener('click',action);return el
 }
 function status(message){const el=$('dmStatus');if(el)el.textContent=message}
+function setPlayerVisible(visible){
+ if(!dock)return;
+ dock.hidden=!visible;
+ document.body.classList.toggle('dm-has-player',Boolean(visible));
+}
 function renderQueueOrder(tracks){
  const positions=new Map(state.savedOrder.map((x,i)=>[x,i]));
  return [...tracks].sort((a,b)=>{
@@ -48,9 +53,9 @@ function mount(){
  panel=element('section','dm-workspace');panel.id='dmWorkspace';panel.hidden=true;
  panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','8aPDF Music');
  panel.innerHTML=
- '<header class="dm-head"><div><div class="dm-eyebrow">8aPDF / MUSIC</div><h2>YOUR MUSIC SPACE</h2><p>Your private collection · Powered by Google Drive</p></div><div class="dm-head-actions"><button id="dmReload" class="dm-icon" type="button" title="Refresh songs from Google Drive" aria-label="Refresh songs">↻</button><button id="dmMinimize" class="dm-icon" type="button" aria-label="Minimize music">↙</button></div></header>'+
+ '<header class="dm-head"><div><div class="dm-eyebrow">8aPDF / MUSIC</div><h2>Music Library</h2><p>Your songs · Google Drive</p></div><div class="dm-head-actions"><button id="dmReload" class="dm-icon" type="button" title="Refresh songs from Google Drive" aria-label="Refresh songs">↻</button><button id="dmMinimize" class="dm-icon" type="button" aria-label="Minimize music">↙</button></div></header>'+
  '<div class="dm-body"><aside class="dm-side"><h3>YOUR LIBRARY</h3><button data-dm-view="all" class="dm-side-item" type="button">♫ All songs <span id="dmTotalCount">0</span></button><button data-dm-view="favorites" class="dm-side-item" type="button">♥ Liked songs</button><div class="dm-side-caption">QUICK LINKS</div><p>Music plays from your connected Google Drive. Nothing is saved to Supabase or GitHub.</p><p class="dm-side-note">MP3s added to the shared Drive folder appear after refresh.</p></aside>'+
- '<main class="dm-main"><div class="dm-greeting"><div><small>YOUR COLLECTION</small><h3>Find your next song.</h3><p>Enjoy uninterrupted music while studying.</p></div><span id="dmCount" class="dm-count">0 tracks</span></div>'+
+ '<main class="dm-main"><div class="dm-greeting"><div><small>YOUR COLLECTION</small><h3>Every song, one place.</h3><p>Pick up where you left off.</p></div><span id="dmCount" class="dm-count">0 tracks</span></div>'+
  '<label class="dm-search"><span aria-hidden="true">⌕</span><input id="dmSearch" type="search" placeholder="Search your songs…" autocomplete="off" maxlength="100" aria-label="Search Drive songs"></label>'+
  '<div class="dm-row-head"><h4 id="dmListHeading">All Songs</h4><button id="dmSort" type="button" title="Sort songs by name">A–Z</button></div>'+
  '<div class="dm-list" id="dmList" aria-live="polite"></div><p id="dmStatus" class="dm-status" role="status">Connecting to Google Drive…</p></main>'+
@@ -69,7 +74,7 @@ function mount(){
  overlay.addEventListener('click',minimize);
  $('dmMinimize').addEventListener('click',minimize);
  $('dmExpand').addEventListener('click',open);
- $('dmCloseDock').addEventListener('click',()=>{audio.pause();dock.hidden=true});
+ $('dmCloseDock').addEventListener('click',()=>{audio.pause();setPlayerVisible(false)});
  $('dmReload').addEventListener('click',()=>fetchSongs(true));
  $('dmSearch').addEventListener('input',e=>{state.query=e.target.value.trim().toLowerCase();renderList()});
  $('dmSort').addEventListener('click',()=>{state.queue.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:'base'}));persist();renderAll()});
@@ -83,7 +88,7 @@ function mount(){
  });
  $('dmVolume').addEventListener('input',e=>{state.volume=Number(e.target.value);audio.volume=state.volume/100;persist()});
  $('dmSeek').addEventListener('change',e=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(e.target.value)/100});
- audio.addEventListener('play',()=>{state.playing=true;dock.hidden=false;window.__8apdfBackgroundAudio?.pause?.();renderPlayer();setMediaState('playing')});
+ audio.addEventListener('play',()=>{state.playing=true;setPlayerVisible(true);window.__8apdfBackgroundAudio?.pause?.();renderPlayer();setMediaState('playing')});
  audio.addEventListener('pause',()=>{state.playing=false;renderPlayer();setMediaState('paused')});
  audio.addEventListener('ended',()=>next(false));
  audio.addEventListener('timeupdate',renderProgress);
@@ -171,7 +176,8 @@ function queueRow(track,index){
 }
 function renderList(){
  if(!mounted)return;
- const list=$('dmList');list.replaceChildren();
+ const list=$('dmList'),previousScroll=list.scrollTop;
+ list.replaceChildren();
  panel.querySelectorAll('[data-dm-view]').forEach(btn=>{
   const active=btn.dataset.dmView===state.filter;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active))
  });
@@ -186,6 +192,7 @@ function renderList(){
  else list.append(element('p','dm-empty',
   state.query?'No matches. Try another song title.':state.filter==='favorites'?'No liked songs yet. Tap ♡ beside a song.':
   'No MP3 files found. Upload songs to your Google Drive folder and tap the ↻ Refresh button.'));
+ list.scrollTop=state.query?0:previousScroll;
 }
 function renderQueue(){
  const list=$('dmQueue');list.replaceChildren();$('dmQueueCount').textContent=String(state.queue.length);
@@ -219,7 +226,7 @@ function play(track){
  if(state.current?.id!==track.id||audio.getAttribute('src')!==url){
   state.current=track;audio.src=url;audio.load();
  }else state.current=track;
- dock.hidden=false;setMediaMetadata(track);renderAll();
+ setPlayerVisible(true);setMediaMetadata(track);renderAll();
  audio.play().catch(e=>{status(e?.name==='NotAllowedError'?'Tap ▶ to start playback (browser autoplay restriction).':'Unable to start song. Verify Drive folder sharing and MP3 access.');renderPlayer()});
 }
 function next(manual){
@@ -250,7 +257,7 @@ function open(){
  window.__8apdfBackgroundAudio?.pause?.();
  focusBefore=document.activeElement;scrollBefore=document.body.style.overflow;
  state.open=true;panel.hidden=false;overlay.hidden=false;document.body.style.overflow='hidden';document.body.classList.add('dm-open');
- if(state.current)dock.hidden=false;
+ if(state.current)setPlayerVisible(true);
  if(!state.hasLoaded)fetchSongs();
  else renderAll();
  $('dmSearch').focus({preventScroll:true});
@@ -258,7 +265,7 @@ function open(){
 function minimize(){
  if(!state.open)return;
  state.open=false;panel.hidden=true;overlay.hidden=true;document.body.style.overflow=scrollBefore;document.body.classList.remove('dm-open');
- if(state.current)dock.hidden=false;
+ if(state.current)setPlayerVisible(true);
  if(focusBefore?.isConnected)focusBefore.focus({preventScroll:true});
  // Do not call pause/remove/src here. Audio must continue while minimized.
 }
