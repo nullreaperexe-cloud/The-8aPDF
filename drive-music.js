@@ -76,9 +76,9 @@ function mount(){
  $('dmExpand').addEventListener('click',open);
  $('dmCloseDock').addEventListener('click',()=>{audio.pause();setPlayerVisible(false)});
  $('dmReload').addEventListener('click',()=>fetchSongs(true));
- $('dmSearch').addEventListener('input',e=>{state.query=e.target.value.trim().toLowerCase();renderList()});
- $('dmSort').addEventListener('click',()=>{state.queue.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:'base'}));persist();renderAll()});
- panel.querySelectorAll('[data-dm-view]').forEach(btn=>btn.addEventListener('click',()=>{state.filter=btn.dataset.dmView;renderList()}));
+ $('dmSearch').addEventListener('input',e=>{state.query=e.target.value.trim().toLowerCase();$('dmList').scrollTop=0;renderList()});
+ $('dmSort').addEventListener('click',()=>{state.queue.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:'base'}));persist();$('dmList').scrollTop=0;renderAll()});
+ panel.querySelectorAll('[data-dm-view]').forEach(btn=>btn.addEventListener('click',()=>{state.filter=btn.dataset.dmView;$('dmList').scrollTop=0;renderList()}));
  $('dmPlayPause').addEventListener('click',toggle);
  $('dmPrev').addEventListener('click',previous);
  $('dmNext').addEventListener('click',()=>next(true));
@@ -143,7 +143,7 @@ async function fetchSongs(refresh=false){
    if(fresh)state.current=fresh;
    else if(!audio.paused){audio.pause();audio.removeAttribute('src');audio.load();state.current=null}
   }
-  status(tracks.length?tracks.length+' songs found in your Google Drive folder.':'Folder connected! No MP3s found yet. Upload songs to your shared Google Drive music folder and tap Refresh.');
+  status(tracks.length?tracks.length+' songs ready · Scroll to explore the library.':'Folder connected! No MP3s found yet. Upload songs to your shared Google Drive music folder and tap Refresh.');
  }catch(e){
   if(currentRequest===requestToken){
    state.error=e?.message||'Could not connect to Google Drive';
@@ -156,7 +156,7 @@ async function fetchSongs(refresh=false){
 function row(track,index){
  const item=element('div','dm-track');item.dataset.active=String(state.current?.id===track.id);
  const i=element('span','dm-track-index',String(index+1).padStart(2,'0'));
- const btn=button('','dm-track-info',()=>play(track));btn.append(element('span','dm-small-cover','♫'));
+ const btn=button('','dm-track-info',()=>play(track));btn.title=track.title;btn.append(element('span','dm-small-cover','♫'));
  const meta=element('span','dm-track-meta');meta.append(element('strong','',track.title),element('small','','MP3 · Google Drive'));
  btn.append(meta);item.append(i,btn);
  const fav=button(state.favorites.has(track.id)?'♥':'♡','dm-like',()=>{
@@ -260,7 +260,9 @@ function open(){
  if(state.current)setPlayerVisible(true);
  if(!state.hasLoaded)fetchSongs();
  else renderAll();
- $('dmSearch').focus({preventScroll:true});
+ // On phones, don't open the keyboard automatically: keep the song list visible.
+ if(window.matchMedia?.('(min-width:661px)').matches)$('dmSearch').focus({preventScroll:true});
+ else $('dmMinimize').focus({preventScroll:true});
 }
 function minimize(){
  if(!state.open)return;
