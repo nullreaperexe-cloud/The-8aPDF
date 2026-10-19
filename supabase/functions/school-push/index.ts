@@ -61,7 +61,7 @@ async function poll(cfg:any,dryRun=false){
      const ids=batch.map((r:any)=>r.event_id);
      if(!events.length){value(await db.from('school_push_deliveries').update({status:'skipped'}).eq('subscription_id',sub.id).in('event_id',ids));continue;}
      const first=events[0],tag=(await sha(ids.slice().sort().join('|'))).slice(0,32);
-     const payload={title:events.length>1?events.length+' new 8aPDF updates':first.source==='device-test'?first.title:first.source==='pdf'?(first.is_test?'New test PDF':'New PDF'):'School announcement',body:events.length>1?events.slice(0,3).map((e:any)=>e.title).join(' · ').slice(0,220):first.source==='device-test'?first.body:first.title,url:notificationPath(first.path,sub.origin),tag};
+     const payload={title:events.length>1?events.length+' new 8aPDF updates':first.source==='music-launch'?first.title:first.source==='device-test'?first.title:first.source==='pdf'?(first.is_test?'New test PDF':'New PDF'):'School announcement',body:events.length>1?events.slice(0,3).map((e:any)=>e.title).join(' · ').slice(0,220):first.source==='music-launch'?first.body:first.source==='device-test'?first.body:first.title,url:notificationPath(first.path,sub.origin),tag};
      // Persist the attempt identity before sending: a fast device may acknowledge
      // display before the push service's response has reached this worker.
      const receiptId=crypto.randomUUID();
