@@ -42,11 +42,12 @@ Push-Location $Root
 try {
   Write-Host "Verified existing Vercel project, Drive folder ID and matching service-account key." -ForegroundColor Green
   Write-Host "1/3 Updating Production Google Drive folder ID (safe value)..."
-  & npx.cmd vercel env update GOOGLE_DRIVE_MUSIC_FOLDER_ID production --value $FolderId --yes
+  $FolderId | & npx.cmd vercel env update GOOGLE_DRIVE_MUSIC_FOLDER_ID production --yes
   if ($LASTEXITCODE -ne 0) { throw "Could not update GOOGLE_DRIVE_MUSIC_FOLDER_ID. Check Vercel CLI login/project permissions." }
   Write-Host "2/3 Updating Production service-account credential (secret stays off-screen)..."
-  # Value passed via process arguments only (not saved to GitHub, clipboard or PowerShell history).
-  & npx.cmd vercel env update GOOGLE_SERVICE_ACCOUNT_JSON production --value $RawJson --sensitive --yes
+  # Pipe the original local JSON directly to Vercel CLI stdin; never place
+  # credentials in CLI arguments, GitHub, terminal output or command history.
+  Get-Content -LiteralPath $ResolvedKeyPath -Raw -Encoding UTF8 | & npx.cmd vercel env update GOOGLE_SERVICE_ACCOUNT_JSON production --yes
   if ($LASTEXITCODE -ne 0) { throw "Could not update GOOGLE_SERVICE_ACCOUNT_JSON. Check Vercel CLI login/project permissions." }
   Write-Host "Production variables updated!" -ForegroundColor Green
   if (-not $SkipDeploy) {
