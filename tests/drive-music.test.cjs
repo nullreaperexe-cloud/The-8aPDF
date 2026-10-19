@@ -9,8 +9,17 @@ const {readFileSync}=require('node:fs');
 const {resolve}=require('node:path');
 (async()=>{
  const src=readFileSync(resolve('drive-music.js'),'utf8');
+ const css=readFileSync(resolve('drive-music.css'),'utf8');
  const home=readFileSync(resolve('index.html'),'utf8');
  new Function(src);
+ assert.match(css,/--dm-bg:var\(--bg/,'Music background must inherit 8aPDF theme');
+ assert.match(css,/--dm-text:var\(--text/,'Music text must inherit 8aPDF theme');
+ assert.match(css,/--dm-action:var\(--button/,'Music action buttons must inherit site colors');
+ assert.match(css,/\.dm-list\{[\s\S]*?overflow-x:hidden;overflow-y:auto/,'Only the song list should scroll');
+ assert.match(css,/\.dm-track\{[\s\S]*?height:48px/,'Desktop library should use compact track rows');
+ assert.match(css,/@media\(max-width:660px\)\{[\s\S]*?\.dm-track\{height:43px/,'Mobile should render dense song rows');
+ assert.match(src,/function setPlayerVisible\(visible\)/,'Player state must reserve room in the list');
+ assert.match(src,/matchMedia\?\.\('\(min-width:661px\)'\)/,'Mobile keyboard should not auto-open');
  assert.match(home,/id="studioDriveMusic"/);
  assert.match(home,/id="studioMobileDriveMusic"/);
  assert.match(home,/src="\/drive-music\.js\?v=3"/);
