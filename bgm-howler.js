@@ -15,7 +15,7 @@ const normalize=value=>{
 };
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
-const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):20,selectedTracks:normalize(saved?.selectedTracks)};
+const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):100,selectedTracks:normalize(saved?.selectedTracks)};
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
 // A quiet background layer even when the device volume is at its maximum.
 // Keep the UI slider at 0–100%; never send more than 5% output to the audio element.
