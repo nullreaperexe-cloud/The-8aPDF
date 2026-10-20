@@ -39,8 +39,8 @@ function start(){
 }
 const seq=s=>Array.from(s.api.getState().selectedTracks);
 const first=start();
-assert.equal(first.api.getState().volume,30,'New listeners start at 30% slider');
-assert.ok(Math.abs(first.audio.volume-0.015)<1e-10,'Actual default output stays quiet');
+assert.equal(first.api.getState().volume,20,'New listeners start at 20% slider');
+assert.ok(Math.abs(first.audio.volume-0.01)<1e-10,'Actual default output stays quiet');
 assert.deepEqual(seq(first),['saiyaara','tum-hi-ho','khairiyat']);
 assert.equal(first.audio.src,'/assets/bgm/saiyaara.mp3');
 assert.equal(first.audio.loop,false);
