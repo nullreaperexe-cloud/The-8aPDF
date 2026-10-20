@@ -6,7 +6,9 @@ const OLD_ROOT='short-links/v1/';
 const VALID=/^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])$/;
 const clean=x=>typeof x==='string'?x.trim().toLowerCase():'';
 const blobConfigured=()=>Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-const baseURL=req=>['8apdf.vercel.app','the-8apdf.vercel.app'].includes(String(req.headers.host||'').toLowerCase())?'https://'+req.headers.host:'https://the-8apdf.vercel.app';
+// Always share the public custom domain, regardless of which Vercel hostname serves the request.
+const SHORT_LINK_ROOT='https://8apdf.me';
+const baseURL=()=>SHORT_LINK_ROOT;
 function respond(res,status,obj){
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
