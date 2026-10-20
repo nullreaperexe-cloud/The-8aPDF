@@ -1,91 +1,293 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="pure-black">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b0c0a">
-  <title>About 8aPDF | School PDF Library & Student Study Workspace</title>
-  <meta name="description" content="Learn about 8aPDF, a student study workspace for school PDFs, chapter notes, teacher announcements, timetables, reminders and learning tools.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <title>About 8aPDF | PDFs, Study Tools & Music Library</title>
+  <meta name="description" content="Explore 8aPDF: a premium student workspace with school PDFs, notes, announcements, timetable, focus tools, chat and a searchable music library.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://www.8apdf.me/about">
-  <link rel="icon" type="image/png" href="/assets/app-icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/app-icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/app-icon-192.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="8aPDF">
-  <meta property="og:title" content="About 8aPDF | School PDF Library & Study Workspace">
-  <meta property="og:description" content="Meet 8aPDF: your student-focused home for school study materials, announcements, timetables and study tools.">
+  <meta property="og:title" content="About 8aPDF | Study Workspace & Music Library">
+  <meta property="og:description" content="All your school PDFs, important updates, focus tools and music in one thoughtfully designed student workspace.">
   <meta property="og:url" content="https://www.8apdf.me/about">
   <meta property="og:image" content="https://www.8apdf.me/assets/app-icon-512.png">
+  <meta name="twitter:card" content="summary">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About 8aPDF",
-    "url": "https://www.8apdf.me/about",
-    "description": "Information about the 8aPDF school study material library and learning workspace.",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "8aPDF",
-      "url": "https://www.8apdf.me/"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.8apdf.me/#website",
+        "name": "8aPDF",
+        "alternateName": "8apdf",
+        "url": "https://www.8apdf.me/"
+      },
+      {
+        "@type": "AboutPage",
+        "@id": "https://www.8apdf.me/about#page",
+        "name": "About 8aPDF",
+        "description": "Discover the 8aPDF student study workspace, school PDF library, announcements, music catalog and productivity tools.",
+        "url": "https://www.8apdf.me/about",
+        "isPartOf": {"@id": "https://www.8apdf.me/#website"},
+        "inLanguage": "en",
+        "breadcrumb": {"@id": "https://www.8apdf.me/about#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://www.8apdf.me/about#breadcrumb",
+        "itemListElement": [
+          {"@type":"ListItem","position":1,"name":"8aPDF","item":"https://www.8apdf.me/"},
+          {"@type":"ListItem","position":2,"name":"About","item":"https://www.8apdf.me/about"}
+        ]
+      }
+    ]
   }
   </script>
   <style>
-    :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    :root{color-scheme:dark;--bg:#000;--sub:#080808;--panel:#101010;--raised:#171717;--text:#f8f8f8;--soft:#d1d1d1;--muted:#a1a1a1;--line:rgba(255,255,255,.115);--strong:rgba(255,255,255,.22);--warm:#e3d6b4;--warm-line:rgba(227,214,180,.2);--max:1180px}
     *{box-sizing:border-box}
-    body{margin:0;background:#0b0c0a;color:#f6f3e9;line-height:1.7}
-    a{color:inherit}
-    .shell{width:min(1050px,calc(100% - 40px));margin:auto}
-    header{border-bottom:1px solid #38362e;background:#10110f}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:78px}
-    .brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-size:23px;font-weight:800;letter-spacing:-1px}
-    .brand img{height:42px;width:42px;border-radius:10px}
-    .back{font-size:14px;text-decoration:none;color:#e6d4aa;border:1px solid #4d4736;border-radius:999px;padding:9px 17px}
-    main{padding:78px 0 86px}
-    .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#c9b687;font-weight:700}
-    h1{font-size:clamp(36px,6vw,68px);line-height:1.1;letter-spacing:-.055em;margin:16px 0 23px;max-width:850px}
-    .intro{max-width:820px;font-size:clamp(17px,2vw,21px);color:#ccc7b9;margin:0 0 35px}
-    .actions{display:flex;flex-wrap:wrap;gap:12px}
-    .action{display:inline-flex;align-items:center;text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px}
-    .action.primary{background:#e6d4aa;color:#191814}
-    .action.secondary{border:1px solid #575041;color:#e6d4aa}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:72px 0 60px}
-    article{background:#171814;border:1px solid #33342d;border-radius:18px;padding:27px}
-    article h2{font-size:21px;letter-spacing:-.025em;margin:0 0 9px}
-    article p{margin:0;color:#bdbdb0;font-size:15px}
-    section.info{border-top:1px solid #38362e;padding-top:32px;max-width:800px}
-    section.info h2{font-size:26px;margin:0 0 10px}
-    section.info p{color:#bdbdb0;margin:0 0 18px}
-    footer{border-top:1px solid #38362e;padding:25px 0;color:#a7a496;font-size:13px}
-    footer .shell{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-    footer a{color:#e6d4aa;text-decoration:none}
-    @media(max-width:660px){.shell{width:min(100% - 30px,1050px)}main{padding:54px 0 64px}.grid{grid-template-columns:1fr;margin:52px 0 42px}.back{font-size:12px;padding:8px 10px}article{padding:22px}}
+    html{scroll-behavior:smooth;scroll-padding-top:110px}
+    body{margin:0;min-width:320px;background:var(--bg);color:var(--text);font:400 15px/1.72 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    button,a{-webkit-tap-highlight-color:transparent}
+    a:focus-visible,summary:focus-visible{outline:2px solid var(--warm);outline-offset:5px}
+    .wrap{width:min(var(--max),calc(100% - 48px));margin-inline:auto}
+    .top{position:sticky;top:0;z-index:20;background:rgba(4,4,4,.88);border-bottom:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .nav{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .logo{display:inline-flex;align-items:center;gap:13px;flex:none;font-size:21px;font-weight:800;letter-spacing:-.055em}
+    .logo img{width:42px;height:42px;border-radius:11px}
+    .logo small{display:block;font-size:9px;font-weight:700;letter-spacing:.25em;color:var(--muted);margin-top:-7px}
+    .navlinks{display:flex;align-items:center;gap:24px;font-size:12px;font-weight:650;color:#b4b4b4}
+    .navlinks a:hover,.footer a:hover{color:#fff}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:12px 19px;font-size:12px;font-weight:750;border-radius:11px;border:1px solid var(--strong);transition:transform .2s,border-color .2s,background .2s}
+    .button:hover{transform:translateY(-2px)}
+    .button.primary{background:var(--text);color:#0c0c0c;border-color:var(--text)}
+    .button.secondary{background:#121212;color:var(--text)}
+    .button.warm{color:#090909;background:var(--warm);border-color:var(--warm)}
+    .hero{position:relative;overflow:hidden;padding:91px 0 80px;border-bottom:1px solid var(--line)}
+    .hero:before{content:"";position:absolute;inset:-210px -250px auto 25%;height:530px;pointer-events:none;background:radial-gradient(ellipse,rgba(255,255,255,.055),transparent 66%)}
+    .hero-layout{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:65px;align-items:center}
+    .eyebrow{font-size:10px;letter-spacing:.21em;font-weight:800;color:var(--warm);text-transform:uppercase}
+    .kicker-line{display:inline-flex;align-items:center;gap:10px}
+    .kicker-line:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--warm);box-shadow:0 0 16px rgba(227,214,180,.35)}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-weight:730;font-size:clamp(45px,5.35vw,78px);line-height:1.045;letter-spacing:-.068em;margin:24px 0 25px;max-width:735px}
+    .dim{color:#8f8f8f}
+    .lead{font-size:clamp(16px,1.55vw,19px);line-height:1.68;color:#cecece;max-width:660px;margin-bottom:22px}
+    .hero-desc{color:var(--muted);max-width:630px;margin-bottom:30px;font-size:13px}
+    .actions{display:flex;gap:11px;flex-wrap:wrap}
+    .trustline{display:flex;gap:15px;flex-wrap:wrap;color:#929292;margin-top:26px;font-size:11px}
+    .trustline span:before{content:"✓";color:var(--warm);margin-right:7px}
+    .showcase{position:relative;background:linear-gradient(145deg,#171717,#080808 65%);border:1px solid rgba(255,255,255,.19);border-radius:23px;overflow:hidden;padding:21px;min-height:440px;box-shadow:0 32px 110px rgba(0,0,0,.9)}
+    .showcase:before{content:"";position:absolute;width:200px;height:200px;border-radius:50%;right:-80px;top:-100px;background:rgba(227,214,180,.075);filter:blur(48px)}
+    .showbar{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#9b9b9b;letter-spacing:.08em;border-bottom:1px solid var(--line);padding-bottom:18px}
+    .dots{display:flex;gap:6px}.dots i{height:6px;width:6px;border-radius:50%;background:#464646}
+    .screen-title{font-size:27px;font-weight:720;line-height:1.15;letter-spacing:-.055em;margin:29px 0 6px}
+    .screen-sub{font-size:12px;color:#8e8e8e;margin:0 0 22px}
+    .screen-list{display:grid;gap:10px}
+    .screen-row{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:12px;display:flex;align-items:center;gap:12px;padding:13px}
+    .screen-icon{width:35px;height:35px;border:1px solid rgba(255,255,255,.13);border-radius:10px;display:grid;place-items:center;color:#e2d5b5;flex:none;font-size:18px}
+    .screen-row strong{display:block;font-size:12px;font-weight:650;line-height:1.2}.screen-row small{font-size:10px;color:#929292}
+    .screen-row .arrow{margin-left:auto;color:#999}
+    .screen-footer{margin-top:19px;padding:12px 4px 0;border-top:1px solid var(--line);font-size:10px;color:#909090;display:flex;justify-content:space-between}
+    .section{padding:86px 0;border-bottom:1px solid var(--line)}
+    .section-heading{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:32px}
+    .section-heading h2{font-size:clamp(30px,3.4vw,47px);line-height:1.14;letter-spacing:-.055em;font-weight:720;margin:12px 0 0;max-width:700px}
+    .section-heading>p{max-width:385px;color:var(--muted);font-size:13px;margin-bottom:3px}
+    .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .tile{border:1px solid var(--line);background:linear-gradient(155deg,#141414,#0b0b0b);border-radius:17px;padding:27px;min-width:0}
+    .tile-icon{font-size:24px;color:var(--warm);width:43px;height:43px;display:grid;place-items:center;border-radius:12px;background:#202020;border:1px solid var(--line);margin-bottom:23px}
+    .tile h3{font-size:17px;font-weight:690;line-height:1.4;letter-spacing:-.025em;margin-bottom:10px}
+    .tile p{color:#a6a6a6;font-size:12px;line-height:1.8;margin-bottom:0}
+    .tile-wide{grid-column:span 2}
+    .wide-strip{display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:40px;align-items:center;background:#101010;border:1px solid var(--line);border-radius:19px;padding:36px;margin-top:15px}
+    .wide-strip h3{font-size:24px;line-height:1.25;letter-spacing:-.04em;margin:9px 0 0}
+    .wide-strip p{color:#ababab;font-size:13px;margin:0}
+    .music{background:linear-gradient(180deg,#060606,#000);position:relative;overflow:hidden}
+    .music-grid{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);gap:70px;align-items:center}
+    .music h2{font-size:clamp(34px,4vw,55px);line-height:1.09;letter-spacing:-.06em;margin:17px 0 22px}
+    .music p{color:#afafaf;font-size:13px;line-height:1.9;margin-bottom:15px}
+    .music ul{padding:0;margin:24px 0 26px;list-style:none;display:grid;gap:13px;color:#d0d0d0;font-size:12px}
+    .music li{padding-left:23px;position:relative}.music li:before{content:"✓";position:absolute;left:0;color:var(--warm)}
+    .music-window{background:#101010;border:1px solid rgba(255,255,255,.17);border-radius:22px;overflow:hidden;box-shadow:0 25px 100px #000}
+    .music-top{padding:19px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);font-size:11px;color:#a7a7a7}
+    .music-top strong{color:#eee;letter-spacing:.1em;font-size:10px}.music-top span{color:#aaa}
+    .music-inside{padding:27px}
+    .music-hero{display:flex;gap:18px;align-items:center;padding:0 0 23px;border-bottom:1px solid var(--line)}
+    .disc{width:102px;height:102px;border-radius:21px;background:radial-gradient(circle at 43% 40%,#353535,#161616 64%,#0a0a0a);display:grid;place-items:center;position:relative;border:1px solid var(--strong);flex:none}
+    .disc:before{content:"";width:69px;height:69px;border-radius:50%;border:1px solid rgba(255,255,255,.13);position:absolute}
+    .disc span{font-size:36px;color:var(--warm)}
+    .music-hero strong{display:block;font-size:24px;line-height:1.2;letter-spacing:-.04em}.music-hero small{color:#999;font-size:11px}
+    .track-line{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid rgba(255,255,255,.07);color:#c9c9c9;font-size:12px}
+    .track-no{font:600 10px/1 monospace;color:#7c7c7c}.track-label{flex:1}.track-pill{font-size:9px;color:#afafaf;background:#202020;border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+    .wave{height:29px;display:flex;align-items:center;gap:3px;margin:21px 0 14px}.wave i{display:block;width:4px;height:var(--height);background:linear-gradient(var(--warm),#706a5c);border-radius:5px;opacity:.85}
+    .music-bottom{display:flex;align-items:center;justify-content:space-between;color:#8f8f8f;font-size:10px;gap:12px}.music-bottom span:last-child{color:var(--warm)}
+    .small-note{font-size:11px!important;color:#838383!important}
+    .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .feature-panel{background:#0f0f0f;border:1px solid var(--line);border-radius:17px;padding:29px}
+    .feature-panel h3{font-size:20px;letter-spacing:-.03em;margin-bottom:13px}
+    .feature-panel p{font-size:13px;color:#ababab;margin:0}
+    .flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;counter-reset:steps}
+    .step{counter-increment:steps;background:#0e0e0e;border:1px solid var(--line);border-radius:17px;padding:28px}
+    .step:before{content:"0" counter(steps);font-size:12px;font-weight:800;letter-spacing:.15em;color:var(--warm)}
+    .step h3{font-size:18px;letter-spacing:-.03em;line-height:1.3;margin:18px 0 9px}
+    .step p{color:#a2a2a2;font-size:12px;line-height:1.85;margin:0}
+    .faq{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .faq details{border:1px solid var(--line);background:#101010;border-radius:14px;padding:20px 22px;align-self:start}
+    .faq summary{cursor:pointer;font-weight:670;font-size:14px;line-height:1.5;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";font-size:21px;color:var(--warm);font-weight:400}.faq details[open] summary:after{content:"−"}
+    .faq p{color:#b1b1b1;font-size:12px;margin:13px 0 0}
+    .cta{padding:80px 0 92px}
+    .cta-card{border:1px solid var(--strong);background:radial-gradient(ellipse at 50% -60%,rgba(255,255,255,.10),transparent 64%),linear-gradient(#141414,#080808);padding:67px 30px;border-radius:25px;text-align:center}
+    .cta h2{font-size:clamp(34px,4vw,54px);line-height:1.1;letter-spacing:-.055em;margin:14px auto;max-width:690px}
+    .cta p{font-size:13px;color:#a9a9a9;max-width:550px;margin:0 auto 24px}.cta .actions{justify-content:center}
+    footer{border-top:1px solid var(--line);background:#050505}
+    .foot{padding:29px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;color:#888;font-size:11px}
+    .footlinks{display:flex;gap:22px;flex-wrap:wrap;color:#b9b9b9}
+    @media(max-width:1050px){.hero-layout{gap:30px}.music-grid{gap:35px}.navlinks{gap:14px}}
+    @media(max-width:850px){.navlinks{display:none}.hero-layout,.music-grid{grid-template-columns:1fr}.hero{padding:66px 0 65px}.showcase{min-height:auto}.section{padding:68px 0}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.section-heading{align-items:start;flex-direction:column}.section-heading>p{max-width:660px}.music-grid{gap:26px}.music-window{max-width:620px}.wide-strip{gap:20px}}
+    @media(max-width:560px){.wrap{width:min(100% - 30px,var(--max))}.nav{min-height:69px}.logo{font-size:19px}.logo img{width:37px;height:37px}.nav .button{font-size:11px;padding:9px 12px;min-height:39px}.hero{padding:55px 0}.hero-layout{gap:32px}h1{font-size:clamp(39px,10.3vw,58px)}.showcase{padding:17px;border-radius:18px}.tiles,.duo,.flow,.faq{grid-template-columns:1fr}.tile-wide{grid-column:auto}.tile,.step,.feature-panel{padding:23px}.wide-strip{grid-template-columns:1fr;padding:24px}.section{padding:57px 0}.section-heading{margin-bottom:24px}.music-inside{padding:20px}.music-hero strong{font-size:21px}.disc{width:85px;height:85px}.cta{padding:52px 0}.cta-card{padding:43px 18px}.foot{align-items:start;flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}.button:hover{transform:none}}
   </style>
 </head>
 <body>
-  <header><div class="shell topbar">
-    <a class="brand" href="/" aria-label="8aPDF home"><img src="/assets/app-icon-192.png" width="42" height="42" alt="">8aPDF</a>
-    <a class="back" href="/">Open study workspace →</a>
-  </div></header>
-  <main class="shell">
-    <p class="eyebrow">The official 8aPDF website</p>
-    <h1>About 8aPDF — your school study workspace</h1>
-    <p class="intro"><strong>8aPDF</strong> is a student-focused digital school library and personal study workspace. It brings study PDFs, notes, teacher announcements, timetable information and learning tools together in one place, making it easier to stay organized.</p>
-    <div class="actions">
-      <a class="action primary" href="/">Explore 8aPDF →</a>
-      <a class="action secondary" href="/#library">Browse study PDFs</a>
+  <header class="top">
+    <div class="wrap nav">
+      <a class="logo" href="/" aria-label="8aPDF official homepage"><img src="/assets/app-icon-192.png" alt="" width="42" height="42"><span>8aPDF<small>STUDY WORKSPACE</small></span></a>
+      <nav class="navlinks" aria-label="About page navigation">
+        <a href="#features">Explore</a><a href="#music">Music</a><a href="#experience">Experience</a><a href="#questions">FAQs</a>
+      </nav>
+      <a class="button primary" href="/">Open 8aPDF <span aria-hidden="true">↗</span></a>
     </div>
+  </header>
 
-    <div class="grid" aria-label="8aPDF features">
-      <article><h2>School PDFs &amp; notes</h2><p>Find available study materials, open documents and keep chapter-wise learning resources within easy reach.</p></article>
-      <article><h2>Teacher announcements</h2><p>Follow school messages and important updates alongside your everyday study materials.</p></article>
-      <article><h2>Timetable &amp; organization</h2><p>Keep school schedules, study reminders and tasks together in a convenient personal workspace.</p></article>
-      <article><h2>Helpful study tools</h2><p>Use available search, study-assistant and focus tools to make revision and planning easier.</p></article>
-    </div>
-
-    <section class="info" aria-labelledby="how-it-works"><h2 id="how-it-works">How does 8aPDF work?</h2>
-      <p>Open the <a href="/">8aPDF homepage</a> to explore the student workspace. Library content and school announcements are updated as new materials are available. Individual tools may depend on your browser and the materials currently published.</p>
-      <p>8aPDF is a study organization resource; always confirm important school deadlines and official information with your school.</p>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-layout">
+        <div>
+          <div class="eyebrow kicker-line">The official 8aPDF experience</div>
+          <h1>Everything school.<br><span class="dim">One beautiful space.</span></h1>
+          <p class="lead"><strong>8aPDF</strong> is a digital study library and personal workspace built around real student life: school PDFs, class notes, teacher announcements, timetables, focus tools and a music catalog, together in one thoughtfully designed website.</p>
+          <p class="hero-desc">No more jumping between scattered documents and updates just to organize the school day. Explore learning resources, keep track of what matters and personalize how your workspace looks and feels.</p>
+          <div class="actions"><a class="button primary" href="/">Enter the workspace <span aria-hidden="true">↗</span></a><a class="button secondary" href="#features">Discover the features ↓</a></div>
+          <div class="trustline"><span>Made for students</span><span>Desktop &amp; mobile friendly</span><span>Personalized experience</span></div>
+        </div>
+        <div class="showcase" aria-label="Overview of the 8aPDF student workspace">
+          <div class="showbar"><span>8aPDF / DISCOVER</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="screen-title">Your day, organized.</div>
+          <p class="screen-sub">Study resources and the tools you use alongside them.</p>
+          <div class="screen-list">
+            <div class="screen-row"><span class="screen-icon" aria-hidden="true">▤</span><span><strong>PDF Library</strong><small>Study notes &amp; learning materials</small></span><span class="arrow" aria-hidden="true">↗</span></div>
+            <div class="screen-row"><span class="screen-icon" aria-hidden="true">◷</span><span><strong>School updates</strong><small>Messages, reminders &amp; timetable</small></span><span class="arrow" aria-hidden="true">↗</span></div>
+            <div class="screen-row"><span class="screen-icon" aria-hidden="true">♫</span><span><strong>Music Library</strong><small>Songs, favorites &amp; mini-player</small></span><span class="arrow" aria-hidden="true">↗</span></div>
+            <div class="screen-row"><span class="screen-icon" aria-hidden="true">✦</span><span><strong>Study tools</strong><small>Focus, chat &amp; assistance</small></span><span class="arrow" aria-hidden="true">↗</span></div>
+          </div>
+          <div class="screen-footer"><span>BUILT FOR A BETTER STUDY DAY</span><span>8aPDF ©</span></div>
+        </div>
+      </div>
     </section>
+
+    <section class="section" id="features">
+      <div class="wrap">
+        <div class="section-heading"><div><div class="eyebrow">01 / Academic essentials</div><h2>More than a school PDF website.</h2></div><p>Everything students need to find, follow and manage their school resources, inside a consistent workspace.</p></div>
+        <div class="tiles">
+          <article class="tile"><div class="tile-icon" aria-hidden="true">▤</div><h3>Organized PDF library</h3><p>Browse available school study materials, chapter notes and reference PDFs. Open files, find the document you need and return to the library without digging through scattered links.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">◎</div><h3>Search &amp; discovery</h3><p>Find relevant materials through the site's browsing and search experiences. Organized study resources help reduce time spent looking for the right file.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">✉</div><h3>Teacher announcements</h3><p>Check school messages, teacher updates, notices and class-related information alongside the study library. Content depends on what has been published to the workspace.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">▦</div><h3>Timetable &amp; calendar</h3><p>Use timetable information and school-focused planning tools to see what comes next and keep subjects, schedules and important dates in view.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">☑</div><h3>Tasks &amp; reminders</h3><p>Make room for your daily study plan. Track things to do, upcoming responsibilities and study-related reminders in a more organized environment.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">✦</div><h3>AI &amp; study assistance</h3><p>Explore built-in study assistance and helpful tools for questions and revision. AI-generated answers should be checked against class notes and teacher guidance.</p></article>
+        </div>
+        <div class="wide-strip"><div><div class="eyebrow">All connected</div><h3>Built around your actual school routine.</h3></div><p>8aPDF is intended to be more useful than a file directory. The library, updates, schedule and tools work together as a student-first place to prepare, revise, check announcements and stay organized.</p></div>
+      </div>
+    </section>
+
+    <section class="section music" id="music">
+      <div class="wrap music-grid">
+        <div>
+          <div class="eyebrow">02 / Music inside 8aPDF</div>
+          <h2>Study mode.<br><span class="dim">Soundtrack included.</span></h2>
+          <p>8aPDF includes a dedicated <strong style="color:#f6f6f6">music catalog</strong> alongside its academic tools. Open the music library from the student workspace to explore the available collection, search songs, manage favorites and keep playback controls close while browsing.</p>
+          <p>The catalog is powered by the site's curated Google Drive music collection. Tracks shown depend on the currently connected catalog and the user's browser or connection.</p>
+          <ul>
+            <li>Search songs in the catalog and explore your collection.</li>
+            <li>Save favorites and arrange the listening queue.</li>
+            <li>Use play, pause, skip, shuffle and repeat controls.</li>
+            <li>Minimize the music panel to a compact player while staying on 8aPDF.</li>
+            <li>Keep music preferences such as favorites and playback options on the same browser where storage is available.</li>
+          </ul>
+          <a class="button warm" href="/">Open 8aPDF &amp; explore music <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="music-window" aria-label="Decorative preview of the music section's features">
+          <div class="music-top"><strong>8aPDF / MUSIC LIBRARY</strong><span>PLAYER EXPERIENCE</span></div>
+          <div class="music-inside">
+            <div class="music-hero"><div class="disc" aria-hidden="true"><span>♫</span></div><div><small>YOUR COLLECTION</small><strong>Music for<br>your moments.</strong><small>Search · Favorite · Play</small></div></div>
+            <div class="track-line"><span class="track-no">01</span><span class="track-label">Find a song</span><span class="track-pill">SEARCH</span></div>
+            <div class="track-line"><span class="track-no">02</span><span class="track-label">Choose your favorites</span><span class="track-pill">SAVE</span></div>
+            <div class="track-line"><span class="track-no">03</span><span class="track-label">Control your queue</span><span class="track-pill">LISTEN</span></div>
+            <div class="wave" aria-hidden="true">
+              <i style="--height:24%"></i><i style="--height:65%"></i><i style="--height:32%"></i><i style="--height:80%"></i><i style="--height:48%"></i><i style="--height:100%"></i><i style="--height:57%"></i><i style="--height:28%"></i><i style="--height:76%"></i><i style="--height:95%"></i><i style="--height:35%"></i><i style="--height:68%"></i><i style="--height:41%"></i><i style="--height:88%"></i><i style="--height:39%"></i><i style="--height:72%"></i><i style="--height:25%"></i><i style="--height:56%"></i><i style="--height:91%"></i><i style="--height:43%"></i><i style="--height:71%"></i><i style="--height:25%"></i>
+            </div>
+            <div class="music-bottom"><span>KEEP YOUR STUDY FLOW</span><span>♫ 8aPDF</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="wrap" style="margin-top:31px"><div class="duo">
+        <article class="feature-panel"><div class="eyebrow">Your music catalog</div><h3>Find music without leaving the workspace.</h3><p>The searchable catalog is a separate music-player experience with a song list and personal controls. Close or minimize its main panel and continue using the student workspace with the compact playback controls.</p></article>
+        <article class="feature-panel"><div class="eyebrow">Quiet background audio</div><h3>A subtle soundtrack, when you want it.</h3><p>Alongside the main music catalog, 8aPDF offers optional low-volume background music with its own track and volume preferences. Background audio is intentionally separate from the full music-library player.</p></article>
+      </div><p class="small-note" style="margin-top:20px">Music and media behavior may vary depending on browser autoplay restrictions, availability of the files and network connection. Music is optional; students can study without audio.</p></div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="wrap">
+        <div class="section-heading"><div><div class="eyebrow">03 / Made for your workflow</div><h2>A smarter, more personal place to study.</h2></div><p>Comfortable to use throughout the school day, whether you are checking homework or planning a longer revision session.</p></div>
+        <div class="tiles">
+          <article class="tile"><div class="tile-icon" aria-hidden="true">◷</div><h3>Focus Studio</h3><p>When it is time to concentrate, use the focus-oriented workspace and timer tools. Structured sessions can make it easier to build a consistent study rhythm.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">☷</div><h3>Student chat</h3><p>8aPDF provides a chat area for conversations with classmates and friends, helping communication fit naturally alongside learning resources.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">◑</div><h3>Appearance &amp; themes</h3><p>Switch between available themes and adjust the site's look from its settings. Its pure-black option focuses on clean contrast, calm surfaces and clear typography.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">⇧</div><h3>Mobile-friendly access</h3><p>Navigate from a phone, tablet or computer with a responsive layout. Certain browsers also support adding the study workspace to the home screen.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">♧</div><h3>Updates &amp; notifications</h3><p>Notification features help you keep up with selected school changes when enabled and supported by the browser. Permissions remain in the user's control.</p></article>
+          <article class="tile"><div class="tile-icon" aria-hidden="true">◇</div><h3>Study-life balance</h3><p>Study material, planning tools and a separate music experience live in one cohesive interface, so the workspace can feel useful and enjoyable rather than cluttered.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="section-heading"><div><div class="eyebrow">04 / Getting started</div><h2>From finding a PDF to getting in the flow.</h2></div><p>Discover the features that matter to you, at your own pace.</p></div>
+        <div class="flow">
+          <div class="step"><h3>Open the student workspace</h3><p>Go to <a href="/" style="text-decoration:underline;text-underline-offset:3px">www.8apdf.me</a>. The welcome flow may ask for a name on your first visit so the workspace can feel more personal.</p></div>
+          <div class="step"><h3>Pick what you need</h3><p>Browse study PDFs, check announcements and timetable information, or use your available planning and study tools.</p></div>
+          <div class="step"><h3>Make it yours</h3><p>Adjust appearance and other preferences, start a focused session, or open the music catalog for an optional soundtrack.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="questions">
+      <div class="wrap">
+        <div class="section-heading"><div><div class="eyebrow">05 / Frequently asked</div><h2>Questions about 8aPDF.</h2></div><p>Helpful answers for anyone discovering the 8aPDF brand for the first time.</p></div>
+        <div class="faq">
+          <details><summary>What is 8aPDF?</summary><p>8aPDF is a student-centered website combining a school study-material library, academic updates, organization tools, chat, study assistance and a music catalog.</p></details>
+          <details><summary>Is 8aPDF just a PDF reader?</summary><p>No. PDFs are a central feature, but the website also has announcements, timetable information, reminders, focus tools, themes and a music experience.</p></details>
+          <details><summary>How do I find school PDFs and notes?</summary><p>Open the <a href="/" style="text-decoration:underline">8aPDF homepage</a>, then use the study-material library and available search or subject navigation. Visible content depends on what has been published.</p></details>
+          <details><summary>Does 8aPDF have music?</summary><p>Yes. 8aPDF has a dedicated searchable music catalog with favorites, queue and playback controls, plus a separate optional low-volume background music feature.</p></details>
+          <details><summary>Can music continue while I browse?</summary><p>The player is designed to stay available through a compact mini-player as you move around the site. Browser audio restrictions and connection quality may affect playback.</p></details>
+          <details><summary>Does 8aPDF work on mobile phones?</summary><p>The workspace is built with responsive layouts for phones and desktop screens. Specific capabilities, including notifications or background audio, depend on device and browser support.</p></details>
+          <details><summary>What does the Focus Studio do?</summary><p>Focus-related tools provide a structured space for timed study sessions and concentration while other parts of the site keep learning materials accessible.</p></details>
+          <details><summary>Is it an official school notice board?</summary><p>8aPDF helps organize and display available school information, but students should always confirm important deadlines, exams and announcements directly with their school or teacher.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta"><div class="wrap"><div class="cta-card"><div class="eyebrow">Explore the 8aPDF experience</div><h2>Everything you need.<br><span class="dim">In your corner.</span></h2><p>Your school PDFs, important updates, study tools and music are waiting in the 8aPDF workspace.</p><div class="actions"><a class="button primary" href="/">Open 8aPDF <span aria-hidden="true">↗</span></a><a class="button secondary" href="/#library">Browse study materials</a></div></div></div></section>
   </main>
-  <footer><div class="shell"><span>© 8aPDF. Made for students.</span><a href="/">Back to 8aPDF</a></div></footer>
+  <footer><div class="wrap foot"><a class="logo" href="/" style="font-size:15px"><img src="/assets/app-icon-192.png" width="31" height="31" alt="" style="width:31px;height:31px">8aPDF</a><span>© 8aPDF. A student-focused study workspace.</span><nav class="footlinks" aria-label="Footer navigation"><a href="/">Home</a><a href="#features">Features</a><a href="#music">Music</a><a href="#questions">FAQs</a></nav></div></footer>
 </body>
 </html>
