@@ -41,7 +41,7 @@
   const body=mask.querySelector('#slBody');
   let current=null, timer=0, checkedSlug='', available=false, lastFocus=null;
   const OWNER_STORAGE='8apdf_short_links_owner_v1';
-  const SHORT_HOST=(location.host==='8apdf.vercel.app'?'8apdf.vercel.app':'the-8apdf.vercel.app');
+  const SHORT_HOST='8apdf.me';
   function ownerKey(){
     try {
       let token=localStorage.getItem(OWNER_STORAGE);
@@ -87,7 +87,7 @@
   managerList.addEventListener('click',async e=>{
     const button=e.target.closest('[data-link-action]'),card=e.target.closest('[data-link-slug]');
     if(!button||!card)return;
-    const slug=card.dataset.linkSlug,url=card.dataset.linkUrl||'https://the-8apdf.vercel.app/'+slug,action=button.dataset.linkAction;
+    const slug=card.dataset.linkSlug,url=card.dataset.linkUrl||'https://8apdf.me/'+slug,action=button.dataset.linkAction;
     if(action==='open'){window.open(url,'_blank','noopener,noreferrer');return}
     if(action==='share'){await shareNative(url,slug+' · 8aPDF');return}
     if(action==='copy'){try{await navigator.clipboard.writeText(url);say('Copied '+url)}catch{window.prompt('Copy link:',url)}return}
