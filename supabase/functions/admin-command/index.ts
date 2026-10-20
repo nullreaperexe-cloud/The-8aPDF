@@ -3,7 +3,7 @@ import { MAX_PDF_BYTES, PUBLIC_ORIGIN, fail, httpsURL, canonicalURL, image2urlPD
 
 const project = Deno.env.get('SUPABASE_URL')!;
 const db = createClient(project, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false, autoRefreshToken: false },global:{fetch:(url,init)=>fetch(url,{...init,signal:AbortSignal.timeout(25000)})} });
-const allowedOrigins = new Set([PUBLIC_ORIGIN, 'https://8apdf.vercel.app', 'http://localhost:3000', 'http://127.0.0.1:3000']);
+const allowedOrigins = new Set([PUBLIC_ORIGIN, 'https://8apdf.vercel.app', 'https://8apdf.me', 'https://www.8apdf.me', 'http://localhost:3000', 'http://127.0.0.1:3000']);
 const cors = (origin: string) => ({ 'Access-Control-Allow-Origin': allowedOrigins.has(origin) ? origin : PUBLIC_ORIGIN, 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' });
 const answer = (status: number, body: unknown, origin = '') => new Response(JSON.stringify(body), { status, headers: { ...cors(origin), 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
 function check<T>(result: { data: T; error: any }): T {
