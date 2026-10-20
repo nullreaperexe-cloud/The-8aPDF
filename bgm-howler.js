@@ -15,8 +15,12 @@ const normalize=value=>{
 };
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
-const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):18,selectedTracks:normalize(saved?.selectedTracks)};
+const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):30,selectedTracks:normalize(saved?.selectedTracks)};
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
+// A quiet background layer even when the device volume is at its maximum.
+// Keep the UI slider at 0–100%; never send more than 5% output to the audio element.
+const MAX_BACKGROUND_OUTPUT=0.05;
+const audioLevel=value=>MAX_BACKGROUND_OUTPUT*Math.max(0,Math.min(100,Number(value)||0))/100;
 const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
 let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
 const track=()=>TRACKS.find(t=>t.id===active)||playlist()[0];
@@ -91,7 +95,7 @@ function enable(v){
  if(audio?.error)load(active);else play();
  sync();
 }
-function volume(v){prefs.volume=Math.max(0,Math.min(100,Math.round(Number(v)||0)));if(audio)audio.volume=prefs.volume/100;write();sync()}
+function volume(v){prefs.volume=Math.max(0,Math.min(100,Math.round(Number(v)||0)));if(audio)audio.volume=audioLevel(prefs.volume);write();sync()}
 function toggle(){if(!prefs.enabled)return;if(playing){pause();return}pausedByUser=false;pending=false;blocked=false;error=false;if(audio?.error)load(active);else play()}
 function mount(){
  const host=byId('eightapdfSettingsMusic');if(!host)return;
@@ -119,7 +123,7 @@ function mount(){
  sync();
 }
 function init(){
- mount();audio=document.createElement('audio');audio.id='eightapdfBgmEngine';audio.style.display='none';audio.preload='metadata';audio.volume=prefs.volume/100;audio.setAttribute('playsinline','');
+ mount();audio=document.createElement('audio');audio.id='eightapdfBgmEngine';audio.style.display='none';audio.preload='metadata';audio.volume=audioLevel(prefs.volume);audio.setAttribute('playsinline','');
  audio.addEventListener('playing',()=>{playing=true;pending=false;blocked=false;error=false;status('Playing '+track().title+' ✓');sync()});
  audio.addEventListener('pause',()=>{playing=false;pending=false;sync()});
  audio.addEventListener('ended',()=>{playing=false;pending=false;next()});
@@ -135,7 +139,7 @@ function init(){
   const n=read();if(!n)return;
   const songs=normalize(n.selectedTracks),changed=songs.join(',')!==prefs.selectedTracks.join(',');
   prefs.selectedTracks=songs;
-  if(Number.isFinite(n.volume)){prefs.volume=Math.max(0,Math.min(100,Math.round(n.volume)));if(audio)audio.volume=prefs.volume/100}
+  if(Number.isFinite(n.volume)){prefs.volume=Math.max(0,Math.min(100,Math.round(n.volume)));if(audio)audio.volume=audioLevel(prefs.volume)}
   if(typeof n.enabled==='boolean')prefs.enabled=n.enabled;
   if(!prefs.enabled){pausedByUser=true;audio?.pause();playing=false;pending=false;status('Background music is off.')}
   else if(changed){pausedByUser=false;load(songs[0])}
