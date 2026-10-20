@@ -333,14 +333,10 @@ export async function handler(req: Request) {
     const ctx = await authorize(req,!multipart&&['access_status','notice_ack'].includes(input.action));
     if ((req.headers.get('content-type') || '').startsWith('multipart/form-data')) {
       if(ctx.role!=='super_admin')fail('View-only access. A Super Admin must upload PDFs.',403);
-      const encoder=new TextEncoder();
-      const stream=new ReadableStream({async start(controller){
-        const emit=(value:unknown)=>{try{controller.enqueue(encoder.encode(JSON.stringify(value)+'\n'));}catch{/* disconnected client; durable upload recovery remains available */}};
-        try{const result=await upload(req,ctx,s=>emit({stage:s}));emit({ok:true,...result});}
-        catch(e){const ex=e as any;emit({ok:false,error:ex.status?ex.message:'Upload could not complete. Check Storage and retry the same queued file.'});}
-        finally{try{controller.close();}catch{}}
-      }});
-      return new Response(stream,{headers:{...cors(origin),'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+      // Complete reading, validating, storing and saving the PDF before responding.
+      // The previous outgoing ReadableStream could stall multipart request consumption
+      // until the Edge worker timed out, leaving the browser at "Validating PDF".
+      return answer(200,{ok:true,...await upload(req,ctx)},origin);
     }
 
     return answer(200,{ok:true,...await perform(input,ctx)},origin);
