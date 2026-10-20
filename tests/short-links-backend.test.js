@@ -17,6 +17,9 @@ assert(api.includes('originalPdfUrl'),'Legacy aliases should be recoverable with
 assert(redirect.includes('fromOldBlob(slug)'),'Legacy Blob redirects should keep working if store reconnects');
 assert(ui.includes("data-link-url="),'Link manager must respect original/new link hostnames');
 assert(ui.includes('SHORT_HOST'),'Share dialog should show active domain');
+assert(ui.includes("const SHORT_HOST='8apdf.me'"),'New links must show the custom domain in the share dialog');
+assert(api.includes("const SHORT_LINK_ROOT='https://8apdf.me'"),'Created and managed short links must use the custom domain');
+assert(ui.includes("url=card.dataset.linkUrl||'https://8apdf.me/'+slug"),'Link manager fallback must use the custom domain');
 assert(edge.includes(".from('study_materials')"),'New aliases must verify a live school PDF');
 assert(edge.includes(".from('short_links')"),'New aliases must be stored in Supabase');
 assert(edge.includes("owner_hash"),'Only owner should manage their links');
