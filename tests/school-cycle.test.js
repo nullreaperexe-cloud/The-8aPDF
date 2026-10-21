@@ -11,6 +11,13 @@ assert.equal(calendarDay('2026-10-10',config).reason,'Second Saturday');
 assert.equal(calendarDay('2026-10-24',config).reason,'Fourth Saturday');
 assert.equal(calendarDay('2026-10-17',config).schoolDay,4);
 assert.equal(calendarDay('2026-10-19',config).schoolDay,5);
+// Midterm timetable correction: next school day on Oct 22 is Day 5.
+assert.equal(calendarDay('2026-10-21',config).schoolDay,4);
+assert.equal(calendarDay('2026-10-21',config).nextDate,'2026-10-22');
+assert.equal(calendarDay('2026-10-21',config).nextDay,5);
+assert.equal(calendarDay('2026-10-22',config).schoolDay,5);
+assert.equal(calendarDay('2026-10-23',config).schoolDay,6);
+assert.equal(calendarDay('2026-10-26',config).schoolDay,1);
 const closed={...config,holidays:[{date:'2026-10-14',reason:'Confirmed school holiday'}]};
 assert.equal(calendarDay('2026-10-14',closed).schoolDay,null);
 assert.equal(calendarDay('2026-10-15',closed).schoolDay,1);
