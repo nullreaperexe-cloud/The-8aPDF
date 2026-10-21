@@ -10,7 +10,11 @@ export function closure(key,config){
  return'';
 }
 export function cycleNumber(key,config){
- const anchor=dateMs(config.anchor.date),target=dateMs(key);let n=Number(config.anchor.day)-1;
+ // Honor later school-confirmed timetable corrections without rewriting earlier days.
+ const target=dateMs(key);
+ const applicable=(config.cycleCorrections||[]).filter(item=>item?.date&&item.day>=1&&item.day<=6&&dateMs(item.date)<=target).sort((a,b)=>dateMs(b.date)-dateMs(a.date));
+ const selectedAnchor=applicable[0]||config.anchor;
+ const anchor=dateMs(selectedAnchor.date);let n=Number(selectedAnchor.day)-1;
  if(target>=anchor){for(let t=anchor+DAY;t<=target;t+=DAY)if(!closure(new Date(t).toISOString().slice(0,10),config))n++;}
  else{for(let t=anchor;t>target;t-=DAY)if(!closure(new Date(t).toISOString().slice(0,10),config))n--;}
  return((n%6)+6)%6+1;
