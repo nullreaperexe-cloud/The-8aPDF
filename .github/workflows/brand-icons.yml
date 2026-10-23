@@ -1,0 +1,56 @@
+name: Generate 8aPDF brand icons
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/brand-icons.yml"
+      - "anime-logo.webp"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install PNG conversion dependency
+        run: python -m pip install --user Pillow==11.3.0
+
+      - name: Export the original anime logo as Google-compatible PNG
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          source = Path("anime-logo.webp")
+          if not source.is_file():
+              raise SystemExit("Missing official anime-logo.webp")
+          with Image.open(source) as original:
+              logo = original.convert("RGBA")
+          if logo.width != logo.height or logo.width < 48:
+              raise SystemExit("Official logo must be square and at least 48px")
+
+          # Preserve all pixels at the source 320x320 resolution.
+          logo.save("favicon.png", format="PNG", optimize=True)
+          Path("assets").mkdir(exist_ok=True)
+          for size in (192, 512):
+              icon = logo.resize((size, size), Image.Resampling.LANCZOS)
+              icon.save(f"assets/app-icon-{size}.png", format="PNG", optimize=True)
+          PY
+
+      - name: Commit generated icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add favicon.png assets/app-icon-192.png assets/app-icon-512.png
+          if git diff --cached --quiet; then
+            echo "Brand icons already up to date"
+            exit 0
+          fi
+          git commit -m "Publish official anime logo as favicon and app icons"
+          git push origin HEAD:main
