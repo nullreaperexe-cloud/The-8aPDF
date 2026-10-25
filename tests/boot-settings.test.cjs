@@ -15,7 +15,7 @@ assert(!main.includes("$('#customMode')"),'Removed Custom Mode element still ref
 assert(!main.includes("$('#customStrength')"),'Removed Color Strength element still referenced');
 assert(!main.includes("$('#strengthValue')"),'Removed Strength Value element still referenced');
 assert(main.includes("store.set('8apdf_classic_glass_settings_v2',settings)"),'Theme settings persistence must remain enabled');
-const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].filter(m=>!m[1].includes('src=')&&m[2].trim());
+const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].filter(m=>!m[1].includes('src=')&&!/type\s*=\s*["']application\/ld\+json["']/i.test(m[1])&&m[2].trim());
 scripts.forEach((m,i)=>new vm.Script(m[2],{filename:'index.inline.'+i+'.js'}));
 assert(html.includes('id="announcementGrid"'),'Teacher announcements container missing');
 assert(html.includes('id="pdfGrid"')||html.includes('id="pdfGridView"')||html.includes('id="materialsGrid"'),'PDF library container missing');
