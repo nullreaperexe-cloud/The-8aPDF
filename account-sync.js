@@ -179,12 +179,12 @@
         return;
       }
       status('Connecting securely with Google...');
+      set(CHOICE,'account');
       const {error}=await supa.auth.signInWithOAuth({
         provider:'google',options:{redirectTo:location.origin+'/',queryParams:{prompt:'select_account'}}
       });
       if(error)throw error;
-      set(CHOICE,'account');
-    }catch(e){status(e.message||'Google login could not start. Continue as guest and retry later.',true)}
+    }catch(e){set(CHOICE,'');status(e.message||'Google login could not start. Continue as guest and retry later.',true)}
   }
   function continueGuest(){
     set(CHOICE,'guest');close();
