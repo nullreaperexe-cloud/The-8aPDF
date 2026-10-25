@@ -2,20 +2,20 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/about",
-      "destination": "/about.html"
-    },
-    {
-      "source": "/about/",
-      "destination": "/about.html"
-    },
-    {
       "source": "/admin",
       "destination": "/admin.html"
     },
     {
       "source": "/admin/",
       "destination": "/admin.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/about/",
+      "destination": "/about.html"
     },
     {
       "source": "/api/materials",
