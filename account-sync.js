@@ -14,7 +14,10 @@
     '8apdf_ws_v4_custom_tasks','8apdf_ws_v4_task_done',
     '8apdf_ws_v4_preferences','8apdf_saved_v1','8apdf_recent_v1',
     '8apdf_selected_school_day_v1','8a_theme','8a_density','8a_motion',
-    '8apdf_ui_mode_v1','8a_music',LINK_KEYS
+    '8apdf_ui_mode_v1','8a_music','8apdf_classic_glass_settings_v2',
+    '8apdf_term_choice_v2','8apdf_term_choice_v3','8apdf_completed_sessions_v1',
+    '8apdf_focus_timer_v1','8apdf_ai_pdf_recent_queries_v1',
+    '8apdf_background_music_v1','8apdf_skip_welcome',LINK_KEYS
   ];
   const ARRAY_KEYS = new Set(['8apdf_tasks_v1','8a_manual_tasks_v1','8apdf_ws_v4_custom_tasks','8apdf_saved_v1','8apdf_recent_v1',LINK_KEYS]);
   const MAP_KEYS = new Set(['8a_auto_done_v1','8apdf_ws_v4_task_done']);
