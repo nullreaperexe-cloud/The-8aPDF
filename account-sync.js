@@ -161,15 +161,30 @@
   async function login(){
     const supa=api();
     if(!supa){status('Account service is loading. Try again.',true);return}
-    status('Connecting securely with Google...');
+    status('Checking Google sign-in availability...');
     try{
-      set(CHOICE,'account');
-      const redirectTo=location.origin+'/'+(location.pathname==='/'?'':'');
+      // Check provider status before navigating; don't send students to a 400 error page.
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),6000);
+      let config=null;
+      try{
+        const response=await fetch(URL+'/auth/v1/settings',{
+          headers:{apikey:PUBLISHABLE_KEY},cache:'no-store',signal:controller.signal
+        });
+        if(response.ok)config=await response.json();
+      }catch{ /* A temporary settings outage should not permanently disable login. */ }
+      finally{clearTimeout(timeout)}
+      if(config?.external?.google===false || config?.external?.google==='false'){
+        status('Google login is not enabled in Supabase yet. Please continue as guest until the site owner completes Google OAuth setup.',true);
+        return;
+      }
+      status('Connecting securely with Google...');
       const {error}=await supa.auth.signInWithOAuth({
         provider:'google',options:{redirectTo:location.origin+'/',queryParams:{prompt:'select_account'}}
       });
       if(error)throw error;
-    }catch(e){set(CHOICE,'');status(e.message||'Google login could not start.',true)}
+      set(CHOICE,'account');
+    }catch(e){status(e.message||'Google login could not start. Continue as guest and retry later.',true)}
   }
   function continueGuest(){
     set(CHOICE,'guest');close();
