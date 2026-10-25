@@ -6,6 +6,8 @@
   const CHOICE = '8apdf_account_prompt_v1';
   const LINK_KEYS = '8apdf_account_link_keys';
   const OWNER = '8apdf_short_links_owner_v1';
+  const ACTIVE = '8apdf_active_account_uid_v1';
+  const GUEST = '8apdf_guest_workspace_backup_v1';
   const TRACKED = [
     'eightapdf_user_name_v2','eightapdf_user_name',
     '8apdf_tasks_v1','8a_manual_tasks_v1','8a_auto_done_v1',
@@ -122,11 +124,20 @@
   }
   async function signedIn(nextUser){
     const previous=user?.id;
+    const active=get(ACTIVE);
+    if(!active){
+      try{localStorage.setItem(GUEST,JSON.stringify(snapshot()))}catch{}
+    }else if(active!==nextUser.id){
+      // Never merge another account's local data into this account.
+      TRACKED.forEach(k=>set(k,null));
+      set(LINK_KEYS,JSON.stringify(validKeys([get(OWNER)])));
+    }
+    set(ACTIVE,nextUser.id);
     user=nextUser;
     set(CHOICE,'account');
     if(previous!==user.id){
       firstSync=true;last={};
-      sessionStorage.removeItem('8apdf_account_reloaded_v1');
+      if(previous && previous!==user.id)sessionStorage.removeItem('8apdf_account_reloaded_v1');
     }
     updateButton();
     await synchronize(true);
@@ -135,6 +146,11 @@
     close();
   }
   function signedOut(){
+    if(get(ACTIVE)){
+      const backup=json(get(GUEST),{});
+      TRACKED.forEach(k=>set(k,typeof backup[k]==='string'?backup[k]:null));
+      set(ACTIVE,null);
+    }
     user=null;clearInterval(timer);firstSync=true;last={};
     sessionStorage.removeItem('8apdf_account_reloaded_v1');
     updateButton();
@@ -192,7 +208,7 @@
   }
   async function signOut(){
     if(!client)return;
-    // Keep this browser's personal data; guest mode can still use it.
+    // Restore the pre-login guest workspace rather than expose the signed-in account.
     const {error}=await client.auth.signOut();
     if(error){status('Could not sign out. Try again.',true);return}
     set(CHOICE,'guest');signedOut();close();
