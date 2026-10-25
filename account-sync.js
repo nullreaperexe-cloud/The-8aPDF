@@ -28,7 +28,7 @@
   const validKeys = values => [...new Set((Array.isArray(values)?values:[]).filter(tokenValid))].slice(0,40);
   let client=null,user=null,started=false,syncBusy=false,last={},timer=0,overlay=null,firstSync=true;
   const account = window.__8apdfAccount = {
-    open, login, continueGuest, signOut,
+    open, login, continueGuest, signOut, syncLinkKeys,
     get user(){return user},
     get ready(){return !!client},
     get loggedIn(){return !!user}
@@ -67,6 +67,47 @@
       if(a&&b&&typeof a==='object'&&typeof b==='object')return JSON.stringify({...b,...a});
     }
     return remote; // Existing account is authoritative for scalar settings.
+  }
+  function localOwnerKey(){
+    const existing=get(OWNER);
+    if(tokenValid(existing))return existing;
+    try{
+      const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);
+      const next=[...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
+      set(OWNER,next);return next;
+    }catch{return null}
+  }
+  let keysPromise=null;
+  async function syncLinkKeys(){
+    if(!user||!api())return [];
+    if(keysPromise)return keysPromise;
+    keysPromise=(async()=>{
+      const id=user.id;
+      // Always register the original browser ownership key, even if
+      // it existed before the user signed in or before this script loaded.
+      const owner=localOwnerKey();
+      const local=validKeys([...json(get(LINK_KEYS),[]),owner]);
+      const {data,error}=await client.from('user_short_link_keys')
+        .select('owner_key').eq('user_id',id);
+      if(error)throw error;
+      const remote=validKeys((data||[]).map(x=>x.owner_key));
+      const merged=validKeys([...remote,...local]);
+      const added=local.filter(k=>!remote.includes(k));
+      if(added.length){
+        const {error:writeError}=await client.from('user_short_link_keys')
+          .upsert(added.map(owner_key=>({user_id:id,owner_key})),{onConflict:'user_id,owner_key'});
+        if(writeError)throw writeError;
+      }
+      const encoded=JSON.stringify(merged);
+      if(get(LINK_KEYS)!==encoded)set(LINK_KEYS,encoded);
+      document.dispatchEvent(new Event('8apdf:short-links-synced'));
+      return merged;
+    })().catch(e=>{
+      console.warn('8aPDF account short links:',e);
+      status('Link sync unavailable. Local links are still available.',true);
+      return validKeys([...json(get(LINK_KEYS),[]),get(OWNER)]);
+    }).finally(()=>{keysPromise=null});
+    return keysPromise;
   }
   function snapshot(){const result={};for(const k of TRACKED)result[k]=get(k);return result}
   function same(a,b){return a===b}
@@ -142,9 +183,10 @@
       firstSync=true;last={};
       if(previous && previous!==user.id)sessionStorage.removeItem('8apdf_account_reloaded_v1');
     }
+    await syncLinkKeys();
     await synchronize(true);
     clearInterval(timer);
-    timer=setInterval(()=>{if(!document.hidden)synchronize()},4500);
+    timer=setInterval(()=>{if(!document.hidden){synchronize();syncLinkKeys()}},8000);
     close();
   }
   function signedOut(){
