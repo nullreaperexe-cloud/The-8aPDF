@@ -15,7 +15,7 @@ const normalize=value=>{
 };
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
-const defaultVolume=/(Android|iPhone|iPad|iPod|Mobile)/i.test(navigator.userAgent)?40:100;
+const defaultVolume=/(Android|iPhone|iPad|iPod|Mobile)/i.test(globalThis.navigator?.userAgent||'')?40:100;
 const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
 // A quiet background layer even when the device volume is at its maximum.
