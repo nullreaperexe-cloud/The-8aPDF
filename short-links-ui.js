@@ -42,6 +42,12 @@
   let current=null, timer=0, checkedSlug='', available=false, lastFocus=null;
   const OWNER_STORAGE='8apdf_short_links_owner_v1';
   const SHORT_HOST='8apdf.me';
+  const KEYRING='8apdf_account_link_keys';
+  const keyring=()=>{
+    let others=[];
+    try{const arr=JSON.parse(localStorage.getItem(KEYRING)||'[]');if(Array.isArray(arr))others=arr}catch{}
+    return [...new Set([ownerKey(),...others].filter(x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x)))].slice(0,40);
+  };
   function ownerKey(){
     try {
       let token=localStorage.getItem(OWNER_STORAGE);
@@ -54,19 +60,21 @@
     }catch{return null}
   }
   let loadSerial=0;
+  const ownerOfLink=new Map();
   const manager=document.createElement('section');
   manager.className='my-short-links shell';
   manager.id='myShortLinks';
   manager.setAttribute('aria-label','Manage your custom short links');
-  manager.innerHTML=`<div class="sl-manager-head"><div><span class="sl-manager-count">8aPDF · PERSONAL LINK MANAGER</span><h2>My Short Links</h2><p>Your custom PDF links, with quick Open, Copy, Share and Delete. Only links owned by this browser are manageable.</p></div><button type="button" class="sl-manager-refresh" id="slManagerRefresh">↻ Refresh links</button></div><div id="myShortLinksList" class="sl-manager-list" aria-live="polite"><div class="sl-manager-empty">Loading your links…</div></div><p id="shortLinksStatus"></p>`;
+  manager.innerHTML=`<div class="sl-manager-head"><div><span class="sl-manager-count">8aPDF · PERSONAL LINK MANAGER</span><h2>My Short Links</h2><p>Your custom PDF links, with quick Open, Copy, Share and Delete. Sign in with Google to manage your links across devices, or stay local as a guest.</p></div><button type="button" class="sl-manager-refresh" id="slManagerRefresh">↻ Refresh links</button></div><div id="myShortLinksList" class="sl-manager-list" aria-live="polite"><div class="sl-manager-empty">Loading your links…</div></div><p id="shortLinksStatus"></p>`;
   const footer=document.querySelector('footer');
   if(footer)footer.before(manager);else document.body.append(manager);
   const managerList=manager.querySelector('#myShortLinksList'), managerStatus=manager.querySelector('#shortLinksStatus');
   const say=text=>{managerStatus.textContent=text||''};
   async function apiAction(action,payload={}){
-    const key=ownerKey();
+    const {__ownerKey,...rest}=payload;
+    const key=__ownerKey||ownerKey();
     if(!key)throw Error('This browser is blocking local storage. Enable it to manage your links.');
-    const r=await fetch('/api/short-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,ownerKey:key,...payload}),cache:'no-store'});
+    const r=await fetch('/api/short-links',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,ownerKey:key,...rest}),cache:'no-store'});
     const data=await r.json().catch(()=>({error:'The server sent an invalid response.'}));
     if(!r.ok)throw Error(data.error||'Request failed');
     return data;
@@ -75,12 +83,24 @@
     const ticket=++loadSerial;
     managerList.innerHTML='<div class="sl-manager-empty">Loading your custom links…</div>';say('');
     try{
-      const data=await apiAction('list');
+      const keys=keyring();
+      const responses=await Promise.allSettled(keys.map(key=>apiAction('list',{__ownerKey:key})));
       if(ticket!==loadSerial)return;
-      const links=Array.isArray(data.links)?data.links:[];
+      const combined=new Map();let successful=0;
+      responses.forEach((result,index)=>{
+        if(result.status!=='fulfilled')return;
+        successful++;
+        for(const item of Array.isArray(result.value.links)?result.value.links:[]){
+          if(!combined.has(item.slug))combined.set(item.slug,{...item,__ownerKey:keys[index]});
+        }
+      });
+      if(!successful)throw Error('Could not load your account links.');
+      const links=[...combined.values()].sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+      // Keys never enter the HTML: cards use a temporary lookup index.
+      ownerOfLink.clear();for(const link of links)ownerOfLink.set(link.slug,link.__ownerKey);
       if(!links.length){managerList.innerHTML='<div class="sl-manager-empty">No managed links yet. Share a PDF → Create Custom Short Link to add one. Previously created Blob links are recovered when their original storage is accessible and this browser owns them.</div>';return}
       managerList.innerHTML=links.map(link=>`<article class="sl-manager-card" data-link-slug="${esc(link.slug)}" data-link-url="${esc(link.shortUrl)}"><strong>${esc(link.title||'School PDF')}</strong><a class="sl-manager-url" href="${esc(link.shortUrl)}" target="_blank" rel="noopener noreferrer">${esc(link.shortUrl)}</a><small>Created ${esc(link.createdAt?new Date(link.createdAt).toLocaleDateString('en-IN'):'recently')}</small><div class="sl-manager-actions"><button type="button" data-link-action="copy">Copy</button><button type="button" data-link-action="share">Share</button><button type="button" data-link-action="open">Open ↗</button><button type="button" class="sl-remove" data-link-action="delete">Delete</button></div></article>`).join('');
-      say(links.length+' owned link'+(links.length===1?'':'s')+' · Links are public; management stays with this browser.');
+      say(links.length+' owned link'+(links.length===1?'':'s')+' · Public links, private account management.');
     }catch(e){if(ticket!==loadSerial)return;managerList.innerHTML='<div class="sl-manager-empty">Could not load your links right now.</div>';say(e.message)}
   }
   manager.querySelector('#slManagerRefresh').addEventListener('click',loadLinks);
@@ -94,12 +114,13 @@
     if(action==='delete'){
       if(!confirm('Delete '+url+' permanently? The public link will stop working.'))return;
       button.disabled=true;button.textContent='Deleting…';
-      try{await apiAction('delete',{slug});await loadLinks();say('Deleted '+slug+' permanently.')}
+      try{await apiAction('delete',{slug,__ownerKey:ownerOfLink.get(slug)});await loadLinks();say('Deleted '+slug+' permanently.')}
       catch(err){say(err.message);button.disabled=false;button.textContent='Delete'}
     }
   });
   const footerLinks=document.querySelector('.footer-grid');
   if(footerLinks){const target=footerLinks.querySelector('div:nth-child(2)');if(target){const a=document.createElement('a');a.href='#myShortLinks';a.className='footer-link';a.textContent='My Short Links';target.append(a)}}
+  document.addEventListener('8apdf:short-links-synced',loadLinks);
   loadLinks();
   const normalize=x=>String(x||'').trim().toLowerCase();
   const valid=x=>/^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])$/.test(x)&&!x.includes('--');
