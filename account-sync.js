@@ -28,7 +28,7 @@
   const validKeys = values => [...new Set((Array.isArray(values)?values:[]).filter(tokenValid))].slice(0,40);
   let client=null,user=null,started=false,syncBusy=false,last={},timer=0,overlay=null,firstSync=true;
   const account = window.__8apdfAccount = {
-    open, login, continueGuest,
+    open, login, continueGuest, signOut,
     get user(){return user},
     get ready(){return !!client},
     get loggedIn(){return !!user}
@@ -142,7 +142,6 @@
       firstSync=true;last={};
       if(previous && previous!==user.id)sessionStorage.removeItem('8apdf_account_reloaded_v1');
     }
-    updateButton();
     await synchronize(true);
     clearInterval(timer);
     timer=setInterval(()=>{if(!document.hidden)synchronize()},4500);
@@ -156,7 +155,6 @@
     }
     user=null;clearInterval(timer);firstSync=true;last={};
     sessionStorage.removeItem('8apdf_account_reloaded_v1');
-    updateButton();
   }
   async function login(){
     const supa=api();
@@ -232,21 +230,8 @@
     set(CHOICE,'guest');signedOut();close();
     location.reload();
   }
-  function updateButton(){
-    let btn=document.getElementById('apAccountButton');
-    if(!btn){
-      btn=document.createElement('button');btn.id='apAccountButton';btn.type='button';btn.className='ap-account-pill';
-      const target=document.getElementById('profileBtn');
-      if(target?.parentElement)target.insertAdjacentElement('afterend',btn);
-      else {btn.classList.add('ap-account-floating');document.body.append(btn)}
-      btn.addEventListener('click',open);
-    }
-    btn.textContent=user?'☁  Synced':'♙  Sign in';
-    btn.title=user?'Manage your 8aPDF account':'Sign in to sync across devices';
-  }
   async function init(){
     if(started)return;started=true;
-    updateButton();
     if(!api()){console.warn('8aPDF: Supabase browser library unavailable');status('Sign in unavailable; continue as guest.',true);return}
     const {data,error}=await client.auth.getSession();
     if(error)console.warn('8aPDF session:',error.message);
