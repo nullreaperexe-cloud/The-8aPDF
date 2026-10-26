@@ -1322,9 +1322,9 @@ html[data-ui-mode="studio"] .pdf-card {
 }
 </style>
 <link rel="stylesheet" href="/name-onboarding.css?v=1"/>
-<link rel="stylesheet" href="/account-ui.css?v=1"/>
+
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
-<script defer src="/account-sync.js?v=1"></script>
+
 <script src="/name-onboarding.js?v=1"></script>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
@@ -1855,33 +1855,7 @@ function saveTasks(){store.set('8apdf_tasks_v1',state.tasks);renderNotes()}
 $('#noteForm').onsubmit=e=>{e.preventDefault();const v=$('#newNote').value.trim();if(!v)return;state.tasks.unshift({id:String(Date.now())+Math.random().toString(16).slice(2,6),text:v.slice(0,170),done:false});$('#newNote').value='';saveTasks()};
 $('#notesList').onchange=e=>{let id=e.target.dataset.taskCheck;if(!id)return;let t=state.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;saveTasks()}};$('#notesList').onclick=e=>{let id=e.target.dataset.taskDelete;if(!id)return;state.tasks=state.tasks.filter(t=>t.id!==id);saveTasks()};$('#clearCompleted').onclick=()=>{state.tasks=state.tasks.filter(x=>!x.done);saveTasks()};
 function openProfile(){showModal('Your 8aPDF Profile',`<p>Your name is saved privately on this device.</p><input id="editName" maxlength="40" value="${safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n)}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();toast('Profile updated')}}
-const originalProfile=openProfile;
-function openProfileAccountMenu(){
-  originalProfile();
-  const actions=document.getElementById('modalActions');
-  if(!actions)return;
-  const acc=window.__8apdfAccount;
-  const button=document.createElement('button');
-  button.id='profileGoogleAccount';
-  button.type='button';
-  button.className='solid ap-profile-account-action';
-  const signedIn=Boolean(acc?.loggedIn);
-  button.textContent=signedIn?'Sign out of Google':'Sign in with Google';
-  button.addEventListener('click',async()=>{
-    if(!window.__8apdfAccount){toast('Account service is loading. Try again.');return;}
-    if(signedIn){
-      await window.__8apdfAccount.signOut();
-    }else{
-      await window.__8apdfAccount.login();
-    }
-  });
-  actions.appendChild(button);
-  const detail=document.createElement('p');
-  detail.className='ap-profile-account-detail';
-  detail.textContent=signedIn?'Signed in as '+(acc.user?.email||'Google user')+' · Your study data syncs across devices.':'Optional Google sign-in enables cross-device task and short-link sync. Guest access stays available.';
-  document.getElementById('modalContent')?.append(detail);
-}
-$('#profileBtn').onclick=openProfileAccountMenu;
+$('#profileBtn').onclick=openProfile;
 function askNotification(){if(!('Notification' in window)){toast('Notifications are not supported by this browser');return}if(Notification.permission==='granted'){toast('Notifications are enabled. Alerts work while this page stays open.');return}if(Notification.permission==='denied'){toast('Notifications are blocked. Enable them in browser site settings.');return}if(!window.isSecureContext){toast('Notification permission needs HTTPS or localhost.');return}Notification.requestPermission().then(x=>toast(x==='granted'?'Notifications enabled for this browser':'Notifications not enabled'))}
 $('#notificationsBtn').onclick=askNotification;$('#footerBell').onclick=askNotification;
 function closeCommand(){$('#command').classList.remove('open')}
