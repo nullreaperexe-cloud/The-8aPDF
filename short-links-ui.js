@@ -65,7 +65,7 @@
   manager.className='my-short-links shell';
   manager.id='myShortLinks';
   manager.setAttribute('aria-label','Manage your custom short links');
-  manager.innerHTML=`<div class="sl-manager-head"><div><span class="sl-manager-count">8aPDF · PERSONAL LINK MANAGER</span><h2>My Short Links</h2><p>Your custom PDF links, with quick Open, Copy, Share and Delete. Sign in with Google to manage your links across devices, or stay local as a guest.</p></div><button type="button" class="sl-manager-refresh" id="slManagerRefresh">↻ Refresh links</button></div><div id="myShortLinksList" class="sl-manager-list" aria-live="polite"><div class="sl-manager-empty">Loading your links…</div></div><p id="shortLinksStatus"></p>`;
+  manager.innerHTML=`<div class="sl-manager-head"><div><span class="sl-manager-count">8aPDF · PERSONAL LINK MANAGER</span><h2>My Short Links</h2><p>Your custom PDF links, with quick Open, Copy, Share and Delete. Manage your saved links from this browser. Copy or share any link when needed.</p></div><button type="button" class="sl-manager-refresh" id="slManagerRefresh">↻ Refresh links</button></div><div id="myShortLinksList" class="sl-manager-list" aria-live="polite"><div class="sl-manager-empty">Loading your links…</div></div><p id="shortLinksStatus"></p>`;
   const footer=document.querySelector('footer');
   if(footer)footer.before(manager);else document.body.append(manager);
   const managerList=manager.querySelector('#myShortLinksList'), managerStatus=manager.querySelector('#shortLinksStatus');
