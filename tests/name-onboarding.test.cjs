@@ -22,20 +22,20 @@ function fixture(saved = {}, blocked = []) {
   const timers=[];let confirmations=0,finished=0;
   vm.runInNewContext(source,{window,localStorage:window.localStorage,sessionStorage:window.sessionStorage,document,MutationObserver:class{observe(){} disconnect(){}},matchMedia:()=>({matches:false}),setTimeout:fn=>timers.push(fn)});
   const opened=window.initNameOnboarding({onConfirm(){confirmations++;},onFinish(){finished++;}});
-  return {nodes,local,session,opened,submit(value){node('nameInput').value=value;node('nameForm').handlers.submit({preventDefault(){}});},guest(){window.__8apdfFinishAccountOnboarding();},flush(){while(timers.length)timers.shift()();},get confirmations(){return confirmations;},get finished(){return finished;}};
+  return {nodes,local,session,opened,submit(value){node('nameInput').value=value;node('nameForm').handlers.submit({preventDefault(){}});},flush(){while(timers.length)timers.shift()();},get confirmations(){return confirmations;},get finished(){return finished;}};
 }
 let f=fixture();assert(f.opened);assert(!f.local.has(marker));
 f.submit('   ');assert.equal(f.confirmations,0);assert.equal(f.nodes.nameInput.attrs['aria-invalid'],'true');assert(!f.local.has(marker));
 f.submit('  अनन्या  李  ');assert.equal(f.local.get('eightapdf_user_name_v2'),'अनन्या  李');assert.equal(f.local.get(marker),'complete');
-f.submit('Other');assert.equal(f.confirmations,1);f.flush();assert.equal(f.finished,0);assert.equal(f.nodes.nameModal.dataset.phase,'auth');f.guest();f.flush();assert.equal(f.finished,1);assert(!f.nodes.main.inert);
+f.submit('Other');assert.equal(f.confirmations,1);f.flush();assert.equal(f.finished,1);assert(!f.nodes.main.inert);assert(!f.nodes.main.inert);
 for(const key of ['eightapdf_user_name','eightapdf_user_name_v2']){
  f=fixture({[key]:'Student',unrelated:'keep'});assert(f.opened);assert.equal(f.nodes.nameInput.value,'Student');assert(!f.local.has(marker));f.submit('Edited');assert.equal(f.local.get(key),'Edited');assert.equal(f.local.get('unrelated'),'keep');
 }
-f=fixture({[marker]:'complete'});assert(f.opened);assert.equal(f.nodes.nameModal.dataset.phase,'auth');
-f=fixture({[marker]:'complete','8apdf_account_prompt_v1':'guest'});assert(!f.opened);
-f=fixture({},['local']);f.submit('Name');assert.equal(f.session.get(marker),'complete');f.flush();assert.equal(f.finished,0);f.guest();f.flush();assert.equal(f.finished,1);
-f=fixture({},['local','session']);f.submit('<img onerror=alert(1)>');assert.equal(f.nodes.nameWelcomeTitle.textContent,'Welcome, <img onerror=alert(1)>.');f.flush();assert.equal(f.finished,0);f.guest();f.flush();assert.equal(f.finished,1);
+f=fixture({[marker]:'complete'});assert(f.opened);assert.equal(f.nodes.nameInput.value,'');
+f=fixture({[marker]:'complete','eightapdf_user_name_v2':'Kanish'});assert(!f.opened);
+f=fixture({},['local']);f.submit('Name');assert.equal(f.session.get(marker),'complete');f.flush();assert.equal(f.finished,1);
+f=fixture({},['local','session']);f.submit('<img onerror=alert(1)>');assert.equal(f.nodes.nameWelcomeTitle.textContent,'Welcome, <img onerror=alert(1)>.');f.flush();assert.equal(f.finished,1);
 for(const file of ['index.html','classic.html']){
  const html=fs.readFileSync(file,'utf8');assert(html.includes('window.initNameOnboarding('));assert(!html.includes('function openOriginalName()'));assert(html.includes('aria-modal="true"'));assert(html.includes('for="nameInput"'));
 }
-console.log('PASS name → optional Google account flow: Unicode, skip, returning-user prompt, safe text, storage fallbacks');
+console.log('PASS name-only onboarding: Unicode, returning user, safe text, storage fallbacks');
