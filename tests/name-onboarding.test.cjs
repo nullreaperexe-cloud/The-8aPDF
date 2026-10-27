@@ -27,7 +27,7 @@ function fixture(saved = {}, blocked = []) {
 let f=fixture();assert(f.opened);assert(!f.local.has(marker));
 f.submit('   ');assert.equal(f.confirmations,0);assert.equal(f.nodes.nameInput.attrs['aria-invalid'],'true');assert(!f.local.has(marker));
 f.submit('  अनन्या  李  ');assert.equal(f.local.get('eightapdf_user_name_v2'),'अनन्या  李');assert.equal(f.local.get(marker),'complete');
-f.submit('Other');assert.equal(f.confirmations,1);f.flush();assert.equal(f.finished,1);assert(!f.nodes.main.inert);assert(!f.nodes.main.inert);
+f.submit('Other');assert.equal(f.confirmations,1);f.flush();assert.equal(f.finished,1);assert(!f.nodes.main.inert);assert.equal(f.nodes.nameModal.attrs['aria-hidden'],'true');
 for(const key of ['eightapdf_user_name','eightapdf_user_name_v2']){
  f=fixture({[key]:'Student',unrelated:'keep'});assert(f.opened);assert.equal(f.nodes.nameInput.value,'Student');assert(!f.local.has(marker));f.submit('Edited');assert.equal(f.local.get(key),'Edited');assert.equal(f.local.get('unrelated'),'keep');
 }
@@ -35,7 +35,10 @@ f=fixture({[marker]:'complete'});assert(f.opened);assert.equal(f.nodes.nameInput
 f=fixture({[marker]:'complete','eightapdf_user_name_v2':'Kanish'});assert(!f.opened);
 f=fixture({},['local']);f.submit('Name');assert.equal(f.session.get(marker),'complete');f.flush();assert.equal(f.finished,1);
 f=fixture({},['local','session']);f.submit('<img onerror=alert(1)>');assert.equal(f.nodes.nameWelcomeTitle.textContent,'Welcome, <img onerror=alert(1)>.');f.flush();assert.equal(f.finished,1);
+const removedAccountMarkers=['account-sync.js','account-ui.css','__8apdfAccount','__8apdfFinishAccountOnboarding','ap-onboard-google','ap-onboard-guest'];
+assert(!source.includes('__8apdfFinishAccountOnboarding'),'Name-only onboarding must finish without an account step');
 for(const file of ['index.html','classic.html']){
- const html=fs.readFileSync(file,'utf8');assert(html.includes('window.initNameOnboarding('));assert(!html.includes('function openOriginalName()'));assert(html.includes('aria-modal="true"'));assert(html.includes('for="nameInput"'));
+ const html=fs.readFileSync(file,'utf8');
+ for(const removed of removedAccountMarkers)assert(!html.includes(removed),`${file} still references removed Google account UI: ${removed}`);assert(html.includes('window.initNameOnboarding('));assert(!html.includes('function openOriginalName()'));assert(html.includes('aria-modal="true"'));assert(html.includes('for="nameInput"'));
 }
 console.log('PASS name-only onboarding: Unicode, returning user, safe text, storage fallbacks');
