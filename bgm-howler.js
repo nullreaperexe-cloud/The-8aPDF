@@ -16,8 +16,8 @@ const normalize=value=>{
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
 const isMobile=/(Android|iPhone|iPad|iPod|Mobile)/i.test(globalThis.navigator?.userAgent||'');
-const MOBILE_VOLUME_MIGRATION_KEY='8apdf_mobile_bgm_volume_v2';
-const defaultVolume=isMobile?20:100;
+const MOBILE_VOLUME_MIGRATION_KEY='8apdf_mobile_bgm_volume_v3';
+const defaultVolume=isMobile?2:100;
 // Reset older mobile volumes once; subsequent changes in Settings remain saved.
 let mobileVolumeMigrated=false;
 if(isMobile){
@@ -25,11 +25,11 @@ if(isMobile){
 }
 const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
 if(isMobile&&!mobileVolumeMigrated){
- prefs.volume=20;
+ prefs.volume=2;
  try{localStorage.setItem(KEY,JSON.stringify(prefs));localStorage.setItem(MOBILE_VOLUME_MIGRATION_KEY,'1')}catch{}
 }
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
-// Volume slider directly controls audio output; mobile starts at 20%, and users may raise it.
+// Volume slider directly controls audio output; mobile starts at 2%, and users may raise it.
 const audioLevel=value=>Math.max(0,Math.min(100,Number(value)||0))/100;
 const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
 let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
