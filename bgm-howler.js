@@ -16,13 +16,21 @@ const normalize=value=>{
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
 const isMobile=/(Android|iPhone|iPad|iPod|Mobile)/i.test(globalThis.navigator?.userAgent||'');
-const defaultVolume=100;
+const MOBILE_VOLUME_MIGRATION_KEY='8apdf_mobile_bgm_volume_v2';
+const defaultVolume=isMobile?20:100;
+// Reset older mobile volumes once; subsequent changes in Settings remain saved.
+let mobileVolumeMigrated=false;
+if(isMobile){
+ try{mobileVolumeMigrated=localStorage.getItem(MOBILE_VOLUME_MIGRATION_KEY)==='1'}catch{}
+}
 const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
+if(isMobile&&!mobileVolumeMigrated){
+ prefs.volume=20;
+ try{localStorage.setItem(KEY,JSON.stringify(prefs));localStorage.setItem(MOBILE_VOLUME_MIGRATION_KEY,'1')}catch{}
+}
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
-// Device-specific background music output: mobile capped at 20%, desktop at 100%.
-// The saved volume slider still scales within each device's output cap.
-const MAX_BACKGROUND_OUTPUT=isMobile?0.20:1;
-const audioLevel=value=>MAX_BACKGROUND_OUTPUT*Math.max(0,Math.min(100,Number(value)||0))/100;
+// Volume slider directly controls audio output; mobile starts at 20%, and users may raise it.
+const audioLevel=value=>Math.max(0,Math.min(100,Number(value)||0))/100;
 const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
 let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
 const track=()=>TRACKS.find(t=>t.id===active)||playlist()[0];
