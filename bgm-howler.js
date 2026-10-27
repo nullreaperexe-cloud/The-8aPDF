@@ -19,9 +19,9 @@ const isMobile=/(Android|iPhone|iPad|iPod|Mobile)/i.test(globalThis.navigator?.u
 const defaultVolume=100;
 const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
 const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
-// Device-specific background music output: mobile capped at 5%, desktop at 100%.
+// Device-specific background music output: mobile capped at 20%, desktop at 100%.
 // The saved volume slider still scales within each device's output cap.
-const MAX_BACKGROUND_OUTPUT=isMobile?0.05:1;
+const MAX_BACKGROUND_OUTPUT=isMobile?0.20:1;
 const audioLevel=value=>MAX_BACKGROUND_OUTPUT*Math.max(0,Math.min(100,Number(value)||0))/100;
 const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
 let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
