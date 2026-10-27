@@ -16,7 +16,7 @@ const normalize=value=>{
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 const saved=read();
 const isMobile=/(Android|iPhone|iPad|iPod|Mobile)/i.test(globalThis.navigator?.userAgent||'');
-const MOBILE_VOLUME_MIGRATION_KEY='8apdf_mobile_bgm_volume_v3';
+const MOBILE_VOLUME_MIGRATION_KEY='8apdf_mobile_bgm_volume_v4';
 const defaultVolume=isMobile?2:100;
 // Reset older mobile volumes once; subsequent changes in Settings remain saved.
 let mobileVolumeMigrated=false;
@@ -105,6 +105,15 @@ function enable(v){
  if(audio?.error)load(active);else play();
  sync();
 }
+function resetDefaults(){
+ prefs.enabled=true;
+ prefs.volume=defaultVolume;
+ prefs.selectedTracks=ordered();
+ pausedByUser=false;error=false;
+ write();
+ if(audio){audio.volume=audioLevel(prefs.volume);load(prefs.selectedTracks[0])}
+ sync();status('Default music settings restored.');
+}
 function volume(v){prefs.volume=Math.max(0,Math.min(100,Math.round(Number(v)||0)));if(audio)audio.volume=audioLevel(prefs.volume);write();sync()}
 function toggle(){if(!prefs.enabled)return;if(playing){pause();return}pausedByUser=false;pending=false;blocked=false;error=false;if(audio?.error)load(active);else play()}
 function mount(){
@@ -122,6 +131,7 @@ function mount(){
  '<small class="eightapdf-bgm-note">Tum Hi Ho → Khairiyat → Saiyaara → repeat. Browsers may require a tap to allow audio.</small>';
  const style=document.createElement('style');style.textContent='.eightapdf-bgm-heading,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-heading small,.eightapdf-bgm-note{color:var(--muted);font-size:.7rem}.eightapdf-bgm-list{display:grid;gap:9px;margin:16px 0}.eightapdf-bgm-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--surface-high);padding:10px;border-radius:12px}.eightapdf-bgm-item label{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer}.eightapdf-bgm-item input{width:17px;height:17px;accent-color:var(--button);flex:none}.eightapdf-bgm-number{border:1px solid var(--line-bold);border-radius:7px;padding:5px 8px;font-size:.7rem}.eightapdf-bgm-copy{display:flex;flex-direction:column;gap:4px;min-width:0}.eightapdf-bgm-copy strong{font-size:.8rem}.eightapdf-bgm-copy small,.eightapdf-bgm-current{font-size:.7rem;color:var(--muted)}.eightapdf-bgm-item button{flex:none}.eightapdf-bgm-item button,.eightapdf-bgm-actions button{border:1px solid var(--line-bold);border-radius:10px;background:var(--surface-soft);color:var(--text);padding:9px 11px;cursor:pointer;font:inherit;font-size:.75rem}.eightapdf-bgm-item button:disabled,.eightapdf-bgm-actions button:disabled{opacity:.45;cursor:not-allowed}.eightapdf-bgm-mode{font-size:.77rem;color:var(--text-soft);font-weight:650;line-height:1.5}.eightapdf-bgm-current{margin-bottom:18px}.eightapdf-bgm-current strong{color:var(--text)}.eightapdf-bgm-volume{font-size:.8rem}.eightapdf-settings-music input[type=range]{width:100%;accent-color:var(--button);margin:12px 0 18px}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:8px}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}#eightapdfBgmStatus{font-size:.76rem;color:var(--muted);margin:16px 0 8px}.eightapdf-bgm-note{display:block;line-height:1.5}@media(max-width:450px){.eightapdf-bgm-item{padding:8px}.eightapdf-bgm-item label{gap:6px}.eightapdf-bgm-item button{padding:8px}}';
  document.head.appendChild(style);
+ byId('resetSettings')?.addEventListener('click',resetDefaults);
  byId('eightapdfBgmToggle').addEventListener('change',e=>enable(e.target.checked));
  byId('eightapdfBgmVolume').addEventListener('input',e=>volume(e.target.value));
  byId('eightapdfBgmTest').addEventListener('click',toggle);
