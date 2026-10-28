@@ -6,7 +6,16 @@ const TRACKS=[
  {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'},
  {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
 ];
-const KEY='8apdf_background_music_v1',byId=id=>document.getElementById(id);
+const KEY='8apdf_background_music_v1',CONSENT_KEY='8apdf_music_choice_v1',byId=id=>document.getElementById(id);
+const consent=()=>{
+ try{const v=localStorage.getItem(CONSENT_KEY);if(v==='with'||v==='without')return v}catch{}
+ try{const v=sessionStorage.getItem(CONSENT_KEY);if(v==='with'||v==='without')return v}catch{}
+ return null;
+};
+const storeConsent=value=>{
+ try{localStorage.setItem(CONSENT_KEY,value);return}catch{}
+ try{sessionStorage.setItem(CONSENT_KEY,value)}catch{}
+};
 const ordered=()=>TRACKS.map(x=>x.id);
 const normalize=value=>{
  const selected=new Set(Array.isArray(value)?value:[]);
@@ -23,7 +32,7 @@ let mobileVolumeMigrated=false;
 if(isMobile){
  try{mobileVolumeMigrated=localStorage.getItem(MOBILE_VOLUME_MIGRATION_KEY)==='1'}catch{}
 }
-const prefs={enabled:typeof saved?.enabled==='boolean'?saved.enabled:true,volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
+const prefs={enabled:consent()==='with'&&(typeof saved?.enabled==='boolean'?saved.enabled:true),volume:Number.isFinite(saved?.volume)?Math.max(0,Math.min(100,Math.round(saved.volume))):defaultVolume,selectedTracks:normalize(saved?.selectedTracks)};
 if(isMobile&&!mobileVolumeMigrated){
  prefs.volume=2;
  try{localStorage.setItem(KEY,JSON.stringify(prefs));localStorage.setItem(MOBILE_VOLUME_MIGRATION_KEY,'1')}catch{}
@@ -52,7 +61,7 @@ function sync(){
  });
 }
 function play(){
- if(!audio||!prefs.enabled||pausedByUser||playing||pending||error)return;
+ if(!audio||consent()!=='with'||!prefs.enabled||pausedByUser||playing||pending||error)return;
  const id=generation;
  pending=true;blocked=false;status('Starting '+track().title+'…');
  try{
@@ -99,14 +108,27 @@ function only(id){if(ordered().includes(id))choose([id],true)}
 function all(){choose(ordered(),true)}
 function pause(){pausedByUser=true;generation++;audio?.pause();playing=false;pending=false;blocked=false;status('Paused. Your music selection is saved.');sync()}
 function enable(v){
- prefs.enabled=!!v;write();
+ // Only a deliberate Settings toggle may change an already-made choice.
+ if(!consent()){status('Choose With Music or No Music to continue.');sync();return}
+ prefs.enabled=!!v;
+ storeConsent(prefs.enabled?'with':'without');
+ write();
  if(!prefs.enabled){pause();status('Background music is off.');return}
  pausedByUser=false;error=false;
  if(audio?.error)load(active);else play();
  sync();
 }
+function acceptChoice(value){
+ // Called only by the required onboarding choice after it is saved.
+ if(consent()!==(value?'with':'without'))return;
+ prefs.enabled=!!value;write();
+ if(!value){pause();status('Background music is off.');return}
+ pausedByUser=false;error=false;
+ if(audio?.error)load(active);else play();
+ sync();
+}
 function resetDefaults(){
- prefs.enabled=true;
+ prefs.enabled=consent()==='with';
  prefs.volume=defaultVolume;
  prefs.selectedTracks=ordered();
  pausedByUser=false;error=false;
@@ -155,12 +177,18 @@ function init(){
   blocked=false;play();
  },{capture:true,passive:true});
  window.addEventListener('storage',e=>{
+  if(e.key===CONSENT_KEY){
+   const selected=consent();
+   if(selected!=='with'){prefs.enabled=false;pause();status('Background music is off.')}
+   else{const n=read();prefs.enabled=n?.enabled!==false;pausedByUser=false;error=false;play()}
+   sync();return;
+  }
   if(e.key!==KEY)return;
   const n=read();if(!n)return;
   const songs=normalize(n.selectedTracks),changed=songs.join(',')!==prefs.selectedTracks.join(',');
   prefs.selectedTracks=songs;
   if(Number.isFinite(n.volume)){prefs.volume=Math.max(0,Math.min(100,Math.round(n.volume)));if(audio)audio.volume=audioLevel(prefs.volume)}
-  if(typeof n.enabled==='boolean')prefs.enabled=n.enabled;
+  if(typeof n.enabled==='boolean')prefs.enabled=n.enabled&&consent()==='with';
   if(!prefs.enabled){pausedByUser=true;audio?.pause();playing=false;pending=false;status('Background music is off.')}
   else if(changed){pausedByUser=false;load(songs[0])}
   else{if(audio)audio.loop=songs.length===1;if(!pausedByUser)play()}
@@ -168,5 +196,5 @@ function init(){
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-window.__8apdfBackgroundAudio={play:()=>enable(true),stop:()=>enable(false),pause,setVolume:volume,select:only,setSongs:choose,playAll:all,next,retry:toggle,getState:()=>({...prefs,selectedTracks:[...prefs.selectedTracks],current:active,playing,pending,blocked,loop:audio?.loop,tracks:TRACKS.map(x=>({...x}))})};
+window.__8apdfBackgroundAudio={play:()=>{if(consent()==='with'&&prefs.enabled)toggle()},stop:()=>enable(false),pause,acceptChoice,setVolume:volume,select:only,setSongs:choose,playAll:all,next,retry:()=>{if(consent()==='with'&&prefs.enabled)toggle()},getState:()=>({...prefs,consent:consent(),selectedTracks:[...prefs.selectedTracks],current:active,playing,pending,blocked,loop:audio?.loop,tracks:TRACKS.map(x=>({...x}))})};
 })();
