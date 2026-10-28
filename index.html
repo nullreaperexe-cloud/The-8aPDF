@@ -1502,6 +1502,8 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 
 <script src="/name-onboarding.js?v=2"></script>
+<link rel="stylesheet" href="/music-choice.css?v=1"/>
+<script src="/music-choice.js?v=1"></script>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -2293,6 +2295,7 @@ function closeOriginalWelcome(){
   originalWelcome.classList.remove('show');originalWelcome.setAttribute('aria-hidden','true');
   document.body.classList.remove('locked');
   clearTimeout(welcomeTimer);
+  window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
   try {
@@ -2315,7 +2318,12 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
-  onFinish:offerNotificationAfterWelcome
+  onFinish(){
+    const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
+    if(showingMusicChoice){
+      document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
+    }else offerNotificationAfterWelcome();
+  }
 });
 // Same welcome animation on every reload and every new website open.
 const previousName=existingUserName().trim();
@@ -3541,7 +3549,7 @@ draw();
 <script defer src="/workspace-pages.js?v=20261017-chat-fullbleed"></script>
 <script defer src="/school-calendar-client.js?v=20261013-2"></script>
 <!-- Native MP3 background player: saved song selection and ordered three-track playlist. -->
-<script defer src="/bgm-howler.js?v=20261020-soft-background-v2"></script>
+<script defer src="/bgm-howler.js?v=20261028-choice"></script>
 <link rel="stylesheet" href="/drive-music.css?v=3">
 <script defer src="/drive-music.js?v=3"></script>
 <link rel="stylesheet" href="/music-launch.css?v=1">
