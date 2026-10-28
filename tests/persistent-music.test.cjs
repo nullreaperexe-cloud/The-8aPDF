@@ -1,8 +1,16 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const buttons={musicPlay:{},musicPause:{}},sent=[],listeners={},frame={closest:()=>null,setAttribute(){}},widget={querySelectorAll:()=>[frame]};let player,plays=0,pauses=0,options;
-const context={window:{YT:{Player:class {constructor(el,o){assert.equal(el,frame);options=o;player=this}playVideo(){plays++}pauseVideo(){pauses++}}}},parent:{postMessage:(data)=>sent.push(data)},location:{origin:'https://8apdf.vercel.app'},document:{body:{},getElementById:id=>buttons[id],querySelector:()=>widget,querySelectorAll:()=>[],addEventListener:(n,f)=>listeners[n]=f},MutationObserver:class {observe(){}},setTimeout(){},clearTimeout(){},setInterval(){return 1},clearInterval(){}};
-context.YT=context.window.YT;vm.runInNewContext(fs.readFileSync('music-autostart.js','utf8'),context);
-assert(player,'Must attach official API to the existing widget iframe');options.events.onReady({target:player});assert.equal(plays,1,'Try playback as soon as track is ready');options.events.onAutoplayBlocked();assert(sent.at(-1).blocked,'Autoplay failure must be truthful');
-context.window.__8apdfStartMusic();assert.equal(plays,2,'A user gesture can retry blocked playback');options.events.onStateChange({data:1});context.window.__8apdfStartMusic();assert.equal(plays,2,'Navigation/gestures must not restart playing music');
-buttons.musicPause.onclick();assert.equal(pauses,1);context.window.__8apdfStartMusic();assert.equal(plays,2,'Manual pause must persist');buttons.musicPlay.onclick();assert.equal(plays,3,'Play explicitly resumes');
-console.log('PASS existing Elfsight iframe autoplay attempt, blocked state, continuous playback and deliberate pause/resume');
+/* Retired Elfsight player must never start arbitrary background audio. */
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const script=fs.readFileSync('music-autostart.js','utf8');
+const page=fs.readFileSync('music-player.html','utf8');
+new vm.Script(script);
+assert.doesNotMatch(script,/\.playVideo\(|\.play\(\)|addEventListener\('pointerdown'/);
+assert.doesNotMatch(page,/elfsightcdn\.com|elfsight-app-|music-autostart\.js|<audio|<iframe/);
+let attempted=0;
+const window={};
+vm.runInNewContext(script,{window});
+assert.equal(typeof window.__8apdfStartMusic,'function');
+window.__8apdfStartMusic();
+assert.equal(attempted,0);
+console.log('PASS retired Elfsight autoplay: no unrelated background music player');
