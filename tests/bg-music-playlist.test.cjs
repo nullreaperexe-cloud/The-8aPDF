@@ -38,9 +38,10 @@ function start(){
  return {audio,elements,api:context.window.__8apdfBackgroundAudio,windowListeners};
 }
 const seq=s=>Array.from(s.api.getState().selectedTracks);
+storage.set('8apdf_music_choice_v1','with');
 const first=start();
 assert.equal(first.api.getState().volume,100,'Desktop users start at 100% slider');
-assert.ok(Math.abs(first.audio.volume-0.05)<1e-10,'Actual default output stays limited to 5%');
+assert.ok(Math.abs(first.audio.volume-1)<1e-10,'Desktop music uses the configured 100% volume');
 assert.deepEqual(seq(first),['tum-hi-ho','khairiyat','saiyaara']);
 assert.equal(first.audio.src,'/assets/bgm/tum-hi-ho.mp3');
 assert.equal(first.audio.loop,false);
@@ -72,19 +73,19 @@ storage.set('8apdf_background_music_v1',JSON.stringify({enabled:true,volume:18,s
 const migrated=start();
 assert.deepEqual(seq(migrated),['tum-hi-ho','khairiyat','saiyaara']);
 assert.equal(migrated.audio.src,'/assets/bgm/tum-hi-ho.mp3');
-assert.ok(Math.abs(migrated.audio.volume-0.009)<1e-10,'Old stored slider values are safely capped');
+assert.ok(Math.abs(migrated.audio.volume-0.18)<1e-10,'Saved slider value is respected after consent');
 migrated.api.setVolume(100);
-assert.ok(Math.abs(migrated.audio.volume-0.05)<1e-10,'Even 100% UI never exceeds 5% audio output');
+assert.ok(Math.abs(migrated.audio.volume-1)<1e-10,'100% slider corresponds to 100% output');
 migrated.api.setVolume(2);
-assert.ok(Math.abs(migrated.audio.volume-0.001)<1e-10,'Low volume stays adjustable');
+assert.ok(Math.abs(migrated.audio.volume-0.02)<1e-10,'2% mobile-style volume remains adjustable');
 const quieterReload=start();
 assert.equal(quieterReload.api.getState().volume,2,'Volume preference survives refresh');
-assert.ok(Math.abs(quieterReload.audio.volume-0.001)<1e-10);
+assert.ok(Math.abs(quieterReload.audio.volume-0.02)<1e-10);
 const changed=JSON.parse(storage.get('8apdf_background_music_v1'));
 changed.volume=65;
 storage.set('8apdf_background_music_v1',JSON.stringify(changed));
 quieterReload.windowListeners.storage({key:'8apdf_background_music_v1'});
-assert.ok(Math.abs(quieterReload.audio.volume-0.0325)<1e-10,'Volume stays capped on cross-tab changes');
+assert.ok(Math.abs(quieterReload.audio.volume-0.65)<1e-10,'Cross-tab volume change is applied');
 assert.equal(source.includes('meri-duniya-tu-hi-re'),false);
 for(const name of ['tum-hi-ho','khairiyat','saiyaara'])
  assert(fs.existsSync('assets/bgm/'+name+'.mp3'),'Original MP3 missing: '+name);
