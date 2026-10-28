@@ -1,0 +1,130 @@
+/* 8aPDF Music Choice — editorial, full-screen continuation of the name screen.
+ * Inherit the original Space Grotesk site type and pure-black surface system.
+ * This is NOT a dismissible popup or an Elfsight music widget.
+ */
+html body.music-choice-locked{overflow:hidden!important;overscroll-behavior:none}
+#eightapdfMusicChoice, #eightapdfMusicChoice *{box-sizing:border-box}
+#eightapdfMusicChoice{
+ position:fixed;inset:0;z-index:30020;
+ display:flex;align-items:center;justify-content:center;
+ width:100%;height:100dvh;min-height:100svh;
+ padding:max(22px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right))
+         max(22px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));
+ overflow:auto;overscroll-behavior:contain;
+ background:linear-gradient(140deg,#101010 0%,#060606 45%,#000 100%);
+ color:#fff;font-family:inherit;isolation:isolate;
+}
+#eightapdfMusicChoice .mc-stage{
+ width:min(100%,1040px);margin:auto;padding:32px 0;
+ animation:mc-enter .6s cubic-bezier(.16,1,.3,1) both
+}
+#eightapdfMusicChoice .mc-masthead,#eightapdfMusicChoice .mc-footer{
+ display:flex;align-items:center;justify-content:space-between;gap:20px
+}
+#eightapdfMusicChoice .mc-masthead{border-bottom:1px solid #ffffff26;padding-bottom:26px}
+#eightapdfMusicChoice .mc-wordmark{
+ display:inline-flex;align-items:center;gap:10px;font-size:20px;
+ font-weight:700;letter-spacing:-.06em;color:#fff
+}
+#eightapdfMusicChoice .mc-logo{
+ display:grid;place-items:center;width:30px;height:30px;
+ border:1px solid #ffffff55;border-radius:9px;font-size:17px;font-weight:800
+}
+#eightapdfMusicChoice .mc-edition,#eightapdfMusicChoice .mc-footer,
+#eightapdfMusicChoice .mc-kicker,#eightapdfMusicChoice .mc-decisions-label{
+ color:#929292;font-size:10px;letter-spacing:.14em;font-weight:500
+}
+#eightapdfMusicChoice .mc-composition{
+ display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);
+ align-items:center;gap:clamp(34px,7vw,100px);padding:clamp(42px,9vh,92px) 0
+}
+#eightapdfMusicChoice .mc-intro{min-width:0}
+#eightapdfMusicChoice .mc-kicker{display:flex;align-items:center;gap:12px;margin:0 0 24px}
+#eightapdfMusicChoice .mc-kicker span{width:24px;height:1px;background:#929292}
+#eightapdfMusicChoice h2{
+ margin:0;color:#fff;font:inherit;font-size:clamp(44px,5.2vw,76px);
+ font-weight:500;line-height:1.08;letter-spacing:-.069em;text-wrap:balance
+}
+#eightapdfMusicChoice h2 span{display:block;color:#929292}
+#eightapdfMusicChoice #musicChoiceDescription{
+ color:#d2d2d2;font-size:clamp(14px,1.4vw,17px);line-height:1.7;
+ letter-spacing:-.015em;margin:29px 0 0;max-width:355px
+}
+#eightapdfMusicChoice .mc-equalizer{display:flex;align-items:center;gap:6px;height:32px;margin:31px 0 12px}
+#eightapdfMusicChoice .mc-equalizer i{
+ display:block;width:3px;border-radius:8px;background:#d2d2d2;
+ height:var(--h,12px);animation:mc-wave 2.2s ease-in-out infinite alternate;
+ animation-delay:var(--delay,0s)
+}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(1){--h:10px;--delay:-.1s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(2){--h:22px;--delay:-.7s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(3){--h:16px;--delay:-1.5s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(4){--h:27px;--delay:-.4s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(5){--h:13px;--delay:-1.9s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(6){--h:23px;--delay:-.8s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(7){--h:10px;--delay:-1.4s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(8){--h:18px;--delay:-.3s}
+#eightapdfMusicChoice .mc-equalizer i:nth-child(9){--h:9px;--delay:-1.2s}
+#eightapdfMusicChoice .mc-track-note{
+ color:#929292;font-size:9px;line-height:1.6;letter-spacing:.12em;font-weight:500
+}
+#eightapdfMusicChoice .mc-decisions{
+ display:grid;gap:12px;padding:27px;
+ border:1px solid #ffffff26;border-radius:18px;
+ background:linear-gradient(155deg,#161616,#101010);
+ box-shadow:inset 0 1px 0 #ffffff0a,0 24px 60px #0003
+}
+#eightapdfMusicChoice .mc-decisions-label{
+ margin:0 0 9px;display:flex;justify-content:space-between;
+ gap:12px;align-items:center;letter-spacing:.12em
+}
+#eightapdfMusicChoice .mc-decisions-label span{color:#d2d2d2;letter-spacing:.04em;font-size:9px}
+#eightapdfMusicChoice button.mc-option{
+ appearance:none;display:flex;align-items:center;text-align:left;gap:15px;
+ width:100%;min-height:94px;padding:17px 18px;
+ border-radius:12px;border:1px solid #ffffff32;
+ background:#0a0a0a;color:#fff;font:inherit;cursor:pointer;
+ transition:transform .2s,border-color .2s,background .2s;
+ -webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+#eightapdfMusicChoice .mc-option.mc-on{background:#ededed;color:#171717;border-color:#ededed}
+#eightapdfMusicChoice .mc-option:hover{transform:translateY(-2px);border-color:#fff}
+#eightapdfMusicChoice .mc-option:active{transform:scale(.986)}
+#eightapdfMusicChoice .mc-option:focus-visible{outline:2px solid #fff;outline-offset:4px}
+#eightapdfMusicChoice .mc-option.mc-on:focus-visible{outline-color:#fff}
+#eightapdfMusicChoice .mc-option-icon{
+ display:grid;place-items:center;flex:none;width:39px;height:39px;
+ border:1px solid currentColor;border-radius:11px;font-size:20px;opacity:.82
+}
+#eightapdfMusicChoice .mc-option-copy{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+#eightapdfMusicChoice .mc-option-copy strong{font-size:17px;font-weight:650;letter-spacing:-.036em}
+#eightapdfMusicChoice .mc-option-copy small{font-size:11px;font-weight:400;line-height:1.5;opacity:.72}
+#eightapdfMusicChoice .mc-option-arrow{font-size:21px;align-self:flex-start;opacity:.75}
+#eightapdfMusicChoice .mc-saved-note{
+ margin:8px 0 0;color:#929292;line-height:1.65;font-size:11px
+}
+#eightapdfMusicChoice .mc-footer{padding-top:23px;border-top:1px solid #ffffff26}
+@keyframes mc-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes mc-wave{from{transform:scaleY(.45);opacity:.45}to{transform:scaleY(1);opacity:.96}}
+@media(max-width:700px){
+ #eightapdfMusicChoice .mc-stage{max-width:460px;padding:8px 0}
+ #eightapdfMusicChoice .mc-masthead{padding-bottom:20px}
+ #eightapdfMusicChoice .mc-edition{font-size:8px;letter-spacing:.08em}
+ #eightapdfMusicChoice .mc-composition{grid-template-columns:1fr;gap:30px;padding:35px 0}
+ #eightapdfMusicChoice h2{font-size:clamp(41px,10vw,57px)}
+ #eightapdfMusicChoice #musicChoiceDescription{font-size:14px;max-width:320px;margin-top:18px}
+ #eightapdfMusicChoice .mc-equalizer{margin-top:20px}
+ #eightapdfMusicChoice .mc-decisions{padding:20px;gap:12px}
+ #eightapdfMusicChoice .mc-option{min-height:82px!important;padding:14px!important}
+ #eightapdfMusicChoice .mc-option-copy strong{font-size:16px}
+ #eightapdfMusicChoice .mc-decisions-label span{font-size:8px}
+ #eightapdfMusicChoice .mc-footer{font-size:8px;letter-spacing:.08em}
+}
+@media(max-height:650px) and (min-width:701px){
+ #eightapdfMusicChoice .mc-stage{padding:0}
+ #eightapdfMusicChoice .mc-composition{padding:25px 0}
+ #eightapdfMusicChoice .mc-equalizer{margin-top:15px}
+}
+@media(prefers-reduced-motion:reduce){
+ #eightapdfMusicChoice *,#eightapdfMusicChoice{animation:none!important;transition:none!important}
+}
