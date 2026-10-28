@@ -113,7 +113,7 @@ assert.deepEqual(Array.from(b.api.getState().tracks.map(t=>t.id)),['tum-hi-ho','
 b.elem('eightapdfBgmToggle').listeners.change({target:{checked:false}});
 assert.equal(store.get('8apdf_music_choice_v1'),'without');
 assert.equal(b.api.getState().enabled,false);
-b.api.resetDefaults?.();
+b.elem('resetSettings').listeners.click();
 assert.equal(b.api.getState().enabled,false);
 b.elem('eightapdfBgmToggle').listeners.change({target:{checked:true}});
 assert.equal(store.get('8apdf_music_choice_v1'),'with');
