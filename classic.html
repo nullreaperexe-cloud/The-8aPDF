@@ -1326,6 +1326,8 @@ html[data-ui-mode="studio"] .pdf-card {
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 
 <script src="/name-onboarding.js?v=2"></script>
+<link rel="stylesheet" href="/music-choice.css?v=1"/>
+<script src="/music-choice.js?v=1"></script>
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1556,6 +1558,7 @@ html[data-ui-mode="studio"] .pdf-card {
 <div class="setting-group"><span class="setting-label">Accessibility &amp; Motion</span><label class="setting-row"><span>Reduce Motion</span><input class="toggle" id="motionToggle" type="checkbox"/></label><label class="setting-row"><span>Larger Text</span><input class="toggle" id="largeTextToggle" type="checkbox"/></label><label class="setting-row"><span>High Contrast</span><input class="toggle" id="contrastToggle" type="checkbox"/></label></div>
 <div class="setting-group"><span class="setting-label">Content Density</span><div class="segmented" id="densityGroup"><button class="active" data-density-choice="comfortable">Comfortable</button><button data-density-choice="compact">Compact</button><button data-density-choice="spacious">Spacious</button></div></div>
 <div class="setting-group"><span class="setting-label">Font Size</span><div class="font-row"><span>A</span><input aria-label="Font size" id="fontRange" max="120" min="90" step="5" type="range" value="100"/><span style="font-size:1.08rem">A</span></div></div>
+<div id="eightapdfSettingsMusic" class="setting-group eightapdf-settings-music" aria-label="Background Music Settings"></div>
 <div class="setting-foot"><button class="solid" id="resetSettings">Reset Default</button><button class="solid" id="saveSettings" style="background:var(--button);color:var(--button-text)">Done</button></div>
 </div></div></aside>
 <div aria-hidden="true" aria-modal="true" class="sheet" id="modal" role="dialog"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button aria-label="Close dialog" class="round-btn" id="modalClose"><svg><use href="#i-x"></use></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
@@ -1876,6 +1879,7 @@ function closeOriginalWelcome(){
   originalWelcome.classList.remove('show');originalWelcome.setAttribute('aria-hidden','true');
   document.body.classList.remove('locked');
   clearTimeout(welcomeTimer);
+  window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
   try {
@@ -1902,7 +1906,12 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
-  onFinish:offerNotificationAfterWelcome
+  onFinish(){
+    const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
+    if(showingMusicChoice){
+      document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
+    }else offerNotificationAfterWelcome();
+  }
 });
 // Same welcome animation on every reload and every new website open.
 const previousName=existingUserName().trim();
@@ -2671,6 +2680,7 @@ html #schoolTermBar .school-term-segment button {
 <!-- Shared Music Catalog player and launch announcement for the classic entry point. -->
 <link rel="stylesheet" href="/drive-music.css?v=3">
 <script defer src="/drive-music.js?v=3"></script>
+<script defer src="/bgm-howler.js?v=20261028-choice"></script>
 <link rel="stylesheet" href="/music-launch.css?v=1">
 <script defer src="/music-launch.js?v=1"></script>
 </body>
