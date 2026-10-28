@@ -3,21 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>8aPDF Music Player</title>
+<meta name="robots" content="noindex">
+<title>8aPDF · Background Music</title>
 <style>
 :root{color-scheme:dark}
-html,body{box-sizing:border-box;margin:0;width:100%;height:100%;min-height:190px;background:transparent;color:#fff;font-family:Inter,system-ui,sans-serif;overflow:hidden}
-*,*::before,*::after{box-sizing:inherit}
-.music-frame{position:relative;isolation:isolate;width:100%;height:100%;min-height:190px;overflow:hidden;background:transparent}
-.elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653{width:100%;height:100%;min-height:190px}
-.music-controls{position:absolute;bottom:8px;left:10px;z-index:100;display:flex;gap:6px}.music-controls button{background:#202020;color:#fff;border:1px solid #666;border-radius:8px;padding:7px 12px;font:12px Inter,system-ui,sans-serif;cursor:pointer}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#070707;color:#eee;font-family:'Space Grotesk',system-ui,sans-serif}
+body{min-height:100dvh;display:grid;place-items:center;padding:24px}
+main{max-width:440px;width:100%;border:1px solid #ffffff23;border-radius:16px;background:#131313;padding:28px}
+small{display:block;color:#989898;letter-spacing:.14em;font-size:10px}
+h1{font-size:27px;letter-spacing:-.05em;font-weight:600;margin:22px 0 10px}
+p{line-height:1.7;color:#b6b6b6;font-size:14px}
+a{color:#fff;font-weight:600}
 </style>
 </head>
-<body>
-<main class="music-frame" aria-label="8aPDF background music player">
-<div class="elfsight-app-c819d00c-c4d5-4b38-8e51-d5294975f653"></div>
-</main>
-<nav class="music-controls" aria-label="Music playback"><button id="musicPlay" type="button">▶ Play</button><button id="musicPause" type="button">Ⅱ Pause</button></nav>
-<script src="https://elfsightcdn.com/platform.js" async></script>
-<script src="/music-autostart.js?v=20261013"></script></body>
+<body><main><small>8aPDF / MUSIC</small><h1>Background music lives in Settings.</h1><p>The older embedded music widget has been retired. Open 8aPDF, choose With Music or No Music, and manage the three original background tracks under Settings.</p><a href="/settings">Open 8aPDF Settings</a></main></body>
 </html>
