@@ -9,7 +9,7 @@ const choice=fs.readFileSync('music-choice.js','utf8');
 const index=fs.readFileSync('index.html','utf8');
 const classic=fs.readFileSync('classic.html','utf8');
 new vm.Script(launch);new vm.Script(choice);
-assert.match(launch,/hiddenForever=\\?()=>true/);
+assert.match(launch,/hiddenForever=\(\)=>true/);
 for(const html of [index,classic]){
  assert.match(html,/src="\/music-launch\.js\?v=1"/);
  assert.match(html,/src="\/music-choice\.js\?v=1"/);
