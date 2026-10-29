@@ -34,6 +34,8 @@ assert.deepEqual(rank('English notebook submission',notes,'announcement').map(x=
 
 assert.deepEqual(rank('Science homework',notes,'announcement').map(x=>x.id),['n3'],'Science homework must not turn into a test');
 assert.equal(rank('latest teacher announcements',notes,'announcement').length,3,'Generic latest teacher messages must be discoverable');
+assert.deepEqual(rank('Which test is coming next?',notes,'announcement').map(x=>x.id),['n1'],'Natural-language upcoming test question must work');
+assert.deepEqual(rank('Any notebook submissions coming up?',notes,'announcement').map(x=>x.id),['n2'],'Upcoming notebook query must find the correct notice');
 assert.deepEqual(rank('Maths chapter 3',docs).map(x=>x.id),[],'Cross-subject chapter collisions must be rejected');
 assert.deepEqual(rank('latest PDFs',docs).map(x=>x.id).slice(0,2),['f','e'],'Recent PDF search must order by date');
 assert.equal(subjectOf('physics'),'science','Physics belongs to Science');
