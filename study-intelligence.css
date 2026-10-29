@@ -89,13 +89,6 @@ html[data-ui-mode="studio"] #dashboardWidgets .small-icon{
 .ws-event-toast p{font-size:.76rem;line-height:1.6;color:var(--text-soft);padding:10px 0;border-bottom:1px solid var(--line)}
 .ws-event-toast p strong{color:var(--text)}
 .ws-event-view{border:1px solid var(--line);background:var(--surface-soft);color:var(--text);border-radius:10px;padding:9px 12px;cursor:pointer;font:600 .76rem inherit}
-.ws-gemini-settings{margin:18px 0;padding-top:15px;border-top:1px solid var(--line)}
-.ws-gemini-settings .setting-label{display:block;margin-bottom:8px}
-.ws-gemini-settings label{display:block;font-size:.78rem;margin:13px 0 8px;font-weight:650}
-.ws-key-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.ws-key-row input{flex:1 1 240px;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid var(--line-bold);background:var(--surface);color:var(--text);font:inherit}
-.ws-key-row button{border:1px solid var(--line-bold);border-radius:10px;background:var(--surface-high);color:var(--text);font:650 .76rem inherit;padding:11px 13px;cursor:pointer}
-.ws-gemini-settings small{display:block;color:var(--muted);font-size:.72rem;line-height:1.5;margin-top:9px}
 .pdf-ai-source-link{cursor:pointer;border:1px solid var(--line-bold);background:var(--surface-high);color:var(--text);padding:9px 12px;border-radius:10px;margin-top:10px;font:650 .72rem inherit}
 .pdf-ai-result p{font-size:.76rem;line-height:1.6;color:var(--muted);margin-top:9px;overflow-wrap:anywhere}
 @media(max-width:550px){
