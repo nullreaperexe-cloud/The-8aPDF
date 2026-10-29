@@ -2863,39 +2863,72 @@ function showNoticeResults(result){
  }
  parent.append(list);feed.scrollTop=feed.scrollHeight;
 }
-function answerLocal(query,docs){const norm=normalize(query),all=docs.length,sub=subjectOf(query),chap=chapterOf(query),term=termOf(query);
-if(/^(hi|hii|hello|hey|namaste|hello bhai|hlo)\b/.test(norm))return{message:'Hey! 👋 Ask me for any PDF by subject, chapter, term or topic.',results:[]};
-if(/\b(timetable|time table|periods|schedule)\b/.test(norm)&&!sub){const days=bridge()?.timetable?.();const detail=Array.isArray(days)?'\n\n'+days.map(x=>'Day '+x.day+': '+x.periods.slice(1).join(' · ')).join('\n'):'';return{message:'Your six-day school timetable is also available in the left sidebar → Timetable.'+detail,results:[]}}
-if(!all)return{message:'The PDF library is still connecting. Please wait a moment and try again.',results:[]};
-const found=rank(query,docs);
-if(found.length)return{message:'Found '+found.length+' matching PDF'+(found.length===1?'':'s')+' in your 8aPDF library. Open, download or share below:',results:found};
-if(sub||chap||term||/\bpdfs?|notes?|worksheet|study\s+material\b/.test(norm))return{message:'I couldn’t find a matching PDF in the current library. Try another chapter name, subject or term.',results:[]};
-return null;}
+function answerLocal(query,docs){
+ const norm=normalize(query),notices=bridge()?.announcements?.()||[];
+ const sub=subjectOf(query),chap=chapterOf(query),term=termOf(query);
+ if(/^(hi|hii|hello|hey|namaste|hello bhai|hlo)\b/.test(norm))return{message:'Hey! 👋 Ask me to find PDFs or teacher announcements by subject, chapter, test or topic.',results:[],announcements:[]};
+ if(/\b(timetable|time table|periods|schedule)\b/.test(norm)&&!sub){
+  const days=bridge()?.timetable?.(),detail=Array.isArray(days)?'\n\n'+days.map(x=>'Day '+x.day+': '+x.periods.slice(1).join(' · ')).join('\n'):'';
+  return {message:'Your six-day timetable is in the left sidebar → Timetable.'+detail,results:[],announcements:[]};
+ }
+ if(!docs.length&&!notices.length)return{message:'The school library is still loading. Please try again in a moment.',results:[],announcements:[]};
+ const wantPdf=/\b(pdf|pdfs|file|files|worksheet|notes|chapter|chap|study material|download|document)\b|पीडीएफ/i.test(norm)||Boolean(chap||term);
+ const wantAnnouncement=/\b(announcement|announcements|circular|teacher|test|exam|quiz|homework|submission|notebook|notice|message|assignment|holiday|event|due)\b|सूचना|परीक्षा|ਹੋਮਵਰਕ/i.test(norm);
+ const pdfResults=wantAnnouncement&&!wantPdf?[]:rank(query,docs);
+ const noticeResults=wantPdf&&!wantAnnouncement?[]:rank(query,notices,'announcement');
+ // A high-confidence local answer never calls the remote AI: same instant speed.
+ if(pdfResults.length||noticeResults.length){
+  const texts=[];if(pdfResults.length)texts.push(pdfResults.length+' matching PDF'+(pdfResults.length===1?'':'s'));
+  if(noticeResults.length)texts.push(noticeResults.length+' teacher announcement'+(noticeResults.length===1?'':'s'));
+  return {message:'Found '+texts.join(' and ')+' in the 8aPDF library. These are the closest verified source titles; tap a result below.'+(wantAnnouncement?' Teacher message dates are not automatically test dates.':''),results:pdfResults,announcements:noticeResults};
+ }
+ if(wantPdf||wantAnnouncement||sub||chap||term)return{message:'No reliable match found in the currently loaded PDFs and teacher announcements. Try another subject, exact chapter or topic.',results:[],announcements:[]};
+ return null;
+}
 async function answerAI(question,docs){
  if(!configured)return null;
  const anns=bridge()?.announcements?.()||[];
- const key=normalize(question)+'|'+docs.length+'|'+anns.length;
+ const key=normalize(question)+'|'+docs.length+'|'+anns.length+'|'+(docs[0]?.id||'')+'|'+(anns[0]?.id||'');
  if(memory.has(key))return memory.get(key);
- const tokens=words(question).filter(x=>x.length>2);
- const score=x=>{const t=normalize([x.title,x.subject,x.category].join(' ')),d=normalize([x.description,x.message,x.fullMessage].join(' '));return tokens.reduce((v,k)=>v+(t.includes(k)?5:d.includes(k)?2:0),0)};
- const catalog=docs.slice().sort((a,b)=>score(b)-score(a)).slice(0,36).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,170),chapter:d.chapter,term:d.term}));
- const dateText=v=>{if(typeof v==='string')return v.slice(0,50);try{if(v?.toDate)return v.toDate().toISOString().slice(0,10);if(typeof v?.seconds==='number')return new Date(v.seconds*1000).toISOString().slice(0,10)}catch{}return''};
- const announcements=anns.slice().sort((a,b)=>score(b)-score(a)).slice(0,38).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,350),eventDate:dateText(a.eventDate),messageDate:dateText(a.messageDate)}));
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),11000);
+ const tokens=words(question);
+ const score=x=>{const head=normalize([x.title,x.subject,x.category,x.chapter].join(' ')),desc=normalize([x.description,x.message,x.fullMessage].join(' '));return tokens.reduce((v,k)=>v+(head.includes(k)?7:desc.includes(k)?2:0),0)};
+ const shortlist=(list,kind,size)=>{
+  const good=rank(question,list,kind),seen=new Set(good.map(x=>x.id));
+  const fallback=list.filter(x=>!seen.has(x.id)).sort((a,b)=>score(b)-score(a)).slice(0,Math.max(0,size-good.length));
+  return [...good,...fallback].slice(0,size);
+ };
+ const catalog=shortlist(docs,'pdf',24).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,400),chapter:d.chapter,term:d.term}));
+ const dateText=v=>{if(typeof v==='string')return v.slice(0,55);try{if(v?.toDate)return v.toDate().toISOString().slice(0,10);if(typeof v?.seconds==='number')return new Date(v.seconds*1000).toISOString().slice(0,10)}catch{}return''};
+ const announcements=shortlist(anns,'announcement',24).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,500),eventDate:dateText(a.eventDate),messageDate:dateText(a.messageDate)}));
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
  try{
-  const headers={'Content-Type':'application/json'},personal=window.__8apdfStudyIntel?.customKey?.();
-  if(personal)headers['x-8apdf-gemini-key']=personal;
-  const response=await fetch('/api/pdf-chat',{method:'POST',headers,body:JSON.stringify({question,catalog,announcements}),signal:controller.signal});
+  const response=await fetch('/api/pdf-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,catalog,announcements}),signal:controller.signal});
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw Error(data.error||'AI currently unavailable');
+  if(!response.ok)throw Error(data.error||'AI unavailable');
   const ids=new Set(Array.isArray(data.ids)?data.ids:[]),annIds=new Set(Array.isArray(data.announcementIds)?data.announcementIds:[]);
-  const result={message:String(data.answer||'No confirmed match in the current materials.'),results:docs.filter(d=>ids.has(d.id)).slice(0,4),announcements:anns.filter(a=>annIds.has(a.id)).slice(0,4)};
+  const result={message:String(data.answer||'No confirmed match in current sources.'),results:docs.filter(d=>ids.has(d.id)).slice(0,4),announcements:anns.filter(a=>annIds.has(a.id)).slice(0,4)};
   memory.set(key,result);if(memory.size>30)memory.delete(memory.keys().next().value);
   return result;
- }catch(e){hint.textContent=e.name==='AbortError'?'Groq timed out. Local answers remain available.':'Groq unavailable: '+String(e.message||'Please retry').slice(0,140);return null}
+ }catch(e){hint.textContent=e.name==='AbortError'?'Groq timed out. Local answers remain available.':'Groq unavailable: '+String(e.message||'Try again').slice(0,140);return null}
  finally{clearTimeout(timer)}
 }
-async function send(){const question=input.value.trim();if(!question||busy)return;input.value='';makeMessage(question,'user');const docs=bridge()?.documents?.()||[];const announcement=window.__8apdfStudyIntel?.answer?.(question);if(announcement){showNoticeResults(announcement);return}const result=answerLocal(question,docs);if(result){showResults(result.message,result.results);return}busy=true;const placeholder=makeMessage('Checking PDFs and teacher announcements…');try{await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();if(resultAI)showNoticeResults(resultAI);else showResults('No confirmed answer from the current PDFs or teacher announcements. Ask a specific subject, test or notebook submission question.',[])}finally{busy=false}}
+async function send(){
+ const question=input.value.trim();if(!question||busy)return;
+ input.value='';makeMessage(question,'user');
+ const docs=bridge()?.documents?.()||[];
+ const wantsDate=/\b(when|upcoming|next|tomorrow|due|date|kab|kal)\b/i.test(normalize(question));
+ const teacherAnswer=wantsDate?window.__8apdfStudyIntel?.answer?.(question):null;
+ if(teacherAnswer&&teacherAnswer.announcements?.length){showNoticeResults(teacherAnswer);return}
+ const result=answerLocal(question,docs);
+ if(result){showNoticeResults(result);return}
+ busy=true;
+ const placeholder=makeMessage('Checking PDFs and teacher announcements…');
+ try{
+  await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();
+  if(resultAI)showNoticeResults(resultAI);
+  else showResults('No confirmed answer in currently loaded PDFs or teacher messages. Ask for a specific subject, chapter or topic.',[]);
+ }finally{busy=false}
+}
 el('pdfAiForm').addEventListener('submit',e=>{e.preventDefault();send()});input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();el('pdfAiForm').requestSubmit()}});
 window.__8apdfAiFinderTest={rank,answerLocal,normalize,subjectOf,chapterOf,termOf};
 })();
