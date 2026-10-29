@@ -2,6 +2,14 @@ name: Train AI Finder Search Keywords (Groq)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ai-finder-train.mjs'
+      - 'tests/ai-finder-quality.test.cjs'
+      - 'tests/ai-chat.test.cjs'
+      - 'api/pdf-chat.js'
+      - '.github/workflows/ai-finder-training.yml'
   schedule:
     # 19:30 UTC = 01:00 AM Asia/Kolkata
     - cron: '30 19 * * *'
@@ -30,11 +38,13 @@ jobs:
           node --check scripts/ai-finder-train.mjs
           node tests/ai-finder-quality.test.cjs
       - name: Enrich published PDFs and announcements with Groq
+        if: github.event_name != 'push'
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           AI_FINDER_SITE: https://8apdf.me
         run: node scripts/ai-finder-train.mjs
       - name: Commit updated training metadata only
+        if: github.event_name != 'push'
         run: |
           if git diff --quiet -- data/ai-finder-training.json; then
             echo "Keyword index already fresh."
