@@ -1,1 +1,39 @@
-{"version":1,"timeZone":"Asia/Kolkata","anchor":{"date":"2026-10-13","day":6,"source":"Confirmed by Kanish"},"weeklyOff":[0],"saturdayOff":[2,4],"start":"2026-10-13","end":"2028-03-31","holidays":[],"note":"Sunday and second/fourth Saturday are confirmed. Additional closures are imported only from explicit school notices; a complete school holiday list has not been supplied.","cycleCorrections":[{"date":"2026-10-21","day":4,"source":"School confirmation on 2026-10-21: next school day is Day 5"}]}
+{
+  "version": 1,
+  "timeZone": "Asia/Kolkata",
+  "anchor": {
+    "date": "2026-10-13",
+    "day": 6,
+    "source": "Confirmed by Kanish"
+  },
+  "weeklyOff": [
+    0
+  ],
+  "saturdayOff": [
+    2,
+    4
+  ],
+  "start": "2026-10-13",
+  "end": "2028-03-31",
+  "holidays": [
+    {
+      "date": "2026-10-29",
+      "reason": "Karva Chauth",
+      "source": "edusecure-holiday-banner-screenshot"
+    }
+  ],
+  "note": "Sunday and second/fourth Saturday are weekly closures. EduSecure's verified green holiday banners are synced nightly at 12:00 AM IST after GitHub credentials are configured. Existing manually confirmed holidays remain preserved.",
+  "cycleCorrections": [
+    {
+      "date": "2026-10-21",
+      "day": 4,
+      "source": "School confirmation on 2026-10-21: next school day is Day 5"
+    }
+  ],
+  "holidaySync": {
+    "source": "edusecure-holiday-banner",
+    "status": "awaiting-credentials",
+    "checkedAt": null,
+    "bannersFound": 0
+  }
+}
