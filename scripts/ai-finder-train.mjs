@@ -7,7 +7,7 @@ import {createHash} from 'node:crypto';
 
 const OUT=new URL('../data/ai-finder-training.json',import.meta.url);
 const BASE=process.env.AI_FINDER_SITE||'https://8apdf.me';
-const MODEL='llama-3.1-8b-instant';
+const MODEL='llama-3.3-70b-versatile';
 const MAX_TOTAL=1500, BATCH=12;
 const compact=(v,n=220)=>String(v??'').replace(/\s+/g,' ').trim().slice(0,n);
 const redact=v=>compact(v,230).replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[email]').replace(/(?:\+?\d[\d\s()-]{8,}\d)/g,'[phone]');
@@ -54,7 +54,7 @@ async function enrich(batch,key){
    const response=await fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},
     signal:AbortSignal.timeout(25000),
-    body:JSON.stringify({model:MODEL,temperature:0,response_format:{type:'json_object'},max_tokens:1250,
+    body:JSON.stringify({model:MODEL,temperature:0,response_format:{type:'json_object'},max_tokens:1750,
      messages:[{role:'system',content:instructions},{role:'user',content:JSON.stringify({items:payload})}]})
    });
    if(!response.ok)throw Error('Groq returned HTTP '+response.status);
