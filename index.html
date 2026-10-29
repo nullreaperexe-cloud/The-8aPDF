@@ -2805,7 +2805,7 @@ function matchChapter(d,no){if(!no)return true;const titleNums=chapterNumbers([d
 function rank(q,docs,kind='pdf'){
  const norm=normalize(q),sub=subjectOf(q),chap=chapterOf(q),term=termOf(q),recent=/\b(latest|recent|newest|today|last|recently)\b/i.test(norm);
  const isNotice=kind==='announcement';
- const stop=new Set(['test','exam','assessment','quiz','submission','submit','notebook','homework','assignment','holiday','event','events','teacher','teachers','announcement','announcements','circular','circulars','message','messages','pdf','pdfs','notes','files','file','chapter','ch','lesson','document','documents','new','recent','latest','newest','today','last','school','work','workbook']);
+ const stop=new Set(['test','tests','exam','exams','assessment','quiz','quizzes','submission','submissions','submit','notebook','notebooks','homework','assignment','holiday','event','events','teacher','teachers','announcement','announcements','circular','circulars','message','messages','pdf','pdfs','notes','files','file','chapter','ch','lesson','document','documents','new','recent','latest','newest','today','last','school','work','workbook']);
  const namedSubjectTokens=new Set(words(sub));
  const significant=[...new Set(words(q).filter(t=>!stop.has(t)&&!namedSubjectTokens.has(t)&&!/^\d+$/.test(t)))];
  const wantTest=/\b(test|tests|exam|exams|assessment|quiz|quizzes)\b|परीक्षा|ਟੈਸਟ/i.test(norm);
