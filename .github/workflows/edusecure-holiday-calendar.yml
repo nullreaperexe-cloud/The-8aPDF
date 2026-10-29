@@ -2,6 +2,12 @@ name: EduSecure Holiday Calendar Sync
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/edusecure_holiday_sync.py'
+      - 'tests/test_edusecure_holidays.py'
+      - '.github/workflows/edusecure-holiday-calendar.yml'
   schedule:
     # 18:30 UTC = 00:00 Asia/Kolkata the following calendar day.
     # GitHub schedules are best-effort and can start late.
@@ -34,6 +40,7 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_edusecure_holidays.py' -v
 
       - name: Read EduSecure holiday banner and update calendar
+        if: github.event_name != 'push'
         env:
           EDUSECURE_USERNAME: ${{ secrets.EDUSECURE_USERNAME }}
           EDUSECURE_PASSWORD: ${{ secrets.EDUSECURE_PASSWORD }}
@@ -41,6 +48,7 @@ jobs:
         run: python scripts/edusecure_holiday_sync.py
 
       - name: Commit only verified holiday calendar changes
+        if: github.event_name != 'push'
         run: |
           if git diff --quiet -- data/school-calendar.json; then
             echo "Calendar is unchanged; nothing to commit."
