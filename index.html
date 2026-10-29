@@ -2790,6 +2790,15 @@ function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical
 function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
 function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
 const chapterPattern=/(?:chapter|chap|lesson|ch|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})\b/gi;
+const trainedTerms=new Map();
+fetch('/data/ai-finder-training.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(data=>{
+ if(!data||data.version!==1||typeof data.items!=='object'||!data.items)return;
+ for(const [id,item] of Object.entries(data.items)){
+  if(!Array.isArray(item?.keywords)||item.keywords.length>12)continue;
+  trainedTerms.set(id,normalize(item.keywords.join(' ')));
+ }
+}).catch(()=>{}); // Background-only. Search never waits for training metadata.
+
 function chapterNumbers(text){const arr=[];for(const m of normalize(text).matchAll(chapterPattern))arr.push(String(Number(m[1])));return arr}
 function matchChapter(d,no){if(!no)return true;const titleNums=chapterNumbers([d.title,d.chapter].join(' ')),explicit=normalize(d.chapter);if(titleNums.includes(no)||explicit===no)return true;if(titleNums.length)return false;const descNums=chapterNumbers([d.description,d.message].join(' '));return descNums.includes(no)}
 function rank(q,docs,kind='pdf'){
@@ -2804,6 +2813,7 @@ function rank(q,docs,kind='pdf'){
   if(!isNotice&&term&&doc.term!==term)continue;
   const title=normalize(doc.title),ds=normalize(doc.subject),desc=normalize([doc.description,doc.message,doc.fullMessage].join(' ')),meta=normalize([doc.chapter,doc.className,(doc.tags||[]).join(' ')].join(' ')),cat=normalize(doc.category);
   const text=title+' '+ds+' '+desc+' '+meta+' '+cat;
+  const enriched=trainedTerms.get(kind+':'+doc.id)||'';
   const namedSubject=(ds===sub||ds.includes(sub)||title.includes(sub)||meta.includes(sub));
   const unknownSubject=(!ds||/^(other|general|uncategorized|circular|school diary)$/.test(ds));
   if(sub&&!namedSubject&&!(unknownSubject&&desc.includes(sub)))continue;
@@ -2813,12 +2823,14 @@ function rank(q,docs,kind='pdf'){
   for(const token of significant){
    const aliases=token==='qa'||token==='qna'?['question','answer','qa','qna']:token==='solution'?['answer','solved','solution']:token==='revision'?['practice','revision']:token==='worksheet'?['worksheet','work sheet']:token==='programs'?['program','programs']:token==='sci'?['science']:[token];
    const has=field=>aliases.some(w=>field.includes(w));
-   if(has(title)){score+=30;matched++}else if(has(meta)){score+=19;matched++}else if(has(ds)){score+=15;matched++}else if(has(desc)){score+=9;matched++}
+   if(has(title)){score+=30;matched++}else if(has(meta)){score+=19;matched++}else if(has(ds)){score+=15;matched++}else if(has(desc)){score+=9;matched++}else if(has(enriched)){score+=7;matched++}
   }
   if(significant.length&&!matched&&!chap)continue;
   if(significant.length>=2&&matched<Math.ceil(significant.length/2)&&!chap)continue;
   if(isNotice){
+   if(wantTest&&!/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text))continue;
    if(wantTest&&/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text))score+=45;
+   if(wantSubmission&&!/\b(submit|submission|notebook|homework|bring|जमा)\b/.test(text))continue;
    if(wantSubmission&&/\b(submit|submission|notebook|homework|bring|जमा)\b/.test(text))score+=40;
    if((wantTest||wantSubmission)&&score<25)continue;
   }
