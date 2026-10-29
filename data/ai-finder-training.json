@@ -1,7 +1,219 @@
 {
   "version": 1,
-  "generatedAt": null,
+  "generatedAt": "2026-10-29",
   "model": null,
-  "source": "Groq metadata enrichment; no PDF text is included",
+  "source": "train.md deterministic offline retrieval vocabulary; zero model calls or Groq credits",
+  "aliases": {
+    "qa": [
+      "question answer",
+      "question answers",
+      "questions and answers",
+      "qna",
+      "qa",
+      "solved questions",
+      "exercise answers"
+    ],
+    "qna": [
+      "question answers",
+      "qa",
+      "solutions",
+      "questions"
+    ],
+    "questions": [
+      "question",
+      "question answers",
+      "exercise",
+      "qna"
+    ],
+    "answers": [
+      "answer",
+      "solutions",
+      "solved",
+      "question answers"
+    ],
+    "solution": [
+      "solutions",
+      "answer",
+      "solved",
+      "worked solution"
+    ],
+    "solutions": [
+      "solution",
+      "answer",
+      "solved"
+    ],
+    "notes": [
+      "notes",
+      "study notes",
+      "chapter notes",
+      "revision notes",
+      "notebook"
+    ],
+    "notebook": [
+      "notebook",
+      "copy",
+      "exercise book",
+      "school notebook"
+    ],
+    "worksheet": [
+      "worksheet",
+      "work sheet",
+      "practice sheet",
+      "exercise sheet"
+    ],
+    "revision": [
+      "revision",
+      "revise",
+      "recap",
+      "practice"
+    ],
+    "revise": [
+      "revision",
+      "recap",
+      "practice"
+    ],
+    "practice": [
+      "practice",
+      "revision",
+      "exercise"
+    ],
+    "exercises": [
+      "exercise",
+      "questions",
+      "practice"
+    ],
+    "test": [
+      "test",
+      "unit test",
+      "class test",
+      "assessment"
+    ],
+    "exam": [
+      "exam",
+      "examination",
+      "test",
+      "assessment"
+    ],
+    "submission": [
+      "submission",
+      "submit",
+      "notebook submission",
+      "bring notebook"
+    ],
+    "submit": [
+      "submit",
+      "submission",
+      "hand in",
+      "bring notebook"
+    ],
+    "homework": [
+      "homework",
+      "home work",
+      "assignment",
+      "hw"
+    ],
+    "assignment": [
+      "assignment",
+      "homework",
+      "project"
+    ],
+    "circular": [
+      "circular",
+      "notice",
+      "school announcement"
+    ],
+    "holiday": [
+      "holiday",
+      "school closed",
+      "vacation",
+      "chhutti"
+    ],
+    "program": [
+      "program",
+      "programs",
+      "coding",
+      "code"
+    ],
+    "programs": [
+      "programs",
+      "program",
+      "coding",
+      "code"
+    ],
+    "html": [
+      "html",
+      "webpage",
+      "web page",
+      "markup"
+    ],
+    "css": [
+      "css",
+      "stylesheet",
+      "styles"
+    ],
+    "physics": [
+      "physics",
+      "force",
+      "motion"
+    ],
+    "biology": [
+      "biology",
+      "living organisms"
+    ],
+    "fractions": [
+      "fraction",
+      "fractions"
+    ],
+    "grammar": [
+      "grammar",
+      "व्याकरण",
+      "vyakaran"
+    ],
+    "literature": [
+      "literature",
+      "साहित्य",
+      "sahitya"
+    ],
+    "poem": [
+      "poem",
+      "poetry",
+      "कविता"
+    ],
+    "maths": [
+      "maths",
+      "mathematics",
+      "math",
+      "ganit",
+      "गणित"
+    ],
+    "science": [
+      "science",
+      "vigyan",
+      "विज्ञान"
+    ],
+    "hindi": [
+      "hindi",
+      "हिंदी",
+      "हिन्दी"
+    ],
+    "punjabi": [
+      "punjabi",
+      "ਪੰਜਾਬੀ"
+    ],
+    "english": [
+      "english",
+      "अंग्रेजी"
+    ],
+    "practical": [
+      "practical",
+      "lab",
+      "program"
+    ],
+    "map": [
+      "map",
+      "political map",
+      "geography"
+    ]
+  },
   "items": {}
 }
