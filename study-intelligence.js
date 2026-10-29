@@ -1,6 +1,6 @@
-/* Local-first 8aPDF announcement, reminder and Gemini-key helper. */
+/* Local-first 8aPDF teacher announcements and dated reminders. */
 (()=>{'use strict';
-const $=id=>document.getElementById(id),K='8apdf_events_v2',SEEN='8apdf_events_seen_v2',API='8apdf_gemini_custom_session';
+const $=id=>document.getElementById(id),K='8apdf_events_v2',SEEN='8apdf_events_seen_v2';
 const str=(x,n=500)=>String(x??'').replace(/\s+/g,' ').trim().slice(0,n);
 const lower=x=>str(x,2000).toLocaleLowerCase();
 const fromStore=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch{return d}};
@@ -94,23 +94,13 @@ function remind(){
 function updateButton(){
  const b=$('wsUpcomingBtn');if(!b)return;const n=upcoming().length;b.hidden=n===0;b.textContent='◷ '+n+' upcoming '+(n===1?'reminder':'reminders');
 }
-function setupSettings(){
- const body=document.querySelector('#studioUiSetting');if(!body||$('wsGeminiSettings'))return;
- const section=document.createElement('div');section.className='ws-gemini-settings';section.id='wsGeminiSettings';
- section.innerHTML='<strong class="setting-label">AI Finder · Gemini API key</strong><p class="setting-explainer">Default server key remains configured and hidden. Optionally use your own key for this tab only; clearing it restores default.</p><label for="wsGeminiInput">Your Gemini API key</label><div class="ws-key-row"><input type="password" id="wsGeminiInput" placeholder="Paste your Gemini key" autocomplete="off" spellcheck="false"><button type="button" id="wsGeminiSet">Use key</button><button type="button" id="wsGeminiReset">Use default</button></div><small id="wsGeminiStatus" role="status">Server default active. Your personal key is never stored permanently.</small>';
- body.append(section);
- const input=$('wsGeminiInput'),message=$('wsGeminiStatus');
- if(customKey())message.textContent='Personal key active for this browser tab.';
- $('wsGeminiSet').onclick=()=>{const k=input.value.trim();if(!/^[a-zA-Z0-9_-]{20,180}$/.test(k)){message.textContent='Invalid key format; default unchanged.';return}try{sessionStorage.setItem(API,k);input.value='';message.textContent='Personal key active for this tab. Default server key stays available.';document.dispatchEvent(new Event('8apdf:gemini-key-changed'))}catch{message.textContent='Session storage unavailable.'}};
- $('wsGeminiReset').onclick=()=>{try{sessionStorage.removeItem(API)}catch{}input.value='';message.textContent='Server default active.';document.dispatchEvent(new Event('8apdf:gemini-key-changed'))};
-}
-function customKey(){try{return sessionStorage.getItem(API)||''}catch{return''}}
+function customKey(){return ''} // AI uses the server-side GROQ_API_KEY only.
 function addBadge(){
  const root=$('workspaceHomeActions');if(!root||$('wsUpcomingBtn'))return;
  const b=document.createElement('button');b.type='button';b.id='wsUpcomingBtn';b.hidden=true;b.className='ws-upcoming-btn';b.onclick=()=>{try{localStorage.removeItem(SEEN)}catch{}remind()};root.append(b);updateButton();
 }
 window.__8apdfStudyIntel={getAnnouncements:()=>announcements.slice(),upcoming,answer,customKey,mountBadge:addBadge,refresh:()=>ingest(window.__8apdfStudyBridge?.announcements?.()||[])};
 document.addEventListener('8apdf:teacher-data',e=>ingest(e.detail));
-function init(){setupSettings();addBadge();ingest(window.__8apdfStudyBridge?.announcements?.()||[]);ready=true;remind()}
+function init(){addBadge();ingest(window.__8apdfStudyBridge?.announcements?.()||[]);ready=true;remind()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
