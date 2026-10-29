@@ -2802,47 +2802,66 @@ fetch('/data/ai-finder-training.json',{cache:'force-cache'}).then(r=>r.ok?r.json
 function chapterNumbers(text){const arr=[];for(const m of normalize(text).matchAll(chapterPattern))arr.push(String(Number(m[1])));return arr}
 function matchChapter(d,no){if(!no)return true;const titleNums=chapterNumbers([d.title,d.chapter].join(' ')),explicit=normalize(d.chapter);if(titleNums.includes(no)||explicit===no)return true;if(titleNums.length)return false;const descNums=chapterNumbers([d.description,d.message].join(' '));return descNums.includes(no)}
 function rank(q,docs,kind='pdf'){
- const norm=normalize(q),sub=subjectOf(q),chap=chapterOf(q),term=termOf(q),recent=/\b(latest|recent|new|today|newest|last|recently)\b/i.test(norm);
- const isNotice=kind==='announcement',allTokens=words(q);
- const significant=[...new Set(allTokens.filter(x=>!['test','exam','submit','announcement','announcements','circular','teacher','message','homework'].includes(x)&&x!==sub&&!/^\d+$/.test(x)))];
+ const norm=normalize(q),sub=subjectOf(q),chap=chapterOf(q),term=termOf(q),recent=/\b(latest|recent|newest|today|last|recently)\b/i.test(norm);
+ const isNotice=kind==='announcement';
+ const stop=new Set(['test','exam','assessment','quiz','submission','submit','notebook','homework','assignment','holiday','event','events','teacher','teachers','announcement','announcements','circular','circulars','message','messages','pdf','pdfs','notes','files','file','chapter','ch','lesson','document','documents','new','recent','latest','newest','today','last','school','work','workbook']);
+ const namedSubjectTokens=new Set(words(sub));
+ const significant=[...new Set(words(q).filter(t=>!stop.has(t)&&!namedSubjectTokens.has(t)&&!/^\d+$/.test(t)))];
  const wantTest=/\b(test|exam|assessment|quiz)\b|परीक्षा|ਟੈਸਟ/i.test(norm);
- const wantSubmission=/\b(submit|submission|notebook|homework)\b|जमा|ਕਾਪੀ/i.test(norm);
+ const wantSubmission=/\b(submit|submission|notebook|copy checking)\b|जमा|ਕਾਪੀ/i.test(norm);
+ const wantHomework=/\bhomework\b|होमवर्क|ਹੋਮਵਰਕ/i.test(norm);
+ const wantHoliday=/\b(holiday|holidays|vacation|closed|closure|chhutti)\b|छुट्टी/i.test(norm);
+ const wantNotice=/\b(teacher|teachers|announcement|announcements|notice|circular|message|messages)\b/i.test(norm);
+ const wantWorksheet=/\bworksheet\b|\bwork sheet\b/i.test(norm);
+ const aliases=token=>token==='qa'||token==='qna'?['question answer','questions','qa','qna','solution','answers']:token==='solutions'||token==='solution'?['solution','solved','answer','answers']:token==='revision'||token==='revise'?['revision','practice','review']:token==='worksheet'?['worksheet','work sheet','practice sheet']:token==='programs'||token==='program'?['program','programs','coding']:token==='sci'?['science']:token==='fractions'?['fraction','fractions']:[token];
+ const has=(field,token)=>aliases(token).some(w=>(' '+field+' ').includes(' '+w+' '));
  const rows=[];
  for(const doc of docs||[]){
   if(!doc||!doc.id||!doc.title)continue;
-  if(!isNotice&&term&&doc.term!==term)continue;
+  if(!isNotice&&term&&doc.term&&doc.term!==term)continue;
+  if(chap&&!matchChapter(doc,chap))continue;
   const title=normalize(doc.title),ds=normalize(doc.subject),desc=normalize([doc.description,doc.message,doc.fullMessage].join(' ')),meta=normalize([doc.chapter,doc.className,(doc.tags||[]).join(' ')].join(' ')),cat=normalize(doc.category);
   const text=title+' '+ds+' '+desc+' '+meta+' '+cat;
   const enriched=trainedTerms.get(kind+':'+doc.id)||'';
-  const namedSubject=(ds===sub||ds.includes(sub)||title.includes(sub)||meta.includes(sub));
-  const unknownSubject=(!ds||/^(other|general|uncategorized|circular|school diary)$/.test(ds));
-  if(sub&&!namedSubject&&!(unknownSubject&&desc.includes(sub)))continue;
-  if(chap&&!matchChapter(doc,chap))continue;
-  let score=(sub?(namedSubject?55:22):0)+(chap?85:0);
-  let matched=0;
+  const knownSubject=subjectOf(ds)||subjectOf(title)||subjectOf(meta);
+  const unknownSubject=!ds||/^(other|general|uncategorized|circular|school diary)$/.test(ds);
+  if(sub&&knownSubject&&knownSubject!==sub)continue;
+  if(sub&&!knownSubject&&!(unknownSubject&&subjectOf(desc)===sub))continue;
+  let score=(sub?(knownSubject===sub?65:24):0)+(chap?105:0),matched=0;
   for(const token of significant){
-   const aliases=token==='qa'||token==='qna'?['question','answer','qa','qna']:token==='solution'?['answer','solved','solution']:token==='revision'?['practice','revision']:token==='worksheet'?['worksheet','work sheet']:token==='programs'?['program','programs']:token==='sci'?['science']:[token];
-   const has=field=>aliases.some(w=>field.includes(w));
-   if(has(title)){score+=30;matched++}else if(has(meta)){score+=19;matched++}else if(has(ds)){score+=15;matched++}else if(has(desc)){score+=9;matched++}else if(has(enriched)){score+=7;matched++}
+   if(has(title,token)){score+=34;matched++}
+   else if(has(meta,token)){score+=22;matched++}
+   else if(has(ds,token)){score+=16;matched++}
+   else if(has(desc,token)){score+=10;matched++}
+   else if(has(enriched,token)){score+=7;matched++}
   }
   if(significant.length&&!matched&&!chap)continue;
   if(significant.length>=2&&matched<Math.ceil(significant.length/2)&&!chap)continue;
   if(isNotice){
-   if(wantTest&&!/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text))continue;
-   if(wantTest&&/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text))score+=45;
-   if(wantSubmission&&!/\b(submit|submission|notebook|homework|bring|जमा)\b/.test(text))continue;
-   if(wantSubmission&&/\b(submit|submission|notebook|homework|bring|जमा)\b/.test(text))score+=40;
-   if((wantTest||wantSubmission)&&score<25)continue;
-  }
-  if(norm.length>8&&title.includes(norm))score+=65;
+   const isTest=/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text);
+   const isSubmission=/\b(submit|submission|notebook|copy|bring)\b|जमा|ਕਾਪੀ/.test(text);
+   const isHomework=/\b(homework|home work|assignment)\b|ਹੋਮਵਰਕ/.test(text);
+   const isHoliday=/\b(holiday|holidays|closed|closure|vacation|chhutti)\b|छुट्टी/.test(text);
+   if(wantTest&&!isTest)continue;
+   if(wantSubmission&&!isSubmission)continue;
+   if(wantHomework&&!isHomework)continue;
+   if(wantHoliday&&!isHoliday)continue;
+   if(wantTest)score+=55;
+   if(wantSubmission)score+=48;
+   if(wantHomework)score+=40;
+   if(wantHoliday)score+=45;
+   if(wantNotice)score+=18;
+   if(wantTest&&/\b(tests|exams)\b/.test(cat))score+=15;
+  }else if(wantWorksheet&&/\bworksheet\b|\bwork sheet\b/.test(text))score+=30;
+  if(norm.length>8&&title.includes(norm))score+=70;
   const time=Number(doc.uploadedAtMs||doc.dateMs||Date.parse(doc.messageDate||doc.createdAt||0))||0;
-  if(recent&&time)score+=12;
-  if(!sub&&!chap&&!significant.length&&!wantTest&&!wantSubmission&&!recent)continue;
-  if(!sub&&!chap&&!significant.length&&!isNotice&&!recent)continue;
-  if(score<=0)continue;
+  if(recent&&time)score+=15;
+  if(!sub&&!chap&&!significant.length&&!wantTest&&!wantSubmission&&!wantHomework&&!wantHoliday&&!wantNotice&&!recent&&!term)continue;
+  if(!sub&&!chap&&!significant.length&&!isNotice&&!recent&&!term)continue;
+  if(score<=0&&!recent)continue;
   rows.push({doc,score,time});
  }
- rows.sort((a,b)=>b.score-a.score||(b.time-a.time)||String(a.doc.title).localeCompare(String(b.doc.title)));
+ rows.sort((a,b)=>b.score-a.score||b.time-a.time||String(a.doc.title).localeCompare(String(b.doc.title)));
  return rows.slice(0,isNotice?4:6).map(x=>x.doc);
 }
 function makeMessage(text,type='ai'){const initial=el('pdfAiWelcome');if(initial)initial.hidden=true;const p=document.createElement('div');p.className='pdf-ai-message '+(type==='user'?'user':'ai');const z=document.createElement('p');z.textContent=text;p.append(z);feed.append(p);feed.scrollTop=feed.scrollHeight;return p}
