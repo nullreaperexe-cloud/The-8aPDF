@@ -2230,7 +2230,7 @@ function showAbout8aPDF(){
  const features=[
  ['📚 PDF Study Library','Browse school materials by subject, search for topics, and filter by Term 1 or Term 2.'],
  ['🔍 Fast Search','Find titles, subjects and chapters using the library search and shortcuts.'],
- ['🤖 AI PDF Finder','Ask for school PDFs in a dedicated chat workspace; local matches work without a paid AI request. Optional Gemini assistance depends on server setup.'],
+ ['🤖 AI PDF Finder','Ask for school PDFs in a dedicated chat workspace; local matches work without a paid AI request. Optional Groq assistance depends on server setup.'],
  ['📄 Preview & Download','Open a PDF preview, download it, or share it directly from its study-material card.'],
  ['🔗 Smart Share & Short Links','Choose the original PDF link or create a custom short URL. Your browser can manage its own newly created short links.'],
  ['📢 School Announcements','See published school notices, updates, events and circulars in one place.'],
@@ -2765,11 +2765,11 @@ body.pdf-ai-open{overflow:hidden!important}.pdf-ai-layer button:focus-visible{ou
   <p class="ai-nav-footnote">Your searches stay on this device. Matching PDFs come straight from your library.</p>
 </nav>
 <div class="pdf-ai-main">
-  <div class="pdf-ai-top"><button type="button" class="ai-nav-menu" id="pdfAiNavToggle" aria-label="Toggle AI navigation" aria-expanded="false">☰</button><span class="pdf-ai-avatar" aria-hidden="true">✦</span><div><h2 id="pdfAiHeading">8aPDF Study AI</h2><p id="pdfAiState">Instant search · Gemini only when needed</p></div><button type="button" id="pdfAiClose" class="pdf-ai-close" aria-label="Close AI finder">×</button></div>
+  <div class="pdf-ai-top"><button type="button" class="ai-nav-menu" id="pdfAiNavToggle" aria-label="Toggle AI navigation" aria-expanded="false">☰</button><span class="pdf-ai-avatar" aria-hidden="true">✦</span><div><h2 id="pdfAiHeading">8aPDF Study AI</h2><p id="pdfAiState">Instant search · Groq only when needed</p></div><button type="button" id="pdfAiClose" class="pdf-ai-close" aria-label="Close AI finder">×</button></div>
   <div class="pdf-ai-feed" id="pdfAiFeed" role="log" aria-live="polite" aria-relevant="additions">
-   <div class="pdf-ai-welcome" id="pdfAiWelcome"><span class="ai-welcome-logo anime-logo-mark" aria-hidden="true"></span><span class="ai-welcome-kicker">8aPDF · YOUR STUDY ASSISTANT</span><h1>How can I help you study?</h1><p>Find PDFs, ask about teacher messages, upcoming tests and notebook submissions. Instant answers first; Gemini only when needed.</p><div class="pdf-ai-quick" id="pdfAiQuick"><button type="button" data-ai-prompt="Science chapter 3">Science Ch 3</button><button type="button" data-ai-prompt="Latest Computer PDFs">Computer PDFs</button><button type="button" data-ai-prompt="Hindi Term 2 PDFs">Hindi Term 2</button><button type="button" data-ai-prompt="Which test is coming next?">Upcoming Test</button><button type="button" data-ai-prompt="Any notebook submissions coming up?">Notebook Submission</button><button type="button" data-ai-prompt="Show latest teacher announcements">Teacher Messages</button></div></div>
+   <div class="pdf-ai-welcome" id="pdfAiWelcome"><span class="ai-welcome-logo anime-logo-mark" aria-hidden="true"></span><span class="ai-welcome-kicker">8aPDF · YOUR STUDY ASSISTANT</span><h1>How can I help you study?</h1><p>Find PDFs, ask about teacher messages, upcoming tests and notebook submissions. Instant answers first; Groq only when needed.</p><div class="pdf-ai-quick" id="pdfAiQuick"><button type="button" data-ai-prompt="Science chapter 3">Science Ch 3</button><button type="button" data-ai-prompt="Latest Computer PDFs">Computer PDFs</button><button type="button" data-ai-prompt="Hindi Term 2 PDFs">Hindi Term 2</button><button type="button" data-ai-prompt="Which test is coming next?">Upcoming Test</button><button type="button" data-ai-prompt="Any notebook submissions coming up?">Notebook Submission</button><button type="button" data-ai-prompt="Show latest teacher announcements">Teacher Messages</button></div></div>
   </div>
-  <div class="pdf-ai-bottom"><form class="pdf-ai-compose" id="pdfAiForm"><textarea id="pdfAiInput" rows="1" maxlength="400" placeholder="Ask about PDFs, tests, homework and teacher messages…" aria-label="Ask 8aPDF Study AI"></textarea><button class="pdf-ai-submit" type="submit" aria-label="Send question">➜</button></form><p class="pdf-ai-caption" id="pdfAiHint">Fast local matching · Server-side Gemini Flash-Lite when configured</p></div>
+  <div class="pdf-ai-bottom"><form class="pdf-ai-compose" id="pdfAiForm"><textarea id="pdfAiInput" rows="1" maxlength="400" placeholder="Ask about PDFs, tests, homework and teacher messages…" aria-label="Ask 8aPDF Study AI"></textarea><button class="pdf-ai-submit" type="submit" aria-label="Send question">➜</button></form><p class="pdf-ai-caption" id="pdfAiHint">Fast local matching · Secure Groq AI when configured</p></div>
  </div>
  </section>
 </aside>
@@ -2777,36 +2777,67 @@ body.pdf-ai-open{overflow:hidden!important}.pdf-ai-layer button:focus-visible{ou
 (()=>{'use strict';
 const el=id=>document.getElementById(id),bridge=()=>window.__8apdfStudyBridge;
 const layer=el('pdfAiLayer'),feed=el('pdfAiFeed'),input=el('pdfAiInput'),status=el('pdfAiState'),hint=el('pdfAiHint');
-const normalize=s=>String(s||'').normalize('NFKC').toLocaleLowerCase().replace(/mathematics/g,'maths').replace(/social\s+studies/g,'social science').replace(/\bsst\b/g,'social science').replace(/\bcomputers\b/g,'computer').replace(/[.,!?;:()[\]{}\/\\_]/g,' ').replace(/\s+/g,' ').trim();
-const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide'.split(' '));
-const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers']],['science',['science','vigyan']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
-const words=s=>normalize(s).split(/\s+/).filter(x=>x.length>1&&!ignore.has(x));
-function subjectOf(q){const n=normalize(q);for(const [canonical,aliases] of subjects){for(const name of aliases){if(n===name||n.includes(name))return canonical}}return ''}
-function chapterOf(q){const m=normalize(q).match(/(?:chapter|ch\.?|chap|lesson|अध्याय|पाठ)\s*(?:number|no\.?|#)?\s*[-:]?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
+const normalize=s=>String(s||'').normalize('NFKC').toLocaleLowerCase()
+ .replace(/\bmathematics\b|\bmath\b|\bganit\b/g,'maths')
+ .replace(/\bsst\b|\bsocial studies\b/g,'social science')
+ .replace(/\bcomputers\b/g,'computer')
+ .replace(/\bch\s*(\d{1,3})\b/g,'chapter $1')
+ .replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
+const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide latest recent new newest today chapter chap lesson of full file document worksheet what when is are any bata bta dikha kiya kya'.split(' '));
+const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers','ai']],['science',['science','vigyan']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
+const words=s=>normalize(s).split(/\s+/).filter(x=>(x.length>1||/^\d+$/.test(x))&&!ignore.has(x));
+function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical,aliases] of subjects){for(const name of aliases){const needle=' '+normalize(name)+' ';if(padded.includes(needle))return canonical}}return ''}
+function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
 function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
-function matchChapter(d,no){if(!no)return true;const t=normalize([d.title,d.chapter,d.description].join(' '));if(t.match(new RegExp('(?:chapter|ch\\.?|chap|lesson|अध्याय|पाठ)\\s*(?:number|no\\.?|#)?\\s*[-:]?\\s*'+no+'(?:\\D|$)','i')))return true;const c=normalize(d.chapter);return c===no||c==='ch '+no||c==='chapter '+no}
-function rank(q,docs){const n=normalize(q),tokens=words(q),sub=subjectOf(q),chap=chapterOf(q),term=termOf(q),recent=/\b(latest|recent|new|today|newest)\b/i.test(n);const rows=[];
-for(const d of docs){if(!d||!d.title||!d.id)continue;
-const ds=normalize(d.subject),title=normalize(d.title),desc=normalize(d.description),meta=normalize(d.chapter),whole=title+' '+ds+' '+desc+' '+meta;
-if(term&&d.term!==term)continue;
-if(sub && !ds.includes(sub) && !(sub==='social science'&&/geography|history|civics/.test(ds)))continue;
-if(chap&&!matchChapter(d,chap))continue;
-let score=0;
-if(sub)score+=60;if(chap)score+=55;
-const significant=tokens.filter(t=>!['term','chapter','chap','ch','latest','recent','new','pdf','notes','study','class','all'].includes(t)&&!/^\d+$/.test(t));
-for(const t of significant){if(title.includes(t))score+=22;else if(ds.includes(t))score+=16;else if(meta.includes(t))score+=9;else if(desc.includes(t))score+=5;else score-=7;}
-if(n.length>7&&title.includes(n))score+=100;
-if((!sub&&!chap)&&significant.length>0 && !significant.some(t=>whole.includes(t)))continue;
-if(!sub&&!chap&&significant.length===0&&!recent&&!term)continue;
-if(recent)score+=Math.min(15,(Number(d.dateMs)||0)/2e11);
-rows.push({doc:d,score});}
-rows.sort((a,b)=>(b.score-a.score)||(recent?(Number(b.doc.dateMs)||0)-(Number(a.doc.dateMs)||0):0));
-return rows.filter(x=>x.score>0).slice(0,6).map(x=>x.doc)}
+const chapterPattern=/(?:chapter|chap|lesson|ch|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})\b/gi;
+function chapterNumbers(text){const arr=[];for(const m of normalize(text).matchAll(chapterPattern))arr.push(String(Number(m[1])));return arr}
+function matchChapter(d,no){if(!no)return true;const titleNums=chapterNumbers([d.title,d.chapter].join(' ')),explicit=normalize(d.chapter);if(titleNums.includes(no)||explicit===no)return true;if(titleNums.length)return false;const descNums=chapterNumbers([d.description,d.message].join(' '));return descNums.includes(no)}
+function rank(q,docs,kind='pdf'){
+ const norm=normalize(q),sub=subjectOf(q),chap=chapterOf(q),term=termOf(q),recent=/\b(latest|recent|new|today|newest|last|recently)\b/i.test(norm);
+ const isNotice=kind==='announcement',allTokens=words(q);
+ const significant=[...new Set(allTokens.filter(x=>!['test','exam','submit','announcement','announcements','circular','teacher','message','homework'].includes(x)&&x!==sub&&!/^\d+$/.test(x)))];
+ const wantTest=/\b(test|exam|assessment|quiz)\b|परीक्षा|ਟੈਸਟ/i.test(norm);
+ const wantSubmission=/\b(submit|submission|notebook|homework)\b|जमा|ਕਾਪੀ/i.test(norm);
+ const rows=[];
+ for(const doc of docs||[]){
+  if(!doc||!doc.id||!doc.title)continue;
+  if(!isNotice&&term&&doc.term!==term)continue;
+  const title=normalize(doc.title),ds=normalize(doc.subject),desc=normalize([doc.description,doc.message,doc.fullMessage].join(' ')),meta=normalize([doc.chapter,doc.className,(doc.tags||[]).join(' ')].join(' ')),cat=normalize(doc.category);
+  const text=title+' '+ds+' '+desc+' '+meta+' '+cat;
+  const namedSubject=(ds===sub||ds.includes(sub)||title.includes(sub)||meta.includes(sub));
+  const unknownSubject=(!ds||/^(other|general|uncategorized|circular|school diary)$/.test(ds));
+  if(sub&&!namedSubject&&!(unknownSubject&&desc.includes(sub)))continue;
+  if(chap&&!matchChapter(doc,chap))continue;
+  let score=(sub?(namedSubject?55:22):0)+(chap?85:0);
+  let matched=0;
+  for(const token of significant){
+   const aliases=token==='qa'||token==='qna'?['question','answer','qa','qna']:token==='solution'?['answer','solved','solution']:token==='revision'?['practice','revision']:token==='worksheet'?['worksheet','work sheet']:token==='programs'?['program','programs']:token==='sci'?['science']:[token];
+   const has=field=>aliases.some(w=>field.includes(w));
+   if(has(title)){score+=30;matched++}else if(has(meta)){score+=19;matched++}else if(has(ds)){score+=15;matched++}else if(has(desc)){score+=9;matched++}
+  }
+  if(significant.length&&!matched&&!chap)continue;
+  if(significant.length>=2&&matched<Math.ceil(significant.length/2)&&!chap)continue;
+  if(isNotice){
+   if(wantTest&&/\b(test|exam|quiz|assessment)\b|परीक्षा|ਟੈਸਟ/.test(text))score+=45;
+   if(wantSubmission&&/\b(submit|submission|notebook|homework|bring|जमा)\b/.test(text))score+=40;
+   if((wantTest||wantSubmission)&&score<25)continue;
+  }
+  if(norm.length>8&&title.includes(norm))score+=65;
+  const time=Number(doc.uploadedAtMs||doc.dateMs||Date.parse(doc.messageDate||doc.createdAt||0))||0;
+  if(recent&&time)score+=12;
+  if(!sub&&!chap&&!significant.length&&!wantTest&&!wantSubmission&&!recent)continue;
+  if(!sub&&!chap&&!significant.length&&!isNotice&&!recent)continue;
+  if(score<=0)continue;
+  rows.push({doc,score,time});
+ }
+ rows.sort((a,b)=>b.score-a.score||(b.time-a.time)||String(a.doc.title).localeCompare(String(b.doc.title)));
+ return rows.slice(0,isNotice?4:6).map(x=>x.doc);
+}
 function makeMessage(text,type='ai'){const initial=el('pdfAiWelcome');if(initial)initial.hidden=true;const p=document.createElement('div');p.className='pdf-ai-message '+(type==='user'?'user':'ai');const z=document.createElement('p');z.textContent=text;p.append(z);feed.append(p);feed.scrollTop=feed.scrollHeight;return p}
 function showResults(text,docs){const node=makeMessage(text);if(!docs.length)return;const grid=document.createElement('div');grid.className='pdf-ai-results';for(const doc of docs){const card=document.createElement('article');card.className='pdf-ai-result';const h=document.createElement('h3');h.textContent=doc.title;const small=document.createElement('small');small.textContent=[doc.subject,doc.term==='term1'?'Term 1':doc.term==='term2'?'Term 2':'Date unavailable',doc.chapter].filter(Boolean).join(' · ');card.append(h,small);const actions=document.createElement('div');actions.className='pdf-ai-result-actions';for(const [label,action] of [['Preview','preview'],['Download','download'],['Share','share']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{if(!bridge()?.openDocument)return;bridge().openDocument(doc.id,action)});actions.append(b)}card.append(actions);grid.append(card)}node.append(grid);feed.scrollTop=feed.scrollHeight}
 let configured=false,checked=false,busy=false,lastFocus=null,seq=0;const memory=new Map();
-async function checkAI(){if(checked)return configured;checked=true;if(window.__8apdfStudyIntel?.customKey?.()){configured=true;status.textContent='Instant answers · Personal Gemini key active';return true}try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant answers · Gemini available when needed':'Local-first search · no AI credits';return configured}
-document.addEventListener('8apdf:gemini-key-changed',()=>{checked=false;checkAI()});
+async function checkAI(){if(checked)return configured;checked=true;try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant answers · Groq available when needed':'Local-first search · no AI credits';return configured}
+
 async function open(){lastFocus=document.activeElement;layer.hidden=false;document.body.classList.add('pdf-ai-open');if(document.documentElement.dataset.studioMobileMenu==='open')el('studioSidebarClose')?.click();input.focus({preventScroll:true});checkAI();}
 function close(){layer.hidden=true;document.body.classList.remove('pdf-ai-open');lastFocus?.focus?.({preventScroll:true})}
 el('studioAssistantLink')?.addEventListener('click',open);el('pdfAiClose').addEventListener('click',close);el('pdfAiShade').addEventListener('click',close);
@@ -2861,7 +2892,7 @@ async function answerAI(question,docs){
   const result={message:String(data.answer||'No confirmed match in the current materials.'),results:docs.filter(d=>ids.has(d.id)).slice(0,4),announcements:anns.filter(a=>annIds.has(a.id)).slice(0,4)};
   memory.set(key,result);if(memory.size>30)memory.delete(memory.keys().next().value);
   return result;
- }catch(e){hint.textContent=e.name==='AbortError'?'Gemini timed out. Local answers remain available.':'Gemini unavailable: '+String(e.message||'Please retry').slice(0,140);return null}
+ }catch(e){hint.textContent=e.name==='AbortError'?'Groq timed out. Local answers remain available.':'Groq unavailable: '+String(e.message||'Please retry').slice(0,140);return null}
  finally{clearTimeout(timer)}
 }
 async function send(){const question=input.value.trim();if(!question||busy)return;input.value='';makeMessage(question,'user');const docs=bridge()?.documents?.()||[];const announcement=window.__8apdfStudyIntel?.answer?.(question);if(announcement){showNoticeResults(announcement);return}const result=answerLocal(question,docs);if(result){showResults(result.message,result.results);return}busy=true;const placeholder=makeMessage('Checking PDFs and teacher announcements…');try{await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();if(resultAI)showNoticeResults(resultAI);else showResults('No confirmed answer from the current PDFs or teacher announcements. Ask a specific subject, test or notebook submission question.',[])}finally{busy=false}}
