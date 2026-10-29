@@ -2784,14 +2784,14 @@ const normalize=s=>String(s||'').normalize('NFKC').toLocaleLowerCase()
  .replace(/\bch\s*(\d{1,3})\b/g,'chapter $1')
  .replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
 const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide latest recent new newest today chapter chap lesson of full file document worksheet what when is are any bata bta dikha kiya kya'.split(' '));
-const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers','ai']],['science',['science','vigyan']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
+const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers','ai']],['science',['science','vigyan','physics','chemistry','biology']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
 const words=s=>normalize(s).split(/\s+/).filter(x=>(x.length>1||/^\d+$/.test(x))&&!ignore.has(x));
 function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical,aliases] of subjects){for(const name of aliases){const needle=' '+normalize(name)+' ';if(padded.includes(needle))return canonical}}return ''}
 function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
 function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
 const chapterPattern=/(?:chapter|chap|lesson|ch|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})\b/gi;
 const trainedTerms=new Map();
-fetch('/data/ai-finder-training.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(data=>{
+fetch('/data/ai-finder-training.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{
  if(!data||data.version!==1||typeof data.items!=='object'||!data.items)return;
  for(const [id,item] of Object.entries(data.items)){
   if(!Array.isArray(item?.keywords)||item.keywords.length>12)continue;
