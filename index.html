@@ -2785,7 +2785,8 @@ const normalize=s=>String(s||'').normalize('NFKC').toLocaleLowerCase()
  .replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
 const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide latest recent new newest today chapter chap lesson of full file document worksheet what when is are any bata bta dikha kiya kya'.split(' '));
 const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers','ai']],['science',['science','vigyan','physics','chemistry','biology']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
-const words=s=>normalize(s).split(/\s+/).filter(x=>(x.length>1||/^\d+$/.test(x))&&!ignore.has(x));
+const conversationalStop=new Set('which coming upcoming next tomorrow date dates due on when where please whenis kab kal hoga hone up about asking could would any all do does jo koi hai ki ka bata bta aane baare soon important recently nearest newest'.split(' '));
+const words=s=>normalize(s).split(/\s+/).filter(x=>(x.length>1||/^\d+$/.test(x))&&!ignore.has(x)&&!conversationalStop.has(x));
 function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical,aliases] of subjects){for(const name of aliases){const needle=' '+normalize(name)+' ';if(padded.includes(needle))return canonical}}return ''}
 function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
 function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
@@ -2807,8 +2808,8 @@ function rank(q,docs,kind='pdf'){
  const stop=new Set(['test','exam','assessment','quiz','submission','submit','notebook','homework','assignment','holiday','event','events','teacher','teachers','announcement','announcements','circular','circulars','message','messages','pdf','pdfs','notes','files','file','chapter','ch','lesson','document','documents','new','recent','latest','newest','today','last','school','work','workbook']);
  const namedSubjectTokens=new Set(words(sub));
  const significant=[...new Set(words(q).filter(t=>!stop.has(t)&&!namedSubjectTokens.has(t)&&!/^\d+$/.test(t)))];
- const wantTest=/\b(test|exam|assessment|quiz)\b|परीक्षा|ਟੈਸਟ/i.test(norm);
- const wantSubmission=/\b(submit|submission|notebook|copy checking)\b|जमा|ਕਾਪੀ/i.test(norm);
+ const wantTest=/\b(test|tests|exam|exams|assessment|quiz|quizzes)\b|परीक्षा|ਟੈਸਟ/i.test(norm);
+ const wantSubmission=/\b(submit|submission|submissions|notebook|notebooks|copy checking)\b|जमा|ਕਾਪੀ/i.test(norm);
  const wantHomework=/\bhomework\b|होमवर्क|ਹੋਮਵਰਕ/i.test(norm);
  const wantHoliday=/\b(holiday|holidays|vacation|closed|closure|chhutti)\b|छुट्टी/i.test(norm);
  const wantNotice=/\b(teacher|teachers|announcement|announcements|notice|circular|message|messages)\b/i.test(norm);
