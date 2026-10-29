@@ -31,6 +31,18 @@ const notes=[
 ];
 assert.deepEqual(rank('Science test',notes,'announcement').map(x=>x.id),['n1'],'Tests must not be confused with homework');
 assert.deepEqual(rank('English notebook submission',notes,'announcement').map(x=>x.id),['n2']);
+
+assert.deepEqual(rank('Science homework',notes,'announcement').map(x=>x.id),['n3'],'Science homework must not turn into a test');
+assert.equal(rank('latest teacher announcements',notes,'announcement').length,3,'Generic latest teacher messages must be discoverable');
+assert.deepEqual(rank('Maths chapter 3',docs).map(x=>x.id),[],'Cross-subject chapter collisions must be rejected');
+assert.deepEqual(rank('latest PDFs',docs).map(x=>x.id).slice(0,2),['f','e'],'Recent PDF search must order by date');
+assert.equal(subjectOf('physics'),'science','Physics belongs to Science');
+const large=Array.from({length:600},(_,i)=>({id:'large-'+i,title:'Science Chapter '+(i%12+1)+' Practice',subject:'Science',description:'revision and concepts',chapter:String(i%12+1),term:'term2',dateMs:i}));
+const started=performance.now();
+const matches=rank('Science chapter 3',large);
+assert(matches.length>0&&matches.every(d=>d.chapter==='3'),'Large-library matches must remain strictly chapter-specific');
+assert(performance.now()-started<500,'Instant local ranking must stay within a small browser CPU budget');
+
 assert(html.includes("Groq available when needed"));
 assert(!html.includes('x-8apdf-gemini-key'));
 assert(!html.includes('Gemini only when needed'));
