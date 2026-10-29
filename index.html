@@ -2791,14 +2791,18 @@ function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical
 function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
 function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
 const chapterPattern=/(?:chapter|chap|lesson|ch|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})\b/gi;
-const trainedTerms=new Map();
-fetch('/data/ai-finder-training.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(data=>{
+const trainedTerms=new Map(),trainedAliases=new Map();
+fetch('/data/ai-finder-training.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(data=>{
  if(!data||data.version!==1||typeof data.items!=='object'||!data.items)return;
  for(const [id,item] of Object.entries(data.items)){
   if(!Array.isArray(item?.keywords)||item.keywords.length>12)continue;
   trainedTerms.set(id,normalize(item.keywords.join(' ')));
  }
-}).catch(()=>{}); // Background-only. Search never waits for training metadata.
+ for(const [token,variants] of Object.entries(data.aliases||{})){
+  if(!Array.isArray(variants)||variants.length>12||token.length>40)continue;
+  trainedAliases.set(normalize(token),variants.filter(x=>typeof x==='string'&&x.length<55).map(normalize));
+ }
+}).catch(()=>{}); // Compact train.md vocabulary is loaded asynchronously; no query waits for it.
 
 function chapterNumbers(text){const arr=[];for(const m of normalize(text).matchAll(chapterPattern))arr.push(String(Number(m[1])));return arr}
 function matchChapter(d,no){if(!no)return true;const titleNums=chapterNumbers([d.title,d.chapter].join(' ')),explicit=normalize(d.chapter);if(titleNums.includes(no)||explicit===no)return true;if(titleNums.length)return false;const descNums=chapterNumbers([d.description,d.message].join(' '));return descNums.includes(no)}
@@ -2814,7 +2818,14 @@ function rank(q,docs,kind='pdf'){
  const wantHoliday=/\b(holiday|holidays|vacation|closed|closure|chhutti)\b|छुट्टी/i.test(norm);
  const wantNotice=/\b(teacher|teachers|announcement|announcements|notice|circular|message|messages)\b/i.test(norm);
  const wantWorksheet=/\bworksheet\b|\bwork sheet\b/i.test(norm);
- const aliases=token=>token==='qa'||token==='qna'?['question answer','questions','qa','qna','solution','answers']:token==='solutions'||token==='solution'?['solution','solved','answer','answers']:token==='revision'||token==='revise'?['revision','practice','review']:token==='worksheet'?['worksheet','work sheet','practice sheet']:token==='programs'||token==='program'?['program','programs','coding']:token==='sci'?['science']:token==='fractions'?['fraction','fractions']:[token];
+ const wantNotes=/\b(notes|study notes|chapter notes|handwritten notes)\b/i.test(norm);
+ const wantQna=/\b(qna|qa|question answers|questions and answers|solutions|ques ans)\b/i.test(norm);
+ const wantPractical=/\b(practical|program|programs|coding)\b/i.test(norm);
+ const wantRevision=/\b(revision|revise|practice)\b/i.test(norm);
+ const aliases=token=>{
+  const base=token==='qa'||token==='qna'?['question answer','question answers','questions','qa','qna','solution','answers']:token==='solutions'||token==='solution'?['solution','solved','answer','answers']:token==='revision'||token==='revise'?['revision','practice','review']:token==='worksheet'?['worksheet','work sheet','practice sheet']:token==='programs'||token==='program'?['program','programs','coding']:token==='sci'?['science']:token==='fractions'?['fraction','fractions']:[token];
+  return [...new Set([...base,...(trainedAliases.get(token)||[])])];
+ };
  const has=(field,token)=>aliases(token).some(w=>(' '+field+' ').includes(' '+w+' '));
  const rows=[];
  for(const doc of docs||[]){
@@ -2853,10 +2864,19 @@ function rank(q,docs,kind='pdf'){
    if(wantHoliday)score+=45;
    if(wantNotice)score+=18;
    if(wantTest&&/\b(tests|exams)\b/.test(cat))score+=15;
-  }else if(wantWorksheet&&/\bworksheet\b|\bwork sheet\b/.test(text))score+=30;
+  }else{
+   if(wantWorksheet&&/\bworksheet\b|\bwork sheet\b/.test(title))score+=40;
+   else if(wantWorksheet&&/\bworksheet\b|\bwork sheet\b/.test(desc))score+=15;
+   if(wantNotes&&/\b(notes|study notes|chapter notes)\b/.test(title))score+=42;
+   else if(wantNotes&&/\bnotes\b/.test(desc))score+=13;
+   if(wantQna&&/\b(question|questions|answer|answers|qna|qa|solution|solved)\b/.test(title))score+=36;
+   else if(wantQna&&/\b(question|answer|solution)\b/.test(desc))score+=12;
+   if(wantPractical&&/\b(practical|programs?|coding|html|css)\b/.test(title))score+=30;
+   if(wantRevision&&/\b(revision|practice|revise)\b/.test(title))score+=27;
+  }
   if(norm.length>8&&title.includes(norm))score+=70;
   const time=Number(doc.uploadedAtMs||doc.dateMs||Date.parse(doc.messageDate||doc.createdAt||0))||0;
-  if(recent&&time)score+=15;
+  if(recent&&time)score+=15; // Sort equal-relevance matches by actual source date; no remote API.
   if(!sub&&!chap&&!significant.length&&!wantTest&&!wantSubmission&&!wantHomework&&!wantHoliday&&!wantNotice&&!recent&&!term)continue;
   if(!sub&&!chap&&!significant.length&&!isNotice&&!recent&&!term)continue;
   if(score<=0&&!recent)continue;
