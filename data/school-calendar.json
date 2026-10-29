@@ -32,8 +32,8 @@
   ],
   "holidaySync": {
     "source": "edusecure-holiday-banner",
-    "status": "awaiting-credentials",
-    "checkedAt": null,
-    "bannersFound": 0
+    "status": "synced",
+    "checkedAt": "2026-10-29T10:15:38+05:30",
+    "bannersFound": 1
   }
 }
