@@ -39,6 +39,8 @@ assert.deepEqual(rank('Any notebook submissions coming up?',notes,'announcement'
 assert.deepEqual(rank('Maths chapter 3',docs).map(x=>x.id),[],'Cross-subject chapter collisions must be rejected');
 assert.deepEqual(rank('latest PDFs',docs).map(x=>x.id).slice(0,2),['f','e'],'Recent PDF search must order by date');
 assert.equal(subjectOf('physics'),'science','Physics belongs to Science');
+assert.deepEqual(rank('SCIENCE CH3',docs).map(x=>x.id),['f','a'],'Compact upper-case chapter search must keep exact chapter results');
+assert(!fs.readFileSync('api/pdf-chat.js','utf8').includes('GEMINI_API_KEY'),'No Gemini server key should remain in the Finder');
 const large=Array.from({length:600},(_,i)=>({id:'large-'+i,title:'Science Chapter '+(i%12+1)+' Practice',subject:'Science',description:'revision and concepts',chapter:String(i%12+1),term:'term2',dateMs:i}));
 const started=performance.now();
 const matches=rank('Science chapter 3',large);
