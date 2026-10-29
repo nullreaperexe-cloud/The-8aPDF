@@ -14,11 +14,11 @@ let result=response();await handler(makeReq(Buffer.from('%PDF-1.7\nHello'),'wron
 result=response();await handler(makeReq(Buffer.from('HACKSCRIPT'),'sample-secret'),result);assert.equal(result.result().code,415);
 result=response();await handler(makeReq(Buffer.from('%PDF-1.7\nHello'), 'sample-secret',{'x-owner-key':'a'.repeat(64)}),result);assert.equal(result.result().code,201);assert.equal(stored.length,2);assert.equal(stored[0].options.contentType,'application/pdf');assert.equal(stored[1].options.contentType,'application/json');const record=JSON.parse(stored[1].data);assert.equal(record.ownerHash,createHash('sha256').update('a'.repeat(64)).digest('hex'));assert.match(result.result().payload.shortUrl,/^\/p[0-9a-f]{14}$/);
 console.log('PASS upload auth, file type, public short link, owner linkage');
-let geminiCalls=0;const fakefetch=async (url,options)=>{geminiCalls++;assert(url.includes('gemini-2.5-flash-lite'));return {ok:true,json:async()=>({candidates:[{content:{parts:[{text:'Science Ch8: Example Summary'}]}}]})}};
-const {handler:summary}=load('pdf-summarize.js',{fetch:fakefetch,process:{env:{GEMINI_API_KEY:'dummy'}} ,AbortController, setTimeout,clearTimeout, Date,Map, console});
+let groqCalls=0;const fakefetch=async (url,options)=>{groqCalls++;assert(url.includes('api.groq.com/openai/v1/chat/completions'));assert.equal(options.headers.Authorization,'Bearer dummy');return {ok:true,json:async()=>({choices:[{message:{content:'Science Ch8: Example Summary'}}]})}};
+const {handler:summary}=load('pdf-summarize.js',{fetch:fakefetch,process:{env:{GROQ_API_KEY:'dummy'}},AbortController,setTimeout,clearTimeout,Date,Map,console});
 result=response();await summary({method:'GET',headers:{}},result);assert.equal(result.result().payload.configured,true);
-result=response();await summary({method:'POST',headers:{'x-forwarded-for':'unit-test'},body:{title:'Science',text:'Sentence '.repeat(30)}},result);assert.equal(result.result().code,200);assert.equal(geminiCalls,1);assert.match(result.result().payload.summary,/Science Ch8/);
-console.log('PASS Gemini route configuration check and mocked generation');
+result=response();await summary({method:'POST',headers:{'x-forwarded-for':'unit-test'},body:{title:'Science',text:'Sentence '.repeat(30)}},result);assert.equal(result.result().code,200);assert.equal(groqCalls,1);assert.match(result.result().payload.summary,/Science Ch8/);
+console.log('PASS Groq summary configuration and mocked generation');
 })().catch(e=>{console.error(e);process.exit(1)});
 
 // Static assertions prevent accidentally disconnecting original features.
