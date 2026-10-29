@@ -82,9 +82,9 @@ async function summarize(doc){
   let summary='',source='On-device smart summary';
   status.textContent='Preparing study summary…';
   try{
-   const summaryHeaders={'Content-Type':'application/json'},personal=window.__8apdfStudyIntel?.customKey?.();if(personal)summaryHeaders['x-8apdf-gemini-key']=personal;
+   const summaryHeaders={'Content-Type':'application/json'};
    const ai=await fetch('/api/pdf-summarize',{method:'POST',headers:summaryHeaders,body:JSON.stringify({title:doc.title,text:text.slice(0,24000)}),signal:abort.signal});
-   const obj=await ai.json().catch(()=>({}));if(ai.ok&&obj.summary){summary=obj.summary;source='Gemini AI summary'}else throw Error(obj.error||'AI unavailable');
+   const obj=await ai.json().catch(()=>({}));if(ai.ok&&obj.summary){summary=obj.summary;source='Groq AI summary'}else throw Error(obj.error||'AI unavailable');
   }catch(aiError){if(abort.signal.aborted)return;summary=localStudySummary(text,doc.title);if(!summary)throw aiError}
   status.textContent=source+' · '+Math.min(pdf.numPages,12)+' page(s) read';
   result.innerHTML='<div class="ws-notice" style="white-space:pre-wrap"></div>';result.firstChild.textContent=summary;
