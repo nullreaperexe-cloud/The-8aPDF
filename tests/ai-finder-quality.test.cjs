@@ -52,4 +52,24 @@ assert(!html.includes('x-8apdf-gemini-key'));
 assert(!html.includes('Gemini only when needed'));
 assert(fs.existsSync('data/ai-finder-training.json'));
 assert.equal(JSON.parse(fs.readFileSync('data/ai-finder-training.json','utf8')).version,1);
+// Offline train.md vocabulary must improve retrieval without invoking Groq or background Actions.
+const genres=[
+ {id:'practice',title:'Science Chapter 3 Practice',subject:'Science',chapter:'3',description:'Revision activities',term:'term2',dateMs:20},
+ {id:'note',title:'Science Chapter 3 Notes',subject:'Science',chapter:'3',description:'Concept explanations',term:'term2',dateMs:1},
+ {id:'answers',title:'Science Chapter 3 Question Answers',subject:'Science',chapter:'3',description:'Question and answer exercise',term:'term2',dateMs:3}
+];
+assert.equal(rank('Science chapter 3 notes',genres)[0].id,'note','Asked-for notes must outrank newer practice');
+assert.equal(rank('Science chapter 3 qna',genres)[0].id,'answers','Asked-for Q&A must outrank other same-chapter PDFs');
+assert.deepEqual(rank('maths chapter 3',genres),[],'Do not invent cross-subject results');
+const playbook=fs.readFileSync('train.md','utf8');
+const offline=JSON.parse(fs.readFileSync('data/ai-finder-training.json','utf8'));
+assert(playbook.includes('Offline Training & Retrieval Playbook'));
+assert(playbook.includes('Zero Groq credits')||playbook.includes('Zero Groq tokens')||playbook.includes('0 Groq tokens'));
+assert(offline.aliases&&offline.aliases.qa.includes('question answers'),'Static Q&A aliases must exist');
+assert(offline.aliases.revision&&offline.aliases.hindi,'Offline multilingual query knowledge must exist');
+assert(html.includes('trainedAliases.get(token)'),'Finder must actually consume offline trained aliases');
+assert(!fs.existsSync('.github/workflows/ai-finder-training.yml'),'No scheduled Groq training jobs');
+assert(!fs.existsSync('scripts/ai-finder-train.mjs'),'Retired AI batch trainer must not spend credits');
+assert(!fs.readFileSync('package.json','utf8').includes('ai-finder-train.mjs'),'Unused Groq trainer no longer in npm tests');
+
 console.log('PASS exact chapter and subject ranking; multilingual search; teacher tests vs homework; Groq-only UI');
