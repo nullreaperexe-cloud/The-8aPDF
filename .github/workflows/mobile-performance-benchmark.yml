@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Iteration: critical CSS, offscreen content visibility, and deferred settings DOM
+# Iteration: welcome timer anchored to first painted overlay
 on:
   push:
     paths:
