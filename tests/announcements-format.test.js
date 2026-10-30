@@ -52,3 +52,20 @@ test('main home page wires clean reader, source filter, share actions',()=>{
   assert.match(html,/features\/app-core\.js/);
   assert.doesNotThrow(()=>new Script(core,{filename:'features/app-core.js'}));
 });
+
+test('all announcement dialogs use adaptive actions with wrapping; other dialogs stay unchanged',()=>{
+  const base=readFileSync(new URL('../performance-home.css',import.meta.url),'utf8');
+  const source=readFileSync(new URL('../announcement-format.css',import.meta.url),'utf8');
+  const core=readFileSync(new URL('../features/app-core.js',import.meta.url),'utf8');
+  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+  for(const css of [base,source]){
+    assert.match(css,/#modal\\.announcement-modal #modalActions\\s*\\{/);
+    assert.match(css,/grid-template-columns:repeat\\(auto-fit,minmax\\(min\\(100%,145px\\),1fr\\)\\)/);
+    assert.match(css,/white-space:normal!important/);
+    assert.match(css,/#modal\\.announcement-modal #modalActions > a\\.solid\\{grid-column:1 \\/ -1\\}/);
+  }
+  assert.match(core,/classList\\.toggle\\('announcement-modal',!!\\$\\('#modalContent'\\)\\.querySelector\\('\\.intelligent-notice'\\)\\)/);
+  assert.match(html,/performance-home\\.css\\?v=20261030-announcement-fit-v3/);
+  assert.match(html,/features\\/app-core\\.js\\?v=announcement-fit-v5/);
+  assert.doesNotThrow(()=>new Script(core,{filename:'features/app-core.js'}));
+});
