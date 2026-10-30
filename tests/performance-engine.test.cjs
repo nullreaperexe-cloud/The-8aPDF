@@ -34,6 +34,13 @@ for(const [id,path] of styles){
  assert(html.includes('href="/performance-home.css?v=20261030v2"') && fs.readFileSync('performance-home.css','utf8').includes(path),'Bundled feature CSS missing: '+path);
  assert(fs.statSync(path).size>500,'Extracted CSS is empty: '+path);
 }
+const criticalStyle=html.match(/<style id="8apdf-critical-overlay-style">([\\s\\S]*?)<\\/style>/)?.[1]||'';
+const fullStyle=fs.readFileSync('performance-home.css','utf8');
+for(const label of ['#welcomeScreen','#nameModal','@keyframes welcomeLiquidFloat','@keyframes name-word-in']){
+ assert(criticalStyle.includes(label),'Preserved first-paint welcome/name style missing: '+label);
+ assert(fullStyle.includes(label),'Full animation bundle is missing: '+label);
+}
+assert(html.includes('https://fonts.gstatic.com/s/spacegrotesk/')&&html.includes('as="font"'),'Original font should preload for first screen');
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
 assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
