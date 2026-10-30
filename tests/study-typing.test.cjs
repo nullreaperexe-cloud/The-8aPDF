@@ -9,7 +9,7 @@ new vm.Script(js,{filename:'study-typing.js'});
 assert(!html.includes('<h1>Your study space.</h1>'),'Old static hero still rendered');
 assert(html.includes('id="studyTypingHeadline"'),'Typing headline element missing');
 assert(html.includes('id="studyTypingText"'),'Typing output span missing');
-assert(html.includes('study-typing.js?v=welcome-20261013'),'Typing script not loaded');
+assert(html.includes('study-typing.js?v=daily-intro-20261030-v1'),'Typing script not loaded');
 const match=js.match(/const lines=\[([\s\S]*?)\];/);
 assert(match,'Phrase catalogue missing');
 const lines=vm.runInNewContext('['+match[1]+']');
@@ -21,3 +21,12 @@ assert(js.includes('visibilitychange'),'Paused tabs must not keep running timers
 assert(css.includes('min-height:2.35em'),'Mobile headline height reservation missing');
 assert(css.includes('@keyframes studyTypingBlink'),'Blinking cursor animation missing');
 console.log('PASS 8aPDF responsive typing hero: '+lines.length+' unique motivational lines');
+
+assert(js.includes('const introStages=4'), 'Welcome, daily PDFs, daily messages and upcoming tests must play before quotes');
+assert(js.includes('uploadedAtMs'), 'Today's PDFs must be counted by actual upload timestamp');
+assert(js.includes('areAnnouncementsReady'), 'Unread/loading announcements cannot be falsely reported as zero');
+assert(js.includes('Asia/Kolkata'), 'School-day comparisons must use India timezone');
+assert(js.includes('No upcoming tests confirmed.'), 'No fake test count when none are dated');
+assert(js.includes('window.__8apdfStudyIntel.upcoming()'), 'Only dated upcoming reminders count as tests');
+assert(!js.includes('localStorage.setItem'), 'Typing summary must not leak or persist private user information');
+console.log('PASS daily welcome → PDFs → announcements → upcoming tests → quotes');
