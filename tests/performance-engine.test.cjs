@@ -53,6 +53,11 @@ for(const url of ['https://www.8apdf.me/','https://www.8apdf.me/api/materials','
  callback.fetch({request:{method:'GET',mode:url.endsWith('/')?'navigate':'cors',url},respondWith(){invoked=true}});
  assert.equal(invoked,false,'Private or non-static requests cannot be SW-cached: '+url);
 }
+const core=fs.readFileSync('features/app-core.js','utf8');
+assert(core.includes('pendingFirstPdfRender=true;else renderMaterials()'),'PDF data should load without competing with welcome render');
+assert(core.includes('pendingFirstAnnouncementsRender=true;else renderAnnouncements()'),'Announcement cards should wait until welcome closes');
+assert(core.includes('scheduleFirstCatalogRender()'),'Deferred cards must be rendered after onboarding finishes');
+assert(html.includes('/features/app-core.js?v=perf-20261030v4'),'Core cache version must match deployed code');
 assert(html.includes('features/static-cache-register.js'),'Idle cache registration missing');
 assert(!fs.readFileSync('features/static-cache-register.js','utf8').includes('Notification.requestPermission'),'Static cache must not request push notifications');
 console.log('PASS modular scripts, CSS parity, instant onboarding cover, adaptive animation and safe static cache');
