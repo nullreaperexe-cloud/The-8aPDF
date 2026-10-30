@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Iteration: minimal welcome critical CSS with complete original full stylesheet preserved
+# Iteration: defer additional below-fold dashboard and library layouts
 on:
   push:
     paths:
