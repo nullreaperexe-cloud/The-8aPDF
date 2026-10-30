@@ -2083,7 +2083,10 @@ window.__8apdfStudyBridge={
 (function adaptiveAmbientGlow(){
  const root=document.documentElement;
  let x=.5,y=.40,targetX=.5,targetY=.4,lastPointer=0,lastScroll=scrollY,lastScrollTime=performance.now(),scrollEnergy=0;
- let lastFrame=0,raf=0;
+ let lastFrame=0,raf=0,frameDelay=0;
+ // Keep every glow animation; throttle JS wakeups on slower hardware.
+ const cadence=()=>innerWidth<650?90:(Number(navigator.hardwareConcurrency||8)<=4?55:36);
+ const scheduleFrame=()=>{if(document.hidden||!settings.glow)return;frameDelay=window.setTimeout(()=>{frameDelay=0;raf=requestAnimationFrame(step)},cadence())};
  const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
  const reduced=()=>settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(fine) document.addEventListener('pointermove',e=>{
@@ -2101,7 +2104,7 @@ window.__8apdfStudyBridge={
  function step(now){
   raf=0;
   if(document.hidden||!settings.glow)return;
-  if(now-lastFrame<(innerWidth<650?90:36)){raf=requestAnimationFrame(step);return}
+  if(now-lastFrame<cadence()){scheduleFrame();return}
   lastFrame=now;
   if(!reduced()){
    const idle=!fine||!settings.glowCursor||(now-lastPointer>1800);
@@ -2119,9 +2122,9 @@ window.__8apdfStudyBridge={
   }
   root.style.setProperty('--glow-x',(x*100).toFixed(2)+'%');
   root.style.setProperty('--glow-y',(y*100).toFixed(2)+'%');
-  raf=requestAnimationFrame(step);
+  scheduleFrame();
  }
- function restart(){if(raf)cancelAnimationFrame(raf);raf=0;if(settings.glow&&!document.hidden)raf=requestAnimationFrame(step)}
+ function restart(){if(raf)cancelAnimationFrame(raf);if(frameDelay)clearTimeout(frameDelay);raf=0;frameDelay=0;if(settings.glow&&!document.hidden)raf=requestAnimationFrame(step)}
  document.addEventListener('visibilitychange',restart);
  document.addEventListener('8apdf:glow-change',restart);
  restart();
