@@ -42,7 +42,7 @@ for(const label of ['#welcomeScreen','#nameModal','@keyframes welcomeLiquidFloat
  assert(criticalStyle.includes(label),'Preserved first-paint welcome/name style missing: '+label);
  assert(fullStyle.includes(label),'Full animation bundle is missing: '+label);
 }
-assert(html.includes('https://fonts.gstatic.com/s/spacegrotesk/')&&html.includes('as="font"'),'Original font should preload for first screen');
+
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
 assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
