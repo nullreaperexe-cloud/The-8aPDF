@@ -1,7 +1,7 @@
 /* Deterministic school reminder tests: absolutely no Gemini or real Firebase calls. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm');
-const src=fs.readFileSync('study-intelligence.js','utf8'),css=fs.readFileSync('study-intelligence.css','utf8'),html=fs.readFileSync('index.html','utf8');
+const src=fs.readFileSync('study-intelligence.js','utf8'),css=fs.readFileSync('study-intelligence.css','utf8'),html=fs.readFileSync('index.html','utf8'),core=fs.readFileSync('features/app-core.js','utf8');
 new vm.Script(src,{filename:'study-intelligence.js'});
 const listeners={},saved=new Map();
 const storage={getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,String(v)),removeItem:k=>saved.delete(k)};
@@ -27,7 +27,7 @@ const submit=w.__8apdfStudyIntel.answer('Any notebook submission coming up?');
 assert(submit.message.includes('English notebook submission'),'Notebook submission must be found');
 assert.equal(w.__8apdfStudyIntel.answer('Find Science chapter 3 PDF'),null,'PDF questions belong to PDF Finder');
 assert.equal(w.__8apdfStudyIntel.customKey(),'','Default API key must stay private');
-assert(html.includes('announcements:()=>state.announcements.map'),'Real announcements bridge missing');
+assert(core.includes('announcements:()=>state.announcements.map'),'Real announcements bridge missing');
 assert(html.includes('/features/ai-chat-client.js') && fs.readFileSync('features/ai-chat-client.js','utf8').includes('showNoticeResults(resultAI)'),'Grounded AI result renderer missing');
 assert(css.includes('ws-event-toast'),'Visual reminder must exist');
 console.log('PASS local test/notebook announcements, dated memory and default-key privacy');
