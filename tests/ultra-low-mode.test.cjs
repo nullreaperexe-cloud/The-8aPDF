@@ -1,0 +1,27 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const html=fs.readFileSync('index.html','utf8'),settings=fs.readFileSync('settings.html','utf8'),core=fs.readFileSync('features/app-core.js','utf8'),script=fs.readFileSync('features/ultra-low-mode.js','utf8');
+new vm.Script(script);
+const boot=html.match(/\/\* ULTRA LOW BOOT START \*\/([\s\S]*?)\/\* ULTRA LOW BOOT END \*\//)?.[1];
+assert(boot,'low-end first paint bootstrap missing');
+function detect(ua,mem,cores,pref){const r={dataset:{}};vm.runInNewContext(boot,{document:{documentElement:r},navigator:{userAgent:ua,deviceMemory:mem,hardwareConcurrency:cores},localStorage:{getItem:()=>pref}});return r.dataset.ultraLow}
+assert.equal(detect('Android Mobile',2,4,null),'on');
+assert.equal(detect('Android Mobile',8,8,null),'off');
+assert.equal(detect('Android Mobile',2,4,'off'),'off');
+assert.equal(detect('Android Mobile',8,8,'on'),'on');
+assert.equal(detect('Desktop',2,2,null),'off');
+let saved=null;
+const controls={ultraLowModeToggle:{checked:false,addEventListener(t,fn){this[t]=fn}},ultraLowModeStatus:{textContent:''},ultraLowAutoButton:{hidden:true,addEventListener(t,fn){this[t]=fn}}};
+const doc={readyState:'complete',documentElement:{dataset:{ultraLowAuto:'on',ultraLow:'on'}},getElementById:id=>controls[id],dispatchEvent(){},addEventListener(){}};
+const win={addEventListener(){}};
+vm.runInNewContext(script,{document:doc,window:win,Event:class{constructor(type){this.type=type}},localStorage:{getItem(){return saved},setItem(k,v){saved=v},removeItem(){saved=null}}});
+assert(win.__8apdfUltraLow.enabled);
+controls.ultraLowModeToggle.checked=false;controls.ultraLowModeToggle.change();assert(!win.__8apdfUltraLow.enabled);assert.equal(saved,'off');
+win.__8apdfUltraLow.setMode('auto');assert(win.__8apdfUltraLow.enabled);assert.equal(saved,null);
+assert(html.indexOf('ultra-low-mode.js')<html.indexOf('features/app-core.js'));
+assert(html.includes('html[data-ultra-low="on"] *::after'));
+assert(settings.includes('id="ultraLowModeToggle"')&&html.includes('id="ultraLowModeToggle"'));
+assert(core.includes("document.addEventListener('8apdf:ultra-low-change',restart)"));
+assert(core.includes('lastBackgroundRefresh<360000'));
+assert(core.includes("window.__8apdfUltraLow?.setMode('auto')"));
+assert(!script.includes('audio.')&&!script.includes('bgm'));
+console.log('PASS ultra low detection, manual preference, audio separation, settings and ambient pause');

@@ -292,7 +292,7 @@ function setSettings(){
 try{setSettings()}catch(error){console.error('8aPDF appearance setup failed; study library will still start',error)}$('#profileBtn').textContent=state.name[0].toUpperCase();
 function openSettings(){closeCommand();$('#settingsPanel').classList.add('open');renderPalette();$('#settingsPanel').setAttribute('aria-hidden','false');$('#drawerMask').classList.add('open')}
 function closeSettings(){ $('#settingsPanel').classList.remove('open');$('#settingsPanel').setAttribute('aria-hidden','true');$('#drawerMask').classList.remove('open') }
-$('#settingsBtn').onclick=openSettings;$('#closeSettings').onclick=closeSettings;$('#saveSettings').onclick=()=>{closeSettings();toast('Appearance saved on this device')};$('#drawerMask').onclick=closeSettings;$('#resetSettings').onclick=()=>{settings={...defaults};setSettings();toast('Default appearance restored')};
+$('#settingsBtn').onclick=openSettings;$('#closeSettings').onclick=closeSettings;$('#saveSettings').onclick=()=>{closeSettings();toast('Appearance saved on this device')};$('#drawerMask').onclick=closeSettings;$('#resetSettings').onclick=()=>{settings={...defaults};setSettings();window.__8apdfUltraLow?.setMode('auto');toast('Default appearance restored')};
 $$('[data-density-choice]').forEach(b=>b.onclick=()=>{settings.density=b.dataset.densityChoice;setSettings()});$$('[data-card-choice]').forEach(b=>b.onclick=()=>{settings.layout=b.dataset.cardChoice;setSettings()});
 for(const [id,key] of [['sidebarToggle','sidebar'],['readingToggle','reading'],['motionToggle','motion'],['largeTextToggle','large'],['contrastToggle','contrast']])$('#'+id).onchange=e=>{settings[key]=e.target.checked;setSettings()};
 $('#compactToggle').onchange=e=>{settings.density=e.target.checked?'compact':'comfortable';setSettings()};$('#fontRange').oninput=e=>{settings.fontSize=+e.target.value;setSettings()};$('#themeShortcut').onclick=()=>{settings.theme=selectedTheme().tone==='light'?'pure-black':'light';setSettings()};
@@ -625,24 +625,24 @@ window.__8apdfStudyBridge={
  let lastFrame=0,raf=0,frameDelay=0;
  // Keep every glow animation; throttle JS wakeups on slower hardware.
  const cadence=()=>innerWidth<650?90:(Number(navigator.hardwareConcurrency||8)<=4?55:36);
- const scheduleFrame=()=>{if(document.hidden||!settings.glow)return;frameDelay=window.setTimeout(()=>{frameDelay=0;raf=requestAnimationFrame(step)},cadence())};
+ const scheduleFrame=()=>{if(document.hidden||!settings.glow||window.__8apdfUltraLow?.enabled)return;frameDelay=window.setTimeout(()=>{frameDelay=0;raf=requestAnimationFrame(step)},cadence())};
  const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
  const reduced=()=>settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(fine) document.addEventListener('pointermove',e=>{
-  if(!settings.glow||!settings.glowCursor)return;
+  if(!settings.glow||!settings.glowCursor||window.__8apdfUltraLow?.enabled)return;
   targetX=Math.min(.99,Math.max(.01,e.clientX/Math.max(1,innerWidth)));
   targetY=Math.min(.99,Math.max(.01,e.clientY/Math.max(1,innerHeight)));
   lastPointer=performance.now();
  },{passive:true});
  window.addEventListener('scroll',()=>{
-  if(!settings.glow||!settings.glowScroll)return;
+  if(!settings.glow||!settings.glowScroll||window.__8apdfUltraLow?.enabled)return;
   const now=performance.now();const delta=scrollY-lastScroll;
   scrollEnergy=Math.max(-.23,Math.min(.23,scrollEnergy+delta/Math.max(400,innerHeight)*.22));
   lastScroll=scrollY;lastScrollTime=now;
  },{passive:true});
  function step(now){
   raf=0;
-  if(document.hidden||!settings.glow)return;
+  if(document.hidden||!settings.glow||window.__8apdfUltraLow?.enabled)return;
   if(now-lastFrame<cadence()){scheduleFrame();return}
   lastFrame=now;
   if(!reduced()){
@@ -663,9 +663,10 @@ window.__8apdfStudyBridge={
   root.style.setProperty('--glow-y',(y*100).toFixed(2)+'%');
   scheduleFrame();
  }
- function restart(){if(raf)cancelAnimationFrame(raf);if(frameDelay)clearTimeout(frameDelay);raf=0;frameDelay=0;if(settings.glow&&!document.hidden)raf=requestAnimationFrame(step)}
+ function restart(){if(raf)cancelAnimationFrame(raf);if(frameDelay)clearTimeout(frameDelay);raf=0;frameDelay=0;if(settings.glow&&!document.hidden&&!window.__8apdfUltraLow?.enabled)raf=requestAnimationFrame(step)}
  document.addEventListener('visibilitychange',restart);
  document.addEventListener('8apdf:glow-change',restart);
+  document.addEventListener('8apdf:ultra-low-change',restart);
  restart();
 })();
 
@@ -674,7 +675,7 @@ window.__8apdfStudyBridge={
 if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
  let target=null, x=0, pending=false;
  document.addEventListener('pointermove',e=>{
-  if(document.documentElement.dataset.glass!=='on'||document.documentElement.dataset.fluid!=='on')return;
+  if(window.__8apdfUltraLow?.enabled||document.documentElement.dataset.glass!=='on'||document.documentElement.dataset.fluid!=='on')return;
   target=e.target.closest?.('.pdf-card,.feature,.widget,.top-nav,.big-search,.notice-card');
   if(!target)return;
   x=e.clientX-target.getBoundingClientRect().left;
@@ -732,7 +733,8 @@ function showOffline(){if(!state.live){if(previewMode)$('#previewRibbon').classL
 setTimeout(()=>{if(!state.live)showOffline()},4200);
 refreshSupabaseMaterials();
 refreshSupabaseAnnouncements();
-setInterval(()=>{if(!document.hidden){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}},120000);
+let lastBackgroundRefresh=Date.now();
+ setInterval(()=>{if(document.hidden)return;if(window.__8apdfUltraLow?.enabled&&Date.now()-lastBackgroundRefresh<360000)return;lastBackgroundRefresh=Date.now();refreshSupabaseMaterials();refreshSupabaseAnnouncements()},120000);
 // Admin saves refresh already-open student tabs immediately on this origin.
 try{new BroadcastChannel('8apdf-catalogue').addEventListener('message',()=>{refreshSupabaseMaterials();refreshSupabaseAnnouncements()});}catch{}
 window.addEventListener('storage',e=>{if(e.key==='8apdf_admin_catalogue_changed'){refreshSupabaseMaterials();refreshSupabaseAnnouncements()}});
