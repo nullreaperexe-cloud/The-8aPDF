@@ -24,4 +24,11 @@ assert(core.includes("document.addEventListener('8apdf:ultra-low-change',restart
 assert(core.includes('lastBackgroundRefresh<360000'));
 assert(core.includes("window.__8apdfUltraLow?.setMode('auto')"));
 assert(!script.includes('audio.')&&!script.includes('bgm'));
+const simpleSettings=fs.readFileSync('workspace-upgrade.js','utf8');
+assert(simpleSettings.includes("show('Simple Settings'"),'Simple Settings panel missing');
+assert(simpleSettings.includes('id="wsUltraLow"'),'Ultra Low Mode must appear directly inside Simple Settings');
+assert(simpleSettings.includes("ultra?.setMode(e.target.checked?'on':'off')"),'Simple Settings toggle must update shared Ultra Low state');
+assert(simpleSettings.includes("ultra?.setMode('auto')"),'Simple Settings must restore automatic detection');
+assert(simpleSettings.includes('renderUltraLow()'),'Simple Settings toggle must reflect saved/automatic state');
+assert(html.includes('/workspace-upgrade.js?v=simple-ultra-low-20261030'),'Updated Settings controller needs a fresh cache key');
 console.log('PASS ultra low detection, manual preference, audio separation, settings and ambient pause');
