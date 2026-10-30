@@ -122,7 +122,7 @@ for(const file of ['index.html','classic.html']){
  const html=fs.readFileSync(file,'utf8');
  assert.match(html,/src="\/music-choice\.js\?v=1"/);
  assert(file==='classic.html' ? /href="\/music-choice\.css\?v=1"/.test(html) : (html.includes('performance-home.css?v=20261030v2') && fs.readFileSync('performance-home.css','utf8').includes('music-choice.css')), 'Music-choice stylesheet must remain available in both interfaces');
- assert.match(html,/window\.__8apdfMusicConsent\?\.request/);
+ assert.match(file==='index.html'?fs.readFileSync('features/app-core.js','utf8'):html,/window\.__8apdfMusicConsent\?\.request/);
 }
 const oldWidget=fs.readFileSync('music-player.html','utf8');
 assert.doesNotMatch(oldWidget,/elfsightcdn\.com|elfsight-app-|music-autostart/);
