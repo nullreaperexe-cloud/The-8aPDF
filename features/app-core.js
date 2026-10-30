@@ -533,10 +533,24 @@ $('#supportLink').addEventListener('click',e=>{e.preventDefault();toast('Support
 // Every fresh open shows a personalized welcome. New visitors enter their name once.
 const originalWelcome=$('#welcomeScreen'), originalNameModal=$('#nameModal');
 let welcomeTimer;
+let pendingFirstPdfRender=false,pendingFirstAnnouncementsRender=false;
+function welcomeBlocksCatalogPaint(){
+ return document.getElementById('welcomeScreen')?.classList.contains('show') ||
+        document.getElementById('nameModal')?.classList.contains('show');
+}
+function flushFirstCatalogRender(){
+ if(welcomeBlocksCatalogPaint())return;
+ if(pendingFirstPdfRender){pendingFirstPdfRender=false;renderMaterials()}
+ if(pendingFirstAnnouncementsRender){pendingFirstAnnouncementsRender=false;renderAnnouncements()}
+}
+function scheduleFirstCatalogRender(){
+ requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(flushFirstCatalogRender,60)));
+}
 function closeOriginalWelcome(){
   // Preserve the full welcome until the async stylesheet is applied.
   if(originalWelcome.classList.contains('show')&&!window.__8apdfHomeStyleReady&&Date.now()-Number(window.__8apdfHomeStyleStart||0)<9000){setTimeout(closeOriginalWelcome,125);return;}
   originalWelcome.classList.remove('show');originalWelcome.setAttribute('aria-hidden','true');delete document.documentElement.dataset.entryPending;
+  scheduleFirstCatalogRender();
   document.body.classList.remove('locked');
   clearTimeout(welcomeTimer);
   window.__8apdfMusicConsent?.request?.();
@@ -565,6 +579,7 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
   onFinish(){
+    scheduleFirstCatalogRender();
     const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
     if(showingMusicChoice){
       document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
@@ -680,7 +695,7 @@ async function refreshSupabaseMaterials(){
   state.live=true;state.error=false;
   try{localStorage.setItem('8a_cache_pdfs',JSON.stringify(state.materials.slice(0,150)))}catch{}
   $('#previewRibbon').classList.remove('show');
-  renderMaterials();
+  if(welcomeBlocksCatalogPaint())pendingFirstPdfRender=true;else renderMaterials();
   document.dispatchEvent(new Event('8apdf:library-updated'));
  }catch(err){console.warn('8aPDF Supabase study_materials could not load:',err);showOffline()}
  finally{pdfSyncInProgress=false}
@@ -700,7 +715,7 @@ async function refreshSupabaseAnnouncements(){
    .sort((a,b)=>announcementTime(b)-announcementTime(a)||
      String(a.title||'').localeCompare(String(b.title||'')));
   state.annReady=true;
-  renderAnnouncements();
+  if(welcomeBlocksCatalogPaint())pendingFirstAnnouncementsRender=true;else renderAnnouncements();
  }catch(e){
   console.warn('8aPDF Supabase announcements unavailable:',e?.message||e);
   if(!state.annReady){
