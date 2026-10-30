@@ -35,7 +35,7 @@ self.addEventListener('fetch',event=>{
  let url;
  try{url=new URL(request.url)}catch{return}
  if(url.origin!==self.location.origin||url.pathname.startsWith('/api/')||
-    !/\\.(?:js|css)$/i.test(url.pathname)||!url.searchParams.has('v'))return;
+    !/\.(?:js|css)$/i.test(url.pathname)||!url.searchParams.has('v'))return;
  event.respondWith((async()=>{
   if(typeof caches==='undefined')return fetch(request);
   try{
