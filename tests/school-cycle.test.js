@@ -39,13 +39,17 @@ let now=0,serial=0,covered=true;const timers=new Map(),seen=[];
 const output={_text:'',get textContent(){return this._text},set textContent(v){this._text=v;seen.push(v)}};
 const root={dataset:{uiMode:'studio',motion:'on'}};
 const doc={hidden:false,documentElement:root,getElementById:id=>id==='studyTypingText'?output:{setAttribute(){},classList:{toggle(){}}},querySelector:()=>covered?{}:null,addEventListener(){}};
-const win={matchMedia:()=>({matches:false,addEventListener(){}}),setTimeout:(fn,delay)=>{const id=++serial;timers.set(id,{fn,at:now+delay});return id},clearTimeout:id=>timers.delete(id)};
+const liveToday=Date.now();
+const win={matchMedia:()=>({matches:false,addEventListener(){}}),setTimeout:(fn,delay)=>{const id=++serial;timers.set(id,{fn,at:now+delay});return id},clearTimeout:id=>timers.delete(id),__8apdfStudyBridge:{isLive:()=>true,areAnnouncementsReady:()=>true,documents:()=>[{id:'a',uploadedAtMs:liveToday},{id:'b',uploadedAtMs:liveToday}],announcements:()=>[{id:'message1',messageDate:new Date(liveToday).toISOString()}]},__8apdfStudyIntel:{upcoming:()=>[{id:'future-test',date:'2099-01-01',kind:'test'}]}};
 vm.runInNewContext(fs.readFileSync('study-typing.js','utf8'),{document:doc,window:win,localStorage:{getItem:()=> 'Kanish'},MutationObserver:class {observe(){}}});
 function advance(ms){const end=now+ms;while(timers.size){const [id,t]=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];if(t.at>end)break;now=t.at;timers.delete(id);t.fn()}now=end}
 advance(5000);assert(!seen.includes('Welcome Kanish'),'Greeting must wait until welcome overlay closes');
 covered=false;advance(1300);assert(seen.includes('Welcome Kanish'));assert(!seen.includes('Learn today. Lead tomorrow.'));
-advance(5000);assert(seen.includes('Learn today. Lead tomorrow.'));
-console.log('PASS school rotation, confirmed closures, notification dedupe and greeting-to-motivation animation');
+advance(25000);
+for(const phrase of ['2 PDFs uploaded today.','1 new announcement today.','1 upcoming test.','Learn today. Lead tomorrow.'])assert(seen.includes(phrase),'Expected typed stage: '+phrase);
+const positions=['Welcome Kanish','2 PDFs uploaded today.','1 new announcement today.','1 upcoming test.','Learn today. Lead tomorrow.'].map(p=>seen.indexOf(p));
+assert(positions.every((p,i)=>p>=0&&(i===0||p>positions[i-1])),'Typing intro must appear exactly before motivational quotes');
+console.log('PASS school rotation, notices and ordered daily-briefing typing animation');
 // Verify the production compact toast waits five seconds and exits after three.
 let clock=0,seq=0;const jobs=new Map(),nodes=[];
 function node(tag){const classes=new Set();return {tag,children:[],setAttribute(){},append(...kids){this.children.push(...kids)},classList:{contains:c=>classes.has(c),add:c=>classes.add(c)},remove(){this.removed=true}}}
