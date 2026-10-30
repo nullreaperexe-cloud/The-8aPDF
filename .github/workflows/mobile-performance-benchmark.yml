@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Iteration: defer PDF and announcement DOM until welcome closes
+# Iteration: minimal welcome critical CSS with complete original full stylesheet preserved
 on:
   push:
     paths:
