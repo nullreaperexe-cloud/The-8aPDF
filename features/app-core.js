@@ -554,7 +554,9 @@ function originalShowWelcome(name,notifyAfter=false){
   document.body.classList.add('locked');
   originalWelcome.classList.add('show');originalWelcome.setAttribute('aria-hidden','false');delete document.documentElement.dataset.entryPending;
   clearTimeout(welcomeTimer);
-  welcomeTimer=setTimeout(()=>{closeOriginalWelcome();if(notifyAfter)offerNotificationAfterWelcome()},2350);
+  const shownAt=Number(window.__8apdfWelcomeShownAt||0);
+  const remaining=shownAt?Math.max(0,2350-(performance.now()-shownAt)):2350;
+  welcomeTimer=setTimeout(()=>{closeOriginalWelcome();if(notifyAfter)offerNotificationAfterWelcome()},remaining);
 }
 const premiumOnboardingOpen=window.initNameOnboarding({
   onConfirm(name){
