@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Iteration: original font preloaded to avoid late hero layout and LCP regression
+# Final verification: rollback font preload, retain reduced critical CSS and idle feature initialization
 on:
   push:
     paths:
