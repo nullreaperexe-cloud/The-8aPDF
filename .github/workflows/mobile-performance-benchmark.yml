@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Final verification: rollback font preload, retain reduced critical CSS and idle feature initialization
+# Experiment: prefetch exact premium hero stylesheet before welcome completes
 on:
   push:
     paths:
