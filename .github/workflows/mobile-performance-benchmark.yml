@@ -71,9 +71,9 @@ jobs:
           const diff=(before,after)=>+(100*(before-after)/before).toFixed(1);
           console.log('BASELINE '+JSON.stringify(results.before));
           console.log('OPTIMIZED '+JSON.stringify(results.after));
-          console.log('MEASURED FCP SPEED IMPROVEMENT PERCENT '+diff(results.before.fcp,results.after));
-          console.log('MEASURED LCP SPEED IMPROVEMENT PERCENT '+diff(results.before.lcp,results.after));
-          console.log('MEASURED SPEED INDEX IMPROVEMENT PERCENT '+diff(results.before.speedIndex,results.after));
+          console.log('MEASURED FCP SPEED IMPROVEMENT PERCENT '+diff(results.before.fcp,results.after.fcp));
+          console.log('MEASURED LCP SPEED IMPROVEMENT PERCENT '+diff(results.before.lcp,results.after.lcp));
+          console.log('MEASURED SPEED INDEX IMPROVEMENT PERCENT '+diff(results.before.speedIndex,results.after.speedIndex));
           console.log('LIGHTHOUSE PERFORMANCE SCORE CHANGE POINTS '+(results.after.score-results.before.score).toFixed(1));
           const lines=['| Metric | Before | After | Improvement |','|---|---:|---:|---:|',
             ...['fcp','lcp','tbt','speedIndex'].map(k=>`| ${k} | ${results.before[k].toFixed(0)} ms | ${results.after[k].toFixed(0)} ms | ${diff(results.before[k],results.after)}% |`),
