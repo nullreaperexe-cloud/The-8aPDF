@@ -28,7 +28,7 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert(ui.includes('function buildSidebar()'));
 assert(ui.includes('function summarize(doc)'));
 assert(ui.includes('function settings()'));
-assert(html.includes('/workspace-upgrade.js')&&html.includes('/workspace-upgrade.css'));
+assert(html.includes('/workspace-upgrade.js')&&html.includes('/performance-home.css')&&fs.readFileSync(path.join(root,'performance-home.css'),'utf8').includes('workspace-upgrade.css'));
 assert(html.includes('window.__8apdfStudyBridge='));
 assert(html.includes('window.__8apdfZipExport=createPdfZip'));
 const subjectStart=html.indexOf("document.addEventListener('click',e=>{const b=e.target.closest('[data-sidebar-subject]')");
