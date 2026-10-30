@@ -1,14 +1,14 @@
-/* Automatic + manual low-end performance policy. Never touches music or theme data. */
+/* Super Ultra Low Mode: OFF by default on all hardware; user controls opt-in. */
 (()=>{
  'use strict';
  const KEY='8apdf_super_ultra_low_mode_v1',root=document.documentElement,autoDetected=root.dataset.ultraLowAuto==='on';
  const read=()=>{try{const v=localStorage.getItem(KEY);return v==='on'||v==='off'?v:'auto'}catch{return 'auto'}};
  let choice=read();
- const enabled=()=>choice==='on'||(choice==='auto'&&autoDetected);
+ const enabled=()=>choice==='on'; // Opt-in only; never automatically enable.
  function syncControls(){
   const toggle=document.getElementById('ultraLowModeToggle'),status=document.getElementById('ultraLowModeStatus'),reset=document.getElementById('ultraLowAutoButton');
   if(toggle)toggle.checked=enabled();
-  if(status)status.textContent=choice==='on'?'On manually · music unchanged':choice==='off'?'Off manually · automatic detection paused':autoDetected?'Automatically enabled for this phone':'Auto detects low-end phones · currently off';
+  if(status)status.textContent=choice==='on'?'On manually · music unchanged':choice==='off'?'Off manually · music unchanged':'Off by default · switch on anytime';
   if(reset)reset.hidden=choice==='auto';
  }
  function apply(){

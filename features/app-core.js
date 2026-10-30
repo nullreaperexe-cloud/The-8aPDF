@@ -159,11 +159,11 @@ function selectedTheme(){
 }
 function applySitePalette(){
  const t=selectedTheme(),root=document.documentElement;
- root.dataset.theme=t.id;root.dataset.tone=t.tone;root.style.colorScheme=t.tone;
+ if(root.dataset.theme!==t.id)root.dataset.theme=t.id;if(root.dataset.tone!==t.tone)root.dataset.tone=t.tone;if(root.style.colorScheme!==t.tone)root.style.colorScheme=t.tone;
  const values=paletteFor(t);
- paletteVars.forEach(key=>root.style.setProperty(key,values[key]));
- document.querySelector('meta[name="theme-color"]').content=values['--bg'];
- $('#selectedThemeName').textContent=t.name;
+ paletteVars.forEach(key=>{if(root.style.getPropertyValue(key)!==values[key])root.style.setProperty(key,values[key])});
+ const meta=document.querySelector('meta[name="theme-color"]');if(meta&&meta.content!==values['--bg'])meta.content=values['--bg'];
+ const label=$('#selectedThemeName');if(label&&label.textContent!==t.name)label.textContent=t.name;
 }
 let activePaletteFilter='all',lastSelectedPreset=allThemes.some(t=>t.id===settings.lastPresetTheme)?settings.lastPresetTheme:(allThemes.some(t=>t.id===settings.theme)?settings.theme:'pure-black');
 function renderRoleEditors(){
@@ -621,6 +621,8 @@ window.__8apdfStudyBridge={
 // Feathered ambient glow: pointer, scrolling, and idle drift; no image or visible blob geometry.
 (function adaptiveAmbientGlow(){
  const root=document.documentElement;
+ // Move continuously changing glow coordinates off <html> to prevent whole-page restyling.
+ const glowSurface=document.getElementById('siteAmbientGlow')||root;
  let x=.5,y=.40,targetX=.5,targetY=.4,lastPointer=0,lastScroll=scrollY,lastScrollTime=performance.now(),scrollEnergy=0;
  let lastFrame=0,raf=0,frameDelay=0;
  // Keep every glow animation; throttle JS wakeups on slower hardware.
@@ -659,8 +661,8 @@ window.__8apdfStudyBridge={
    const follow=.045+settings.glowSpeed*.0019;
    x+=(targetX-x)*follow;y+=(targetY-y)*follow;
   }
-  root.style.setProperty('--glow-x',(x*100).toFixed(2)+'%');
-  root.style.setProperty('--glow-y',(y*100).toFixed(2)+'%');
+  glowSurface.style.setProperty('--glow-x',(x*100).toFixed(2)+'%');
+  glowSurface.style.setProperty('--glow-y',(y*100).toFixed(2)+'%');
   scheduleFrame();
  }
  function restart(){if(raf)cancelAnimationFrame(raf);if(frameDelay)clearTimeout(frameDelay);raf=0;frameDelay=0;if(settings.glow&&!document.hidden&&!window.__8apdfUltraLow?.enabled)raf=requestAnimationFrame(step)}

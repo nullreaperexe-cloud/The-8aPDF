@@ -10,7 +10,7 @@
  var automatic=mobile&&((memory>0&&memory<=4)||(cores>0&&cores<=4)),choice='auto';
  try{choice=localStorage.getItem('8apdf_super_ultra_low_mode_v1')||'auto'}catch(e){}
  root.dataset.ultraLowAuto=automatic?'on':'off';
- root.dataset.ultraLow=(choice==='on'||(choice!=='off'&&automatic))?'on':'off';
+ root.dataset.ultraLow=choice==='on'?'on':'off';
 })();
 /* ULTRA LOW BOOT END */
 try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='false'?'closed':'open'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='open'}
@@ -834,7 +834,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <div class="experience-setting-actions"><button id="experienceExport" type="button" class="experience-outline">Export Activity</button><button id="experienceClear" type="button" class="experience-outline">Clear Study History</button></div>
 <p class="liquid-tip">Your timer, goal, streak and recent activity are private browser data. Clearing browser storage clears them too.</p>
 </div>
-<div class="setting-group"><span class="setting-label">Accessibility &amp; Motion</span><label class="setting-row"><span>Super Ultra Low Mode<small id="ultraLowModeStatus">Detecting device performance…</small></span><input class="toggle" id="ultraLowModeToggle" type="checkbox" aria-label="Super Ultra Low Mode"/></label><button type="button" class="experience-outline" id="ultraLowAutoButton" hidden>Restore automatic detection</button><p class="setting-explainer">Animations off, lighter background refresh. Design and background music unchanged.</p><label class="setting-row"><span>Reduce Motion</span><input class="toggle" id="motionToggle" type="checkbox"/></label><label class="setting-row"><span>Larger Text</span><input class="toggle" id="largeTextToggle" type="checkbox"/></label><label class="setting-row"><span>High Contrast</span><input class="toggle" id="contrastToggle" type="checkbox"/></label></div>
+<div class="setting-group"><span class="setting-label">Accessibility &amp; Motion</span><label class="setting-row"><span>Super Ultra Low Mode<small id="ultraLowModeStatus">Detecting device performance…</small></span><input class="toggle" id="ultraLowModeToggle" type="checkbox" aria-label="Super Ultra Low Mode"/></label><button type="button" class="experience-outline" id="ultraLowAutoButton" hidden>Restore Default (Off)</button><p class="setting-explainer">Animations off, lighter background refresh. Design and background music unchanged.</p><label class="setting-row"><span>Reduce Motion</span><input class="toggle" id="motionToggle" type="checkbox"/></label><label class="setting-row"><span>Larger Text</span><input class="toggle" id="largeTextToggle" type="checkbox"/></label><label class="setting-row"><span>High Contrast</span><input class="toggle" id="contrastToggle" type="checkbox"/></label></div>
 <div class="setting-group"><span class="setting-label">Content Density</span><div class="segmented" id="densityGroup"><button class="active" data-density-choice="comfortable">Comfortable</button><button data-density-choice="compact">Compact</button><button data-density-choice="spacious">Spacious</button></div></div>
 <div class="setting-group"><span class="setting-label">Font Size</span><div class="font-row"><span>A</span><input aria-label="Font size" id="fontRange" max="120" min="90" step="5" type="range" value="100"/><span style="font-size:1.08rem">A</span></div></div>
 <div class="setting-group" id="eightapdfMusicGroup" data-settings-category="music"><div id="eightapdfSettingsMusic" class="eightapdf-settings-music"><span class="setting-label">Background Music</span></div></div>
@@ -843,8 +843,8 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <div aria-hidden="true" aria-modal="true" class="sheet" id="modal" role="dialog"><div class="dialog"><div class="dialog-head"><h2 id="modalTitle">Details</h2><button aria-label="Close dialog" class="round-btn" id="modalClose"><svg><use href="#i-x"></use></svg></button></div><div id="modalContent"></div><div class="dialog-actions" id="modalActions"></div></div></div>
 <div aria-label="Quick search" aria-modal="true" class="command" id="command" role="dialog"><div class="command-card"><input aria-label="Command search" id="commandInput" placeholder="Search PDFs, subjects or actions..."/><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
 <div aria-live="polite" class="toast-area" id="toastArea"></div>
-<script defer src="/features/ultra-low-mode.js?v=20261030-v1"></script>
-<script defer src="/features/app-core.js?v=announcement-fit-v6"></script>
+<script defer src="/features/ultra-low-mode.js?v=default-off-20261030"></script>
+<script defer src="/features/app-core.js?v=isolated-glow-20261030"></script>
 
 <script id="8apdf-experience-script" defer src="/features/study-experience.js?v=performance-20261030"></script>
 <script id="8apdf-studio-ui-controller" defer src="/features/studio-controls.js?v=performance-20261030"></script>
@@ -1260,7 +1260,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
   html[data-ui-mode="studio"] #newSchoolPlanner :is(.widget,.planner-task){transition:none!important}
 }
 </style>
-<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=simple-ultra-low-20261030"></script>
+<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=smooth-theme-20261030"></script>
 
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 
