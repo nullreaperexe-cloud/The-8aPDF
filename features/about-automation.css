@@ -1,0 +1,27 @@
+#modal:has(.about-8apdf) .dialog{
+ width:min(900px,calc(100vw - 26px));max-height:min(91dvh,920px);
+ border-radius:clamp(18px,2.2vw,30px);padding:clamp(19px,3vw,34px);
+ background:var(--surface);color:var(--text);
+ box-shadow:0 36px 120px rgba(0,0,0,.42)
+}
+#modal:has(.about-8apdf) .dialog-head{align-items:center;margin-bottom:20px}
+#modal:has(.about-8apdf) .dialog-head h2{font:750 clamp(1.4rem,2.3vw,1.85rem)/1.15 'Space Grotesk',sans-serif;letter-spacing:-.04em}
+.about-8apdf{color:var(--text);font-family:var(--ui-font,'Space Grotesk',sans-serif)}
+.about-eyebrow,.about-section-label{font-size:.68rem;letter-spacing:.105em;text-transform:uppercase;font-weight:790;color:var(--muted)}
+.about-hero{padding:20px clamp(14px,2.8vw,26px) 22px;border-radius:20px;background:var(--surface-high);border:1px solid var(--line)}
+.about-8apdf h3{font-size:clamp(1.28rem,2.4vw,2rem);letter-spacing:-.055em;line-height:1.17;margin:12px 0 11px;font-weight:750}
+.about-8apdf p{font-size:.82rem;line-height:1.7;color:var(--text-soft);margin:0}
+.about-section-label{margin:26px 0 13px}
+.about-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.about-feature{border:1px solid var(--line);border-radius:15px;padding:17px;background:var(--surface-glass);min-width:0}
+.about-feature strong{display:block;font-weight:730;font-size:.85rem;color:var(--text);margin:0 0 7px}
+.about-feature p{font-size:.75rem;line-height:1.65;color:var(--muted)}
+.about-automation{margin:22px 0 0;border:1px solid var(--line-bold);background:var(--surface-high);padding:clamp(17px,2.9vw,27px);border-radius:20px}
+.about-automation h3{font-size:clamp(1.2rem,2.1vw,1.65rem);margin:10px 0}
+.about-automation-actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:19px}
+.about-automation-button{display:inline-flex;justify-content:center;align-items:center;text-align:center;gap:8px;min-height:45px;border-radius:12px;padding:13px 18px;background:var(--button);color:var(--button-text)!important;text-decoration:none!important;font-size:.78rem;font-weight:760;transition:transform .24s ease,opacity .24s ease}
+.about-automation-button:hover{transform:translateY(-2px);opacity:.91}
+.about-automation-button:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.about-automation-actions span{font-size:.7rem;line-height:1.55;flex:1 1 230px;color:var(--muted)}
+@media(max-width:620px){#modal:has(.about-8apdf) .dialog{padding:19px;max-height:calc(100dvh - 22px)}.about-feature-grid{grid-template-columns:1fr}.about-feature{padding:15px}.about-automation-button{width:100%}}
+@media(prefers-reduced-motion:reduce){.about-automation-button{transition:none}}
