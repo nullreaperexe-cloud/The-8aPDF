@@ -61,7 +61,8 @@ function indiaDay(value){
  let date=null;
  if(typeof value==='number')date=new Date(value<1e11?value*1000:value);
  else if(value&&typeof value==='object'){
-  if(typeof value.toDate==='function'){try{date=value.toDate()}catch{}}
+  if(value instanceof Date)date=value;
+  else if(typeof value.toDate==='function'){try{date=value.toDate()}catch{}}
   else if(Number.isFinite(Number(value.seconds??value._seconds))){
    date=new Date(Number(value.seconds??value._seconds)*1000);
   }
