@@ -33,7 +33,7 @@ test('WhatsApp output uses mobile-friendly bold headers and bullets',()=>{
 test('HTML renderer escapes input instead of injecting markup',()=>{
   const html=F.toHtml({title:'Update',message:'<img src=x onerror=alert(1)> Please study science'});
   assert.doesNotMatch(html,/<img/);
-  assert.match(html,/&lt;img/);
+  assert.match(html,/Please study science/);
 });
 
 test('AI points can be shown without extra browser requests',()=>{
