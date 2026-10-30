@@ -44,11 +44,11 @@ test('AI points can be shown without extra browser requests',()=>{
 test('main home page wires clean reader, source filter, share actions',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   assert.match(html,/announcement-format\.js/);
-  assert.match(html,/AFormat\.toHtml\(x\)/);
-  assert.match(html,/AFormat\.toWhatsApp\(x\)/);
-  assert.match(html,/AFormat\.blocked\(x\)/);
-  assert.match(html,/shareWhatsAppAnnouncement/);
-  const main = html.match(/<script>\s*([\s\S]*?)<\/script>/);
-  assert.ok(main);
-  assert.doesNotThrow(()=>new Script(main[1],{filename:'index-main.js'}));
+  const core=readFileSync(new URL('../features/app-core.js',import.meta.url),'utf8');
+  assert.match(core,/AFormat\.toHtml\(x\)/);
+  assert.match(core,/AFormat\.toWhatsApp\(x\)/);
+  assert.match(core,/AFormat\.blocked\(x\)/);
+  assert.match(core,/shareWhatsAppAnnouncement/);
+  assert.match(html,/features\/app-core\.js/);
+  assert.doesNotThrow(()=>new Script(core,{filename:'features/app-core.js'}));
 });
