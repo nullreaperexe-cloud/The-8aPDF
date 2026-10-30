@@ -23,7 +23,7 @@ assert(css.includes('@keyframes studyTypingBlink'),'Blinking cursor animation mi
 console.log('PASS 8aPDF responsive typing hero: '+lines.length+' unique motivational lines');
 
 assert(js.includes('const introStages=4'), 'Welcome, daily PDFs, daily messages and upcoming tests must play before quotes');
-assert(js.includes('uploadedAtMs'), 'Today's PDFs must be counted by actual upload timestamp');
+assert(js.includes('uploadedAtMs'), "Today's PDFs must be counted by actual upload timestamp");
 assert(js.includes('areAnnouncementsReady'), 'Unread/loading announcements cannot be falsely reported as zero');
 assert(js.includes('Asia/Kolkata'), 'School-day comparisons must use India timezone');
 assert(js.includes('No upcoming tests confirmed.'), 'No fake test count when none are dated');
