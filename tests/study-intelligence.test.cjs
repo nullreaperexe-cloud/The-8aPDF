@@ -28,6 +28,6 @@ assert(submit.message.includes('English notebook submission'),'Notebook submissi
 assert.equal(w.__8apdfStudyIntel.answer('Find Science chapter 3 PDF'),null,'PDF questions belong to PDF Finder');
 assert.equal(w.__8apdfStudyIntel.customKey(),'','Default API key must stay private');
 assert(html.includes('announcements:()=>state.announcements.map'),'Real announcements bridge missing');
-assert(html.includes('showNoticeResults(resultAI)'),'Grounded AI result renderer missing');
+assert(html.includes('/features/ai-chat-client.js') && fs.readFileSync('features/ai-chat-client.js','utf8').includes('showNoticeResults(resultAI)'),'Grounded AI result renderer missing');
 assert(css.includes('ws-event-toast'),'Visual reminder must exist');
 console.log('PASS local test/notebook announcements, dated memory and default-key privacy');
