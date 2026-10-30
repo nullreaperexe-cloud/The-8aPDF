@@ -34,7 +34,9 @@ for(const [id,path] of styles){
  assert(html.includes('href="/performance-home.css?v=20261030v2"') && fs.readFileSync('performance-home.css','utf8').includes(path),'Bundled feature CSS missing: '+path);
  assert(fs.statSync(path).size>500,'Extracted CSS is empty: '+path);
 }
-const criticalStyle=html.match(/<style id="8apdf-critical-overlay-style">([\\s\\S]*?)<\\/style>/)?.[1]||'';
+const styleStart=html.indexOf('<style id="8apdf-critical-overlay-style">');
+assert(styleStart>=0,'Critical CSS block missing');
+const criticalStyle=html.slice(styleStart,html.indexOf('</style>',styleStart));
 const fullStyle=fs.readFileSync('performance-home.css','utf8');
 for(const label of ['#welcomeScreen','#nameModal','@keyframes welcomeLiquidFloat','@keyframes name-word-in']){
  assert(criticalStyle.includes(label),'Preserved first-paint welcome/name style missing: '+label);
