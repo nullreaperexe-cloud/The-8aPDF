@@ -43,6 +43,20 @@ for(const label of ['#welcomeScreen','#nameModal','@keyframes welcomeLiquidFloat
  assert(fullStyle.includes(label),'Full animation bundle is missing: '+label);
 }
 
+// Regression: an earlier media=print/onload typo disabled the entire mobile layout.
+const screenStyles=[...html.matchAll(/<link\\b[^>]*rel="stylesheet"[^>]*>/g)].map(m=>m[0]);
+for(const asset of ['/performance-home.css?v=20261030v2','/premium-workspace.css?v=20261017-chat-fullbleed']){
+ const tag=screenStyles.find(x=>x.includes('href="'+asset+'"'));
+ assert(tag,'Required premium screen stylesheet missing: '+asset);
+ assert(!/\\bmedia=["']print["']/.test(tag),'Premium layout must never depend on a print-only stylesheet: '+asset);
+ assert(!/\\bonload=/.test(tag),'Premium layout must not depend on fragile onload JavaScript: '+asset);
+}
+const premiumCss=fs.readFileSync('premium-workspace.css','utf8');
+for(const selector of ['.premium-hero-scene','.premium-hero-actions','.premium-summary','.premium-stat']){
+ assert(premiumCss.includes(selector),'Original premium UI styling must be preserved: '+selector);
+}
+assert(!screenStyles.some(x=>/this\\.media=.*all/.test(x)),'Never reintroduce deferred print media hack');
+assert(html.includes('window.__8apdfHomeStyleReady=true'),'Premium layout may safely display without CSS load timer');
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
 assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
