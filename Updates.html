@@ -41,7 +41,23 @@ window.addEventListener('pagehide',stopMusic);
 })();</script><script>
 (()=>{'use strict';const U=window.U,E=U.esc,$=U.$,F=window.__8aPDFAnnouncementFormat;let all=[];
 function render(){const q=$('#find').value.toLowerCase().trim(),cat=$('#category').value;const matches=all.filter(x=>{const s=[x.title,x.message,x.fullMessage,x.description,x.subject,x.category].join(' ').toLowerCase();return (!q||s.includes(q))&&(!cat||cat==='Important'||s.includes(cat.toLowerCase()))});$('#updates').innerHTML=matches.length?matches.slice(0,100).map(x=>{const msg=String(x.message||x.fullMessage||x.description||'Message details unavailable');const url=U.safeUrl(x.attachmentUrl);const attached=(x.hasAttachment||url)&&url;return '<article class="feed-card" id="'+E(x.id)+'"><div class="between wrap"><span class="tag">'+E(x.category||'School update')+'</span><small>'+E(U.dateLabel(x.messageDate||x.createdAt))+'</small></div><h3 style="margin:13px 0">'+E(x.title||'Teacher message')+'</h3>'+F.toHtml(x)+'<div class="actions">'+(attached?'<a class="button small" target="_blank" rel="noopener noreferrer" href="'+E(url)+'">▤ Open Attachment</a>':'')+'<button class="button small secondary" data-share="'+E(x.id)+'">Copy for WhatsApp</button><button class="button small secondary" data-wa="'+E(x.id)+'">WhatsApp</button></div></article>'}).join(''):'<div class="empty">No matching published messages found.</div>';}
-U.live('announcements',(data)=>{all=data.filter(x=>x.published===true&&!F.blocked(x)).sort((a,b)=>(U.valDate(b.createdAt)?.getTime()||0)-(U.valDate(a.createdAt)?.getTime()||0));render();if(location.hash)setTimeout(()=>document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView(),130)});
+async function loadPublishedAnnouncements(){
+  try{
+    // This page must read the authoritative Supabase feed, never retired Firestore.
+    const {fetchAllSupabaseAnnouncements,normalizeSupabaseAnnouncement}=await import('/supabase-announcements.js');
+    const rows=await fetchAllSupabaseAnnouncements();
+    all=rows.filter(x=>x&&x.published===true).map(normalizeSupabaseAnnouncement)
+      .filter(x=>!F.blocked(x))
+      .sort((a,b)=>(U.valDate(b.messageDate||b.createdAt)?.getTime()||0)-(U.valDate(a.messageDate||a.createdAt)?.getTime()||0));
+    try{localStorage.setItem('8a_cache_messages',JSON.stringify(all.slice(0,150)))}catch(e){}
+  }catch(error){
+    console.warn('Teacher Updates Supabase temporarily unavailable',error);
+    try{const cached=JSON.parse(localStorage.getItem('8a_cache_messages')||'[]');all=Array.isArray(cached)?cached.filter(x=>x.published===true&&!F.blocked(x)):[]}catch(e){all=[]}
+  }
+  render();
+  if(location.hash){try{const id=decodeURIComponent(location.hash.slice(1));setTimeout(()=>document.getElementById(id)?.scrollIntoView(),130)}catch(e){}}
+}
+loadPublishedAnnouncements();
 $('#find').addEventListener('input',render);$('#category').addEventListener('change',render);
 $('#updates').addEventListener('click',async e=>{const copy=e.target.closest('[data-share]'),wa=e.target.closest('[data-wa]');if(!copy&&!wa)return;const x=all.find(x=>x.id===(copy?.dataset.share||wa?.dataset.wa));if(!x)return;const txt=F.toWhatsApp(x);if(wa){const url='https://api.whatsapp.com/send?text='+encodeURIComponent(txt);const opened=window.open(url,'_blank','noopener,noreferrer');if(!opened)location.assign(url);return}try{await navigator.clipboard.writeText(txt);copy.textContent='Copied ✓'}catch{window.prompt('Copy message:',txt)}});
 })();</script></body></html>
