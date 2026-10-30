@@ -4,11 +4,11 @@ import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const core=readFileSync(new URL('../features/app-core.js',import.meta.url),'utf8');
 const section=(start,end)=>{
- const from=html.indexOf(start);
+ const from=core.indexOf(start);
  assert(from>=0,'Missing source block: '+start);
- const to=html.indexOf(end,from+start.length);
+ const to=core.indexOf(end,from+start.length);
  assert(to>=0,'Missing end marker: '+end);
- return html.slice(from,to);
+ return core.slice(from,to);
 };
 
 assert(!html.includes('eightapdf-maintenance'),'Maintenance overlay should be gone');
