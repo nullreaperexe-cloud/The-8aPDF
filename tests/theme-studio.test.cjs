@@ -1,6 +1,7 @@
 /* 8aPDF five-color theme combinations and role-editor regression checks. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const html=fs.readFileSync('index.html','utf8');
+const core=fs.readFileSync('features/app-core.js','utf8');
 const css=fs.readFileSync('theme-studio.css','utf8');
 const workspace=fs.readFileSync('workspace-upgrade.js','utf8');
 const start=html.indexOf('const monoThemes='),end=html.indexOf("let activePaletteFilter=",start);
@@ -28,9 +29,9 @@ for(const t of themes){
 assert.equal(theme.roleDefs.length,10);
 assert.equal(theme.selectedTheme().id,'pure-black','Default Pure Black preference must remain');
 assert(html.includes('id="themeRoleGrid"'),'Theme role editor missing');
-assert(html.includes('data-theme-role'),'Ten color editors not rendered');
-assert(html.includes("lastPresetTheme=settings.theme"),'Preset reset target must save');
-assert(html.includes("document.dispatchEvent(new Event('8apdf:palette-customized'))"),'Workspace override persistence event missing');
+assert(core.includes('data-theme-role'),'Ten color editors not rendered');
+assert(core.includes("lastPresetTheme=settings.theme"),'Preset reset target must save');
+assert(core.includes("document.dispatchEvent(new Event('8apdf:palette-customized'))"),'Workspace override persistence event missing');
 assert(workspace.includes("document.addEventListener('8apdf:palette-customized'"),'Studio must preserve selected palette');
 assert(css.includes('.theme-swatches i'),'Five swatch strips should render');
 assert(css.includes('.theme-role-field'),'Editable color inputs must be styled');
