@@ -39,6 +39,6 @@ const removedAccountMarkers=['account-sync.js','account-ui.css','__8apdfAccount'
 assert(!source.includes('__8apdfFinishAccountOnboarding'),'Name-only onboarding must finish without an account step');
 for(const file of ['index.html','classic.html']){
  const html=fs.readFileSync(file,'utf8');
- for(const removed of removedAccountMarkers)assert(!html.includes(removed),`${file} still references removed Google account UI: ${removed}`);assert(html.includes('window.initNameOnboarding('));assert(!html.includes('function openOriginalName()'));assert(html.includes('aria-modal="true"'));assert(html.includes('for="nameInput"'));
+ for(const removed of removedAccountMarkers)assert(!html.includes(removed),`${file} still references removed Google account UI: ${removed}`);assert((file==='index.html'?fs.readFileSync('features/app-core.js','utf8'):html).includes('window.initNameOnboarding('));assert(!html.includes('function openOriginalName()'));assert(html.includes('aria-modal="true"'));assert(html.includes('for="nameInput"'));
 }
 console.log('PASS name-only onboarding: Unicode, returning user, safe text, storage fallbacks');
