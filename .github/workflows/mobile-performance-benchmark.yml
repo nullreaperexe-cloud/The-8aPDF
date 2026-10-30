@@ -1,0 +1,68 @@
+name: Mobile Performance Before-After Benchmark
+on:
+  push:
+    paths:
+      - '.github/workflows/mobile-performance-benchmark.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lighthouse-mobile-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout current code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare baseline and current static servers
+        run: |
+          git worktree add --detach /tmp/8apdf-before be32fd2b56803e4778467065d388b175259f08e9
+          python3 -m http.server 4331 --bind 127.0.0.1 --directory /tmp/8apdf-before >/tmp/before-http.log 2>&1 &
+          python3 -m http.server 4332 --bind 127.0.0.1 --directory "$PWD" >/tmp/after-http.log 2>&1 &
+          for attempt in $(seq 1 15); do
+            if curl -fsS http://127.0.0.1:4331/ >/dev/null && curl -fsS http://127.0.0.1:4332/ >/dev/null; then break; fi
+            sleep 1
+          done
+      - name: Install mobile Lighthouse
+        run: |
+          npm install -g lighthouse@12
+          echo "CHROME_PATH=$(command -v google-chrome || command -v chromium || command -v chromium-browser)" >> "$GITHUB_ENV"
+      - name: Benchmark twice per version under identical mobile settings
+        run: |
+          set -e
+          for pass in 1 2; do
+            for variant in before after; do
+              if [ "$variant" = before ]; then port=4331; else port=4332; fi
+              echo "Running $variant / $pass"
+              lighthouse "http://127.0.0.1:$port/"                 --only-categories=performance                 --throttling-method=simulate                 --form-factor=mobile                 --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"                 --output=json --output-path="/tmp/lh-$variant-$pass.json" --quiet
+            done
+          done
+      - name: Print measured before-after change
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const median=x=>x.sort((a,b)=>a-b)[Math.floor((x.length-1)/2)];
+          const results={};
+          for (const variant of ['before','after']){
+            const reports=[1,2].map(i=>JSON.parse(fs.readFileSync('/tmp/lh-'+variant+'-'+i+'.json')));
+            results[variant]={
+              score:median(reports.map(r=>r.categories.performance.score*100)),
+              fcp:median(reports.map(r=>r.audits['first-contentful-paint'].numericValue)),
+              lcp:median(reports.map(r=>r.audits['largest-contentful-paint'].numericValue)),
+              tbt:median(reports.map(r=>r.audits['total-blocking-time'].numericValue)),
+              speedIndex:median(reports.map(r=>r.audits['speed-index'].numericValue))
+            };
+          }
+          const diff=(before,after)=>+(100*(before-after)/before).toFixed(1);
+          console.log('BASELINE '+JSON.stringify(results.before));
+          console.log('OPTIMIZED '+JSON.stringify(results.after));
+          console.log('MEASURED FCP SPEED IMPROVEMENT PERCENT '+diff(results.before.fcp,results.after));
+          console.log('MEASURED LCP SPEED IMPROVEMENT PERCENT '+diff(results.before.lcp,results.after));
+          console.log('MEASURED SPEED INDEX IMPROVEMENT PERCENT '+diff(results.before.speedIndex,results.after));
+          console.log('LIGHTHOUSE PERFORMANCE SCORE CHANGE POINTS '+(results.after.score-results.before.score).toFixed(1));
+          const lines=['| Metric | Before | After | Improvement |','|---|---:|---:|---:|',
+            ...['fcp','lcp','tbt','speedIndex'].map(k=>`| ${k} | ${results.before[k].toFixed(0)} ms | ${results.after[k].toFixed(0)} ms | ${diff(results.before[k],results.after)}% |`),
+            `| Lighthouse score | ${results.before.score} | ${results.after.score} | ${(results.after.score-results.before.score).toFixed(1)} points |`];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,lines.join('\n')+'\n');
+          NODE
