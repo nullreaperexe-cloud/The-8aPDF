@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const core=readFileSync(new URL('../features/app-core.js',import.meta.url),'utf8');
 const section=(start,end)=>{
  const from=html.indexOf(start);
  assert(from>=0,'Missing source block: '+start);
@@ -13,9 +14,9 @@ const section=(start,end)=>{
 assert(!html.includes('eightapdf-maintenance'),'Maintenance overlay should be gone');
 assert(!html.includes('Website Under Maintenance'),'Page title should be restored');
 assert(html.includes('data-school-term="all"'),'All PDFs term selector should be available');
-assert(html.includes("sort:'new'"),'Latest-first PDF sort should be default');
-assert(html.includes("refreshSupabaseMaterials();"));
-assert(html.includes("refreshSupabaseAnnouncements();"));
+assert(core.includes("sort:'new'"),'Latest-first PDF sort should be default');
+assert(core.includes("refreshSupabaseMaterials();"));
+assert(core.includes("refreshSupabaseAnnouncements();"));
 
 const code=[
  section('function sortedDocs(){','function dateMs('),
