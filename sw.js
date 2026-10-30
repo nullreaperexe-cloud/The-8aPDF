@@ -1,4 +1,4 @@
-/* Native Web Push. No app-shell cache, so new deployments remain visible. */
+/* Native Web Push + versioned static asset caching. HTML, APIs, PDFs and user data are never cached. */
 'use strict';
 const PUSH_WORKER_VERSION = 'lockscreen-v2';
 async function reportDisplay(token, stage, error) {
@@ -19,7 +19,44 @@ function safePath(value) {
   } catch { return '/'; }
 }
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+self.addEventListener('activate', event => event.waitUntil((async()=>{
+  if(typeof caches!=='undefined'){
+   const keys=await caches.keys();
+   await Promise.all(keys.filter(k=>k.startsWith('8apdf-static-')&&k!==STATIC_ASSET_CACHE).map(k=>caches.delete(k)));
+  }
+  await self.clients.claim();
+})()));
+
+/* Cache only explicitly versioned code/style resources, never HTML, API, chat, PDF or personal data. */
+const STATIC_ASSET_CACHE='8apdf-static-v1';
+self.addEventListener('fetch',event=>{
+ const request=event.request;
+ if(request.method!=='GET'||request.mode==='navigate')return;
+ let url;
+ try{url=new URL(request.url)}catch{return}
+ if(url.origin!==self.location.origin||url.pathname.startsWith('/api/')||
+    !/\\.(?:js|css)$/i.test(url.pathname)||!url.searchParams.has('v'))return;
+ event.respondWith((async()=>{
+  if(typeof caches==='undefined')return fetch(request);
+  try{
+   const cache=await caches.open(STATIC_ASSET_CACHE);
+   const saved=await cache.match(request);
+   if(saved){
+    event.waitUntil(fetch(request).then(res=>{
+     if(res.ok&&res.type!=='opaque')return cache.put(request,res.clone());
+    }).catch(()=>{}));
+    return saved;
+   }
+   const response=await fetch(request);
+   if(response.ok&&response.type!=='opaque')event.waitUntil((async()=>{
+    await cache.put(request,response.clone());
+    const keys=await cache.keys();
+    await Promise.all(keys.length>100?keys.slice(0,keys.length-100).map(key=>cache.delete(key)):[]);
+   })().catch(()=>{}));
+   return response;
+  }catch{return fetch(request)}
+ })());
+});
 self.addEventListener('push', event => {
   event.waitUntil((async () => {
     let payload = {};
