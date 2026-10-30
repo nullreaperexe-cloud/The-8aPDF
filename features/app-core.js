@@ -534,6 +534,8 @@ $('#supportLink').addEventListener('click',e=>{e.preventDefault();toast('Support
 const originalWelcome=$('#welcomeScreen'), originalNameModal=$('#nameModal');
 let welcomeTimer;
 function closeOriginalWelcome(){
+  // Preserve the full welcome until the async stylesheet is applied.
+  if(originalWelcome.classList.contains('show')&&!window.__8apdfHomeStyleReady&&Date.now()-Number(window.__8apdfHomeStyleStart||0)<9000){setTimeout(closeOriginalWelcome,125);return;}
   originalWelcome.classList.remove('show');originalWelcome.setAttribute('aria-hidden','true');delete document.documentElement.dataset.entryPending;
   document.body.classList.remove('locked');
   clearTimeout(welcomeTimer);
