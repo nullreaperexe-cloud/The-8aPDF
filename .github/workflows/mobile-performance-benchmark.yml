@@ -66,6 +66,12 @@ jobs:
               const items=details.map(x=>({url:String(x.url||x.node?.snippet||x.source||x.request?.url||'').slice(0,130),wastedMs:x.wastedMs,transfer:x.transferSize,total:x.total,group:x.group,percent:x.percent,resourceSize:x.resourceSize})).filter(x=>x.url||x.wastedMs||x.group).slice(0,15);
               console.log('DIAGNOSTIC '+variant+' '+id+' '+JSON.stringify({display:obj.displayValue,score:obj.score,savings:obj.metricSavings||obj.overallSavingsMs,items}).slice(0,3000));
             }
+            const lcp=audits['largest-contentful-paint-element'];
+            console.log('LCP_RAW '+variant+' '+JSON.stringify(lcp?.details?.items||[]).slice(0,8500));
+            const breakdown=audits['lcp-breakdown-insight'];
+            console.log('LCP_BREAKDOWN '+variant+' '+JSON.stringify(breakdown?.details?.items||[]).slice(0,6000));
+            const timeline=audits['mainthread-work-breakdown']?.details?.items||[];
+            console.log('MAIN_THREAD '+variant+' '+JSON.stringify(timeline.map(i=>({group:i.group,duration:i.duration}))));
             const resources=(audits['network-requests']?.details?.items||[]).sort((a,b)=>(b.transferSize||0)-(a.transferSize||0)).slice(0,12);
             console.log('BIGGEST_NETWORK '+variant+' '+JSON.stringify(resources.map(r=>({url:r.url,transferSize:r.transferSize,resourceSize:r.resourceSize,startTime:r.startTime,endTime:r.endTime}))).slice(0,5500));
           }
