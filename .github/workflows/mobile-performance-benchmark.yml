@@ -1,5 +1,5 @@
 name: Mobile Performance Before-After Benchmark
-# Iteration: welcome timer anchored to first painted overlay
+# Iteration: defer PDF and announcement DOM until welcome closes
 on:
   push:
     paths:
