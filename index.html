@@ -4,8 +4,8 @@
 <head>
 <script id="8apdf-ui-early">try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='false'?'closed':'open'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='open'}
 /* Before first paint, pick the exact existing overlay; do not show the hero underneath. */
-try{const n=(localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim();const known=localStorage.getItem('8apdf_premium_name_onboarding_v1')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
-setTimeout(()=>{delete document.documentElement.dataset.entryPending},12000);
+try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_premium_name_onboarding_v1')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
+setTimeout(()=>{if(!document.documentElement.dataset.entryPending)return;document.getElementById('welcomeScreen')?.classList.remove('show');delete document.documentElement.dataset.entryPending},12000);
 </script>
 <style id="8apdf-first-paint-guard">
 html[data-entry-pending] {background:#000}
@@ -1232,7 +1232,7 @@ html[data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{displ
 <h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
 <p class="welcome-subtitle">Opening your PDF study library...</p>
 </div>
-</section><script id="8apdf-welcome-first-paint">if(document.documentElement.dataset.entryPending==='welcome'){try{const name=(localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'').trim();const overlay=document.getElementById('welcomeScreen');document.getElementById('welcomeTitle').textContent='Welcome, '+name;overlay.classList.add('show');overlay.setAttribute('aria-hidden','false')}catch{}}</script><section aria-hidden="true" aria-labelledby="nameModalTitle" aria-describedby="nameFeedback" aria-modal="true" role="dialog" tabindex="-1" class="name-modal" id="nameModal">
+</section><script id="8apdf-welcome-first-paint">if(document.documentElement.dataset.entryPending==='welcome'){try{const name=(localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||sessionStorage.getItem('eightapdf_user_name_v2')||sessionStorage.getItem('eightapdf_user_name')||'').trim();const overlay=document.getElementById('welcomeScreen');document.getElementById('welcomeTitle').textContent='Welcome, '+name;overlay.classList.add('show');overlay.setAttribute('aria-hidden','false')}catch{}}</script><section aria-hidden="true" aria-labelledby="nameModalTitle" aria-describedby="nameFeedback" aria-modal="true" role="dialog" tabindex="-1" class="name-modal" id="nameModal">
 <div class="name-stage">
 <div class="name-masthead"><div class="name-wordmark"><svg aria-hidden="true"><use href="#i-book"></use></svg><span>8aPDF</span></div><span class="name-edition">A little space. A lot of possibility.</span></div>
 <div class="name-composition">
