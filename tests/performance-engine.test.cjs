@@ -31,7 +31,7 @@ const styles=[
  ['8apdf-full-todo-premium','features/study-todo.css']
 ];
 for(const [id,path] of styles){
- assert(html.includes('id="'+id+'" rel="stylesheet" href="/'+path+'?v=perf-20261030"'),'Extracted CSS is missing: '+path);
+ assert(html.includes('href="/performance-home.css?v=20261030v2"') && fs.readFileSync('performance-home.css','utf8').includes(path),'Bundled feature CSS missing: '+path);
  assert(fs.statSync(path).size>500,'Extracted CSS is empty: '+path);
 }
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
@@ -40,7 +40,7 @@ assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard
 assert(html.indexOf('id="8apdf-welcome-first-paint"')<html.indexOf('id="nameModal"'),'Welcome must be initialized before name onboarding markup');
 assert(html.includes('delete document.documentElement.dataset.entryPending;'),'Early screen must release after startup');
 assert(html.includes('if(now-lastFrame<cadence()){scheduleFrame();return}'),'Glow uses adaptive scheduling');
-assert(html.length<310000,'HTML must stay substantially smaller than original monolith');
+assert(html.length<170000,'HTML should stay lean following stylesheet bundling');
 const worker=fs.readFileSync('sw.js','utf8');
 new vm.Script(worker,{filename:'sw.js'});
 assert(worker.includes("request.mode==='navigate'"),'Never cache HTML navigation');
