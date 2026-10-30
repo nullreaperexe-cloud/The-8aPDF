@@ -60,7 +60,10 @@ export function normalizeSupabaseAnnouncement(row){
  return {
   ...original,
   id:String(row.id),
-  title:pick('title','title','School announcement'),
+  // The normalized database title is authoritative. Legacy raw.title can be
+  // a truncated EduSecure preview even after the title column was corrected.
+  // Admin edits are also persisted in row.title, so this preserves them.
+  title:String(row.title||original.title||'School announcement'),
   subject:pick('subject','subject','General'),
   category:pick('category','category','General'),
   description:pick('description','description',''),
