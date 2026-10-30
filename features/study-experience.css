@@ -1,0 +1,34 @@
+/* 8aPDF Experience Hub — does not override the original welcome screen. */
+.experience-hub{padding:22px 0 32px;scroll-margin-top:115px}
+.experience-heading{display:flex;justify-content:space-between;align-items:end;gap:22px;margin:3px 0 20px}
+.experience-heading h2{font-size:clamp(1.45rem,3vw,2.35rem);letter-spacing:-.055em;line-height:1.12;margin:7px 0}
+.experience-heading p{font-size:.84rem;color:var(--muted);margin:0;max-width:620px}
+.experience-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.experience-tile{min-width:0;position:relative;padding:20px 21px;border-radius:var(--card-roundness,24px);border:1px solid var(--line);background:var(--surface);box-shadow:0 12px 35px rgba(0,0,0,.10);transition:transform .38s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s;overflow:hidden}
+.experience-tile:hover{transform:translateY(-3px);border-color:var(--line-bold);box-shadow:0 16px 40px rgba(0,0,0,.16)}
+.experience-kicker{display:block;font-size:.62rem;letter-spacing:.14em;font-weight:750;color:var(--muted);text-transform:uppercase}
+.experience-large{display:block;font-size:clamp(1.65rem,2.6vw,2.15rem);letter-spacing:-.06em;font-weight:750;line-height:1.2;margin:15px 0 5px;color:var(--text)}
+.experience-doc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:15px 0 5px;font-size:1.05rem;line-height:1.35;min-height:2.75rem;color:var(--text)}
+.experience-tile p{font-size:.72rem;color:var(--muted);line-height:1.5;margin:7px 0 0}
+.experience-link{background:transparent;border:0;padding:0;color:var(--text);font-size:.75rem;font-weight:750;margin-top:15px;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.experience-link:hover{color:var(--text-soft)}
+.experience-button{border:1px solid var(--button);background:var(--button);color:var(--button-text);padding:13px 18px;border-radius:14px;font-weight:750;cursor:pointer;white-space:nowrap;transition:transform .2s,opacity .2s}
+.experience-button:hover{transform:translateY(-2px)}.experience-button:active,.experience-outline:active{transform:scale(.975)}
+.experience-progress{height:7px;border-radius:20px;background:var(--surface-soft);overflow:hidden;margin:12px 0 9px}
+.experience-progress span{display:block;height:100%;width:0;background:var(--text);border-radius:20px;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.experience-overlay{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:none;place-items:center;padding:16px}
+.experience-overlay.open{display:grid}.experience-dialog{position:relative;width:min(510px,100%);max-height:calc(100dvh - 35px);overflow-y:auto;background:var(--surface);color:var(--text);border:1px solid var(--line-bold);border-radius:30px;padding:24px;box-shadow:0 26px 100px rgba(0,0,0,.4)}
+.experience-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.experience-dialog-head h2{font-size:1.6rem;letter-spacing:-.05em;margin:4px 0 0}
+.experience-close{border:1px solid var(--line-bold);border-radius:50%;width:35px;height:35px;background:var(--surface-soft);color:var(--text);font-size:1.4rem;cursor:pointer}
+.focus-modes{display:flex;gap:6px;padding:5px;background:var(--surface-soft);border-radius:14px;margin:22px 0}
+.focus-modes button{background:transparent;color:var(--muted);border:0;border-radius:10px;flex:1;padding:11px 4px;font-size:.74rem;font-weight:700;cursor:pointer}
+.focus-modes .selected{background:var(--button);color:var(--button-text)}
+.focus-time-ring{width:min(260px,80vw);height:min(260px,80vw);border:1px solid var(--line-bold);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:14px auto 24px;background:radial-gradient(circle at 50% 38%,var(--surface-high),var(--surface));box-shadow:inset 0 0 0 13px var(--surface-soft),0 16px 40px rgba(0,0,0,.14)}
+.focus-clock{font-variant-numeric:tabular-nums;font-size:clamp(3rem,10vw,4.2rem);font-weight:730;letter-spacing:-.08em;line-height:1.06}.focus-time-ring>span{font-size:.73rem;color:var(--muted);margin-top:12px}
+.focus-actions{display:grid;grid-template-columns:1.2fr .7fr .8fr;gap:8px}.experience-outline{border:1px solid var(--line-bold);border-radius:13px;background:var(--surface-soft);color:var(--text);cursor:pointer;padding:12px 10px;font-weight:700;font-size:.73rem}
+.focus-info{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.72rem;margin:20px 0 12px}.focus-tools{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--line)}
+.experience-setting-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+#studyExperienceSettings .setting-row small{display:block;color:var(--muted);font-size:.65rem;margin-top:3px;max-width:210px}
+@media(max-width:950px){.experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:590px){.experience-hub{padding:18px 0}.experience-heading{display:block}.experience-heading .experience-button{margin-top:15px;width:100%}.experience-grid{grid-template-columns:1fr;gap:10px}.experience-tile{padding:19px}.experience-dialog{border-radius:22px;padding:20px}.focus-actions{grid-template-columns:1fr 1fr}.focus-actions .experience-button{grid-column:1/-1}.focus-tools{gap:13px}}
+@media(prefers-reduced-motion:reduce){.experience-tile,.experience-progress span{transition:none!important}}
