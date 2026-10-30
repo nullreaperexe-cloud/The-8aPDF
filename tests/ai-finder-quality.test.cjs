@@ -2,10 +2,12 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const html=fs.readFileSync('index.html','utf8');
-const begin=html.indexOf('const normalize=s=>',html.indexOf('<script id="8apdf-chatbot-client">'));
-const end=html.indexOf('function makeMessage(',begin);
+const client=fs.readFileSync('features/ai-chat-client.js','utf8');
+assert(html.includes('/features/ai-chat-client.js'),'Finder client module missing from page');
+const begin=client.indexOf('const normalize=s=>');
+const end=client.indexOf('function makeMessage(',begin);
 assert(begin>0&&end>begin,'Finder ranking implementation must exist');
-const inline=html.slice(begin,end);
+const inline=client.slice(begin,end);
 const fetch=async()=>({ok:false});
 const {rank,chapterOf,subjectOf,termOf,normalize}=new Function('fetch',inline+';return {rank,chapterOf,subjectOf,termOf,normalize}')(fetch);
 const docs=[
@@ -67,7 +69,7 @@ assert(playbook.includes('Offline Training & Retrieval Playbook'));
 assert(playbook.includes('Zero Groq credits')||playbook.includes('Zero Groq tokens')||playbook.includes('0 Groq tokens'));
 assert(offline.aliases&&offline.aliases.qa.includes('question answers'),'Static Q&A aliases must exist');
 assert(offline.aliases.revision&&offline.aliases.hindi,'Offline multilingual query knowledge must exist');
-assert(html.includes('trainedAliases.get(token)'),'Finder must actually consume offline trained aliases');
+assert(client.includes('trainedAliases.get(token)'),'Finder must actually consume offline trained aliases');
 assert(!fs.existsSync('.github/workflows/ai-finder-training.yml'),'No scheduled Groq training jobs');
 assert(!fs.existsSync('scripts/ai-finder-train.mjs'),'Retired AI batch trainer must not spend credits');
 assert(!fs.readFileSync('package.json','utf8').includes('ai-finder-train.mjs'),'Unused Groq trainer no longer in npm tests');
