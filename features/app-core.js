@@ -297,7 +297,7 @@ $$('[data-density-choice]').forEach(b=>b.onclick=()=>{settings.density=b.dataset
 for(const [id,key] of [['sidebarToggle','sidebar'],['readingToggle','reading'],['motionToggle','motion'],['largeTextToggle','large'],['contrastToggle','contrast']])$('#'+id).onchange=e=>{settings[key]=e.target.checked;setSettings()};
 $('#compactToggle').onchange=e=>{settings.density=e.target.checked?'compact':'comfortable';setSettings()};$('#fontRange').oninput=e=>{settings.fontSize=+e.target.value;setSettings()};$('#themeShortcut').onclick=()=>{settings.theme=selectedTheme().tone==='light'?'pure-black':'light';setSettings()};
 function closeModal(){$('#modal').classList.remove('open');$('#modal').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll')}
-function showModal(title,html,actions=''){$('#modalTitle').textContent=title;$('#modalContent').innerHTML=html;$('#modalActions').innerHTML=actions;$('#modal').classList.add('open');$('#modal').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll')}
+function showModal(title,html,actions=''){$('#modalTitle').textContent=title;$('#modalContent').innerHTML=html;$('#modalActions').innerHTML=actions;$('#modal').classList.toggle('announcement-modal',!!$('#modalContent').querySelector('.intelligent-notice'));$('#modal').classList.add('open');$('#modal').setAttribute('aria-hidden','false');document.body.classList.add('no-scroll')}
 $('#modalClose').onclick=closeModal;$('#modal').addEventListener('click',e=>{if(e.target===$('#modal'))closeModal()});
 function showTimetable(){
  const header=['DAY','P0','P1','P2','P3','P4','P5','P6','P7','P8'].map(t=>`<th scope="col">${t}</th>`).join('');
