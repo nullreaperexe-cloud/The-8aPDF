@@ -1,0 +1,95 @@
+#modal:has(#fullTaskCenter) .dialog{width:min(780px,calc(100vw - 24px));max-height:min(90dvh,900px);overflow-y:auto;border-radius:var(--user-radius,24px);padding:clamp(17px,3vw,29px)}
+#fullTaskCenter .planner-modal-intro{font-size:.83rem;color:var(--muted);padding:10px 0 22px}
+#fullTaskCenter h3{font-size:1.12rem;letter-spacing:-.04em;padding:15px 0 10px}
+#fullTaskCenter h3 small{font-size:.75rem;color:var(--muted)}
+#fullTaskCenter .planner-delete{border:1px solid var(--line);background:var(--surface-high);color:var(--text);border-radius:10px;min-width:35px;min-height:35px}
+#plannerAddTask{display:flex;gap:10px;margin:10px 0 18px}
+#plannerAddTask input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:11px 12px;color:var(--text);font:inherit}
+@media(max-width:520px){#plannerAddTask{flex-wrap:wrap}#plannerAddTask .solid{min-height:44px}}
+
+/* My Study To-Do: independently scoped task layout (the dashboard-only
+   .planner-task rules do not apply inside this modal). */
+#modal:has(#fullTaskCenter) .dialog{
+ width:min(860px,calc(100vw - 24px))!important;
+ max-height:min(91dvh,980px)!important;
+ padding:clamp(18px,2.6vw,32px)!important;
+ overflow-y:auto!important;overscroll-behavior:contain;
+}
+#modal #fullTaskCenter{display:block;min-width:0;color:var(--text);font:inherit}
+#modal #fullTaskCenter .planner-modal-intro{margin:0 0 18px!important;font-size:.82rem;line-height:1.55;color:var(--muted)}
+#modal #fullTaskCenter .todo-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 17px}
+#modal #fullTaskCenter .todo-stats>span{display:grid;gap:3px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft);font-size:.72rem;color:var(--muted)}
+#modal #fullTaskCenter .todo-stats strong{color:var(--text);font-size:1.3rem;font-weight:740;font-variant-numeric:tabular-nums}
+#modal #fullTaskCenter .todo-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:10px;margin:0 0 21px}
+#modal #fullTaskCenter .todo-toolbar label{display:grid;gap:6px;font-size:.73rem;font-weight:700;color:var(--text-soft);min-width:0}
+#modal #fullTaskCenter .todo-toolbar :is(input,select){font:inherit;font-size:.8rem;min-width:0;width:100%;min-height:41px;padding:9px 12px;border:1px solid var(--line-bold);border-radius:11px;background:var(--surface-soft);color:var(--text)}
+#modal #fullTaskCenter .todo-section{display:block;margin:0 0 24px;min-width:0}
+#modal #fullTaskCenter .todo-section-heading{display:flex;justify-content:space-between;align-items:center;gap:9px;border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:3px}
+#modal #fullTaskCenter .todo-section-heading h3{font-size:1rem!important;line-height:1.3!important;margin:0!important;padding:0!important;font-weight:740;letter-spacing:-.02em}
+#modal #fullTaskCenter .todo-section-heading small{font-size:.73rem;white-space:nowrap;color:var(--muted)}
+#modal #fullTaskCenter .todo-items{display:grid;gap:0;min-width:0}
+#modal #fullTaskCenter .planner-task.todo-item{
+ display:flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:space-between!important;gap:11px!important;
+ margin:0!important;padding:12px 4px!important;
+ border:0!important;border-bottom:1px solid var(--line)!important;
+ border-radius:0!important;background:transparent!important;
+ min-width:0!important;width:100%!important;
+ font:inherit!important;
+}
+#modal #fullTaskCenter .planner-task.todo-item:last-child{border-bottom:0!important}
+#modal #fullTaskCenter .todo-checkbox-label{
+ display:flex!important;align-items:flex-start!important;gap:13px!important;
+ flex:1 1 auto!important;min-width:0!important;width:100%!important;
+ font:inherit!important;cursor:pointer;
+}
+#modal #fullTaskCenter .todo-checkbox-label input[type=checkbox]{
+ appearance:auto!important;accent-color:var(--text);width:19px!important;
+ height:19px!important;min-width:19px!important;flex:none!important;
+ margin:3px 0 0!important;padding:0!important;cursor:pointer;
+}
+#modal #fullTaskCenter .todo-copy{
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ gap:6px!important;min-width:0!important;flex:1 1 auto!important;
+ overflow-wrap:anywhere!important;word-break:normal!important;
+}
+#modal #fullTaskCenter .todo-copy strong{
+ display:block!important;max-width:100%!important;white-space:normal!important;
+ font-size:.83rem!important;font-weight:650!important;line-height:1.55!important;
+ letter-spacing:-.012em!important;overflow-wrap:anywhere!important;
+}
+#modal #fullTaskCenter .todo-meta{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+ gap:6px!important;min-width:0!important;color:var(--muted);
+ font-size:.7rem!important;line-height:1.35!important;
+}
+#modal #fullTaskCenter .todo-subject{
+ display:inline-flex!important;max-width:100%;padding:3px 7px;
+ border:1px solid var(--line);border-radius:7px;background:var(--surface-soft);
+ overflow-wrap:anywhere;font-size:.7rem!important;
+}
+#modal #fullTaskCenter .todo-due{display:inline-flex!important;color:var(--muted);font-size:.7rem!important}
+#modal #fullTaskCenter .todo-due:before{content:'·';margin-right:7px;opacity:.7}
+#modal #fullTaskCenter .todo-finished .todo-copy strong{text-decoration:line-through;opacity:.58}
+#modal #fullTaskCenter .todo-finished .todo-meta{opacity:.65}
+#modal #fullTaskCenter .todo-show-more{display:block;width:100%;margin-top:9px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);color:var(--text);font:650 .78rem/1.4 inherit;cursor:pointer}
+#modal #fullTaskCenter .todo-show-more:hover{background:var(--hover)}
+#modal #fullTaskCenter .todo-empty{margin:0!important;padding:17px 4px;font-size:.8rem!important;color:var(--muted)}
+#modal #fullTaskCenter .todo-add-section{padding:15px 0 3px;margin:0 0 13px;border-top:1px solid var(--line)}
+#modal #fullTaskCenter .todo-add-section h3{font-size:.94rem!important;line-height:1.35!important;margin:0 0 12px!important;padding:0!important}
+#modal #fullTaskCenter #plannerAddTask{display:flex!important;gap:9px!important;flex-wrap:nowrap!important;margin:0 0 10px!important}
+#modal #fullTaskCenter #plannerNewText{width:auto!important;min-width:0!important;flex:1 1 auto!important;font-size:.78rem!important}
+#modal #fullTaskCenter #plannerAddTask button{flex:none!important;font-size:.77rem!important;white-space:nowrap}
+#modal #fullTaskCenter .planner-delete{flex:none!important;margin:0!important;cursor:pointer;font-size:17px}
+#modal #fullTaskCenter :is(input,button,select):focus-visible{outline:2px solid var(--text-soft);outline-offset:3px}
+@media(max-width:560px){
+ #modal:has(#fullTaskCenter) .dialog{width:calc(100vw - 12px)!important;padding:17px 15px!important;max-height:calc(100dvh - 18px)!important}
+ #modal #fullTaskCenter .todo-toolbar{grid-template-columns:minmax(0,1fr) 120px;gap:8px}
+ #modal #fullTaskCenter .todo-stats{gap:6px}
+ #modal #fullTaskCenter .todo-stats>span{padding:10px 8px;font-size:.67rem}
+ #modal #fullTaskCenter .todo-stats strong{font-size:1.1rem}
+ #modal #fullTaskCenter .todo-checkbox-label{gap:10px!important}
+ #modal #fullTaskCenter .todo-copy strong{font-size:.78rem!important}
+ #modal #fullTaskCenter #plannerAddTask{flex-wrap:wrap!important}
+ #modal #fullTaskCenter #plannerNewText{flex:1 1 170px!important}
+}
