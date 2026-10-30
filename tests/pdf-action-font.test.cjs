@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const core=fs.readFileSync('features/app-core.js','utf8');
+const ws=fs.readFileSync('workspace-upgrade.js','utf8');
+const index=fs.readFileSync('index.html','utf8');
+const css=fs.readFileSync('site-unified-font.css','utf8');
+assert(core.includes('class="action wide pdf-summary-utility"'),'Summarize PDF must share action button classes');
+assert(core.includes('Summarize PDF</button></div></article>'),'Summarize PDF must be inside the same grid as Preview, Download and Share');
+assert(ws.includes('function ensureSummaryAction(card)'),'Dynamically rendered cards must stay consistent');
+assert(ws.includes("actions.insertAdjacentHTML('beforeend'"),'Fallback PDF action must be inserted into the existing action group');
+assert(css.includes("Space Grotesk")&&css.includes('--8apdf-text-font'),'Website font tokens missing');
+assert(css.includes('html body')&&css.includes('font-family:var(--8apdf-text-font)!important'),'Consistent font override missing');
+assert(css.includes(':not([class*="icon"])'),'Icon fonts should be preserved');
+assert(css.includes('.card-actions > .action.pdf-summary-utility'),'Matching PDF button styling missing');
+assert(index.includes('/site-unified-font.css?v=unified-20261030-v1'),'Global CSS is not loaded');
+assert(index.includes('/features/app-core.js?v=pdf-actions-20261030-v1'),'PDF card cache key needs updating');
+console.log('PASS all PDF actions match and a shared website font is loaded');

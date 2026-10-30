@@ -1,0 +1,39 @@
+/* 8aPDF unified text typography — keeps icon glyphs and code editors functional.
+   All normal text adopts the exact Space Grotesk family of Preview/Download/Share. */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root{
+  --8apdf-text-font:'Space Grotesk','Noto Sans Devanagari','Noto Sans Gurmukhi',system-ui,sans-serif;
+  --ui-font:var(--8apdf-text-font)!important;
+  --sans:var(--8apdf-text-font);
+}
+html body,
+html body :not(svg):not(path):not(text):not(code):not(pre):not(kbd):not(samp):not([class*="icon"]):not(.material-icons):not(.material-symbols-rounded):not(.material-symbols-outlined):not(.fa):not(.fas):not(.far):not(.fab):not([class^="fa-"]):not([class*=" fa-"]):not(.codicon){
+  font-family:var(--8apdf-text-font)!important;
+}
+/* Summarize is the fourth button in the original action group: same shape and typography as Share. */
+.pdf-card .card-actions > .action.pdf-summary-utility{
+  box-sizing:border-box;
+  width:100%!important;
+  flex:1 0 100%!important;
+  grid-column:1/-1!important;
+  margin:0!important;
+  border:1px solid var(--line-bold)!important;
+  border-radius:10px!important;
+  min-height:38px!important;
+  padding:9px 8px!important;
+  background:transparent!important;
+  color:var(--text)!important;
+  font-size:.73rem!important;
+  font-weight:600!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:5px!important;
+  white-space:nowrap;
+  transform:none!important;
+  transition:background var(--duration),border-color var(--duration);
+}
+.pdf-card .card-actions > .action.pdf-summary-utility svg{width:15px;height:15px;flex:none}
+.pdf-card .card-actions > .action.pdf-summary-utility:hover{background:var(--hover)!important;color:var(--text)!important}
+html:not([data-ui-mode="studio"]) .pdf-card .card-actions > .action.pdf-summary-utility{border-radius:7px!important;min-height:32px!important;font-size:.67rem!important}

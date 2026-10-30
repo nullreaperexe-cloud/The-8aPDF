@@ -17,4 +17,6 @@ jobs:
           package-manager-cache: false
       - name: Verify Super Ultra Low Mode
         run: node tests/ultra-low-mode.test.cjs
+      - name: Verify unified font and PDF action design
+        run: node tests/pdf-action-font.test.cjs
       - run: npm test
