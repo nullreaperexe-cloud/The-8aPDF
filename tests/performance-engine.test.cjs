@@ -38,7 +38,7 @@ assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing'
 assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
 assert(html.indexOf('id="8apdf-welcome-first-paint"')<html.indexOf('id="nameModal"'),'Welcome must be initialized before name onboarding markup');
-assert(html.includes('delete document.documentElement.dataset.entryPending;'),'Early screen must release after startup');
+assert(fs.readFileSync('features/app-core.js','utf8').includes('delete document.documentElement.dataset.entryPending;'),'Early screen must release after startup');
 assert(html.includes('if(now-lastFrame<cadence()){scheduleFrame();return}'),'Glow uses adaptive scheduling');
 assert(html.length<170000,'HTML should stay lean following stylesheet bundling');
 const worker=fs.readFileSync('sw.js','utf8');
