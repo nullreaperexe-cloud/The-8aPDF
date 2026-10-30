@@ -15,4 +15,6 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
+      - name: Verify Super Ultra Low Mode
+        run: node tests/ultra-low-mode.test.cjs
       - run: npm test
