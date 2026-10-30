@@ -1,0 +1,27 @@
+name: Announcement reader privacy and formatting checks
+on:
+  push:
+    paths:
+      - "announcement-format.js"
+      - "announcement-format.css"
+      - "index.html"
+      - "messages.html"
+      - "Updates.html"
+      - "tests/announcements-format.test.js"
+      - ".github/workflows/announcement-reader-checks.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  notice-reader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Validate formatter and integration
+        run: |
+          node --check announcement-format.js
+          node --test tests/announcements-format.test.js
