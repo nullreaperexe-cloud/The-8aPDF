@@ -32,7 +32,7 @@ jobs:
       - name: Benchmark twice per version under identical mobile settings
         run: |
           set -e
-          for pass in 1 2; do
+          for pass in 1 2 3; do
             for variant in before after; do
               if [ "$variant" = before ]; then port=4331; else port=4332; fi
               echo "Running $variant / $pass"
@@ -43,10 +43,10 @@ jobs:
         run: |
           node <<'NODE'
           const fs=require('fs');
-          const median=x=>x.sort((a,b)=>a-b)[Math.floor((x.length-1)/2)];
+          const median=x=>x.sort((a,b)=>a-b)[Math.floor(x.length/2)];
           const results={};
           for (const variant of ['before','after']){
-            const reports=[1,2].map(i=>JSON.parse(fs.readFileSync('/tmp/lh-'+variant+'-'+i+'.json')));
+            const reports=[1,2,3].map(i=>JSON.parse(fs.readFileSync('/tmp/lh-'+variant+'-'+i+'.json')));
             results[variant]={
               score:median(reports.map(r=>r.categories.performance.score*100)),
               fcp:median(reports.map(r=>r.audits['first-contentful-paint'].numericValue)),
