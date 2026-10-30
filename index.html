@@ -7,6 +7,7 @@
 try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_premium_name_onboarding_v1')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
 setTimeout(()=>{if(!document.documentElement.dataset.entryPending)return;document.getElementById('welcomeScreen')?.classList.remove('show');delete document.documentElement.dataset.entryPending},12000);
 </script>
+<link rel="preload" as="style" href="/performance-home.css?v=20261030v2" fetchpriority="high">
 <style id="8apdf-first-paint-guard">
 html[data-entry-pending] {background:#000}
 html[data-entry-pending] body {background:#000!important}
