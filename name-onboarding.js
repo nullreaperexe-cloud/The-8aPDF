@@ -52,7 +52,7 @@
       },reduced()?0:280);
     }
     document.body.classList.add('locked');
-    modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+    modal.classList.add('show');modal.setAttribute('aria-hidden','false');delete document.documentElement.dataset.entryPending;
     input.value=nameKeys.map(read).find(x=>x.trim())||'';
     const update=()=>{button.disabled=submitting||!input.value.trim();input.removeAttribute('aria-invalid');feedback.textContent='Just your name. Make yourself at home.'};
     input.addEventListener('input',update);update();input.focus({preventScroll:true});
