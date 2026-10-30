@@ -1,4 +1,5 @@
 name: Mobile Performance Before-After Benchmark
+# Iteration: critical first-paint CSS and deferred app core
 on:
   push:
     paths:
