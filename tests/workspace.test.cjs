@@ -37,6 +37,8 @@ const subjectHandler=html.slice(subjectStart,html.indexOf("});$('#morePdf').oncl
 assert(subjectHandler.includes("window.matchMedia('(max-width:810px)').matches"),'Subject selection must only auto-close sidebar on phone');
 assert(subjectHandler.includes("document.documentElement.dataset.studioMobileMenu==='open'"),'Only close an open mobile sidebar');
 assert(!/scrollToSection\('#library'\);\$\('#studioSidebarClose'\)\?\.click\(\)/.test(subjectHandler),'Unconditional subject-click sidebar close would break desktop');
-assert(html.includes("sidebar.addEventListener('click',event=>{if(mobile()&&event.target.closest('.studio-side-link'))setOpen(false)}"),'Mobile nav auto-close must remain intact');
+const sidebarModule=fs.readFileSync(path.join(root,'features/sidebar-toggle.js'),'utf8');
+assert(html.includes('/features/sidebar-toggle.js'),'Sidebar feature must be loaded');
+assert(sidebarModule.includes("sidebar.addEventListener('click',event=>{if(mobile()&&event.target.closest('.studio-side-link'))setOpen(false)}"),'Mobile nav auto-close must remain intact');
 console.log('PASS responsive subject sidebar behavior: desktop stays open; mobile closes');
 console.log('PASS existing 8aPDF integration markers');
