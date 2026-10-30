@@ -54,6 +54,20 @@ jobs:
               speedIndex:median(reports.map(r=>r.audits['speed-index'].numericValue))
             };
           }
+          // Diagnose exactly which resources and audits dominate first paint.
+          for(const variant of ['before','after']){
+            const rep=JSON.parse(fs.readFileSync('/tmp/lh-'+variant+'-1.json'));
+            const audits=rep.audits;
+            const ids=['largest-contentful-paint-element','lcp-discovery-insight','render-blocking-resources','render-blocking-insight','network-requests','mainthread-work-breakdown','unused-javascript','unused-css-rules','font-display-insight','third-party-summary','diagnostics'];
+            for(const id of ids){
+              const obj=audits[id];if(!obj)continue;
+              const details=obj.details?.items||[];
+              const items=details.map(x=>({url:String(x.url||x.node?.snippet||x.source||x.request?.url||'').slice(0,130),wastedMs:x.wastedMs,transfer:x.transferSize,total:x.total,group:x.group,percent:x.percent,resourceSize:x.resourceSize})).filter(x=>x.url||x.wastedMs||x.group).slice(0,15);
+              console.log('DIAGNOSTIC '+variant+' '+id+' '+JSON.stringify({display:obj.displayValue,score:obj.score,savings:obj.metricSavings||obj.overallSavingsMs,items}).slice(0,3000));
+            }
+            const resources=(audits['network-requests']?.details?.items||[]).sort((a,b)=>(b.transferSize||0)-(a.transferSize||0)).slice(0,12);
+            console.log('BIGGEST_NETWORK '+variant+' '+JSON.stringify(resources.map(r=>({url:r.url,transferSize:r.transferSize,resourceSize:r.resourceSize,startTime:r.startTime,endTime:r.endTime}))).slice(0,5500));
+          }
           const diff=(before,after)=>+(100*(before-after)/before).toFixed(1);
           console.log('BASELINE '+JSON.stringify(results.before));
           console.log('OPTIMIZED '+JSON.stringify(results.after));
