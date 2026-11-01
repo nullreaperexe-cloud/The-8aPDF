@@ -66,6 +66,6 @@ test('all announcement dialogs use adaptive actions with wrapping; other dialogs
   }
   assert.match(core,/classList\.toggle\('announcement-modal',!!\$\('#modalContent'\)\.querySelector\('\.intelligent-notice'\)\)/);
   assert.match(html,/performance-home\.css\?v=20261030-announcement-fit-v3/);
-  assert.match(html,/features\/app-core\.js\?v=announcement-fit-v5/);
+  assert.match(html,/features\/app-core\.js\?v=title-clarity-20261101-v1/);
   assert.doesNotThrow(()=>new Script(core,{filename:'features/app-core.js'}));
 });
