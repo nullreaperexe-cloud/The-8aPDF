@@ -22,8 +22,8 @@ const {resolve}=require('node:path');
  assert.match(src,/matchMedia\?\.\('\(min-width:661px\)'\)/,'Mobile keyboard should not auto-open');
  assert.match(home,/id="studioDriveMusic"/);
  assert.match(home,/id="studioMobileDriveMusic"/);
- assert.match(home,/src="\/drive-music\.js\?v=3"/);
- assert.match(home,/href="\/drive-music\.css\?v=3"/);
+ assert.match(home,/src="\\/drive-music\\.js\\?v=4"/);
+ assert.doesNotMatch(home,/href="\\/drive-music\\.css/);
  const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});
  const previous={json:process.env.GOOGLE_SERVICE_ACCOUNT_JSON,folder:process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID,fetch:globalThis.fetch};
  process.env.GOOGLE_SERVICE_ACCOUNT_JSON=JSON.stringify({
