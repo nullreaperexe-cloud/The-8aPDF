@@ -1,0 +1,18 @@
+/* Title clarity: no two-line clipping, ellipses or cut-off card copy. */
+html[data-ui-mode="studio"] #pdfGrid .pdf-card h3,
+html[data-ui-mode="studio"] #announcementGrid .notice-card h3,
+#pdfGrid .pdf-card h3,#announcementGrid .notice-card h3,
+.pdf-ai-result h3{
+ display:block!important;-webkit-line-clamp:unset!important;
+ -webkit-box-orient:initial!important;line-clamp:unset!important;
+ max-height:none!important;height:auto!important;min-height:0!important;
+ overflow:visible!important;text-overflow:clip!important;
+ white-space:normal!important;overflow-wrap:break-word!important;word-break:normal!important;
+}
+#pdfGrid .pdf-card .description,#announcementGrid .notice-card p{
+ display:block!important;-webkit-line-clamp:unset!important;
+ max-height:none!important;height:auto!important;min-height:0!important;
+ white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+ overflow-wrap:break-word!important;
+}
+#pdfGrid .pdf-card,#announcementGrid .notice-card{min-width:0;min-height:0;height:auto!important}
