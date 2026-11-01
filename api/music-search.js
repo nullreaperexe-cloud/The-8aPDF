@@ -166,7 +166,7 @@ async function stream(req,res,conf,id){
   throw error('DRIVE_RANGE_MISMATCH',502,'Google Drive returned incorrect audio range.');
  }
  res.status(206);
- res.setHeader('Content-Type',track.mimeType||'audio/mpeg');
+  res.setHeader('Content-Type',track.mimeType||'audio/mpeg');
  res.setHeader('Content-Length',String(length));
  res.setHeader('Content-Range','bytes '+start+'-'+end+'/'+track.size);
  res.setHeader('Cache-Control','private, no-store');

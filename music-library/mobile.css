@@ -1,0 +1,36 @@
+@media(max-width:1050px){
+ .dm-body{grid-template-columns:172px minmax(0,1fr) 240px}
+ .dm-side{padding:14px 9px}.dm-brand{font-size:1rem;gap:7px}.dm-brand>span{width:35px;height:35px}
+ .dm-main{padding:15px 14px 8px}.dm-queue-panel{padding:15px 9px}
+ .dm-hide-queue .dm-body{grid-template-columns:172px minmax(0,1fr)}
+}
+@media(max-width:790px){
+ .dm-queue-panel{display:none!important}.dm-body{grid-template-columns:150px minmax(0,1fr)}
+ .dm-hide-queue .dm-body{grid-template-columns:150px minmax(0,1fr)}
+ .dm-header p{font-size:.75rem}.dm-now{max-width:31vw}.dm-volume{display:none}
+}
+@media(max-width:660px){
+ .dm-workspace{inset:0 0 calc(88px + env(safe-area-inset-bottom));transform:none;width:100%;border:0;border-radius:0;max-width:none}
+ body.dm-open.dm-has-player .dm-workspace{bottom:calc(88px + env(safe-area-inset-bottom))}
+ .dm-head{padding:10px 15px;min-height:70px}.dm-head h2{font-size:1.38rem}.dm-head p{font-size:.67rem}
+ .dm-head-actions{gap:6px}.dm-icon{width:34px;height:34px}
+ .dm-body,.dm-hide-queue .dm-body{display:flex;flex-direction:column;min-height:0}
+ .dm-side{flex:none;display:flex;flex-direction:row;padding:7px 12px;gap:7px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--ml-line)}
+ .dm-brand,.dm-side-caption,.dm-side p,.dm-side-spacer,.dm-side h3,.dm-side-settings{display:none!important}
+ .dm-side .dm-side-item{white-space:nowrap;min-height:35px;padding:7px 11px;margin:0;font-size:.77rem}
+ .dm-main{padding:13px 12px 8px;flex:1;overflow:hidden}
+ .dm-greeting h3{font-size:1.08rem}.dm-greeting p,.dm-greeting small{display:none}.dm-greeting{margin-bottom:10px}
+ .dm-search{height:42px;border-radius:12px;margin-bottom:9px}
+ .dm-track{height:53px;min-height:53px;padding:4px 2px}
+ .dm-track-info{gap:7px}.dm-small-cover{width:33px;height:33px;min-width:33px}
+ .dm-track-meta strong{font-size:.78rem}.dm-track-meta small{font-size:.62rem}
+ .dm-track-index{font-size:.7rem;min-width:23px}.dm-like,.dm-track-more{width:29px;font-size:1.12rem}
+ .dm-dock,body.dm-open.dm-has-player .dm-dock{bottom:0;left:0;right:0;transform:none;width:100%;height:calc(83px + env(safe-area-inset-bottom));border-radius:15px 15px 0 0;padding:8px 10px env(safe-area-inset-bottom);gap:8px}
+ .dm-cover-btn{width:42px;height:42px;min-width:42px;font-size:1.22rem}
+ .dm-now{flex:1;max-width:36vw}.dm-now strong{font-size:.77rem}.dm-now small{font-size:.61rem}
+ .dm-control-center{flex:1.1;min-width:100px;gap:2px}.dm-actions{gap:3px}.dm-actions button{width:23px;height:27px;font-size:.87rem}.dm-actions .dm-main-play{width:32px;height:32px;font-size:.88rem}
+ .dm-progress{gap:4px;font-size:.55rem}.dm-close-dock{display:none}
+ .ml-toast{bottom:98px}
+}
+@media(max-width:390px){.dm-head h2{font-size:1.2rem}.dm-track-meta small{display:none}.dm-now{max-width:31vw}}
+@media(prefers-reduced-motion:reduce){.dm-workspace *,.dm-dock *{animation:none!important;transition:none!important}}

@@ -6,7 +6,15 @@ const TRACKS=[
  {id:'khairiyat',title:'Khairiyat',detail:'Piano Cover · Aakash Desai',url:'/assets/bgm/khairiyat.mp3'},
  {id:'saiyaara',title:'Saiyaara',detail:'Peaceful instrumental',url:'/assets/bgm/saiyaara.mp3'}
 ];
-const KEY='8apdf_background_music_v1',CONSENT_KEY='8apdf_music_choice_v1',byId=id=>document.getElementById(id);
+const KEY='8apdf_background_music_v1',CONSENT_KEY='8apdf_music_choice_v1',DRIVE_KEY='8apdf_background_drive_song_v1',byId=id=>document.getElementById(id);
+const readDrive=()=>{
+ try{
+  const data=JSON.parse(localStorage.getItem(DRIVE_KEY)||'null');
+  if(!data||typeof data.id!=='string'||!/^[A-Za-z0-9_-]{10,180}$/.test(data.id)||typeof data.title!=='string')return null;
+  return {id:data.id,title:data.title.slice(0,180),detail:'Google Drive · Background Music',url:'/api/music-search?provider=drive&action=stream&id='+encodeURIComponent(data.id)};
+ }catch{return null}
+};
+let driveTrack=readDrive();
 const consent=()=>{
  try{const v=localStorage.getItem(CONSENT_KEY);if(v==='with'||v==='without')return v}catch{}
  try{const v=sessionStorage.getItem(CONSENT_KEY);if(v==='with'||v==='without')return v}catch{}
@@ -41,8 +49,8 @@ const write=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch{}};
 // Volume slider directly controls audio output; mobile starts at 2%, and users may raise it.
 const audioLevel=value=>Math.max(0,Math.min(100,Number(value)||0))/100;
 const playlist=()=>TRACKS.filter(t=>prefs.selectedTracks.includes(t.id));
-let active=prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
-const track=()=>TRACKS.find(t=>t.id===active)||playlist()[0];
+let active=driveTrack?.id||prefs.selectedTracks[0],audio=null,playing=false,pending=false,blocked=false,pausedByUser=false,error=false,generation=0;
+const track=()=>driveTrack||TRACKS.find(t=>t.id===active)||playlist()[0];
 const status=s=>{const e=byId('eightapdfBgmStatus');if(e)e.textContent=s};
 function sync(){
  const toggle=byId('eightapdfBgmToggle'),vol=byId('eightapdfBgmVolume'),label=byId('eightapdfBgmVolumeLabel');
@@ -52,7 +60,7 @@ function sync(){
  if(label)label.textContent=prefs.volume+'%';
  if(button){button.disabled=!prefs.enabled;button.textContent=playing?'❚❚ Pause music':'▶ Play music'}
  if(current)current.textContent=track().title;
- if(mode)mode.textContent=prefs.selectedTracks.length===1?'Repeat one — '+track().title:playlist().map(t=>t.title).join(' → ')+' → repeat';
+ if(mode)mode.textContent=driveTrack?'Repeating Google Drive song — '+driveTrack.title:prefs.selectedTracks.length===1?'Repeat one — '+track().title:playlist().map(t=>t.title).join(' → ')+' → repeat';
  if(all)all.disabled=!prefs.enabled||prefs.selectedTracks.length===3;
  TRACKS.forEach(t=>{
   const cb=byId('eightapdfBgmChoice-'+t.id),solo=byId('eightapdfBgmSolo-'+t.id);
@@ -76,20 +84,21 @@ function play(){
  }catch(e){pending=false;error=true;status('Audio could not start. Please retry.');sync()}
 }
 function load(id){
- if(!TRACKS.some(t=>t.id===id))return;
+ if(!TRACKS.some(t=>t.id===id)&&driveTrack?.id!==id)return;
  active=id;generation++;playing=false;pending=false;blocked=false;error=false;
  if(!audio){sync();return}
  audio.pause();
- audio.loop=prefs.selectedTracks.length===1;
+ audio.loop=!!driveTrack||prefs.selectedTracks.length===1;
  audio.src=track().url;audio.load();sync();
  if(prefs.enabled&&!pausedByUser)play();
 }
 function next(){
- if(!prefs.enabled||pausedByUser||prefs.selectedTracks.length<2)return;
+ if(driveTrack||!prefs.enabled||pausedByUser||prefs.selectedTracks.length<2)return;
  const list=playlist(),idx=list.findIndex(t=>t.id===active);
  load(list[(idx+1)%list.length].id);
 }
 function choose(ids,fromStart=false){
+ if(driveTrack){driveTrack=null;try{localStorage.removeItem(DRIVE_KEY)}catch{}}
  const selected=normalize(ids),included=selected.includes(active);
  prefs.selectedTracks=selected;write();
  if(fromStart||!included){pausedByUser=false;load(selected[0]);return}
@@ -128,6 +137,7 @@ function acceptChoice(value){
  sync();
 }
 function resetDefaults(){
+ if(driveTrack){driveTrack=null;try{localStorage.removeItem(DRIVE_KEY)}catch{}}
  prefs.enabled=consent()==='with';
  prefs.volume=defaultVolume;
  prefs.selectedTracks=ordered();
@@ -135,6 +145,20 @@ function resetDefaults(){
  write();
  if(audio){audio.volume=audioLevel(prefs.volume);load(prefs.selectedTracks[0])}
  sync();status('Default music settings restored.');
+}
+function setDriveTrack(value){
+ if(!value||typeof value.id!=='string'||!/^[A-Za-z0-9_-]{10,180}$/.test(value.id)||typeof value.title!=='string')return false;
+ driveTrack={id:value.id,title:value.title.trim().slice(0,180),detail:'Google Drive · Background Music',url:'/api/music-search?provider=drive&action=stream&id='+encodeURIComponent(value.id)};
+ if(!driveTrack.title)return false;
+ try{localStorage.setItem(DRIVE_KEY,JSON.stringify({id:driveTrack.id,title:driveTrack.title}))}catch{return false}
+ if(consent()==='with'&&prefs.enabled)pausedByUser=false;
+ load(driveTrack.id);sync();return true
+}
+function clearDriveTrack(){
+ if(!driveTrack)return;
+ driveTrack=null;try{localStorage.removeItem(DRIVE_KEY)}catch{}
+ pausedByUser=!(prefs.enabled&&consent()==='with');
+ load(prefs.selectedTracks[0]);sync();
 }
 function volume(v){prefs.volume=Math.max(0,Math.min(100,Math.round(Number(v)||0)));if(audio)audio.volume=audioLevel(prefs.volume);write();sync()}
 function toggle(){if(!prefs.enabled)return;if(playing){pause();return}pausedByUser=false;pending=false;blocked=false;error=false;if(audio?.error)load(active);else play()}
@@ -149,7 +173,8 @@ function mount(){
  '<div class="eightapdf-bgm-volume"><label for="eightapdfBgmVolume">Volume</label><strong id="eightapdfBgmVolumeLabel"></strong></div>'+
  '<input type="range" min="0" max="100" step="1" id="eightapdfBgmVolume" aria-label="Background music volume">'+
  '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmTest" type="button">▶ Play music</button><button id="eightapdfBgmPlayAll" type="button">↺ Play all 3 in order</button></div>'+
- '<p id="eightapdfBgmStatus" role="status" aria-live="polite"></p>'+
+ '<div class="eightapdf-bgm-actions"><button id="eightapdfBgmClearDrive" type="button">Use original background playlist</button></div>'+
+  '<p id="eightapdfBgmStatus" role="status" aria-live="polite"></p>'+
  '<small class="eightapdf-bgm-note">Tum Hi Ho → Khairiyat → Saiyaara → repeat. Browsers may require a tap to allow audio.</small>';
  const style=document.createElement('style');style.textContent='.eightapdf-bgm-heading,.eightapdf-bgm-volume{display:flex;justify-content:space-between;align-items:center;gap:10px}.eightapdf-bgm-heading small,.eightapdf-bgm-note{color:var(--muted);font-size:.7rem}.eightapdf-bgm-list{display:grid;gap:9px;margin:16px 0}.eightapdf-bgm-item{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--surface-high);padding:10px;border-radius:12px}.eightapdf-bgm-item label{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer}.eightapdf-bgm-item input{width:17px;height:17px;accent-color:var(--button);flex:none}.eightapdf-bgm-number{border:1px solid var(--line-bold);border-radius:7px;padding:5px 8px;font-size:.7rem}.eightapdf-bgm-copy{display:flex;flex-direction:column;gap:4px;min-width:0}.eightapdf-bgm-copy strong{font-size:.8rem}.eightapdf-bgm-copy small,.eightapdf-bgm-current{font-size:.7rem;color:var(--muted)}.eightapdf-bgm-item button{flex:none}.eightapdf-bgm-item button,.eightapdf-bgm-actions button{border:1px solid var(--line-bold);border-radius:10px;background:var(--surface-soft);color:var(--text);padding:9px 11px;cursor:pointer;font:inherit;font-size:.75rem}.eightapdf-bgm-item button:disabled,.eightapdf-bgm-actions button:disabled{opacity:.45;cursor:not-allowed}.eightapdf-bgm-mode{font-size:.77rem;color:var(--text-soft);font-weight:650;line-height:1.5}.eightapdf-bgm-current{margin-bottom:18px}.eightapdf-bgm-current strong{color:var(--text)}.eightapdf-bgm-volume{font-size:.8rem}.eightapdf-settings-music input[type=range]{width:100%;accent-color:var(--button);margin:12px 0 18px}.eightapdf-bgm-actions{display:flex;flex-wrap:wrap;gap:8px}.eightapdf-bgm-actions button:first-child{background:var(--button);color:var(--button-text)}#eightapdfBgmStatus{font-size:.76rem;color:var(--muted);margin:16px 0 8px}.eightapdf-bgm-note{display:block;line-height:1.5}@media(max-width:450px){.eightapdf-bgm-item{padding:8px}.eightapdf-bgm-item label{gap:6px}.eightapdf-bgm-item button{padding:8px}}';
  document.head.appendChild(style);
@@ -158,6 +183,7 @@ function mount(){
  byId('eightapdfBgmVolume').addEventListener('input',e=>volume(e.target.value));
  byId('eightapdfBgmTest').addEventListener('click',toggle);
  byId('eightapdfBgmPlayAll').addEventListener('click',all);
+  byId('eightapdfBgmClearDrive').addEventListener('click',clearDriveTrack);
  TRACKS.forEach(t=>{
   byId('eightapdfBgmChoice-'+t.id).addEventListener('change',e=>check(t.id,e.target.checked));
   byId('eightapdfBgmSolo-'+t.id).addEventListener('click',()=>only(t.id));
@@ -177,7 +203,8 @@ function init(){
   blocked=false;play();
  },{capture:true,passive:true});
  window.addEventListener('storage',e=>{
-  if(e.key===CONSENT_KEY){
+   if(e.key===DRIVE_KEY){driveTrack=readDrive();load(driveTrack?.id||prefs.selectedTracks[0]);return}
+   if(e.key===CONSENT_KEY){
    const selected=consent();
    if(selected!=='with'){prefs.enabled=false;pause();status('Background music is off.')}
    else{const n=read();prefs.enabled=n?.enabled!==false;pausedByUser=false;error=false;play()}
@@ -191,10 +218,10 @@ function init(){
   if(typeof n.enabled==='boolean')prefs.enabled=n.enabled&&consent()==='with';
   if(!prefs.enabled){pausedByUser=true;audio?.pause();playing=false;pending=false;status('Background music is off.')}
   else if(changed){pausedByUser=false;load(songs[0])}
-  else{if(audio)audio.loop=songs.length===1;if(!pausedByUser)play()}
+  else{if(audio)audio.loop=!!driveTrack||songs.length===1;if(!pausedByUser)play()}
   sync();
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-window.__8apdfBackgroundAudio={play:()=>{if(consent()==='with'&&prefs.enabled)toggle()},stop:()=>enable(false),pause,acceptChoice,setVolume:volume,select:only,setSongs:choose,playAll:all,next,retry:()=>{if(consent()==='with'&&prefs.enabled)toggle()},getState:()=>({...prefs,consent:consent(),selectedTracks:[...prefs.selectedTracks],current:active,playing,pending,blocked,loop:audio?.loop,tracks:TRACKS.map(x=>({...x}))})};
+window.__8apdfBackgroundAudio={setDriveTrack,clearDriveTrack,play:()=>{if(consent()==='with'&&prefs.enabled)toggle()},stop:()=>enable(false),pause,acceptChoice,setVolume:volume,select:only,setSongs:choose,playAll:all,next,retry:()=>{if(consent()==='with'&&prefs.enabled)toggle()},getState:()=>({...prefs,consent:consent(),selectedTracks:[...prefs.selectedTracks],current:active,customTrack:driveTrack?{id:driveTrack.id,title:driveTrack.title}:null,playing,pending,blocked,loop:audio?.loop,tracks:TRACKS.map(x=>({...x}))})};
 })();

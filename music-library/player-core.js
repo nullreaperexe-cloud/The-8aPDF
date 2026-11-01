@@ -1,0 +1,292 @@
+/* 8aPDF Drive Music — responsive library + persistent player.
+ * Files remain on Google Drive; the secret service account is only used server-side.
+ * The same <audio> element remains mounted while the workspace is minimized.
+ */
+(()=>{'use strict';
+const API='/api/music-search';
+const STORE='8apdf_drive_music_v1';
+const $=id=>document.getElementById(id);
+const seconds=v=>{const s=Math.max(0,Math.floor(Number(v)||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const key=id=>typeof id==='string'&&/^[\w-]{10,180}$/.test(id);
+function loadPrefs(){try{return JSON.parse(localStorage.getItem(STORE)||'null')||{}}catch{return {}}}
+const saved=loadPrefs();
+const state={
+ open:false,loading:false,tracks:[],queue:[],filter:'all',query:'',current:null,
+ shuffle:Boolean(saved.shuffle),repeat:['off','one','all'].includes(saved.repeat)?saved.repeat:'all',
+ favorites:new Set(Array.isArray(saved.favorites)?saved.favorites.filter(key):[]),
+ savedOrder:Array.isArray(saved.order)?saved.order.filter(key):[],
+ volume:Number.isFinite(saved.volume)?Math.max(0,Math.min(100,saved.volume)):45,
+ playing:false,requested:false,error:'',hasLoaded:false
+};
+let overlay,panel,dock,audio,focusBefore,scrollBefore='',mounted=false,requestToken=0;
+const persist=()=>{
+ try{localStorage.setItem(STORE,JSON.stringify({
+  favorites:[...state.favorites].slice(0,400),order:state.queue.map(t=>t.id),
+  repeat:state.repeat,shuffle:state.shuffle,volume:state.volume
+ }))}catch{}
+};
+function element(tag,cls,text){
+ const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e
+}
+function button(text,cls,action,label){
+ const el=element('button',cls,text);el.type='button';if(label)el.setAttribute('aria-label',label);
+ if(action)el.addEventListener('click',action);return el
+}
+function status(message){const el=$('dmStatus');if(el)el.textContent=message}
+function setPlayerVisible(visible){
+ if(!dock)return;
+ dock.hidden=!visible;
+ document.body.classList.toggle('dm-has-player',Boolean(visible));
+}
+function renderQueueOrder(tracks){
+ const positions=new Map(state.savedOrder.map((x,i)=>[x,i]));
+ return [...tracks].sort((a,b)=>{
+  const x=positions.has(a.id)?positions.get(a.id):10000;
+  const y=positions.has(b.id)?positions.get(b.id):10000;
+  return x!==y?x-y:a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:'base'});
+ });
+}
+function mount(){
+ if(mounted)return;
+ if(!document.body)return;mounted=true;
+ overlay=element('div','dm-shade');overlay.id='dmShade';overlay.hidden=true;
+ panel=element('section','dm-workspace');panel.id='dmWorkspace';panel.hidden=true;
+ panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','8aPDF Music');
+ panel.innerHTML=
+ '<header class="dm-head"><div><div class="dm-eyebrow">8aPDF / MUSIC</div><h2>Music Library</h2><p>Your songs, one place. Study, focus, and vibe.</p></div><div class="dm-head-actions"><button id="dmReload" class="dm-icon" type="button" title="Refresh songs" aria-label="Refresh songs">↻</button><button id="dmSettings" class="dm-icon" type="button" aria-label="Music settings" title="Music settings">⚙</button><button id="dmMinimize" class="dm-icon" type="button" aria-label="Minimize music">↙</button></div></header>'+
+ '<div class="dm-body"><aside class="dm-side"><div class="dm-brand"><span>♫</span><strong>8aPDF<small>Study Workspace</small></strong></div><h3>MUSIC</h3><button data-dm-view="all" class="dm-side-item" type="button">♫ &nbsp; All Songs <span id="dmTotalCount">0</span></button><button data-dm-view="favorites" class="dm-side-item" type="button">♡ &nbsp; Liked Songs</button><div class="dm-side-caption">YOUR MUSIC</div><p>Connected to Google Drive. Your songs, ready to play.</p><div class="dm-side-spacer"></div><button id="dmSideSettings" class="dm-side-item dm-side-settings" type="button">⚙ &nbsp; Settings</button></aside>'+
+ '<main class="dm-main"><div class="dm-greeting"><div><small>YOUR COLLECTION</small><h3>Every song, one place.</h3><p>Browse your music collection.</p></div><span id="dmCount" class="dm-count">0 songs</span></div>'+
+ '<label class="dm-search"><span aria-hidden="true">⌕</span><input id="dmSearch" type="search" placeholder="Search your songs…" autocomplete="off" maxlength="100" aria-label="Search Drive songs"></label>'+
+ '<div class="dm-row-head"><h4 id="dmListHeading">All Songs</h4><button id="dmSort" type="button" title="Sort songs by name">A–Z</button></div>'+
+ '<div class="dm-list" id="dmList" aria-live="polite"></div><p id="dmStatus" class="dm-status" role="status">Connecting to Google Drive…</p></main>'+
+ '<aside class="dm-queue-panel"><h3><span>♫ &nbsp; Up Next</span><span id="dmQueueCount">0</span></h3><div class="dm-queue" id="dmQueue"></div><small>Queue order is saved on this device. Use ↑ ↓ to reorder.</small></aside></div>';
+ dock=element('section','dm-dock');dock.id='dmDock';dock.hidden=true;dock.setAttribute('aria-label','Music controls');
+ dock.innerHTML=
+ '<button id="dmExpand" type="button" class="dm-cover-btn" title="Expand Music" aria-label="Expand music"><span>♫</span></button>'+
+ '<div class="dm-now"><strong id="dmNowTitle">No song selected</strong><small id="dmNowSub">Google Drive</small></div>'+
+ '<div class="dm-control-center"><div class="dm-actions"><button id="dmShuffle" type="button" title="Shuffle" aria-label="Shuffle">⤨</button><button id="dmPrev" type="button" title="Previous" aria-label="Previous song">⏮</button><button id="dmPlayPause" class="dm-main-play" type="button" aria-label="Play">▶</button><button id="dmNext" type="button" title="Next" aria-label="Next song">⏭</button><button id="dmRepeat" type="button" title="Repeat all" aria-label="Repeat">↻</button></div>'+
+ '<div class="dm-progress"><time id="dmTime">0:00</time><input type="range" id="dmSeek" min="0" max="100" value="0" aria-label="Seek"><time id="dmDuration">0:00</time></div></div>'+
+ '<div class="dm-volume"><span aria-hidden="true">◖</span><input type="range" id="dmVolume" min="0" max="100" value="45" aria-label="Volume"></div>'+
+ '<button id="dmCloseDock" class="dm-close-dock" type="button" aria-label="Close floating controls and pause music">×</button>';
+ audio=document.createElement('audio');audio.id='dmAudio';audio.preload='metadata';audio.setAttribute('playsinline','');audio.volume=state.volume/100;
+ document.body.append(overlay,panel,dock,audio);
+ $('dmVolume').value=String(state.volume);
+ overlay.addEventListener('click',minimize);
+ $('dmMinimize').addEventListener('click',minimize);
+ $('dmExpand').addEventListener('click',open);
+ $('dmCloseDock').addEventListener('click',()=>{audio.pause();setPlayerVisible(false)});
+ $('dmReload').addEventListener('click',()=>fetchSongs(true));
+ $('dmSearch').addEventListener('input',e=>{state.query=e.target.value.trim().toLowerCase();state.visible=48;$('dmList').scrollTop=0;renderList()});
+ $('dmSort').addEventListener('click',()=>{state.queue.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:'base'}));persist();$('dmList').scrollTop=0;renderAll()});
+ panel.querySelectorAll('[data-dm-view]').forEach(btn=>btn.addEventListener('click',()=>{state.filter=btn.dataset.dmView;state.visible=48;$('dmList').scrollTop=0;renderList()}));
+ $('dmPlayPause').addEventListener('click',toggle);
+ $('dmPrev').addEventListener('click',previous);
+ $('dmNext').addEventListener('click',()=>next(true));
+ $('dmShuffle').addEventListener('click',()=>{state.shuffle=!state.shuffle;persist();renderPlayer()});
+ $('dmRepeat').addEventListener('click',()=>{
+  const modes=['off','all','one'];state.repeat=modes[(modes.indexOf(state.repeat)+1)%3];persist();renderPlayer();
+ });
+ $('dmVolume').addEventListener('input',e=>{state.volume=Number(e.target.value);audio.volume=state.volume/100;persist()});
+ $('dmSeek').addEventListener('change',e=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(e.target.value)/100});
+ audio.addEventListener('play',()=>{state.playing=true;setPlayerVisible(true);window.__8apdfBackgroundAudio?.pause?.();renderPlayer();setMediaState('playing')});
+ audio.addEventListener('pause',()=>{state.playing=false;renderPlayer();setMediaState('paused')});
+ audio.addEventListener('ended',()=>next(false));
+ audio.addEventListener('timeupdate',renderProgress);
+ audio.addEventListener('durationchange',renderProgress);
+ audio.addEventListener('loadedmetadata',()=>{if(state.current&&Number.isFinite(audio.duration)){state.current.duration=audio.duration;renderList()}status('Now playing: '+(state.current?.title||'song'));renderProgress()});
+ audio.addEventListener('waiting',()=>status('Buffering audio from Google Drive…'));
+ audio.addEventListener('error',()=>{
+  const code=audio.error?.code;state.playing=false;
+  status('Audio streaming failed'+(code?' (error '+code+')':'')+'. Check Drive permissions and file format, then try again.');
+  renderPlayer();
+ });
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.open)minimize()});
+ setupMediaSession();renderAll();
+}
+function setMediaState(type){
+ if('mediaSession' in navigator)try{navigator.mediaSession.playbackState=type}catch{}
+}
+function setupMediaSession(){
+ if(!('mediaSession' in navigator))return;
+ const session=navigator.mediaSession;
+ const actions={
+  play:()=>audio.play().catch(()=>{}),pause:()=>audio.pause(),
+  previoustrack:previous,nexttrack:()=>next(true),
+  seekto:details=>{if(Number.isFinite(details.seekTime))audio.currentTime=details.seekTime},
+  seekbackward:()=>{audio.currentTime=Math.max(0,audio.currentTime-10)},
+  seekforward:()=>{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,audio.currentTime+10)}
+ };
+ for(const [action,handler] of Object.entries(actions))try{session.setActionHandler(action,handler)}catch{}
+}
+function setMediaMetadata(track){
+ if(!('mediaSession' in navigator)||!('MediaMetadata' in window))return;
+ try{navigator.mediaSession.metadata=new MediaMetadata({title:track.title,artist:'8aPDF Music · Google Drive',album:'Your Music'})}catch{}
+}
+async function fetchSongs(refresh=false){
+ if(state.loading)return;
+ state.loading=true;state.error='';status(refresh?'Refreshing your Google Drive music…':'Loading your Google Drive songs…');renderList();
+ const currentRequest=++requestToken;
+ try{
+  const response=await fetch(API+'?provider=drive&action=tracks'+(refresh?'&refresh=1':''),{headers:{Accept:'application/json'},cache:'no-store'});
+  const payload=await response.json().catch(()=>null);
+  if(!response.ok)throw Error(payload?.error||'Google Drive request failed (HTTP '+response.status+').');
+  if(!payload||!Array.isArray(payload.tracks)||payload.source!=='Google Drive'){
+   const local=['localhost','127.0.0.1'].includes(location.hostname);
+   throw Error(local?'VS Code Live Server does not run Vercel APIs. Use npm run dev:music at http://localhost:4173 instead.':'The Google Drive music backend is not deployed yet. Please check Vercel deployment.');
+  }
+  if(currentRequest!==requestToken)return;
+  const tracks=payload.tracks.filter(x=>key(x.id)&&typeof x.title==='string'&&Number(x.size)>0);
+  state.tracks=tracks;state.queue=renderQueueOrder(tracks);state.savedOrder=state.queue.map(t=>t.id);
+  state.hasLoaded=true;persist();
+  if(state.current){
+   const fresh=state.queue.find(t=>t.id===state.current.id);
+   if(fresh)state.current=fresh;
+   else if(!audio.paused){audio.pause();audio.removeAttribute('src');audio.load();state.current=null}
+  }
+  status(tracks.length?tracks.length+' songs ready · Scroll to explore the library.':'Folder connected! No MP3s found yet. Upload songs to your shared Google Drive music folder and tap Refresh.');
+ }catch(e){
+  if(currentRequest===requestToken){
+   state.error=e?.message||'Could not connect to Google Drive';
+   status(state.error);
+  }
+ }finally{
+  if(currentRequest===requestToken){state.loading=false;renderAll()}
+ }
+}
+function row(track,index){
+ const item=element('div','dm-track');item.dataset.active=String(state.current?.id===track.id);
+ const i=element('span','dm-track-index',String(index+1).padStart(2,'0'));
+ const btn=button('','dm-track-info',()=>play(track));btn.title=track.title;btn.append(element('span','dm-small-cover','♫'));
+ const meta=element('span','dm-track-meta');meta.append(element('strong','',track.title),element('small','','MP3 · Google Drive'));
+ btn.append(meta);item.append(i,btn);
+  item.append(element('span','dm-track-source','Google Drive · MP3'),element('span','dm-track-length',Number.isFinite(track.duration)?seconds(track.duration):'—'));
+ const fav=button(state.favorites.has(track.id)?'♥':'♡','dm-like',()=>{
+  if(state.favorites.has(track.id))state.favorites.delete(track.id);else state.favorites.add(track.id);
+  persist();renderList();
+ },'Like '+track.title);fav.setAttribute('aria-pressed',String(state.favorites.has(track.id)));item.append(fav);
+  const more=button('⋯','dm-track-more',()=>document.dispatchEvent(new CustomEvent('8apdf:music-menu',{detail:{id:track.id,anchor:more}})),'More options for '+track.title);more.title='More options';item.append(more);
+  return item;
+}
+function queueRow(track,index){
+ const item=element('div','dm-queue-track');item.dataset.active=String(state.current?.id===track.id);
+ const btn=button(track.title,'dm-queue-name',()=>play(track),'Play '+track.title);item.append(btn);
+ for(const [delta,sign,label] of [[-1,'↑','Move up'],[1,'↓','Move down']]){
+  const ctrl=button(sign,'dm-order',()=>{const i=state.queue.findIndex(t=>t.id===track.id),j=i+delta;if(j<0||j>=state.queue.length)return;[state.queue[i],state.queue[j]]=[state.queue[j],state.queue[i]];persist();renderAll()},label);
+  ctrl.disabled=delta===-1?index===0:index===state.queue.length-1;item.append(ctrl);
+ }
+ return item;
+}
+function renderList(){
+ if(!mounted)return;
+ const list=$('dmList'),previousScroll=list.scrollTop;
+ list.replaceChildren();
+ panel.querySelectorAll('[data-dm-view]').forEach(btn=>{
+  const active=btn.dataset.dmView===state.filter;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active))
+ });
+ const visible=state.queue.filter(t=>(state.filter!=='favorites'||state.favorites.has(t.id))&&
+   (!state.query||t.title.toLowerCase().includes(state.query)));
+ $('dmListHeading').textContent=state.filter==='favorites'?'Liked Songs':'All Songs';
+ $('dmTotalCount').textContent=String(state.queue.length);
+ $('dmCount').textContent=visible.length+' songs';
+ if(state.loading){list.append(element('p','dm-empty','Connecting to your Google Drive folder…'))}
+ else if(state.error){list.append(element('p','dm-empty','Cannot load songs: '+state.error))}
+ else if(visible.length){for(const t of visible.slice(0,state.visible||48))list.append(row(t,state.queue.indexOf(t)));if(visible.length>(state.visible||48))list.append(button('Show more songs ('+(visible.length-(state.visible||48))+' remaining)','dm-load-more',()=>{state.visible=(state.visible||48)+48;renderList()}))}
+ else list.append(element('p','dm-empty',
+  state.query?'No matches. Try another song title.':state.filter==='favorites'?'No liked songs yet. Tap ♡ beside a song.':
+  'No MP3 files found. Upload songs to your Google Drive folder and tap the ↻ Refresh button.'));
+ list.scrollTop=state.query?0:previousScroll;
+}
+function renderQueue(){
+ const list=$('dmQueue');list.replaceChildren();$('dmQueueCount').textContent=String(state.queue.length);
+ state.queue.slice(0,state.queueShown||48).forEach((t,i)=>list.append(queueRow(t,i)));if(state.queue.length>(state.queueShown||48))list.append(button('Show more in queue','dm-load-more',()=>{state.queueShown=(state.queueShown||48)+48;renderQueue()}));
+}
+function renderProgress(){
+ if(!mounted)return;
+ const pos=Number(audio.currentTime)||0,dur=Number.isFinite(audio.duration)?audio.duration:0;
+ $('dmTime').textContent=seconds(pos);$('dmDuration').textContent=seconds(dur);
+ $('dmSeek').value=String(dur?Math.max(0,Math.min(100,Math.round(pos/dur*100))):0);
+}
+function renderPlayer(){
+ if(!mounted)return;
+ $('dmNowTitle').textContent=state.current?.title||'Choose a song';
+ $('dmNowSub').textContent=state.current?'Google Drive · Original audio':'8aPDF Music';
+ $('dmPlayPause').textContent=state.playing?'Ⅱ':'▶';
+ $('dmPlayPause').setAttribute('aria-label',state.playing?'Pause song':'Play song');
+ $('dmShuffle').setAttribute('aria-pressed',String(state.shuffle));
+ $('dmRepeat').textContent=state.repeat==='one'?'↻₁':'↻';
+ $('dmRepeat').title='Repeat '+state.repeat;
+ $('dmRepeat').setAttribute('aria-label','Repeat '+state.repeat);
+ $('dmRepeat').setAttribute('aria-pressed',String(state.repeat!=='off'));
+ renderProgress();
+}
+function renderAll(){renderList();renderQueue();renderPlayer()}
+function play(track){
+ if(!track||!key(track.id))return;
+ mount();
+ window.__8apdfBackgroundAudio?.pause?.();
+ const url=API+'?provider=drive&action=stream&id='+encodeURIComponent(track.id);
+ if(state.current?.id!==track.id||audio.getAttribute('src')!==url){
+  state.current=track;audio.src=url;audio.load();
+ }else state.current=track;
+ setPlayerVisible(true);setMediaMetadata(track);renderAll();
+ audio.play().catch(e=>{status(e?.name==='NotAllowedError'?'Tap ▶ to start playback (browser autoplay restriction).':'Unable to start song. Verify Drive folder sharing and MP3 access.');renderPlayer()});
+}
+function next(manual){
+ const tracks=state.queue;
+ if(!tracks.length)return;
+ if(!manual&&state.repeat==='one'&&state.current){audio.currentTime=0;audio.play().catch(()=>{});return}
+ const i=tracks.findIndex(t=>t.id===state.current?.id);
+ if(!manual&&state.repeat==='off'&&i===tracks.length-1){audio.pause();return}
+ const idx=state.shuffle&&tracks.length>1?randomOther(i,tracks.length):(i+1)%tracks.length;
+ play(tracks[idx]);
+}
+function randomOther(i,len){let j=Math.floor(Math.random()*(len-1));if(j>=i&&i>=0)j++;return j}
+function previous(){
+ const t=state.queue;
+ if(!t.length)return;
+ if(audio.currentTime>3){audio.currentTime=0;return}
+ const i=t.findIndex(x=>x.id===state.current?.id);
+ play(t[(i<=0?t.length:i)-1]);
+}
+function toggle(){
+ if(!state.current){if(state.queue.length)play(state.queue[0]);else open();return}
+ if(!audio.paused)audio.pause();else audio.play().catch(()=>status('Tap ▶ again to play. Browser may require interaction.'));
+}
+function open(){
+ if(!document.body){document.addEventListener('DOMContentLoaded',open,{once:true});return}
+ mount();if(state.open)return;
+ // Opening the Music Library never pauses the site's background soundtrack.
+ focusBefore=document.activeElement;scrollBefore=document.body.style.overflow;
+ state.open=true;panel.hidden=false;overlay.hidden=false;document.body.style.overflow='hidden';document.body.classList.add('dm-open');
+ if(state.current)setPlayerVisible(true);
+ if(!state.hasLoaded)fetchSongs();
+ else renderAll();
+ // On phones, don't open the keyboard automatically: keep the song list visible.
+ if(window.matchMedia?.('(min-width:661px)').matches)$('dmSearch').focus({preventScroll:true});
+ else $('dmMinimize').focus({preventScroll:true});
+}
+function minimize(){
+ if(!state.open)return;
+ state.open=false;panel.hidden=true;overlay.hidden=true;document.body.style.overflow=scrollBefore;document.body.classList.remove('dm-open');
+ if(state.current)setPlayerVisible(true);
+ if(focusBefore?.isConnected)focusBefore.focus({preventScroll:true});
+ // Do not call pause/remove/src here. Audio must continue while minimized.
+}
+function setupClassicLauncher(){
+ // Studio has its own Music Library nav. Classic mode needs a visible entry too.
+ const launch=button('♫ Music Library','dm-classic-launcher',open,'Open 8aPDF Music Library');
+ launch.id='dmClassicLauncher';
+ document.body.append(launch);
+ const update=()=>{launch.hidden=document.documentElement.dataset.uiMode==='studio'};
+ update();
+ if(typeof MutationObserver!=='undefined')new MutationObserver(update).observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-mode']});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupClassicLauncher,{once:true});else setupClassicLauncher();
+document.addEventListener('click',e=>{
+ const target=e.target instanceof Element?e.target.closest('#studioDriveMusic,#studioMobileDriveMusic'):null;
+ if(target){e.preventDefault();open()}
+});
+window.__8apdfDriveMusic={open,minimize,reload:()=>fetchSongs(true),pause:()=>audio?.pause(),getTracks:()=>[...state.queue],getCurrent:()=>state.current,getAudio:()=>audio,setVolume:v=>{state.volume=Math.max(0,Math.min(100,Number(v)||0));if(audio)audio.volume=state.volume/100;if($('dmVolume'))$('dmVolume').value=String(state.volume);persist()},setQueueVisible:v=>{panel?.classList.toggle('dm-hide-queue',!v)},setCompact:v=>{panel?.classList.toggle('dm-compact',!!v)},setRepeat:v=>{if(!['off','all','one'].includes(v))return;state.repeat=v;persist();renderPlayer()},setShuffle:v=>{state.shuffle=!!v;persist();renderPlayer()},getState:()=>({
+ opened:state.open,playing:state.playing,tracks:state.queue.length,current:state.current?.id,error:state.error,volume:state.volume,shuffle:state.shuffle,repeat:state.repeat
+})};
+})();
