@@ -25,6 +25,22 @@ assert.deepEqual(rank('Computer chapter 3',docs).map(x=>x.id),['e']);
 assert.equal(chapterOf('Science ch3'),'3');
 assert.equal(subjectOf('SST'),'social science');
 assert.equal(termOf('term 2'),'term2');
+assert.equal(termOf('hindi tern 2'),'term2','Common term misspelling must resolve');
+assert.equal(termOf('Hindi 2nd term'),'term2','Natural term order must resolve');
+const termDocs=[
+ {id:'h2',title:'Hindi Literature Revision',subject:'Hindi',term:'term2',dateMs:9},
+ {id:'h1',title:'Hindi Grammar Notes',subject:'Hindi',term:'term1',dateMs:3},
+ {id:'m2',title:'Mathematics Revision',subject:'Maths',term:'term2',dateMs:8}
+];
+assert.deepEqual(rank('hindi tern 2',termDocs).map(x=>x.id),['h2'],'Term 2 must exclude other subjects and terms');
+const combinedNotices=[
+ {id:'hindi-notice-2',title:'Hindi Reading Homework',subject:'Hindi',description:'Revise for class',messageDate:'2026-10-31'},
+ {id:'hindi-notice-1',title:'Hindi Notebook',subject:'Hindi',description:'Bring notebook',messageDate:'2026-09-12'},
+ {id:'english-notice-2',title:'English Homework',subject:'English',messageDate:'2026-10-31'}
+];
+assert.deepEqual(rank('Hindi term 2',combinedNotices,'announcement').map(x=>x.id),['hindi-notice-2'],'Teacher messages should respect subject and posted school term');
+assert.deepEqual(rank('test',[{id:'paper',title:'Science Test Paper',subject:'Science'},{id:'notes',title:'Science Notes',subject:'Science'}]).map(x=>x.id),['paper'],'Generic test question must find actual test papers');
+
 assert.deepEqual(rank('Physics Chapter 12',docs),[],'Unknown chapters must not hallucinate PDF results');
 const notes=[
  {id:'n1',title:'Science Unit Test',description:'Chapter 3 test on 3 Nov',category:'Tests',messageDate:'2026-10-28'},
