@@ -32,7 +32,7 @@ function start(){
  const windowListeners={};
  const context={document,window:{addEventListener(name,callback){windowListeners[name]=callback}},localStorage:{
   getItem:key=>storage.get(key)??null,
-  setItem:(key,value)=>storage.set(key,String(value))
+  setItem:(key,value)=>storage.set(key,String(value)),removeItem:key=>storage.delete(key)
  },console,Promise};
  vm.runInNewContext(source,context,{filename:'bgm-howler.js'});
  return {audio,elements,api:context.window.__8apdfBackgroundAudio,windowListeners};
@@ -89,4 +89,15 @@ assert.ok(Math.abs(quieterReload.audio.volume-0.65)<1e-10,'Cross-tab volume chan
 assert.equal(source.includes('meri-duniya-tu-hi-re'),false);
 for(const name of ['tum-hi-ho','khairiyat','saiyaara'])
  assert(fs.existsSync('assets/bgm/'+name+'.mp3'),'Original MP3 missing: '+name);
-console.log('PASS 3-track order, solo looping, 2-song selection, saved settings and removed song');
+const custom=start();
+assert.equal(custom.api.setDriveTrack({id:'song123456789ABCDE',title:'Background Test Song'}),true,'Google Drive background selection must succeed');
+assert.equal(custom.audio.src,'/api/music-search?provider=drive&action=stream&id=song123456789ABCDE');
+assert.equal(custom.audio.loop,true,'A selected Drive track should loop continuously');
+assert.equal(custom.api.getState().customTrack.id,'song123456789ABCDE');
+const persisted=start();
+assert.equal(persisted.api.getState().customTrack.title,'Background Test Song','Custom background track survives reload');
+assert.equal(persisted.audio.src,'/api/music-search?provider=drive&action=stream&id=song123456789ABCDE');
+persisted.api.clearDriveTrack();
+assert.equal(storage.has('8apdf_background_drive_song_v1'),false,'Reset removes saved custom song');
+assert.equal(persisted.api.getState().customTrack,null,'Original playlist restored');
+console.log('PASS 3-track order, saved volume, persistent Google Drive background selection and original playlist restore');

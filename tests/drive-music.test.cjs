@@ -29,6 +29,7 @@ const {resolve}=require('node:path');
  assert.doesNotMatch(home,/href="\/drive-music\.css/);
  assert.match(src,/import\('\/music-library\/player-core\.js/,'Core is lazy imported');
  assert.doesNotMatch(player,/Opening the Music Library.*pause\(\)/,'Opening should not pause background');
+ const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});
  const previous={json:process.env.GOOGLE_SERVICE_ACCOUNT_JSON,folder:process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID,fetch:globalThis.fetch};
  process.env.GOOGLE_SERVICE_ACCOUNT_JSON=JSON.stringify({
   client_email:'unit-test@localhost.invalid',
