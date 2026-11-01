@@ -13,5 +13,5 @@ assert(css.includes(':not([class*="icon"])'),'Icon fonts should be preserved');
 assert(css.includes('.card-actions > .action.pdf-summary-utility'),'Matching PDF button styling missing');
 assert(index.includes('Website Font<small>Space Grotesk'),'Settings must not offer incompatible font choices');
 assert(index.includes('/site-unified-font.css?v=unified-20261030-v1'),'Global CSS is not loaded');
-assert(index.includes('/features/app-core.js?v=pdf-actions-20261030-v1'),'PDF card cache key needs updating');
+assert(index.includes('/features/app-core.js?v=title-clarity-20261101-v1'),'PDF card cache key needs updating');
 console.log('PASS all PDF actions match and a shared website font is loaded');
