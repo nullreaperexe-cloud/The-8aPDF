@@ -3,6 +3,14 @@ Version: 1 | Updated: 2026-10-29 | Primary language: Hinglish, English, Hindi, P
 
 > **Important:** This file is a *search-training rulebook*, not a fine-tuned Groq model. Merely storing text in Markdown cannot train an LLM. The working implementation uses these deterministic query-intent and synonym rules in the instant browser-side ranker, with the compact runtime vocabulary mirrored in `data/ai-finder-training.json`. Both are versioned in this repository. No GitHub Action or Groq API call is needed to train/search these rules.
 
+## Complete titles & broad question routing (2026-11-01)
+
+- **No broken title rule:** A generated PDF or teacher-announcement title must be a coherent phrase. Do not display trailing `&`, `find`, `and`, `of`, `to`, ellipses, or arbitrary first-N-character slices; preserve original meaning and Hindi/Punjabi scripts. Prefer a source-grounded shorter title when the upstream preview is incomplete. Never invent a topic to fill missing words.
+- The EduSecure sync title budget is now **72 Unicode characters**; the homepage displays full wrapped titles, not a clipped 2-line preview. Descriptions remain available as evidence and are not silently overwritten.
+- Recognize common school query intent, including `which is the upcoming test`, `test`, `Hindi tern 2`, `Hindi term 2`, and complex reasoning questions. A combined subject + term query searches matching PDFs **and** published teacher announcements in the relevant school term.
+- Show documented, confirmed test dates separately from posting dates. If a due date is missing, say it is not confirmed. Never describe unseen PDF body text as verified.
+- Use fast local search for direct matches; optionally call server-side Groq for complex evidence-backed questions and fall back to available local results on outage. Do not claim that this playbook fine-tunes any AI model.
+
 ## Non-negotiable retrieval contract
 
 1. **Never invent PDFs, announcements, dates, subjects, chapter numbers, hyperlinks or PDF contents.** Every result must map to an exact currently loaded, published catalogue record ID.
