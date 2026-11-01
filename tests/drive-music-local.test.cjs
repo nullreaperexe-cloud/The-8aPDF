@@ -32,7 +32,7 @@ const {createServer}=require('node:net');
   assert.match(await home.text(),/studioDriveMusic/);
   const script=await fetch(base+'/drive-music.js');
   assert.equal(script.status,200);
-  assert.match(await script.text(),/music-library\\/player-core/,'Music player must lazy load');
+  assert.ok((await script.text()).includes('/music-library/player-core.js'),'Music player must lazy load');
   const core=await fetch(base+'/music-library/player-core.js');
   assert.equal(core.status,200);
   assert.match(await core.text(),/Google Drive/,'Google Drive player is available on demand');
