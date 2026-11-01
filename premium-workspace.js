@@ -13,7 +13,7 @@
   $('premiumSubjectCount').textContent=Number.isInteger(window.__8apdfUnreadCount)?String(window.__8apdfUnreadCount):'—';
   $('premiumSavedCount').textContent=bridge()?.isLive?.()?String(docs.length):'—';
   $('premiumMessageCount').textContent=messages.length?String(messages.length):(bridge()?.isLive?.()?'0':'—');
-  const day=window.__8apdfCalendar?.today?.();$('premiumDay').textContent=day?.holiday?'Next Day '+day.nextDay:'Day '+(day?.schoolDay||bridge()?.schoolDay?.()||6);
+  const day=window.__8apdfCalendar?.today?.();$('premiumDay').textContent=day?.holiday?'Day '+day.nextDay+' Next':day?.schoolDay?'Day '+day.schoolDay:'Day 5 Next';
  }
  function summaryPosition(){
   const summary=$('premiumSummary'),widgets=$('dashboardWidgets');
