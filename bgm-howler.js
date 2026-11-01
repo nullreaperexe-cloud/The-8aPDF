@@ -218,7 +218,7 @@ function init(){
   if(typeof n.enabled==='boolean')prefs.enabled=n.enabled&&consent()==='with';
   if(!prefs.enabled){pausedByUser=true;audio?.pause();playing=false;pending=false;status('Background music is off.')}
   else if(changed){pausedByUser=false;load(songs[0])}
-  else{if(audio)audio.loop=songs.length===1;if(!pausedByUser)play()}
+  else{if(audio)audio.loop=!!driveTrack||songs.length===1;if(!pausedByUser)play()}
   sync();
  });
 }

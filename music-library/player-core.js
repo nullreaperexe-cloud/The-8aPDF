@@ -93,7 +93,7 @@ function mount(){
  audio.addEventListener('ended',()=>next(false));
  audio.addEventListener('timeupdate',renderProgress);
  audio.addEventListener('durationchange',renderProgress);
- audio.addEventListener('loadedmetadata',()=>{status('Now playing: '+(state.current?.title||'song'));renderProgress()});
+ audio.addEventListener('loadedmetadata',()=>{if(state.current&&Number.isFinite(audio.duration)){state.current.duration=audio.duration;renderList()}status('Now playing: '+(state.current?.title||'song'));renderProgress()});
  audio.addEventListener('waiting',()=>status('Buffering audio from Google Drive…'));
  audio.addEventListener('error',()=>{
   const code=audio.error?.code;state.playing=false;
@@ -159,6 +159,7 @@ function row(track,index){
  const btn=button('','dm-track-info',()=>play(track));btn.title=track.title;btn.append(element('span','dm-small-cover','♫'));
  const meta=element('span','dm-track-meta');meta.append(element('strong','',track.title),element('small','','MP3 · Google Drive'));
  btn.append(meta);item.append(i,btn);
+  item.append(element('span','dm-track-source','Google Drive · MP3'),element('span','dm-track-length',Number.isFinite(track.duration)?seconds(track.duration):'—'));
  const fav=button(state.favorites.has(track.id)?'♥':'♡','dm-like',()=>{
   if(state.favorites.has(track.id))state.favorites.delete(track.id);else state.favorites.add(track.id);
   persist();renderList();

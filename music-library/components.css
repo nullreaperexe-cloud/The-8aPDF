@@ -31,3 +31,9 @@
 .ml-settings .ml-settings-actions{display:flex;flex-wrap:wrap;gap:10px}
 .dm-workspace :is(.dm-track,.dm-queue-track,.dm-side-item,.dm-icon),.dm-dock button{transition:background-color var(--duration,180ms) ease,color var(--duration,180ms) ease}
 html[data-ultra-low="on"] .dm-workspace *,html[data-ultra-low="on"] .dm-dock *{transition:none!important;animation:none!important;backdrop-filter:none!important}
+
+@media(min-width:850px){
+ .dm-track-source{flex:none;width:145px;padding:0 8px;color:var(--ml-muted);font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .dm-track-length{flex:none;width:45px;text-align:right;color:var(--ml-soft);font-size:.76rem;font-variant-numeric:tabular-nums}
+}
+@media(max-width:849px){.dm-track-source,.dm-track-length{display:none}}

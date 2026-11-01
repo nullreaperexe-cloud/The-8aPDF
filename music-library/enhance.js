@@ -40,7 +40,7 @@ export function attach(){
   const heading=document.createElement('small');heading.textContent=track.title;m.append(heading);
   for(const [symbol,label,handler] of [
    ['♫','Set as background music',()=>setBackground(track)],
-   ['↓','Download MP3',()=>{try{downloadTrack(track);notify('Starting download…')}catch{notify('Cannot download this song.')}}],
+   ['↓','Download file',async()=>{try{notify('Downloading '+track.title+'…');await downloadTrack(track,(done,total)=>notify('Downloading '+Math.round(done/total*100)+'%…'));notify('Download ready.')}catch(e){notify('Download failed: '+(e.message||'Try again'))}}],
    ['⟳','Refresh music library',()=>api.reload?.()]
   ]){
    const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=symbol+'  '+label;

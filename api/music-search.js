@@ -166,10 +166,6 @@ async function stream(req,res,conf,id){
   throw error('DRIVE_RANGE_MISMATCH',502,'Google Drive returned incorrect audio range.');
  }
  res.status(206);
- if(req.query?.action==='download'){
-   const safeTitle=String(track.title||'8aPDF Music').replace(/[^A-Za-z0-9 ._()-]/g,'').slice(0,100);
-   res.setHeader('Content-Disposition','attachment; filename="8apdf-song.mp3"; filename*=UTF-8'+String.fromCharCode(39,39)+encodeURIComponent((safeTitle||'song')+'.mp3'));
-  }
   res.setHeader('Content-Type',track.mimeType||'audio/mpeg');
  res.setHeader('Content-Length',String(length));
  res.setHeader('Content-Range','bytes '+start+'-'+end+'/'+track.size);
@@ -203,7 +199,7 @@ export default async function handler(req,res){
    if(action==='status')return res.status(200).json({ok:true,source:'Google Drive',count:tracks.length,folderConnected:true,folderName:libraryCache.folderName});
    return res.status(200).json({tracks,count:tracks.length,source:'Google Drive',maxRangeBytes:MAX_CHUNK});
   }
-  if(action==='stream'||action==='download')return await stream(req,res,conf,String(req.query?.id||''));
+  if(action==='stream')return await stream(req,res,conf,String(req.query?.id||''));
   return res.status(400).json({error:'Unknown music action'});
  }catch(e){
   const err=safeError(e);
