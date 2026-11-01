@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "timeZone": "Asia/Kolkata",
   "anchor": {
     "date": "2026-10-13",
@@ -28,6 +28,11 @@
       "date": "2026-10-21",
       "day": 4,
       "source": "School confirmation on 2026-10-21: next school day is Day 5"
+    },
+    {
+      "date": "2026-11-02",
+      "day": 5,
+      "source": "8aPDF site owner correction on 2026-11-01: next school day is Day 5"
     }
   ],
   "holidaySync": {
