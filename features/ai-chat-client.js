@@ -105,12 +105,14 @@ function rank(q,docs,kind='pdf'){
    else if(wantQna&&/\b(question|answer|solution)\b/.test(desc))score+=12;
    if(wantPractical&&/\b(practical|programs?|coding|html|css)\b/.test(title))score+=30;
    if(wantRevision&&/\b(revision|practice|revise)\b/.test(title))score+=27;
+   // A generic 'test' query should also discover uploaded test papers, not only teacher notices.
+   if(wantTest){if(!/\b(test|tests|exam|exams|quiz|assessment|question paper|sample paper)\b/.test(text))continue;score+=55;}
   }
   if(norm.length>8&&title.includes(norm))score+=70;
   const time=Number(doc.uploadedAtMs||doc.dateMs||Date.parse(doc.messageDate||doc.createdAt||0))||0;
   if(recent&&time)score+=15; // Sort equal-relevance matches by actual source date; no remote API.
   if(!sub&&!chap&&!significant.length&&!wantTest&&!wantSubmission&&!wantHomework&&!wantHoliday&&!wantNotice&&!recent&&!term)continue;
-  if(!sub&&!chap&&!significant.length&&!isNotice&&!recent&&!term)continue;
+  if(!sub&&!chap&&!significant.length&&!isNotice&&!recent&&!term&&!wantTest)continue;
   if(score<=0&&!recent)continue;
   rows.push({doc,score,time});
  }
