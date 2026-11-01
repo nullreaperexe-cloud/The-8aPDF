@@ -15,7 +15,8 @@ const modules=[
 ];
 let last=-1;
 for(const [id,path] of modules){
- const tag='<script id="'+id+'" defer src="/'+path+'?v=performance-20261030"></script>';
+ const version=path==='features/ai-chat-client.js'?'questions-20261101-v1':'performance-20261030';
+ const tag='<script id="'+id+'" defer src="/'+path+'?v='+version+'"></script>';
  const pos=html.indexOf(tag);
  assert(pos>last,'Feature order or defer tag changed: '+path);
  last=pos;
@@ -31,7 +32,7 @@ const styles=[
  ['8apdf-full-todo-premium','features/study-todo.css']
 ];
 for(const [id,path] of styles){
- assert(html.includes('href="/performance-home.css?v=20261030v2"') && fs.readFileSync('performance-home.css','utf8').includes(path),'Bundled feature CSS missing: '+path);
+ assert(html.includes('href="/performance-home.css?v=20261030-announcement-fit-v3"') && fs.readFileSync('performance-home.css','utf8').includes(path),'Bundled feature CSS missing: '+path);
  assert(fs.statSync(path).size>500,'Extracted CSS is empty: '+path);
 }
 const styleStart=html.indexOf('<style id="8apdf-critical-overlay-style">');
@@ -45,7 +46,7 @@ for(const label of ['#welcomeScreen','#nameModal','@keyframes welcomeLiquidFloat
 
 // Regression: an earlier media=print/onload typo disabled the entire mobile layout.
 const screenStyles=[...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)].map(m=>m[0]);
-for(const asset of ['/performance-home.css?v=20261030v2','/premium-workspace.css?v=20261017-chat-fullbleed']){
+for(const asset of ['/performance-home.css?v=20261030-announcement-fit-v3','/premium-workspace.css?v=20261017-chat-fullbleed']){
  const tag=screenStyles.find(x=>x.includes('href="'+asset+'"'));
  assert(tag,'Required premium screen stylesheet missing: '+asset);
  assert(!/\bmedia=["']print["']/.test(tag),'Premium layout must never depend on a print-only stylesheet: '+asset);
@@ -80,7 +81,7 @@ const core=fs.readFileSync('features/app-core.js','utf8');
 assert(core.includes('pendingFirstPdfRender=true;else renderMaterials()'),'PDF data should load without competing with welcome render');
 assert(core.includes('pendingFirstAnnouncementsRender=true;else renderAnnouncements()'),'Announcement cards should wait until welcome closes');
 assert(core.includes('scheduleFirstCatalogRender()'),'Deferred cards must be rendered after onboarding finishes');
-assert(html.includes('/features/app-core.js?v=perf-20261030v4'),'Core cache version must match deployed code');
+assert(html.includes('/features/app-core.js?v=title-clarity-20261101-v1'),'Core cache version must match deployed code');
 assert(html.includes('features/static-cache-register.js'),'Idle cache registration missing');
 assert(!fs.readFileSync('features/static-cache-register.js','utf8').includes('Notification.requestPermission'),'Static cache must not request push notifications');
 console.log('PASS modular scripts, CSS parity, instant onboarding cover, adaptive animation and safe static cache');
