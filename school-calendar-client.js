@@ -12,11 +12,11 @@ function update(){
  document.dispatchEvent(new Event('8apdf:school-calendar-ready'));document.dispatchEvent(new Event('8apdf:school-day-changed'));
 }
 async function init(){
- core=await import('/shared/school-calendar-core.js');config=await fetch('/data/school-calendar.json').then(r=>r.json());
+ core=await import('/shared/school-calendar-core.js');config=await fetch('/data/school-calendar.json?v=20261101-day5-next',{cache:'no-store'}).then(r=>r.json());
  window.__8apdfCalendar={today,getDay:d=>core.calendarDay(d,merged()),getConfig:()=>merged(),addHoliday:(start,end,reason)=>{core.dateMs(start);core.dateMs(end);if(end<start)throw Error('End date must follow start date');const list=extra();list.push({start,end,reason:reason||'School holiday',source:'my-calendar'});localStorage.setItem(extraKey,JSON.stringify(list));auto=true;update()},removeMyHoliday:index=>{const list=extra();list.splice(index,1);localStorage.setItem(extraKey,JSON.stringify(list));auto=true;update()},myHolidays:extra};
  $('daySelect').addEventListener('change',()=>{auto=false;document.documentElement.dataset.schoolDayMode='manual'});
  update();
- try{const response=await fetch('/api/school-calendar?date='+core.dateKey());if(response.ok){const data=await response.json();config=data.config;update()}}catch{}
+ try{const response=await fetch('/api/school-calendar?date='+core.dateKey()+'&v=20261101-day5-next',{cache:'no-store'});if(response.ok){const data=await response.json();config=data.config;update()}}catch{}
  document.addEventListener('8apdf:teacher-data',e=>{if(!config||!core)return;const imported=core.holidaysFromNotices(e.detail||[]),byDate=new Map([...config.holidays,...imported].map(h=>[h.date||h.start,h]));config={...config,holidays:[...byDate.values()]};update()});
  setInterval(()=>{if(core.dateKey()!==lastDate){auto=true;update()}},60000);
 }
