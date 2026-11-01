@@ -21,7 +21,9 @@ function parseDate(source){
  const p=Date.parse(s);return Number.isFinite(p)?new Date(p):null;
 }
 function dateInText(text,base){
- const s=str(text,3000);
+ // Strip repeated EduSecure posting-date headers before looking for an actual school event date.
+ // A teacher message date is NOT a test/submission deadline.
+ const s=str(text,3000).replace(/\b(?:school diary|circular|learning planner|message)\s*(?:dated\s*)?(?:[:\-]\s*)?(?:(?:\d{1,2})(?:st|nd|rd|th)?\s+)?(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:\s+\d{1,2}(?:st|nd|rd|th)?)?(?:\s*,?\s*20\d\d)?/gi,' ');
  let m=s.match(/\b(20\d\d)-(\d{1,2})-(\d{1,2})\b/);if(m)return localDate(+m[1],+m[2],+m[3]);
  m=s.match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](20\d\d)\b/);if(m)return localDate(+m[3],+m[2],+m[1]);
  const mm={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
