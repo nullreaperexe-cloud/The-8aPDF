@@ -13,13 +13,15 @@ const today=new Date(),later=new Date(today.getFullYear(),today.getMonth(),today
 listeners['8apdf:teacher-data']({detail:[
  {id:'test-1',title:'Science Unit Test',description:'Chapter 5 unit test on '+iso,category:'Tests',eventDate:iso,messageDate:'2026-10-11'},
  {id:'note-1',title:'English notebook submission',description:'Submit English notebook by '+iso,category:'Homework',eventDate:iso},
- {id:'test-undated',title:'Maths class test',description:'Prepare exercise 2; date not yet shared',category:'Tests'}
+ {id:'test-undated',title:'Maths class test',description:'Prepare exercise 2; date not yet shared',category:'Tests'},
+ {id:'test-header-only',title:'English class test',description:'School Diary '+iso+' — Prepare for the test. No test date shared yet.',category:'Tests',messageDate:iso}
 ]});
 const up=w.__8apdfStudyIntel.upcoming();
 assert.equal(up.length,2,'Only dated future events must become reminders');
 assert(up.some(e=>e.id==='test-1'));
 assert(up.some(e=>e.id==='note-1'));
 assert(!up.some(e=>e.id==='test-undated'),'Undated tests cannot create reminders');
+assert(!up.some(e=>e.id==='test-header-only'),'Posting date is not an upcoming test date');
 const ans=w.__8apdfStudyIntel.answer('When is the next Science test?');
 assert(ans.message.includes(iso), 'Science test date must be grounded');
 assert(!ans.message.includes('Maths class test'),'Other subjects must not be invented');
