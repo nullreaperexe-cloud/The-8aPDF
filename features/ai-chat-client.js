@@ -5,15 +5,16 @@ const normalize=s=>String(s||'').normalize('NFKC').toLocaleLowerCase()
  .replace(/\bmathematics\b|\bmath\b|\bganit\b/g,'maths')
  .replace(/\bsst\b|\bsocial studies\b/g,'social science')
  .replace(/\bcomputers\b/g,'computer')
+ .replace(/\btern\s*([12])\b/g,'term $1')
  .replace(/\bch\s*(\d{1,3})\b/g,'chapter $1')
  .replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
-const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide latest recent new newest today chapter chap lesson of full file document worksheet what when is are any bata bta dikha kiya kya'.split(' '));
+const ignore=new Set('find give show send me please the a an for of and in on to pdf pdfs material materials study notes note class my our want i need mujhe which whose what exactly tell explain answer ka ki kaise kaha wala wali wale ke hai me mein se k do de dikhao dikhado chahiye from all about question questions available provide latest recent new newest today chapter chap lesson of full file document worksheet what when is are any bata bta dikha kiya kya'.split(' '));
 const subjects=[['social science',['social science','sst','social studies','geography','history','civics']],['maths',['maths','mathematics','math','ganit']],['computer',['computer','computers','ai']],['science',['science','vigyan','physics','chemistry','biology']],['english',['english']],['hindi',['hindi','हिंदी','हिन्दी']],['punjabi',['punjabi','ਪੰਜਾਬੀ']],['french',['french']],['art',['art','drawing']],['life skills',['life skills']]];
 const conversationalStop=new Set('which coming upcoming next tomorrow date dates due on when where please whenis kab kal hoga hone up about asking could would any all do does jo koi hai ki ka bata bta aane baare soon important recently nearest newest'.split(' '));
 const words=s=>normalize(s).split(/\s+/).filter(x=>(x.length>1||/^\d+$/.test(x))&&!ignore.has(x)&&!conversationalStop.has(x));
 function subjectOf(q){const n=normalize(q),padded=' '+n+' ';for(const [canonical,aliases] of subjects){for(const name of aliases){const needle=' '+normalize(name)+' ';if(padded.includes(needle))return canonical}}return ''}
 function chapterOf(q){const m=normalize(q).match(/(?:chapter|chap|lesson|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})/i);return m?String(Number(m[1])):''}
-function termOf(q){const t=normalize(q);const m=t.match(/\bterm\s*([12])\b/);return m?'term'+m[1]:/\bundated\b/.test(t)?'undated':''}
+function termOf(q){const t=normalize(q);const m=t.match(/\b(?:term\s*([12])|([12])(?:st|nd)?\s*term|term\s*(i|ii))\b/);return m?'term'+(m[1]||m[2]||(m[3]==='ii'?'2':'1')):/\bundated\b/.test(t)?'undated':''}
 const chapterPattern=/(?:chapter|chap|lesson|ch|अध्याय|पाठ)\s*(?:number|no)?\s*(\d{1,3})\b/gi;
 const trainedTerms=new Map(),trainedAliases=new Map();
 fetch('/data/ai-finder-training.json?v=offline-20261029',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(data=>{
@@ -58,6 +59,13 @@ function rank(q,docs,kind='pdf'){
   if(chap&&!matchChapter(doc,chap))continue;
   const title=normalize(doc.title),ds=normalize(doc.subject),desc=normalize([doc.description,doc.message,doc.fullMessage].join(' ')),meta=normalize([doc.chapter,doc.className,(doc.tags||[]).join(' ')].join(' ')),cat=normalize(doc.category);
   const text=title+' '+ds+' '+desc+' '+meta+' '+cat;
+  // A teacher message term follows its published school year or explicit term marker; never an event date.
+  if(isNotice&&term&&term!=='undated'){
+   const mark=termOf(text),posted=Date.parse(doc.messageDate||doc.createdAt||'');
+   const schoolYear=Number.isFinite(posted)?new Date(posted).getFullYear():0;
+   const inferred=Number.isFinite(posted)&&schoolYear?((posted>=Date.parse(schoolYear+'-09-29T00:00:00'))?'term2':'term1'):'';
+   if((mark||inferred)!==term)continue;
+  }
   const enriched=trainedTerms.get(kind+':'+doc.id)||'';
   const knownSubject=subjectOf(ds)||subjectOf(title)||subjectOf(meta);
   const unknownSubject=!ds||/^(other|general|uncategorized|circular|school diary)$/.test(ds);
@@ -107,10 +115,11 @@ function rank(q,docs,kind='pdf'){
   rows.push({doc,score,time});
  }
  rows.sort((a,b)=>b.score-a.score||b.time-a.time||String(a.doc.title).localeCompare(String(b.doc.title)));
- return rows.slice(0,isNotice?4:6).map(x=>x.doc);
+ const broad=/\b(all|every|saare|sare|sab|list)\b/i.test(norm)||Boolean(sub&&term);
+ return rows.slice(0,broad?(isNotice?40:50):(isNotice?8:12)).map(x=>x.doc);
 }
 function makeMessage(text,type='ai'){const initial=el('pdfAiWelcome');if(initial)initial.hidden=true;const p=document.createElement('div');p.className='pdf-ai-message '+(type==='user'?'user':'ai');const z=document.createElement('p');z.textContent=text;p.append(z);feed.append(p);feed.scrollTop=feed.scrollHeight;return p}
-function showResults(text,docs){const node=makeMessage(text);if(!docs.length)return;const grid=document.createElement('div');grid.className='pdf-ai-results';for(const doc of docs){const card=document.createElement('article');card.className='pdf-ai-result';const h=document.createElement('h3');h.textContent=doc.title;const small=document.createElement('small');small.textContent=[doc.subject,doc.term==='term1'?'Term 1':doc.term==='term2'?'Term 2':'Date unavailable',doc.chapter].filter(Boolean).join(' · ');card.append(h,small);const actions=document.createElement('div');actions.className='pdf-ai-result-actions';for(const [label,action] of [['Preview','preview'],['Download','download'],['Share','share']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{if(!bridge()?.openDocument)return;bridge().openDocument(doc.id,action)});actions.append(b)}card.append(actions);grid.append(card)}node.append(grid);feed.scrollTop=feed.scrollHeight}
+function showResults(text,docs){const node=makeMessage(text);if(!docs.length)return;const grid=document.createElement('div');grid.className='pdf-ai-results';for(const doc of docs.slice(0,50)){const card=document.createElement('article');card.className='pdf-ai-result';const h=document.createElement('h3');h.textContent=doc.title;const small=document.createElement('small');small.textContent=[doc.subject,doc.term==='term1'?'Term 1':doc.term==='term2'?'Term 2':'Date unavailable',doc.chapter].filter(Boolean).join(' · ');card.append(h,small);const actions=document.createElement('div');actions.className='pdf-ai-result-actions';for(const [label,action] of [['Preview','preview'],['Download','download'],['Share','share']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{if(!bridge()?.openDocument)return;bridge().openDocument(doc.id,action)});actions.append(b)}card.append(actions);grid.append(card)}node.append(grid);feed.scrollTop=feed.scrollHeight}
 let configured=false,checked=false,busy=false,lastFocus=null,seq=0;const memory=new Map();
 async function checkAI(){if(checked)return configured;checked=true;try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant answers · Groq available when needed':'Local-first search · no AI credits';return configured}
 
@@ -128,7 +137,7 @@ function showNoticeResults(result){
  const parent=messages[messages.length-1];
  if(!parent)return;
  const list=document.createElement('div');list.className='pdf-ai-results';
- for(const a of matches.slice(0,4)){
+ for(const a of matches.slice(0,40)){
   const card=document.createElement('article');card.className='pdf-ai-result';
   const h=document.createElement('h3');h.textContent=a.title||'Teacher announcement';
   const sub=document.createElement('small');sub.textContent=[a.subject,a.category].filter(Boolean).join(' · ')||'Teacher message';
@@ -148,7 +157,7 @@ function answerLocal(query,docs){
   return {message:'Your six-day timetable is in the left sidebar → Timetable.'+detail,results:[],announcements:[]};
  }
  if(!docs.length&&!notices.length)return{message:'The school library is still loading. Please try again in a moment.',results:[],announcements:[]};
- const wantPdf=/\b(pdf|pdfs|file|files|worksheet|notes|chapter|chap|study material|download|document)\b|पीडीएफ/i.test(norm)||Boolean(chap||term);
+ const wantPdf=/\b(pdf|pdfs|file|files|worksheet|notes|chapter|chap|study material|download|document|test|tests|exam|exams)\b|पीडीएफ|परीक्षा/i.test(norm)||Boolean(chap||term);
  const wantAnnouncement=/\b(announcement|announcements|circular|teacher|test|exam|quiz|homework|submission|notebook|notice|message|assignment|holiday|event|due)\b|सूचना|परीक्षा|ਹੋਮਵਰਕ/i.test(norm);
  const pdfResults=wantAnnouncement&&!wantPdf?[]:rank(query,docs);
  const noticeResults=wantPdf&&!wantAnnouncement?[]:rank(query,notices,'announcement');
@@ -156,7 +165,8 @@ function answerLocal(query,docs){
  if(pdfResults.length||noticeResults.length){
   const texts=[];if(pdfResults.length)texts.push(pdfResults.length+' matching PDF'+(pdfResults.length===1?'':'s'));
   if(noticeResults.length)texts.push(noticeResults.length+' teacher announcement'+(noticeResults.length===1?'':'s'));
-  return {message:'Found '+texts.join(' and ')+' in the 8aPDF library. These are the closest verified source titles; tap a result below.'+(wantAnnouncement?' Teacher message dates are not automatically test dates.':''),results:pdfResults,announcements:noticeResults};
+  const futureTest=/\b(upcoming|next|coming|tomorrow|aane|kab|when)\b/i.test(norm)&&/\b(test|tests|exam|exams|quiz)\b/i.test(norm);
+  return {message:'Found '+texts.join(' and ')+' in the 8aPDF library. Tap a source below.'+(futureTest?' These are test-related records; only an explicitly mentioned future test date can confirm an upcoming test.':'')+(wantAnnouncement&&!futureTest?' Teacher message dates are not automatically test dates.':''),results:pdfResults,announcements:noticeResults};
  }
  if(wantPdf||wantAnnouncement||sub||chap||term)return{message:'No reliable match found in the currently loaded PDFs and teacher announcements. Try another subject, exact chapter or topic.',results:[],announcements:[]};
  return null;
@@ -194,15 +204,17 @@ async function send(){
  const docs=bridge()?.documents?.()||[];
  const wantsDate=/\b(when|upcoming|next|tomorrow|due|date|kab|kal)\b/i.test(normalize(question));
  const teacherAnswer=wantsDate?window.__8apdfStudyIntel?.answer?.(question):null;
- if(teacherAnswer&&teacherAnswer.announcements?.length){showNoticeResults(teacherAnswer);return}
+ if(teacherAnswer&&teacherAnswer.announcements?.length&&teacherAnswer.message?.includes('Confirmed from dated teacher messages')){showNoticeResults(teacherAnswer);return}
  const result=answerLocal(question,docs);
- if(result){showNoticeResults(result);return}
+ const complex=/\b(why|how|explain|compare|difference|summarize|summary|based on|according to|what should|which chapter was|how many|tell me about|give an answer)\b/i.test(normalize(question));
+ if(result&&!complex){showNoticeResults(result);return}
  busy=true;
  const placeholder=makeMessage('Checking PDFs and teacher announcements…');
  try{
   await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();
-  if(resultAI)showNoticeResults(resultAI);
-  else showResults('No confirmed answer in currently loaded PDFs or teacher messages. Ask for a specific subject, chapter or topic.',[]);
+  if(resultAI&&resultAI.results.length+resultAI.announcements.length)showNoticeResults(resultAI);
+  else if(result)showNoticeResults(result);
+  else showResults('I could not verify an answer from the currently loaded PDFs and teacher messages. Try a subject, chapter, test, or topic; I will not invent school facts.',[]);
  }finally{busy=false}
 }
 el('pdfAiForm').addEventListener('submit',e=>{e.preventDefault();send()});input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();el('pdfAiForm').requestSubmit()}});
