@@ -25,10 +25,13 @@ const {resolve}=require('node:path');
  assert.match(player,/matchMedia\?\.\('\(min-width:661px\)'\)/,'No keyboard focus on phones');
  assert.match(home,/id="studioDriveMusic"/);
  assert.match(home,/id="studioMobileDriveMusic"/);
- assert.match(home,/src="\/drive-music\.js\?v=4"/);
+ assert.match(home,/src="\/drive-music\.js\?v=5"/);
  assert.doesNotMatch(home,/href="\/drive-music\.css/);
  assert.match(src,/import\('\/music-library\/player-core\.js/,'Core is lazy imported');
  assert.doesNotMatch(player,/Opening the Music Library.*pause\(\)/,'Opening should not pause background');
+ assert.match(player,/<section class="dm-main"/,'Music content must avoid the host global main sidebar margin');
+ assert.doesNotMatch(player,/<main class="dm-main"/,'Nested main causes the gap');
+ assert.match(desktop,/width:min\(1120px,calc\(100vw - 44px\)\)/,'Desktop dock stays centered and moderate width');
  const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});
  const previous={json:process.env.GOOGLE_SERVICE_ACCOUNT_JSON,folder:process.env.GOOGLE_DRIVE_MUSIC_FOLDER_ID,fetch:globalThis.fetch};
  process.env.GOOGLE_SERVICE_ACCOUNT_JSON=JSON.stringify({

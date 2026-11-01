@@ -1,8 +1,8 @@
 /* 8aPDF Music: no art, bitmap, gradients or fixed color palette. */
 .dm-workspace,.dm-dock{--ml-ink:var(--text);--ml-soft:var(--text-soft);--ml-muted:var(--muted);--ml-bg:var(--bg);--ml-panel:var(--surface);--ml-raised:var(--surface-high);--ml-line:var(--line);--ml-strong:var(--line-bold);--ml-action:var(--button);--ml-action-text:var(--button-text);font-family:inherit!important;color:var(--ml-ink);font-size:14px}
 .dm-shade{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(0,0,0,.68)}
-.dm-workspace{width:min(1560px,calc(100vw - 28px));top:14px;bottom:122px;background:var(--ml-bg);border:1px solid var(--ml-strong);border-radius:20px;box-shadow:0 28px 85px rgba(0,0,0,.35);overflow:hidden}
-body.dm-open.dm-has-player .dm-workspace{bottom:122px}
+.dm-workspace{width:min(1560px,calc(100vw - 28px));top:14px;bottom:116px;background:var(--ml-bg);border:1px solid var(--ml-strong);border-radius:20px;box-shadow:0 28px 85px rgba(0,0,0,.35);overflow:hidden}
+body.dm-open.dm-has-player .dm-workspace{bottom:116px}
 .dm-head{min-height:88px;padding:18px 28px;background:var(--ml-bg);border-bottom:1px solid var(--ml-line)}
 .dm-head h2{font-size:clamp(1.65rem,2.3vw,2.35rem);font-weight:750;letter-spacing:-.055em}
 .dm-head p{font-size:.86rem;color:var(--ml-muted);margin-top:7px}
@@ -31,8 +31,8 @@ body.dm-open.dm-has-player .dm-workspace{bottom:122px}
 .dm-queue-track[data-active="true"]{background:var(--ml-raised);border-radius:9px}
 .dm-queue-name{font-size:.82rem;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dm-order{font-size:.85rem;border:1px solid var(--ml-line);border-radius:8px;height:26px;min-width:23px}
-.dm-dock{position:fixed;z-index:3592;bottom:15px;left:50%;transform:translateX(-50%);width:min(1560px,calc(100vw - 28px));height:94px;border:1px solid var(--ml-strong);border-radius:20px;background:var(--ml-bg);box-shadow:0 16px 60px rgba(0,0,0,.23);padding:12px 21px;display:flex;align-items:center;gap:15px}
-body.dm-open.dm-has-player .dm-dock{width:min(1560px,calc(100vw - 28px));bottom:15px}
+.dm-dock{position:fixed;z-index:3592;bottom:15px;left:50%;transform:translateX(-50%);width:min(1120px,calc(100vw - 44px));height:88px;border:1px solid var(--ml-strong);border-radius:20px;background:var(--ml-bg);box-shadow:0 16px 60px rgba(0,0,0,.23);padding:12px 21px;display:flex;align-items:center;gap:15px}
+body.dm-open.dm-has-player .dm-dock{width:min(1120px,calc(100vw - 44px));bottom:15px}
 .dm-cover-btn{width:62px;height:62px;min-width:62px;background:var(--ml-raised);border:1px solid var(--ml-strong);border-radius:15px;font-size:1.65rem}
 .dm-now strong{font-size:1rem;letter-spacing:-.025em}.dm-now small{font-size:.78rem}
 .dm-control-center{flex:1.3;max-width:590px;gap:8px}.dm-actions{gap:13px}.dm-actions button{width:35px;height:35px;font-size:1.15rem}
@@ -40,3 +40,6 @@ body.dm-open.dm-has-player .dm-dock{width:min(1560px,calc(100vw - 28px));bottom:
 .dm-progress{font-size:.73rem;gap:12px}.dm-progress input,.dm-volume input{accent-color:var(--ml-ink)}
 .dm-volume{gap:12px}.dm-close-dock{font-size:1.1rem;width:32px}
 .dm-hide-queue .dm-queue-panel{display:none}.dm-hide-queue .dm-body{grid-template-columns:235px minmax(0,1fr)}
+
+/* Music section must occupy the full grid column, never inherit the host site's global main-sidebar offset. */
+.dm-workspace .dm-body > .dm-main{min-width:0;margin:0;padding-bottom:10px;justify-self:stretch;align-self:stretch;}

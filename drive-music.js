@@ -5,16 +5,16 @@
  function style(name){
   return new Promise(resolve=>{
    const link=document.createElement('link');link.rel='stylesheet';
-   link.href='/music-library/'+name+'?v=20261101-bw1';
+   link.href='/music-library/'+name+'?v=20261101-layout2';
    link.onload=resolve;link.onerror=resolve;document.head.append(link);
   });
  }
  async function ensure(){
   if(!loading)loading=(async()=>{
    const styleReady=Promise.all(css.map(style));
-   await import('/music-library/player-core.js?v=20261101-bw1');
+   await import('/music-library/player-core.js?v=20261101-layout2');
    await styleReady;
-   const module=await import('/music-library/enhance.js?v=20261101-bw1');
+   const module=await import('/music-library/enhance.js?v=20261101-layout2');
    return module;
   })().catch(e=>{loading=null;throw e});
   return loading;
