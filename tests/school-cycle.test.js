@@ -18,6 +18,12 @@ assert.equal(calendarDay('2026-10-21',config).nextDay,5);
 assert.equal(calendarDay('2026-10-22',config).schoolDay,5);
 assert.equal(calendarDay('2026-10-23',config).schoolDay,6);
 assert.equal(calendarDay('2026-10-26',config).schoolDay,1);
+// Sitewide correction announced on Nov 1: the next school day is Day 5, not Day 6.
+assert.equal(calendarDay('2026-11-01',config).reason,'Sunday');
+assert.equal(calendarDay('2026-11-01',config).nextDate,'2026-11-02');
+assert.equal(calendarDay('2026-11-01',config).nextDay,5);
+assert.equal(calendarDay('2026-11-02',config).schoolDay,5);
+assert.equal(calendarDay('2026-11-03',config).schoolDay,6);
 const closed={...config,holidays:[{date:'2026-10-14',reason:'Confirmed school holiday'}]};
 assert.equal(calendarDay('2026-10-14',closed).schoolDay,null);
 assert.equal(calendarDay('2026-10-15',closed).schoolDay,1);
