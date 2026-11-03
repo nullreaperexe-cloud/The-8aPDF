@@ -52,7 +52,7 @@ async function refresh(){
  return request;
 }
 async function init(){
- core=await import('/shared/school-calendar-core.js');
+ core=await import('/shared/school-calendar-core.js?v=20261103-authoritative');
  // Previously saved per-device holidays are deliberately ignored.
  window.__8apdfCalendar={
    today,
