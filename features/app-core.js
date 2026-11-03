@@ -22,11 +22,14 @@ const timetable=[
   ['—','English','English','Games','Maths','Maths (Lab)','Social Science','Social Science','Maths']
 ];
 // Never restore a stale timetable day from a device: authoritative API wins.
-let selectedSchoolDay=1;
+let selectedSchoolDay=1,schoolDayLoaded=false;
 try{localStorage.removeItem('8apdf_selected_school_day_v1')}catch{}
-$('#daySelect').value=String(selectedSchoolDay);
+const dayPicker=$('#daySelect');
+dayPicker.insertAdjacentHTML('afterbegin','<option value="" selected>Syncing…</option>');
+dayPicker.value='';
+dayPicker.disabled=true;
 // Manual timetable preview lasts only until the next authoritative refresh.
-$('#daySelect').onchange=e=>{selectedSchoolDay=Number(e.target.value);renderTimetable()};
+dayPicker.onchange=e=>{selectedSchoolDay=Number(e.target.value);renderTimetable()};
 const cats=['All','Tests','Exams','Homework','Assignments','Projects','Important','Events','Holidays','Timetable','Results','Activities','Competitions','General'];
 const existingUserName=()=>{try{return localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'Student'}catch{return 'Student'}};
 const previewMode=location.protocol==='file:'||location.protocol==='about:';
@@ -308,6 +311,7 @@ function showTimetable(){
  $('#timetableDone').onclick=closeModal;document.dispatchEvent(new Event('8apdf:timetable-open'))
 }
 function renderTimetable(){
+ if(!schoolDayLoaded){$('#todayList').textContent='Syncing school timetable…';return}
  $('#daySelect').value=String(selectedSchoolDay);
  const subjects=timetable[selectedSchoolDay-1];
  $('#todayList').innerHTML=subjects.slice(1,6).map((sub,i)=>`<button class="list-row" data-go="timetable"><span class="timestamp">P${i+1}</span><span class="item-body"><strong>${safe(sub)}</strong><span>Day ${selectedSchoolDay} · Period ${i+1}</span></span></button>`).join('');
@@ -614,7 +618,7 @@ window.__8apdfStudyBridge={
  openAnnouncement:(id)=>{const n=state.announcements.find(n=>String(n.id)===String(id));if(n)openAnnouncement(n);},
  openDocument:(id,action='preview')=>{const x=state.materials.find(x=>x.id===id);if(x)pdfAction(x,['preview','download','share'].includes(action)?action:'preview')},
  navigate:nav,subject:(subject)=>{state.filter=subject;state.query='';$('#searchInput').value='';showLibrary();renderMaterials();scrollToSection('#library')},
- setSchoolDay:(day)=>{if(Number.isInteger(day)&&day>=1&&day<=6){selectedSchoolDay=day;renderTimetable();document.dispatchEvent(new Event('8apdf:school-day-changed'))}}, schoolDay:()=>selectedSchoolDay, timetable:()=>timetable.map((periods,i)=>({day:i+1,periods})),
+ setSchoolDay:(day)=>{if(Number.isInteger(day)&&day>=1&&day<=6){selectedSchoolDay=day;schoolDayLoaded=true;dayPicker.querySelector('option[value=""]')?.remove();dayPicker.disabled=false;renderTimetable();document.dispatchEvent(new Event('8apdf:school-day-changed'))}}, schoolDay:()=>selectedSchoolDay, timetable:()=>timetable.map((periods,i)=>({day:i+1,periods})),
  notify:(message)=>toast(message),
  areAnnouncementsReady:()=>state.annReady,
  isLive:()=>state.live
