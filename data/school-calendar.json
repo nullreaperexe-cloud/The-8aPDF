@@ -22,7 +22,7 @@
       "source": "edusecure-holiday-banner-screenshot"
     }
   ],
-  "note": "Sunday and second/fourth Saturday are weekly closures. EduSecure's verified green holiday banners are synced nightly at 12:00 AM IST after GitHub credentials are configured. Existing manually confirmed holidays remain preserved.",
+  "note": "Only Sunday and 2nd/4th Saturday are recurring closures. Other closures come only from verified EduSecure holiday cards, checked daily at 12:00 PM Asia/Kolkata. Historic verified dates and confirmed school-day corrections are preserved.",
   "cycleCorrections": [
     {
       "date": "2026-10-21",
