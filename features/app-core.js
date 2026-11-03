@@ -21,10 +21,12 @@ const timetable=[
   ['—','Science','Science','Hindi (G)','English (Library)','Hindi (G)','Computer','Punjabi (G)','Drawing'],
   ['—','English','English','Games','Maths','Maths (Lab)','Social Science','Social Science','Maths']
 ];
-let selectedSchoolDay=Number(store.get('8apdf_selected_school_day_v1',1));
-if(!Number.isInteger(selectedSchoolDay)||selectedSchoolDay<1||selectedSchoolDay>6)selectedSchoolDay=1;
+// Never restore a stale timetable day from a device: authoritative API wins.
+let selectedSchoolDay=1;
+try{localStorage.removeItem('8apdf_selected_school_day_v1')}catch{}
 $('#daySelect').value=String(selectedSchoolDay);
-$('#daySelect').onchange=e=>{selectedSchoolDay=Number(e.target.value);store.set('8apdf_selected_school_day_v1',selectedSchoolDay);renderTimetable()};
+// Manual timetable preview lasts only until the next authoritative refresh.
+$('#daySelect').onchange=e=>{selectedSchoolDay=Number(e.target.value);renderTimetable()};
 const cats=['All','Tests','Exams','Homework','Assignments','Projects','Important','Events','Holidays','Timetable','Results','Activities','Competitions','General'];
 const existingUserName=()=>{try{return localStorage.getItem('eightapdf_user_name_v2')||localStorage.getItem('eightapdf_user_name')||'Student'}catch{return 'Student'}};
 const previewMode=location.protocol==='file:'||location.protocol==='about:';
