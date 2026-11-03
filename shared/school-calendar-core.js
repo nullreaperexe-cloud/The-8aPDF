@@ -1,5 +1,5 @@
 const DAY=86400000;
-export const dateKey=(date=new Date())=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
+export const dateKey=(date=new Date())=>{const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));return `${parts.year}-${parts.month}-${parts.day}`;};
 export function dateMs(key){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))throw Error('Use YYYY-MM-DD');const t=Date.parse(key+'T00:00:00Z');if(!Number.isFinite(t)||new Date(t).toISOString().slice(0,10)!==key)throw Error('Invalid calendar date');return t;}
 export const addDays=(key,n)=>new Date(dateMs(key)+n*DAY).toISOString().slice(0,10);
 export function closure(key,config){

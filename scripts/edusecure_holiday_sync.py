@@ -60,15 +60,34 @@ return output.sort((a,b)=>a.length-b.length).slice(0,40);
 """
 
 SCROLL_SLIDER_JS = r"""
-const widgets = Array.from(document.querySelectorAll('div,section,ul'))
-  .filter(el=>el.scrollWidth>el.clientWidth+60 &&
-          /\bDate\s*[:：]/i.test(el.innerText||'') &&
-          /View/i.test(el.innerText||''))
-  .sort((a,b)=>a.scrollWidth-b.scrollWidth);
-if (!widgets.length) return false;
-const el=widgets[0], before=el.scrollLeft;
-el.scrollLeft=Math.min(el.scrollWidth-el.clientWidth,before+Math.max(280,el.clientWidth*.82));
-return el.scrollLeft>before+5;
+// Move only carousels containing dated cards. Do not click page navigation.
+const dated = el => /\bDate\s*[:：]/i.test(el.innerText||'') && /\bView\b/i.test(el.innerText||'');
+const widgets = Array.from(document.querySelectorAll('div,section,ul,main'))
+  .filter(el => el.scrollWidth > el.clientWidth + 55 && el.clientWidth > 180 && dated(el))
+  .sort((a,b)=>(a.scrollWidth-a.clientWidth)-(b.scrollWidth-b.clientWidth));
+for (const el of widgets) {
+  const before = el.scrollLeft, amount = Math.max(260,el.clientWidth*.8);
+  el.scrollLeft = Math.min(el.scrollWidth-el.clientWidth,before+amount);
+  if (el.scrollLeft>before+4) return true;
+}
+// Some EduSecure sliders use transforms instead of scrollLeft.
+// Only press a next arrow inside the closest dated slider container.
+const arrows = Array.from(document.querySelectorAll(
+  'button,[role="button"],a[aria-label],.slick-next,.swiper-button-next,.carousel-control-next'
+)).filter(el => {
+  const text = [el.getAttribute('aria-label'),el.getAttribute('title'),
+      el.className?.toString?.(),el.innerText].join(' ');
+  if (!/next|right|forward|arrow-right|slick-next|swiper-button-next|carousel-control-next/i.test(text))
+    return false;
+  const box = el.getBoundingClientRect(), css = getComputedStyle(el);
+  if (box.width<5 || box.height<5 || css.display==='none' || css.visibility==='hidden')
+    return false;
+  for(let p=el.parentElement,depth=0; p&&depth<5; p=p.parentElement,depth++)
+    if (dated(p)) return true;
+  return false;
+});
+if (arrows.length) { arrows[0].click(); return true; }
+return false;
 """
 
 
@@ -94,26 +113,33 @@ def holiday_from_card(text: str, today: date | None = None) -> dict | None:
 
 
 def merge_calendar(config: dict, cards: list[dict], checked_at: str) -> dict:
-    """Idempotent merge: protect manual/noticed holidays and cycle corrections."""
+    """Keep verified historical events; only currently visible cards are upcoming holidays.
+
+    An empty, successfully scanned carousel is a valid no-holiday result.
+    Never generate school closures from ordinary announcements, manual guesses or
+    expired carousel cards. Historical dates remain for correct six-day cycles.
+    """
     if not isinstance(config.get("holidays"), list):
         raise ValueError("Calendar holidays must be a list")
-    by_date: dict[str, dict] = {}
-    without_date: list[dict] = []
+    today = datetime.fromisoformat(checked_at).date().isoformat()
+    historical = []
     for entry in config["holidays"]:
         if not isinstance(entry, dict):
             raise ValueError("Malformed existing holiday entry")
-        if "date" in entry:
-            by_date[entry["date"]] = entry.copy()
-        else:
-            without_date.append(entry.copy())
+        when = entry.get("date")
+        if isinstance(when, str) and when < today:
+            historical.append(entry.copy())
+    verified = {}
     for card in cards:
         when = card["date"]
-        existing = by_date.get(when)
-        if existing and existing.get("source") != SOURCE:
-            continue
-        by_date[when] = {**(existing or {}), **card}
+        if when >= today:
+            verified[when] = card.copy()
+        else:
+            historical.append(card.copy())
+    by_date = {entry["date"]: entry for entry in historical}
+    by_date.update(verified)
     result = config.copy()
-    result["holidays"] = sorted(by_date.values(), key=lambda h: h["date"]) + without_date
+    result["holidays"] = sorted(by_date.values(), key=lambda h: h["date"])
     result["holidaySync"] = {
         "source": SOURCE,
         "status": "synced",
@@ -181,7 +207,7 @@ def scan_holiday_cards(driver) -> list[dict]:
           el.scrollTop=0;
     """)
     seen: dict[str, dict] = {}
-    for index in range(12):
+    for index in range(28):
         raw = driver.execute_script(BANNER_SCAN_JS) or []
         for candidate in raw:
             parsed = holiday_from_card(candidate.get("text", ""))
@@ -218,8 +244,7 @@ def run(dry_run: bool = False) -> int:
         driver.quit()
 
     if not holidays:
-        print("No verified green holiday banners found. Calendar left unchanged; check portal layout.")
-        return 1
+        print("No active EduSecure holiday cards: today has no newly announced holidays.")
     before = json.loads(CALENDAR_PATH.read_text(encoding="utf-8"))
     now = datetime.now(INDIA).isoformat(timespec="seconds")
     after = merge_calendar(before, holidays, now)
@@ -229,7 +254,7 @@ def run(dry_run: bool = False) -> int:
         print("Dry-run: no calendar file changed.")
         return 0
     CALENDAR_PATH.write_text(json.dumps(after, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Saved {len(holidays)} verified banner(s) to calendar. Existing holidays preserved.")
+    print(f"Published {len(holidays)} active banner(s); preserved verified historical holiday dates.")
     return 0
 
 

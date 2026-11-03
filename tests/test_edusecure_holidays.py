@@ -27,25 +27,32 @@ class HolidaySyncTests(unittest.TestCase):
         self.assertIsNone(worker.holiday_from_card("Test Date : 29/10/2026 View", date(2026, 10, 29)))
         self.assertIsNone(worker.holiday_from_card("Karva Chauth Date : 29/10/2019 View", date(2026, 10, 29)))
 
-    def test_merge_preserves_manual_and_existing_calendar_rules(self):
+    def test_preserves_history_but_prunes_future_unverified_holidays(self):
         original = {
             "anchor": {"date": "2026-10-13", "day": 6},
             "cycleCorrections": [{"date": "2026-10-21", "day": 4}],
             "holidays": [
-                {"date": "2026-10-29", "reason": "School confirmed closure", "source": "teacher-notice"},
-                {"start": "2026-12-20", "end": "2026-12-25", "reason": "Winter break"},
+                {"date": "2026-10-29", "reason": "Confirmed historic holiday", "source": "edusecure-holiday-banner-screenshot"},
+                {"date": "2026-12-10", "reason": "Stale or guessed future holiday", "source": "manual"},
+                {"start": "2026-12-20", "end": "2026-12-25", "reason": "Unverified vacation"},
             ],
         }
         result = worker.merge_calendar(original, [
-            {"date": "2026-10-29", "reason": "Karva Chauth", "source": worker.SOURCE},
-            {"date": "2026-11-01", "reason": "Festival break", "source": worker.SOURCE},
-        ], "2026-10-29T00:00:00+05:30")
-        self.assertEqual(result["holidays"][0]["reason"], "School confirmed closure")
-        self.assertEqual(result["holidays"][1]["date"], "2026-11-01")
-        self.assertEqual(result["holidays"][2]["start"], "2026-12-20")
-        self.assertEqual(original["holidays"][0]["reason"], "School confirmed closure")
+            {"date": "2026-11-05", "reason": "School holiday", "source": worker.SOURCE}
+        ], "2026-11-03T12:00:00+05:30")
+        self.assertEqual([h["date"] for h in result["holidays"]], ["2026-10-29", "2026-11-05"])
         self.assertEqual(result["cycleCorrections"], original["cycleCorrections"])
+        self.assertEqual(result["holidaySync"]["bannersFound"], 1)
+
+    def test_no_cards_means_no_new_holidays_not_an_error(self):
+        config = {"holidays": [
+            {"date": "2026-10-29", "reason": "Historic confirmation", "source": worker.SOURCE},
+            {"date": "2026-11-10", "reason": "Stale future banner", "source": worker.SOURCE},
+        ]}
+        result = worker.merge_calendar(config, [], "2026-11-03T12:00:00+05:30")
+        self.assertEqual([item["date"] for item in result["holidays"]], ["2026-10-29"])
         self.assertEqual(result["holidaySync"]["status"], "synced")
+        self.assertEqual(result["holidaySync"]["bannersFound"], 0)
 
     def test_idempotent_merging(self):
         data = {"holidays": []}
