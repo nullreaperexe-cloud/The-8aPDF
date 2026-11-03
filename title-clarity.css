@@ -16,3 +16,47 @@ html[data-ui-mode="studio"] #announcementGrid .notice-card h3,
  overflow-wrap:break-word!important;
 }
 #pdfGrid .pdf-card,#announcementGrid .notice-card{min-width:0;min-height:0;height:auto!important}
+
+
+/* All PDF surfaces: unlimited visible heading/description length, including
+   compact mobile layout and PDF Explorer. Source data, not CSS, owns the title. */
+#pdfGrid .pdf-card h3,
+#pdfResults .explorer-card h2,
+.explorer-card h2,
+.pdf-card h3,
+#announcementGrid .notice-card h3,
+.notice-card h3,
+.pdf-ai-result h3 {
+  display: block !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: clip !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  height: auto !important;
+}
+#pdfGrid .pdf-card .description,
+#pdfResults .explorer-card .explorer-description,
+.explorer-card .explorer-description,
+.pdf-card .description,
+#announcementGrid .notice-card p {
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  text-overflow: clip !important;
+}
+#pdfGrid .pdf-card,
+#pdfResults .explorer-card,
+.explorer-card,
+#announcementGrid .notice-card {
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
