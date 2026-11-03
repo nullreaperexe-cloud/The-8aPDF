@@ -76,10 +76,10 @@ jobs:
             echo "::warning::Central Supabase project is not linked yet; verified repository snapshot is ready."
             exit 0
           fi
-          OIDC_JSON=$(curl --fail-with-body -fsS \\
-            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \\
+          OIDC_JSON=$(curl --fail-with-body -fsS \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=8apdf-calendar-sync")
           OIDC_TOKEN=$(printf '%s' "$OIDC_JSON" | python -c 'import json,sys;print(json.load(sys.stdin)["value"])')
-          curl --fail-with-body -fsS -X POST "$CALENDAR_SUPABASE_FUNCTION_URL" \\
-            -H "Authorization: Bearer $OIDC_TOKEN" \\
+          curl --fail-with-body -fsS -X POST "$CALENDAR_SUPABASE_FUNCTION_URL" \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
             -H "Content-Type: application/json" --data '{}'
