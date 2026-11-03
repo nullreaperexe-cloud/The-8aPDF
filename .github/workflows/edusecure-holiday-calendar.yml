@@ -42,6 +42,9 @@ jobs:
       - name: Test holiday parsing and calendar safety
         run: python -m unittest discover -s tests -p 'test_edusecure_holidays.py' -v
 
+      - name: Verify confirmed Day 1 and identical school calendar dates
+        run: node tests/calendar-day-sync.test.mjs
+
       - name: Read EduSecure holiday banner and update calendar
         if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
         env:
@@ -70,7 +73,7 @@ jobs:
       - name: Publish verified calendar to Supabase
         if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
         env:
-          CALENDAR_SUPABASE_FUNCTION_URL: ${{ vars.CALENDAR_SUPABASE_FUNCTION_URL }}
+          CALENDAR_SUPABASE_FUNCTION_URL: ${{ vars.CALENDAR_SUPABASE_FUNCTION_URL || 'https://xudhjwojgxblbsebkzso.supabase.co/functions/v1/calendar-publish' }}
         run: |
           if [ -z "$CALENDAR_SUPABASE_FUNCTION_URL" ]; then
             echo "::warning::Central Supabase project is not linked yet; verified repository snapshot is ready."
