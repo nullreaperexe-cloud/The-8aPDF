@@ -13,7 +13,7 @@
   $('premiumSubjectCount').textContent=Number.isInteger(window.__8apdfUnreadCount)?String(window.__8apdfUnreadCount):'—';
   $('premiumSavedCount').textContent=bridge()?.isLive?.()?String(docs.length):'—';
   $('premiumMessageCount').textContent=messages.length?String(messages.length):(bridge()?.isLive?.()?'0':'—');
-  const day=window.__8apdfCalendar?.today?.();$('premiumDay').textContent=day?.holiday?'Day '+day.nextDay+' Next':day?.schoolDay?'Day '+day.schoolDay+' · Next '+day.nextDay:'Syncing…';if(day)$('premiumDay').title=day.date+' · '+(day.holiday?day.reason:'Day '+day.schoolDay)+' · Next '+day.nextDate+' Day '+day.nextDay;
+  const day=window.__8apdfCalendar?.today?.();$('premiumDay').textContent=day?'Next Day '+day.nextDay:'Syncing…';if(day)$('premiumDay').title='Next school day: '+day.nextDate+' · Day '+day.nextDay;
  }
  function summaryPosition(){
   const summary=$('premiumSummary'),widgets=$('dashboardWidgets');
