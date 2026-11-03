@@ -94,26 +94,33 @@ def holiday_from_card(text: str, today: date | None = None) -> dict | None:
 
 
 def merge_calendar(config: dict, cards: list[dict], checked_at: str) -> dict:
-    """Idempotent merge: protect manual/noticed holidays and cycle corrections."""
+    """Keep verified historical events; only currently visible cards are upcoming holidays.
+
+    An empty, successfully scanned carousel is a valid no-holiday result.
+    Never generate school closures from ordinary announcements, manual guesses or
+    expired carousel cards. Historical dates remain for correct six-day cycles.
+    """
     if not isinstance(config.get("holidays"), list):
         raise ValueError("Calendar holidays must be a list")
-    by_date: dict[str, dict] = {}
-    without_date: list[dict] = []
+    today = datetime.fromisoformat(checked_at).date().isoformat()
+    historical = []
     for entry in config["holidays"]:
         if not isinstance(entry, dict):
             raise ValueError("Malformed existing holiday entry")
-        if "date" in entry:
-            by_date[entry["date"]] = entry.copy()
-        else:
-            without_date.append(entry.copy())
+        when = entry.get("date")
+        if isinstance(when, str) and when < today:
+            historical.append(entry.copy())
+    verified = {}
     for card in cards:
         when = card["date"]
-        existing = by_date.get(when)
-        if existing and existing.get("source") != SOURCE:
-            continue
-        by_date[when] = {**(existing or {}), **card}
+        if when >= today:
+            verified[when] = card.copy()
+        else:
+            historical.append(card.copy())
+    by_date = {entry["date"]: entry for entry in historical}
+    by_date.update(verified)
     result = config.copy()
-    result["holidays"] = sorted(by_date.values(), key=lambda h: h["date"]) + without_date
+    result["holidays"] = sorted(by_date.values(), key=lambda h: h["date"])
     result["holidaySync"] = {
         "source": SOURCE,
         "status": "synced",
@@ -218,8 +225,7 @@ def run(dry_run: bool = False) -> int:
         driver.quit()
 
     if not holidays:
-        print("No verified green holiday banners found. Calendar left unchanged; check portal layout.")
-        return 1
+        print("No active EduSecure holiday cards: today has no newly announced holidays.")
     before = json.loads(CALENDAR_PATH.read_text(encoding="utf-8"))
     now = datetime.now(INDIA).isoformat(timespec="seconds")
     after = merge_calendar(before, holidays, now)
@@ -229,7 +235,7 @@ def run(dry_run: bool = False) -> int:
         print("Dry-run: no calendar file changed.")
         return 0
     CALENDAR_PATH.write_text(json.dumps(after, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Saved {len(holidays)} verified banner(s) to calendar. Existing holidays preserved.")
+    print(f"Published {len(holidays)} active banner(s); preserved verified historical holiday dates.")
     return 0
 
 
