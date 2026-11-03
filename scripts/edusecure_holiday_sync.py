@@ -60,15 +60,34 @@ return output.sort((a,b)=>a.length-b.length).slice(0,40);
 """
 
 SCROLL_SLIDER_JS = r"""
-const widgets = Array.from(document.querySelectorAll('div,section,ul'))
-  .filter(el=>el.scrollWidth>el.clientWidth+60 &&
-          /\bDate\s*[:：]/i.test(el.innerText||'') &&
-          /View/i.test(el.innerText||''))
-  .sort((a,b)=>a.scrollWidth-b.scrollWidth);
-if (!widgets.length) return false;
-const el=widgets[0], before=el.scrollLeft;
-el.scrollLeft=Math.min(el.scrollWidth-el.clientWidth,before+Math.max(280,el.clientWidth*.82));
-return el.scrollLeft>before+5;
+// Move only carousels containing dated cards. Do not click page navigation.
+const dated = el => /\bDate\s*[:：]/i.test(el.innerText||'') && /\bView\b/i.test(el.innerText||'');
+const widgets = Array.from(document.querySelectorAll('div,section,ul,main'))
+  .filter(el => el.scrollWidth > el.clientWidth + 55 && el.clientWidth > 180 && dated(el))
+  .sort((a,b)=>(a.scrollWidth-a.clientWidth)-(b.scrollWidth-b.clientWidth));
+for (const el of widgets) {
+  const before = el.scrollLeft, amount = Math.max(260,el.clientWidth*.8);
+  el.scrollLeft = Math.min(el.scrollWidth-el.clientWidth,before+amount);
+  if (el.scrollLeft>before+4) return true;
+}
+// Some EduSecure sliders use transforms instead of scrollLeft.
+// Only press a next arrow inside the closest dated slider container.
+const arrows = Array.from(document.querySelectorAll(
+  'button,[role="button"],a[aria-label],.slick-next,.swiper-button-next,.carousel-control-next'
+)).filter(el => {
+  const text = [el.getAttribute('aria-label'),el.getAttribute('title'),
+      el.className?.toString?.(),el.innerText].join(' ');
+  if (!/next|right|forward|arrow-right|slick-next|swiper-button-next|carousel-control-next/i.test(text))
+    return false;
+  const box = el.getBoundingClientRect(), css = getComputedStyle(el);
+  if (box.width<5 || box.height<5 || css.display==='none' || css.visibility==='hidden')
+    return false;
+  for(let p=el.parentElement,depth=0; p&&depth<5; p=p.parentElement,depth++)
+    if (dated(p)) return true;
+  return false;
+});
+if (arrows.length) { arrows[0].click(); return true; }
+return false;
 """
 
 
@@ -188,7 +207,7 @@ def scan_holiday_cards(driver) -> list[dict]:
           el.scrollTop=0;
     """)
     seen: dict[str, dict] = {}
-    for index in range(12):
+    for index in range(28):
         raw = driver.execute_script(BANNER_SCAN_JS) or []
         for candidate in raw:
             parsed = holiday_from_card(candidate.get("text", ""))
