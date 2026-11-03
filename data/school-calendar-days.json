@@ -1,0 +1,4297 @@
+{
+  "version": 1,
+  "timeZone": "Asia/Kolkata",
+  "start": "2026-10-13",
+  "end": "2028-03-31",
+  "generatedAt": "2026-11-03T13:02:37.304Z",
+  "dates": [
+    {
+      "date": "2026-10-13",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-14",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-10-14",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-15",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-10-15",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-16",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-10-16",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-17",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-10-17",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-19",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-10-18",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-10-19",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-10-19",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-20",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-10-20",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-21",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-10-21",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-22",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-10-22",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-23",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-10-23",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-10-24",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2026-10-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-10-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-10-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-10-26",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-27",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-10-27",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-28",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-10-28",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-10-29",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Karva Chauth",
+      "nextDate": "2026-10-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-10-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-10-31",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-10-31",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-01",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-11-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-11-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-11-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-11-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-08",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-11-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-11-10",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-11",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-11-11",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-12",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-11-12",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-13",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-13",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-14",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2026-11-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-15",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-11-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-11-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-11-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-11-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-22",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-11-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-11-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-11-24",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-25",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-11-25",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-11-26",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-27",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-11-27",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-11-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-28",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2026-11-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-29",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-11-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-11-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-01",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-12-01",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-12-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-12-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-12-06",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-12-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-12-07",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-08",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-12-08",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-12-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-12-10",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-11",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-11",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2026-12-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-12-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-14",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-15",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-12-15",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-12-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-12-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-12-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-20",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-12-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-21",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-22",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-12-22",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-12-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2026-12-24",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-25",
+      "nextDay": 6
+    },
+    {
+      "date": "2026-12-25",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2026-12-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2026-12-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2026-12-28",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-29",
+      "nextDay": 2
+    },
+    {
+      "date": "2026-12-29",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2026-12-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2026-12-31",
+      "nextDay": 4
+    },
+    {
+      "date": "2026-12-31",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-01-03",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-01-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-01-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-01-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-01-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-01-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-09",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-01-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-10",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-01-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-11",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-12",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-01-12",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-01-13",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-14",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-01-14",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-01-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-17",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-01-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-01-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-01-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-01-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-01-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-23",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-01-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-24",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-01-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-25",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-26",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-01-26",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-01-27",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-28",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-01-28",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-01-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-01-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-01-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-01-31",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-02-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-02-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-02-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-02-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-02-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-05",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-02-05",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-06",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-06",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-02-07",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-02-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-02-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-09",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-02-09",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-10",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-02-10",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-11",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-02-11",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-12",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-02-12",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-02-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-14",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-02-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-02-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-02-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-02-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-19",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-02-19",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-20",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-02-20",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-21",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-02-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-02-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-23",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-02-23",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-24",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-02-24",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-25",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-02-25",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-02-26",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-02-26",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-01",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-02-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-03-01",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-02-28",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-03-01",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-01",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-02",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-03-02",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-03",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-03-03",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-04",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-03-04",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-05",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-06",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-06",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-08",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-07",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-03-08",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-08",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-09",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-03-09",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-10",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-03-10",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-03-11",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-12",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-12",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-15",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-03-15",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-14",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-03-15",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-15",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-16",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-16",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-17",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-03-17",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-18",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-03-18",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-03-19",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-20",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-20",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-22",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-21",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-03-22",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-22",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-23",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-23",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-24",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-03-24",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-03-25",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-26",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-03-26",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-29",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-03-29",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-28",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-03-29",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-03-29",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-30",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-03-30",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-03-31",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-03-31",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-01",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-04-01",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-04-04",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-04-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-04-05",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-06",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-04-06",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-04-07",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-08",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-04-08",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-10",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-04-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-11",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-04-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-12",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-13",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-04-13",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-04-14",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-15",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-04-15",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-04-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-18",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-04-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-19",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-20",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-04-20",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-04-21",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-22",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-04-22",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-04-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-24",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-04-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-04-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-04-26",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-27",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-04-27",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-04-28",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-29",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-04-29",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-04-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-04-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-01",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-01",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-03",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-05-02",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-05-03",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-05-03",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-04",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-05-04",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-05-05",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-06",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-05-06",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-07",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-10",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-08",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-05-10",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-09",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-05-10",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-10",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-11",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-05-11",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-05-12",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-13",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-05-13",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-05-14",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-15",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-15",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-17",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-16",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-05-17",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-17",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-18",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-05-18",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-05-19",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-20",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-05-20",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-05-21",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-24",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-22",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-05-24",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-23",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-05-24",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-24",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-25",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-05-25",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-05-26",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-27",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-05-27",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-05-28",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-29",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-05-29",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-05-31",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-30",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-05-31",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-05-31",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-01",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-06-01",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-06-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-06-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-06-06",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-06-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-06-07",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-08",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-06-08",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-06-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-06-10",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-11",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-11",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-06-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-06-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-14",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-15",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-06-15",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-06-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-06-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-06-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-20",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-06-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-21",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-22",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-06-22",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-06-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-06-24",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-25",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-06-25",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-06-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-06-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-06-28",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-29",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-06-29",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-06-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-06-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-01",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-07-01",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-07-04",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-07-05",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-07-05",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-06",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-07-06",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-07",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-07-07",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-08",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-07-08",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-10",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-07-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-11",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-07-12",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-12",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-13",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-07-13",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-14",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-07-14",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-15",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-07-15",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-07-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-18",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-07-19",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-19",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-20",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-07-20",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-21",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-07-21",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-22",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-07-22",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-07-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-24",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-07-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-07-26",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-07-26",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-27",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-07-27",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-28",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-07-28",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-29",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-07-29",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-07-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-07-31",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-07-31",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-01",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-08-02",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-02",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-03",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-08-03",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-08-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-08-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-08",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-08-09",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-09",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-08-10",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-11",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-08-11",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-12",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-08-12",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-13",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-13",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-14",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-08-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-15",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-08-16",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-16",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-17",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-17",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-08-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-08-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-08-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-22",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-08-23",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-23",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-08-24",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-25",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-08-25",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-08-26",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-27",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-08-27",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-28",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-08-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-29",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-08-30",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-08-30",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-08-31",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-08-31",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-09-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-09-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-09-05",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-09-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-09-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-09-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-09-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-09",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-09-09",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-10",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-10",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-11",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-09-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-09-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-13",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-14",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-09-14",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-09-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-09-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-09-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-19",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-09-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-09-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-09-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-23",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-09-23",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-24",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-09-24",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-09-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-09-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-09-27",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-28",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-09-28",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-09-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-09-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-09-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-10-03",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-10-04",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-10-04",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-05",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-10-05",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-10-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-10-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-09",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-10-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-10",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-10-11",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-11",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-12",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-10-12",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-10-13",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-14",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-10-14",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-10-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-17",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-10-18",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-18",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-19",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-10-19",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-10-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-10-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-10-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-23",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-10-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-24",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-10-25",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-25",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-26",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-10-26",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-10-27",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-28",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-10-28",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-10-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-10-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-10-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-10-31",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-11-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-11-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-11-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-11-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-11-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-05",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-05",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-06",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-06",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-11-07",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-11-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-11-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-09",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-11-09",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-10",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-11-10",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-11",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-11-11",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-12",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-12",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-11-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-14",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-11-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-11-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-11-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-11-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-19",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-11-19",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-20",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-20",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-21",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-11-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-23",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-11-23",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-24",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-11-24",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-25",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-11-25",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-26",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-11-26",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-11-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-28",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-11-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-11-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-11-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-11-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-12-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-12-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-12-05",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-12-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-12-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-12-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-12-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-09",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-12-09",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-10",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-10",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-11",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2027-12-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-12-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-13",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-14",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-12-14",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-12-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-12-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-12-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-19",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-12-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-12-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-12-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-23",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-12-23",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-24",
+      "nextDay": 6
+    },
+    {
+      "date": "2027-12-24",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2027-12-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2027-12-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2027-12-27",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-28",
+      "nextDay": 2
+    },
+    {
+      "date": "2027-12-28",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2027-12-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2027-12-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2027-12-31",
+      "nextDay": 5
+    },
+    {
+      "date": "2027-12-31",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-01",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-01",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-01-02",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-01-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-01-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-01-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-05",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-01-05",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-06",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-01-06",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-07",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-07",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-08",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2028-01-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-09",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-01-10",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-10",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-11",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-01-11",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-12",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-01-12",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-13",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-01-13",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-14",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-01-14",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-15",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-15",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-16",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-01-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-01-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-19",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-01-19",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-20",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-01-20",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-21",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-01-21",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-22",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2028-01-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-23",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-01-24",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-24",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-25",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-01-25",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-26",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-01-26",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-27",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-01-27",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-28",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-01-28",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-29",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-01-29",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-01-31",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-30",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-01-31",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-01-31",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-01",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-02-01",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-02",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-02-02",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-03",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-02-03",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-04",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-04",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-05",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-05",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-07",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-02-06",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-02-07",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-02-07",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-08",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-02-08",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-09",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-02-09",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-10",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-02-10",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-11",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-11",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-14",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2028-02-14",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-13",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-02-14",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-14",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-15",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-02-15",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-16",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-02-16",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-17",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-02-17",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-18",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-02-18",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-19",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-19",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-21",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-20",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-02-21",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-21",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-22",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-02-22",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-23",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-02-23",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-24",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-02-24",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-25",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-02-25",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-28",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2028-02-28",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-27",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-02-28",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-02-28",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-02-29",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-02-29",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-01",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-03-01",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-02",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-03-02",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-03",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-03",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-04",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-04",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-03-05",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-03-06",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-03-06",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-07",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-03-07",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-08",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-03-08",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-09",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-03-09",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-10",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-10",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-11",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Second Saturday",
+      "nextDate": "2028-03-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-12",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-03-13",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-13",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-14",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-03-14",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-15",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-03-15",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-16",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-03-16",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-17",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-03-17",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-18",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-18",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-19",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-03-20",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-20",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-21",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-03-21",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-22",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-03-22",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-23",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-03-23",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-24",
+      "nextDay": 6
+    },
+    {
+      "date": "2028-03-24",
+      "schoolDay": 6,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-25",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Fourth Saturday",
+      "nextDate": "2028-03-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-26",
+      "schoolDay": null,
+      "holiday": true,
+      "reason": "Sunday",
+      "nextDate": "2028-03-27",
+      "nextDay": 1
+    },
+    {
+      "date": "2028-03-27",
+      "schoolDay": 1,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-28",
+      "nextDay": 2
+    },
+    {
+      "date": "2028-03-28",
+      "schoolDay": 2,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-29",
+      "nextDay": 3
+    },
+    {
+      "date": "2028-03-29",
+      "schoolDay": 3,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-30",
+      "nextDay": 4
+    },
+    {
+      "date": "2028-03-30",
+      "schoolDay": 4,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-03-31",
+      "nextDay": 5
+    },
+    {
+      "date": "2028-03-31",
+      "schoolDay": 5,
+      "holiday": false,
+      "reason": "",
+      "nextDate": "2028-04-01",
+      "nextDay": 6
+    }
+  ]
+}
