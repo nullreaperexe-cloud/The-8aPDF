@@ -10,7 +10,7 @@ async function getConfiguration(){
  if(!url||!key)return fallback;
  try{
   const response=await fetch(url+'/rest/v1/calendar_state?key=eq.current&select=config&limit=1',{
-   headers:{apikey:key,Authorization:'Bearer '+key},
+   headers:{apikey:key,...(key.startsWith('sb_publishable_')?{}:{Authorization:'Bearer '+key})},
    signal:AbortSignal.timeout(6000),cache:'no-store'
   });
   if(!response.ok)throw new Error('Supabase calendar read failed');
