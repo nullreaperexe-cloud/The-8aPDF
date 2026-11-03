@@ -5,7 +5,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/edusecure_holiday_sync.py'\n      - 'scripts/generate-school-calendar.mjs'\n      - 'shared/school-calendar-core.js'
+      - 'scripts/edusecure_holiday_sync.py'
+      - 'scripts/generate-school-calendar.mjs'
+      - 'shared/school-calendar-core.js'
       - 'tests/test_edusecure_holidays.py'
       - '.github/workflows/edusecure-holiday-calendar.yml'
   schedule:
