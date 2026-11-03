@@ -70,7 +70,7 @@ jobs:
       - name: Publish verified calendar to Supabase
         if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
         env:
-          CALENDAR_SUPABASE_FUNCTION_URL: ${{ vars.CALENDAR_SUPABASE_FUNCTION_URL }}
+          CALENDAR_SUPABASE_FUNCTION_URL: ${{ vars.CALENDAR_SUPABASE_FUNCTION_URL || 'https://xudhjwojgxblbsebkzso.supabase.co/functions/v1/calendar-publish' }}
         run: |
           if [ -z "$CALENDAR_SUPABASE_FUNCTION_URL" ]; then
             echo "::warning::Central Supabase project is not linked yet; verified repository snapshot is ready."
