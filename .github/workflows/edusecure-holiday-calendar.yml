@@ -5,16 +5,17 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/edusecure_holiday_sync.py'
+      - 'scripts/edusecure_holiday_sync.py'\n      - 'scripts/generate-school-calendar.mjs'\n      - 'shared/school-calendar-core.js'
       - 'tests/test_edusecure_holidays.py'
       - '.github/workflows/edusecure-holiday-calendar.yml'
   schedule:
-    # 18:30 UTC = 00:00 Asia/Kolkata the following calendar day.
+    # 06:30 UTC = 12:00 noon Asia/Kolkata (once each day).
     # GitHub schedules are best-effort and can start late.
-    - cron: '30 18 * * *'
+    - cron: '30 6 * * *'
 
 permissions:
   contents: write
+  id-token: write
 
 concurrency:
   group: edusecure-holiday-calendar-sync
@@ -40,22 +41,43 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_edusecure_holidays.py' -v
 
       - name: Read EduSecure holiday banner and update calendar
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
         env:
           EDUSECURE_USERNAME: ${{ secrets.EDUSECURE_USERNAME }}
           EDUSECURE_PASSWORD: ${{ secrets.EDUSECURE_PASSWORD }}
           PYTHONUNBUFFERED: '1'
         run: python scripts/edusecure_holiday_sync.py
 
+      - name: Generate matching dates for all devices
+        if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
+        run: node scripts/generate-school-calendar.mjs
+
       - name: Commit only verified holiday calendar changes
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
         run: |
-          if git diff --quiet -- data/school-calendar.json; then
+          if git diff --quiet -- data/school-calendar.json data/school-calendar-days.json && test -f data/school-calendar-days.json; then
             echo "Calendar is unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/school-calendar.json
+          git add data/school-calendar.json data/school-calendar-days.json
           git commit -m "Update school holidays from EduSecure banner"
           git push origin HEAD:main
+
+      - name: Publish verified calendar to Supabase
+        if: github.event_name != 'push' || contains(github.event.head_commit.message, '[run-calendar-now]')
+        env:
+          CALENDAR_SUPABASE_FUNCTION_URL: ${{ vars.CALENDAR_SUPABASE_FUNCTION_URL }}
+        run: |
+          if [ -z "$CALENDAR_SUPABASE_FUNCTION_URL" ]; then
+            echo "::warning::Central Supabase project is not linked yet; verified repository snapshot is ready."
+            exit 0
+          fi
+          OIDC_JSON=$(curl --fail-with-body -fsS \\
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \\
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=8apdf-calendar-sync")
+          OIDC_TOKEN=$(printf '%s' "$OIDC_JSON" | python -c 'import json,sys;print(json.load(sys.stdin)["value"])')
+          curl --fail-with-body -fsS -X POST "$CALENDAR_SUPABASE_FUNCTION_URL" \\
+            -H "Authorization: Bearer $OIDC_TOKEN" \\
+            -H "Content-Type: application/json" --data '{}'
