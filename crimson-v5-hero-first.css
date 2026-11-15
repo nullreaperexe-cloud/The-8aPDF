@@ -1,0 +1,36 @@
+/* Crimson V5 — Clean hero-first home. Hide only the old home dashboard overview;
+   original API-backed PDF library, announcements, notes, timetable routes, and JS stay intact. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] #dashboardWidgets,
+html[data-crimson-ui="on"][data-ui-mode="studio"] .crimson-section-intro{
+ display:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+ order:0!important;display:block!important;
+ margin:0!important;padding-top:0!important;
+ min-height:min(100svh,860px)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero .premium-hero-scene{
+ padding-top:clamp(82px,10vh,130px)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero .hero-inner{
+ margin-inline:auto!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #experienceHub,
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #newSchoolPlanner,
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #library,
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #announcements{
+ position:relative!important;
+}
+@media(max-width:810px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+ min-height:min(95svh,760px)!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero .premium-hero-scene{
+ padding-top:clamp(92px,13vh,145px)!important;
+ }
+}
+@media(max-width:550px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+ min-height:80svh!important;
+ }
+}
