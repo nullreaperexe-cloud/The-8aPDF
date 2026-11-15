@@ -12,7 +12,7 @@
   button.setAttribute('aria-expanded',String(expanded));
   button.setAttribute('aria-label',expanded?'Close sidebar':'Open sidebar');
   button.setAttribute('title',expanded?'Hide sidebar (Ctrl+B)':'Show sidebar (Ctrl+B)');
-  sidebar.inert=(mobile()&&!expanded) || root.dataset.uiMode!=='studio';
+  sidebar.inert=!expanded || root.dataset.uiMode!=='studio';
   document.body.classList.toggle('studio-mobile-menu-open',mobile()&&isMobileMenu);
  }
  function setOpen(open){
@@ -27,7 +27,7 @@
  button.addEventListener('click',()=>setOpen(!(mobile()?root.dataset.studioMobileMenu==='open':root.dataset.studioNav!=='closed')));
  closeButton.addEventListener('click',()=>setOpen(false));
  shade.addEventListener('click',()=>setOpen(false));
- sidebar.addEventListener('click',event=>{if(mobile()&&event.target.closest('.studio-side-link'))setOpen(false)});
+ sidebar.addEventListener('click',event=>{if(event.target.closest('.studio-side-link'))setOpen(false)});
  document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&mobile()&&root.dataset.studioMobileMenu==='open')setOpen(false);
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='b'&&!event.altKey&&root.dataset.uiMode==='studio'){
