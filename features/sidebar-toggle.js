@@ -12,7 +12,7 @@
   button.setAttribute('aria-expanded',String(expanded));
   button.setAttribute('aria-label',expanded?'Close sidebar':'Open sidebar');
   button.setAttribute('title',expanded?'Hide sidebar (Ctrl+B)':'Show sidebar (Ctrl+B)');
-  sidebar.inert=!expanded || root.dataset.uiMode!=='studio';
+  sidebar.inert=(mobile()&&!expanded) || root.dataset.uiMode!=='studio';
   document.body.classList.toggle('studio-mobile-menu-open',mobile()&&isMobileMenu);
  }
  function setOpen(open){
