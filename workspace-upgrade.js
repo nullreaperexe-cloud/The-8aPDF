@@ -7,24 +7,10 @@ const get=(key,def)=>{try{const o=JSON.parse(localStorage.getItem(key));return o
 const put=(key,obj)=>{try{localStorage.setItem(key,JSON.stringify(obj))}catch{}};
 const bridge=()=>window.__8apdfStudyBridge;
 const prefKey='8apdf_ws_v4_preferences';const taskKey='8apdf_ws_v4_task_done';const customKey='8apdf_ws_v4_custom_tasks';
-const def={theme:'light',boost:false,w:{timetable:true,teachers:true,recents:true,notes:false,planner:false,autoTodo:false}};
+const def={theme:'pure-black',boost:false,w:{timetable:true,teachers:true,recents:true,notes:false,planner:false,autoTodo:false}};
 let pref={...def,...get(prefKey,{}),w:{...def.w,...get(prefKey,{})?.w}};
 let messages=[],modal=null,modalBody=null,musicEngine=null,lastFocus=null,latestSummaryController=null;
 const savePref=()=>put(prefKey,pref);
-/* Keep the separate workspace theme selector in sync with the daylight design.
-   Legacy users with the automatic pure-black default start clean and readable;
-   custom palettes and deliberate later changes remain available. */
-try{
- const key='8apdf_workspace_daylight_readability_fix_v1';
- if(!localStorage.getItem(key)){
-   if(pref.theme==='pure-black'){
-     pref.theme='light';
-     savePref();
-   }
-   localStorage.setItem(key,'1');
- }
-}catch{}
-
 function showToast(text){if(typeof bridge()?.notify==='function')bridge().notify(text);else alert(text)}
 function cacheStatus(){return !!bridge()?.isLive?.()}
 function show(title,html){lastFocus=document.activeElement;if(!modal){modal=document.createElement('div');modal.className='ws-overlay';modal.hidden=true;modal.innerHTML='<section class="ws-dialog" role="dialog" aria-modal="true" aria-labelledby="wsDialogTitle"><div class="ws-dialog-head"><h2 id="wsDialogTitle"></h2><button type="button" id="wsClose" aria-label="Close">✕</button></div><div id="wsDialogBody"></div></section>';document.body.append(modal);modal.addEventListener('click',e=>{if(e.target===modal)close()});$('wsClose').addEventListener('click',close);modalBody=$('wsDialogBody')};$('wsDialogTitle').textContent=title;modalBody.innerHTML=html;modal.hidden=false;document.body.classList.add('no-scroll');$('wsClose').focus({preventScroll:true});return modalBody}

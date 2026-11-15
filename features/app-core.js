@@ -38,16 +38,8 @@ const TERM_BOUNDARY='2026-09-28'; // 28 Sep inclusive in Term 1; 29 Sep begins T
 const storedTerm=store.get('8apdf_term_choice_v3',null);
 const defaultTerm=['all','term1','term2','undated'].includes(storedTerm)?storedTerm:'all';
 const state={materials:previewMode?previewDocuments:[],live:false,error:false,filter:'All Subjects',term:defaultTerm,query:'',sort:'new',visible:12,announcements:[],annCategory:'All',annVisible:9,annLoading:false,annReady:false,saved:store.get('8apdf_saved_v1',[]),recent:store.get('8apdf_recent_v1',[]),tasks:store.get('8apdf_tasks_v1',[]),name:existingUserName()};
-const defaults={theme:'light',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'light',customStrength:65,glass:true,glassIntensity:100,glassMotion:true,glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glowCustomColor:'#e9e9e9',cornerRadius:36,animationSpeed:3,fontChoice:'modern',showActions:true,showSuggestions:true,stickyNav:true};
+const defaults={theme:'pure-black',density:'comfortable',layout:'grid',sidebar:false,reading:false,motion:false,large:false,contrast:false,fontSize:100,customColor:'#7364cf',customMode:'dark',customStrength:65,glass:true,glassIntensity:100,glassMotion:true,glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glowCustomColor:'#e9e9e9',cornerRadius:36,animationSpeed:3,fontChoice:'modern',showActions:true,showSuggestions:true,stickyNav:true};
 let settings={...defaults,...store.get('8apdf_classic_glass_settings_v2',{})};
-/* First-run daylight migration: change only old night defaults; preserve other preferences. */
-if(!store.get('8apdf_alabaster_daylight_migrated_v1',false)){
- if(['pure-black','dark','graphite'].includes(settings.theme))settings.theme='light';
- if(settings.customMode==='dark')settings.customMode='light';
- store.set('8apdf_classic_glass_settings_v2',settings);
- store.set('8apdf_alabaster_daylight_migrated_v1',true);
-}
-
 // One-time upgrade: match the approved Radiant default on this device without discarding other preferences.
 if(!store.get('8apdf_radiant_default_migrated_v1',false)){
  Object.assign(settings,{glow:true,glowIntensity:100,glowSize:840,glowSpeed:100,glowCursor:true,glowScroll:true,glowIdle:true,glowColorMode:'theme',glass:true,glassIntensity:100,glassMotion:true});

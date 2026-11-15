@@ -29,7 +29,7 @@
  shade.addEventListener('click',()=>setOpen(false));
  sidebar.addEventListener('click',event=>{if(mobile()&&event.target.closest('.studio-side-link'))setOpen(false)});
  document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&((mobile()&&root.dataset.studioMobileMenu==='open')||(!mobile()&&root.dataset.studioNav==='open')))setOpen(false);
+  if(event.key==='Escape'&&mobile()&&root.dataset.studioMobileMenu==='open')setOpen(false);
   if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='b'&&!event.altKey&&root.dataset.uiMode==='studio'){
    const e=document.activeElement;
    if(e&&(/^(INPUT|TEXTAREA|SELECT)$/.test(e.tagName)||e.isContentEditable))return;
