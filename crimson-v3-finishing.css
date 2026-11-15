@@ -1,0 +1,68 @@
+
+/* Final specificity fix against original legacy headline and sidebar rules. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing{
+ display:block!important;position:relative!important;width:100%!important;max-width:950px!important;
+ min-height:36px!important;max-height:40px!important;margin:25px auto 0!important;
+ padding:0 13px!important;box-sizing:border-box!important;
+ font-family:Inter,Arial,sans-serif!important;font-size:clamp(15px,1.7vw,22px)!important;
+ font-weight:400!important;line-height:1.5!important;letter-spacing:-.015em!important;
+ color:#b4a6b0!important;-webkit-text-fill-color:#b4a6b0!important;
+ text-align:center!important;white-space:nowrap!important;overflow:hidden!important;
+ text-overflow:ellipsis!important;background:none!important;border:0!important;box-shadow:none!important;
+ text-shadow:none!important;transform:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing #premiumWelcome{
+ white-space:nowrap!important;display:inline-block!important;max-width:100%!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;vertical-align:middle!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing #studyTypingText{
+ font-family:Inter,Arial,sans-serif!important;font-size:inherit!important;font-weight:400!important;
+ line-height:inherit!important;white-space:nowrap!important;color:inherit!important;
+ -webkit-text-fill-color:inherit!important;letter-spacing:inherit!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing .study-typing-caret{
+ vertical-align:middle!important;position:relative!important;margin-left:2px!important;
+}
+/* Reference navbar stays floating as the user scrolls. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] header.top-shell{
+ position:fixed!important;left:50%!important;top:0!important;right:auto!important;
+ transform:translateX(-50%)!important;z-index:320!important;
+ margin:0!important;padding-top:22px!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+ padding-top:92px!important;
+}
+/* Full sidebar opens as overlay rather than reverting to a persistent rail. */
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-studio-nav="closed"] #studioSidebar{
+ visibility:hidden!important;opacity:0!important;
+ transform:translate3d(-115%,0,0)!important;pointer-events:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-studio-nav="open"] #studioSidebar{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ transform:translate3d(0,0,0)!important;pointer-events:auto!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #premiumSummary{display:none!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .feature-strip{display:none!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing{
+ color:#7d6672!important;-webkit-text-fill-color:#7d6672!important;
+}
+@media(max-width:810px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] header.top-shell{
+ top:0!important;padding-top:12px!important;max-width:calc(100% - 24px)!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{padding-top:75px!important}
+ html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing{
+ font-size:clamp(12px,2.7vw,17px)!important;min-height:27px!important;
+ max-height:32px!important;margin-top:18px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"][data-studio-mobile-menu="open"] #studioSidebar{
+ display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+ transform:translate3d(0,0,0)!important;
+ }
+}
+@media(max-width:550px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-copy #studyTypingHeadline.crimson-inline-typing{
+ font-size:clamp(11px,3.2vw,15px)!important;white-space:nowrap!important;
+ margin-top:17px!important;max-width:100%!important;
+ }
+}

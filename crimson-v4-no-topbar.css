@@ -1,0 +1,81 @@
+
+/* V4: Red UI landing without any top navbar. Keep only the original working sidebar toggle. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] header.top-shell,
+html[data-crimson-ui="on"][data-ui-mode="studio"] .top-shell#oldTopNavShell{
+ display:none!important;visibility:hidden!important;
+ width:0!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle{
+ position:fixed!important;top:19px!important;left:20px!important;right:auto!important;bottom:auto!important;
+ z-index:1300!important;display:grid!important;place-items:center!important;
+ width:47px!important;height:47px!important;min-width:47px!important;min-height:47px!important;
+ border-radius:15px!important;border:1px solid #ffffff36!important;
+ background:rgba(12,7,10,.85)!important;color:#f9eff3!important;
+ box-shadow:0 10px 32px #0009,inset 0 1px #ffffff13,0 0 22px #ef233c1a!important;
+ backdrop-filter:blur(22px)!important;-webkit-backdrop-filter:blur(22px)!important;
+ cursor:pointer!important;opacity:1!important;visibility:visible!important;
+ pointer-events:auto!important;transform:none!important;margin:0!important;padding:11px!important;
+ transition:background .22s,border-color .22s,box-shadow .22s!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle svg{
+ display:block!important;width:22px!important;height:22px!important;fill:none!important;stroke:currentColor!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle:hover{
+ border-color:#ef233cbb!important;background:#ef233c2a!important;color:#ff5974!important;
+ box-shadow:0 14px 40px #0009,0 0 30px #ef233c2a!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle[aria-expanded="true"]{
+ background:#ef233c!important;border-color:#ff5e72!important;color:white!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #studioSidebarToggle{
+ background:#fffafcf2!important;color:#89283d!important;
+ border-color:#94344950!important;box-shadow:0 8px 28px #50172b21!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #studioSidebarToggle[aria-expanded="true"]{
+ background:#ef233c!important;color:#fff!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebar{
+ top:80px!important;left:16px!important;bottom:16px!important;
+ max-height:calc(100dvh - 96px)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarShade{z-index:1001!important}
+/* Remove exactly the two old dashboard cards, while their underlying data features stay accessible in sidebar. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] #dashboardWidgets>.widget:nth-child(1),
+html[data-crimson-ui="on"][data-ui-mode="studio"] #dashboardWidgets>.widget:nth-child(2){
+ display:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #dashboardWidgets{
+ margin-top:0!important;padding-top:0!important;
+}
+/* Hero begins at the top of the page now. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+ padding-top:0!important;margin-top:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-scene{
+ padding-top:64px!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .crimson-section-intro{margin-top:0!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main{padding-top:0!important}
+/* Top-left button remains the sole permanent navigation surface on desktop; mobile tabs retained. */
+@media(max-width:810px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle{
+ top:14px!important;left:14px!important;width:45px!important;height:45px!important;
+ min-width:45px!important;min-height:45px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebar{
+ top:72px!important;left:10px!important;bottom:88px!important;
+ max-height:calc(100dvh - 162px)!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-scene{
+ padding-top:85px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{padding-top:0!important}
+}
+@media(max-width:550px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .premium-hero-scene{padding-top:85px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #studioSidebarToggle{
+ transition:none!important;
+ }
+}
