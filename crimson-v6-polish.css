@@ -301,3 +301,17 @@ html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] :is(#pdfGri
 @media(prefers-reduced-motion:reduce){
  html[data-crimson-ui="on"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card){will-change:auto!important}
 }
+
+
+/* Higher specificity than the inherited V3 display:grid!important layout:
+   these two homepage sections must NEVER reappear in the new UI. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] main section#dashboardWidgets,
+html[data-crimson-ui="on"][data-ui-mode="studio"] main section#premiumSummary,
+html[data-crimson-ui="on"][data-ui-mode="studio"] main section.crimson-section-intro {
+ display:none!important;visibility:hidden!important;max-height:0!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #subjectFilters{
+ display:none!important;visibility:hidden!important;max-height:0!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;
+}
