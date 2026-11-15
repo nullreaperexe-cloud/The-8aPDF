@@ -12,7 +12,7 @@
  async function ensure(){
   if(!loading)loading=(async()=>{
    const styleReady=Promise.all(css.map(style));
-   await import('/music-library/player-core.js?v=20261101-layout2');
+   await import('/music-library/player-core.js?v=20261115-exclusive-audio-v8');
    await styleReady;
    const module=await import('/music-library/enhance.js?v=20261101-layout2');
    return module;
