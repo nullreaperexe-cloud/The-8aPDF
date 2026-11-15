@@ -16,7 +16,7 @@ document.documentElement.dataset.crimsonUi='on';
 /* ULTRA LOW BOOT END */
 try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav='closed'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='closed'}
 /* Before first paint, pick the exact existing overlay; do not show the hero underneath. */
-try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_premium_name_onboarding_v1')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
+try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_crimson_fresh_name_v20261115')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
 setTimeout(()=>{if(!document.documentElement.dataset.entryPending)return;document.getElementById('welcomeScreen')?.classList.remove('show');delete document.documentElement.dataset.entryPending},12000);
 </script>
 <style id="8apdf-ultra-low-first-paint">html[data-ultra-low="on"]{--duration:0ms!important;--fluid-speed:0ms!important;scroll-behavior:auto!important}
@@ -588,7 +588,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 
-<script src="/name-onboarding.js?v=2"></script>
+<script src="/name-onboarding.js?v=crimson-name-20261115"></script>
 
 <script src="/music-choice.js?v=1"></script>
 
@@ -733,7 +733,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <button type="button" class="premium-stat" data-go="timetable"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="premium-stat-copy"><strong id="premiumDay">Syncing…</strong><span>Timetable</span><small>Next school day.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
 <button type="button" class="premium-stat" data-go="announcements"><span class="premium-stat-icon"><svg aria-hidden="true"><use href="#i-megaphone"/></svg></span><span class="premium-stat-copy"><strong id="premiumMessageCount">—</strong><span>Messages</span><small>From your teachers.</small></span><svg class="premium-stat-arrow" aria-hidden="true"><use href="#i-chevron"/></svg></button>
 </section>
-<section class="shell widgets" id="dashboardWidgets">
+<section class="shell widgets" id="dashboardWidgets" hidden aria-hidden="true">
 <div class="widget"><div class="widget-header"><svg><use href="#i-calendar"></use></svg><strong>Class Timetable</strong><select aria-label="Choose current school cycle day" class="timetable-day-select" id="daySelect"><option value="1">Day 1</option><option value="2">Day 2</option><option value="3">Day 3</option><option value="4">Day 4</option><option value="5">Day 5</option><option value="6">Day 6</option></select><button data-go="timetable">View Full</button></div><div id="todayList"></div></div>
 <div class="widget"><div class="widget-header"><svg><use href="#i-megaphone"></use></svg><strong>Latest Teacher Messages</strong><button data-go="announcements">View All</button></div><div id="announcementsWidget"></div></div>
 <div class="widget"><div class="widget-header"><svg><use href="#i-file"></use></svg><strong>Latest PDFs</strong><button data-go="latest">View All</button></div><div id="recentWidget"></div></div>
@@ -1265,7 +1265,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
   html[data-ui-mode="studio"] #newSchoolPlanner :is(.widget,.planner-task){transition:none!important}
 }
 </style>
-<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=pdf-actions-20261030-v1"></script>
+<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=crimson-theme-20261115"></script>
 
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 
@@ -1282,7 +1282,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
 
 
-<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release">
-<script defer src="/crimson-redesign.js?v=crimson-feature-preserve-20261115-2"></script>
+<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion">
+<script defer src="/crimson-v6-motion.js?v=crimson-3d-20261115"></script>
 </body>
 </html>
