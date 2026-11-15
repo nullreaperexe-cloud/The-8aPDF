@@ -364,3 +364,85 @@ html[data-motion="off"] [data-alabaster-tilt],html[data-ultra-low="on"] [data-al
  }
 }
 @media(prefers-reduced-motion:reduce){.alabaster-tilting{transform:none!important}}
+
+
+/* Preserve and visibly display the site's original hero description. */
+html[data-ui-mode="studio"][data-tone="light"] .hero .hero-description{
+  display:block!important;max-width:620px!important;margin:12px 0 23px!important;
+  color:#475569!important;font-size:clamp(14px,1.3vw,17px)!important;line-height:1.6!important;
+}
+html[data-ui-mode="studio"][data-tone="light"] .hero .premium-hero-scene{
+  min-height:330px!important;
+}
+html[data-ui-mode="studio"][data-tone="light"] .hero .premium-hero-actions{
+  gap:10px!important;flex-wrap:wrap!important;
+}
+html[data-ui-mode="studio"][data-tone="light"] #studyTypingText{
+  display:inline!important;visibility:visible!important;filter:none!important;
+}
+/* If a saved dark preset is selected, don't strand white cards on black canvas. */
+html[data-ui-mode="studio"][data-tone="dark"] .alabaster-spotlight h2{color:#f1f5f9!important}
+html[data-ui-mode="studio"][data-tone="dark"] .alabaster-spotlight-card{
+  background:#202431!important;color:#f1f5f9!important;border-color:#394050!important;
+}
+html[data-ui-mode="studio"][data-tone="dark"] .alabaster-summary{color:#b5bdcc!important}
+html[data-ui-mode="studio"][data-tone="dark"] .alabaster-spotlight-all{
+  background:#30334b!important;color:#c7d2fe!important;border-color:#444660!important;
+}
+
+/* Native resource pages: collapse the left sidebar on DESKTOP as well as mobile.
+   Reuse their existing menuToggle, closeSidebar and scrim listeners. */
+body:has(.app #menuToggle) .app{display:block!important;grid-template-columns:none!important}
+body:has(.app #menuToggle) .app .sidebar{
+  position:fixed!important;left:0!important;top:0!important;bottom:0!important;
+  width:min(300px,86vw)!important;max-width:86vw!important;height:100dvh!important;
+  z-index:800!important;transform:translateX(-110%)!important;
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+  border-radius:0 18px 18px 0!important;
+  box-shadow:18px 0 50px rgba(15,23,42,.14)!important;
+  transition:transform .32s var(--alb-ease),opacity .25s,visibility .25s!important;
+}
+body:has(.app #menuToggle) .app .sidebar.open{
+  transform:translateX(0)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+}
+body:has(.app #menuToggle) .app .main{margin-left:0!important;width:100%!important;min-width:0!important}
+body:has(.app #menuToggle) .app #menuToggle{
+  display:grid!important;place-items:center!important;
+  width:41px!important;height:41px!important;min-width:41px!important;
+  border:1px solid #e2e8f0!important;background:#fff!important;color:#334155!important;
+}
+body:has(.app #menuToggle) #scrim.open{
+  display:block!important;position:fixed!important;inset:0!important;z-index:799!important;
+  background:rgba(15,23,42,.23)!important;backdrop-filter:blur(3px)!important;
+}
+
+/* Mobile PDF Explorer subject controls: keep a left-side menu, not a bottom tab bar. */
+@media(max-width:600px){
+ .explorer>aside{
+   position:fixed!important;top:0!important;left:0!important;bottom:0!important;
+   height:100dvh!important;width:min(292px,85vw)!important;z-index:610!important;
+   transform:translateX(-110%)!important;transition:transform .33s var(--alb-ease)!important;
+   box-shadow:16px 0 48px rgba(15,23,42,.13)!important;
+   border-right:1px solid #e2e8f0!important;overflow-y:auto!important;
+ }
+ html[data-alabaster-explorer-open="yes"] .explorer>aside{transform:translateX(0)!important}
+ .explorer-mobile-toggle{
+   display:inline-flex!important;align-items:center;justify-content:center;
+   padding:10px 13px!important;min-height:42px!important;
+   border:1px solid #e2e8f0!important;background:#fff!important;
+   color:#5147e8!important;border-radius:12px!important;cursor:pointer;
+ }
+ .explorer-header{display:flex!important;flex-wrap:wrap;gap:10px!important}
+ .explorer-header>div{flex:1 1 170px}
+ .explorer-header input{width:100%!important;flex-basis:100%;margin:5px 0 0!important}
+ .explorer main{padding:16px 13px!important}
+ #explorerSubjects{display:grid!important;overflow:visible!important}
+ .explorer-subject-scrim{
+   position:fixed!important;inset:0!important;z-index:609!important;
+   background:rgba(15,23,42,.22)!important;backdrop-filter:blur(3px)!important;
+ }
+ .explorer-subject-scrim[hidden]{display:none!important}
+ html[data-ui-mode="studio"][data-tone="light"] .hero .hero-description{font-size:14px!important}
+}
+.alabaster-deck{scrollbar-width:none!important}
+.alabaster-deck::-webkit-scrollbar{display:none!important}
