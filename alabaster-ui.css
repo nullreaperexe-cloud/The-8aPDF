@@ -619,3 +619,64 @@ html[data-ui-mode="studio"] .pdf-card:hover .doc-tile::after,.explorer-card:hove
 html[data-ui-mode="studio"] #siteAmbientGlow{display:none!important}
 .alabaster-enter{animation:alabaster-rise .5s var(--daylight-ease) both!important;animation-delay:var(--stagger-delay,0ms)!important}
 @media(prefers-reduced-motion:reduce){.alabaster-enter{animation:none!important}}
+
+
+/* Ensure the existing sidebar/menu triggers win over legacy high-specificity mobile rules. */
+html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .top-nav #studioSidebarToggle{display:grid!important;place-items:center!important}
+@media(max-width:620px){
+ html[data-ui-mode="studio"]:not([data-nova-ui="on"]) .top-nav #topSearch{
+  display:flex!important;flex:none!important;width:43px!important;max-width:43px!important;
+  min-width:43px!important;height:42px!important;justify-content:center!important;padding:0!important
+ }
+ html[data-ui-mode="studio"] .top-nav #topSearch>span{max-width:22px!important;font-size:0!important}
+ html[data-ui-mode="studio"] .top-nav #topSearch>span svg{width:19px!important;height:19px!important}
+ html[data-ui-mode="studio"] #topSearch kbd{display:none!important}
+}
+/* Chat contrast polish: the original standalone chat uses hardcoded dark tokens. */
+.app-shell{
+ --chat-bg:#F8FAFC!important;--chat-surface:#FFFFFF!important;--chat-surface-2:#F1F5F9!important;
+ --chat-raised:#EEF2FF!important;--chat-raised-hover:#E0E7FF!important;
+ --chat-stroke:#E2E8F0!important;--chat-stroke-light:#CBD5E1!important;
+ --chat-text:#0F172A!important;--chat-sub:#475569!important;--chat-muted:#64748B!important;
+ --chat-white:#0F172A!important;
+}
+.app-shell .room-item{color:#334155!important}
+.app-shell :is(.rail-button,.icon-button,.room-actions-menu button,.add-room-button,.members-top h3,.details-top,.side-kicker){
+ color:#475569!important;
+}
+.app-shell :is(.rail-button,.icon-button,.room-actions-menu button):hover{
+ background:#EEF2FF!important;color:#4F46E5!important;
+}
+.app-shell :is(.room-icon,.topic-icon,.details-crest,.member-avatar,.rail-avatar){
+ background:#EEF2FF!important;color:#4F46E5!important;border-color:#DDE2FF!important;
+}
+.app-shell :is(.members-top h3,.details-cover h2,.members-list strong,.msg-meta strong){
+ color:#0F172A!important;
+}
+.app-shell :is(.members-list small,.msg-meta,.msg-options,.details-cover p,.connection-badge,.room-count){
+ color:#64748B!important;
+}
+.app-shell .message-day{background:#EEF2FF!important;border-color:#DDE2FF!important;color:#4F46E5!important;box-shadow:none!important}
+.app-shell .message-day::before,.app-shell .message-day::after{background:#E2E8F0!important}
+.app-shell .msg-bubble{
+ background:#FFF!important;color:#334155!important;border:1px solid #E2E8F0!important;
+ box-shadow:0 5px 18px rgba(15,23,42,.055)!important;
+}
+.app-shell .message-row.mine .msg-bubble{
+ background:linear-gradient(135deg,#4F46E5,#6366F1)!important;
+ color:#FFF!important;border-color:#4F46E5!important;
+}
+.app-shell :is(.composer textarea,.room-search-field input,.members-search){color:#0F172A!important;background:transparent!important}
+.app-shell :is(.composer textarea,.room-search-field input)::placeholder{color:#94A3B8!important}
+.app-shell .attach-button{
+ background:#EEF2FF!important;color:#4F46E5!important;border-color:#DDE2FF!important;
+}
+.app-shell .send-button{
+ background:#4F46E5!important;border-color:#4F46E5!important;color:#FFF!important;
+}
+.app-shell .room-actions-menu button{background:transparent!important;color:#334155!important}
+.app-shell .room-actions-menu button:hover{background:#EEF2FF!important;color:#4338CA!important}
+.app-shell :is(.reply-draft,.app-dialog,.room-actions-menu,.rail-account){color:#0F172A!important;border-color:#E2E8F0!important}
+.app-shell .room-item.selected{box-shadow:inset 3px 0 #4F46E5!important}
+.app-shell .room-item.selected .room-text strong{color:#0F172A!important}
+.app-shell .members-panel{color:#0F172A!important}
