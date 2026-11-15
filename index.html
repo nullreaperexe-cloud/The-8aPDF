@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-ui-mode="studio" data-density="comfortable" data-fluid="on" data-glass="on" data-layout="grid" data-motion="on" data-onboard="complete" data-theme="pure-black" data-tone="dark" lang="en">
+<html data-ui-mode="studio" data-density="comfortable" data-fluid="on" data-glass="on" data-layout="grid" data-motion="on" data-onboard="complete" data-theme="light" data-tone="light" lang="en">
 <head>
 <script id="8apdf-ui-early">
 /* ULTRA LOW BOOT START */
@@ -24,8 +24,8 @@ html[data-ultra-low="on"] #welcomeScreen.show .welcome-content,html[data-ultra-l
 <link rel="preload" as="style" href="/performance-home.css?v=20261030-announcement-fit-v3" fetchpriority="high">
 <link rel="preload" as="style" href="/premium-workspace.css?v=20261017-chat-fullbleed">
 <style id="8apdf-first-paint-guard">
-html[data-entry-pending] {background:#000}
-html[data-entry-pending] body {background:#000!important}
+html[data-entry-pending] {background:#F8FAFC}
+html[data-entry-pending] body {background:#F8FAFC!important}
 html[data-entry-pending] body > :not(#welcomeScreen):not(#nameModal){visibility:hidden!important}
 html[data-entry-pending="welcome"] #welcomeScreen,
 html[data-entry-pending="name"] #nameModal{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
@@ -593,6 +593,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 
 <script src="/announcement-format.js?v=20261030"></script>
 <link rel="stylesheet" href="/site-unified-font.css?v=unified-20261030-v1">
+<link rel="preload" as="style" href="/alabaster-ui.css?v=20261115-v2">
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -1280,5 +1281,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
 
 
+<link rel="stylesheet" href="/alabaster-ui.css?v=20261115-v2">
+<script defer src="/alabaster-ui.js?v=20261115-v2"></script>
 </body>
 </html>
