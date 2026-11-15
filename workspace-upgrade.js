@@ -7,8 +7,18 @@ const get=(key,def)=>{try{const o=JSON.parse(localStorage.getItem(key));return o
 const put=(key,obj)=>{try{localStorage.setItem(key,JSON.stringify(obj))}catch{}};
 const bridge=()=>window.__8apdfStudyBridge;
 const prefKey='8apdf_ws_v4_preferences';const taskKey='8apdf_ws_v4_task_done';const customKey='8apdf_ws_v4_custom_tasks';
-const def={theme:'pure-black',boost:false,w:{timetable:true,teachers:true,recents:true,notes:false,planner:false,autoTodo:false}};
+const def={theme:'pure-black',boost:false,w:{timetable:false,teachers:false,recents:false,notes:false,planner:false,autoTodo:false,focus:false}};
 let pref={...def,...get(prefKey,{}),w:{...def.w,...get(prefKey,{})?.w}};
+// One-time UI migration PER DEVICE: start every existing/new account with widgets disabled.
+// Never clear the user's music, names, saved PDFs, chats, or other preferences.
+const WIDGETS_V8_RESET='8apdf_crimson_widgets_start_off_20261115';
+try{
+ if(localStorage.getItem(WIDGETS_V8_RESET)!=='1'){
+  pref.w=Object.fromEntries(Object.keys(def.w).map(k=>[k,false]));
+  put(prefKey,pref);
+  localStorage.setItem(WIDGETS_V8_RESET,'1');
+ }
+}catch{pref.w=Object.fromEntries(Object.keys(def.w).map(k=>[k,false]))}
 let messages=[],modal=null,modalBody=null,musicEngine=null,lastFocus=null,latestSummaryController=null;
 const savePref=()=>put(prefKey,pref);
 function showToast(text){if(typeof bridge()?.notify==='function')bridge().notify(text);else alert(text)}
@@ -61,8 +71,33 @@ function todo(){show('Auto To-Do & Study Checklist',`<p>School PDFs aur teacher 
 $('wsTaskSearch').oninput=renderTodo;$('wsTaskKind').onchange=renderTodo;$('wsCustomForm').onsubmit=e=>{e.preventDefault();const text=$('wsNewTask').value.trim();if(!text)return;put(customKey,[...get(customKey,[]),{id:(crypto.randomUUID?.()||String(Date.now())),text,time:Date.now()}]);$('wsNewTask').value='';renderTodo()};
 $('wsTaskList').onchange=e=>{const input=e.target.closest('[data-ws-task]');if(!input)return;const status=get(taskKey,{});status[input.dataset.wsTask]=input.checked;put(taskKey,status);renderTodo()};
 $('wsTaskList').onclick=e=>{if(e.target.closest('[data-ws-more]')){$('wsTaskList').dataset.limit=String(Number($('wsTaskList').dataset.limit||80)+80);renderTodo();return}const b=e.target.closest('[data-ws-remove]');if(!b)return;const id=b.dataset.wsRemove.substring(4);put(customKey,get(customKey,[]).filter(x=>String(x.id)!==id));renderTodo()};renderTodo()}
-function widgets(){const root=show('Edit Home Widgets',`<p>Welcome screen par kya dikhe? Choose karo. PDFs Supabase se aur teacher announcements existing service se aayenge.</p><div id="wsWidgetToggles"></div><div class="ws-notice">Changes saved automatically on this device. All features sidebar se accessible rehte hain.</div>`);const names={timetable:'Class Timetable',teachers:'Teacher Messages',recents:'Latest PDFs',notes:'Quick Notes',planner:'Today / Tomorrow Tasks',autoTodo:'Automatic To-Do'};const el=$('wsWidgetToggles');el.innerHTML=Object.entries(names).map(([k,label])=>`<label class="ws-line"><span>${label}</span><input type="checkbox" data-ws-widget="${k}" ${pref.w[k]?'checked':''}></label>`).join('');el.onchange=e=>{const i=e.target.closest('[data-ws-widget]');if(!i)return;pref.w[i.dataset.wsWidget]=i.checked;savePref();applyWidgets()};return root}
-function applyWidgets(){if(!STUDIO())return;const selectors={timetable:'#dashboardWidgets > .widget:nth-child(1)',teachers:'#dashboardWidgets > .widget:nth-child(2)',recents:'#premiumRecentWidget, #dashboardWidgets > .widget:nth-child(3):has(#recentWidget)',notes:'#premiumNotesWidget, #dashboardWidgets > .widget:has(#notesList)',planner:'#newSchoolPlanner > .widget:nth-child(1)',autoTodo:'#newSchoolPlanner > .widget:nth-child(2)'};for(const [key,sel] of Object.entries(selectors))document.querySelector(sel)?.classList.toggle('ws-hidden-widget',!pref.w[key])}
+function widgets(){const root=show('Edit Home Widgets',`<p>Welcome screen par kya dikhe? Choose karo. PDFs Supabase se aur teacher announcements existing service se aayenge.</p><div id="wsWidgetToggles"></div><div class="ws-notice">Changes saved automatically on this device. All features sidebar se accessible rehte hain.</div>`);const names={timetable:'Class Timetable',teachers:'Teacher Messages',recents:'Latest PDFs',notes:'Quick Notes',planner:'Today / Tomorrow Tasks',autoTodo:'Automatic To-Do',focus:'Focus & Study Tools'};const el=$('wsWidgetToggles');el.innerHTML=Object.entries(names).map(([k,label])=>`<label class="ws-line"><span>${label}</span><input type="checkbox" data-ws-widget="${k}" ${pref.w[k]?'checked':''}></label>`).join('');el.onchange=e=>{const i=e.target.closest('[data-ws-widget]');if(!i)return;pref.w[i.dataset.wsWidget]=i.checked;savePref();applyWidgets()};return root}
+function applyWidgets(){
+ if(!STUDIO())return;
+ const selectors={
+  timetable:'#dashboardWidgets > .widget:nth-child(1)',
+  teachers:'#dashboardWidgets > .widget:nth-child(2)',
+  recents:'#premiumRecentWidget, #dashboardWidgets > .widget:nth-child(3):has(#recentWidget)',
+  notes:'#premiumNotesWidget, #dashboardWidgets > .widget:has(#notesList)',
+  planner:'#newSchoolPlanner > .widget:nth-child(1)',
+  autoTodo:'#newSchoolPlanner > .widget:nth-child(2)'
+ };
+ for(const [key,selector] of Object.entries(selectors))
+  document.querySelectorAll(selector).forEach(widget=>widget.classList.toggle('ws-hidden-widget',!pref.w[key]));
+ for(const id of ['dashboardWidgets','newSchoolPlanner','premiumRecentSection']){
+  const host=$(id);if(!host)continue;
+  const enabled=[...host.children].some(el=>el.classList.contains('widget')&&!el.classList.contains('ws-hidden-widget'));
+  host.dataset.widgetsVisible=enabled?'yes':'no';
+  host.hidden=!enabled;
+  host.setAttribute('aria-hidden',String(!enabled));
+ }
+ const focus=$('experienceHub');
+ if(focus){
+  focus.dataset.widgetsVisible=pref.w.focus?'yes':'no';
+  focus.hidden=!pref.w.focus;
+  focus.setAttribute('aria-hidden',String(!pref.w.focus));
+ }
+}
 function buildSidebar(){const side=$('studioSidebar');if(!side||$('wsExtraLinks'))return;const group=document.createElement('div');group.id='wsExtraLinks';group.className='studio-nav-group workspace-sidebar-group';group.innerHTML=`<span class="studio-nav-caption">STUDY ESSENTIALS</span><button type="button" class="studio-side-link" data-ws-action="todo"><span class="ws-icon">☑</span><span>All PDFs & To-Do</span></button><button type="button" class="studio-side-link" data-ws-action="zip"><span class="ws-icon">↓</span><span>Download PDF ZIP</span></button><button type="button" class="studio-side-link" data-ws-action="widgets"><span class="ws-icon">⊞</span><span>Edit Home Widgets</span></button>`;side.insertBefore(group,side.querySelector('.studio-side-end'));group.onclick=e=>{const b=e.target.closest('[data-ws-action]');if(!b)return;const action=b.dataset.wsAction;if(action==='todo')todo();else if(action==='zip')downloadZip();else if(action==='music')music();else if(action==='manual')manual();else if(action==='widgets')widgets();if(innerWidth<810)$('studioSidebarClose')?.click()};
 
 }
@@ -120,7 +155,16 @@ function ensureSummaryAction(card){
  if(!action.classList.contains('action'))action.classList.add('action','wide');
  if(action.parentElement!==actions){action.innerHTML=summaryActionIcon+' Summarize PDF';actions.append(action);}
 }
-function appInit(){if(!$('studioSidebar')||!$('dashboardWidgets'))return;buildSidebar();if(STUDIO()){document.querySelectorAll('.studio-sidebar [data-go="announcements"] span').forEach(el=>el.textContent="Teacher Messages");document.querySelectorAll('.studio-mobile-nav [data-go="announcements"] span').forEach(el=>el.textContent="Messages");const subtitle=document.querySelector('.hero p');if(subtitle)subtitle.textContent="Dream big. Start small. Keep going."}home();applyWidgets();syncDeviceTheme();document.addEventListener('8apdf:teacher-data',notifyUpdates);try{messages=get('8a_cache_messages',[])}catch{};document.addEventListener('8apdf:library-updated',()=>{if(modal&&!modal.hidden&&$('wsTaskList'))renderTodo()});document.addEventListener('click',summaryClick,true);document.addEventListener('click',interceptSettings,true);document.querySelectorAll('.pdf-card').forEach(ensureSummaryAction);if(window.MutationObserver){const grid=$('pdfGrid');const o=new MutationObserver(()=>grid?.querySelectorAll('.pdf-card').forEach(ensureSummaryAction));if(grid)o.observe(grid,{childList:true})}
+function appInit(){if(!$('studioSidebar')||!$('dashboardWidgets'))return;buildSidebar();if(STUDIO()){document.querySelectorAll('.studio-sidebar [data-go="announcements"] span').forEach(el=>el.textContent="Teacher Messages");document.querySelectorAll('.studio-mobile-nav [data-go="announcements"] span').forEach(el=>el.textContent="Messages");const subtitle=document.querySelector('.hero p');if(subtitle)subtitle.textContent="Dream big. Start small. Keep going."}home();applyWidgets();syncDeviceTheme();
+ // Other modules may move Latest PDFs / Quick Notes to a second widget group.
+ const main=document.querySelector('main');
+ if(main&&window.MutationObserver){
+  const widgetHostObserver=new MutationObserver(entries=>{
+   if(entries.some(entry=>[...entry.addedNodes].some(node=>node.nodeType===1&&(node.id==='premiumRecentSection'||node.id==='dashboardWidgets'))))applyWidgets();
+  });
+  widgetHostObserver.observe(main,{childList:true});
+ }
+document.addEventListener('8apdf:teacher-data',notifyUpdates);try{messages=get('8a_cache_messages',[])}catch{};document.addEventListener('8apdf:library-updated',()=>{if(modal&&!modal.hidden&&$('wsTaskList'))renderTodo()});document.addEventListener('click',summaryClick,true);document.addEventListener('click',interceptSettings,true);document.querySelectorAll('.pdf-card').forEach(ensureSummaryAction);if(window.MutationObserver){const grid=$('pdfGrid');const o=new MutationObserver(()=>grid?.querySelectorAll('.pdf-card').forEach(ensureSummaryAction));if(grid)o.observe(grid,{childList:true})}
 }
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&musicEngine?.context?.state==='running')musicEngine.context.suspend().catch(()=>{});else if(!document.hidden&&musicEngine?.context?.state==='suspended')musicEngine.context.resume().catch(()=>{})});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',appInit,{once:true});else appInit();

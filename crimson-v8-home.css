@@ -1,0 +1,226 @@
+
+/* Crimson V8 — hero-height repair, compact live metrics, opt-in widgets, soft 3D cards. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] main > section.hero {
+ order:0!important; min-height:0!important;max-height:none!important;
+ height:auto!important;padding:0 0 32px!important;margin:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main > .hero .premium-hero-scene {
+ min-height:0!important;height:auto!important;
+ padding:clamp(76px,10vh,118px) 10px 17px!important;
+ margin:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero #searchForm.big-search {
+ margin-top:24px!important;margin-bottom:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] .hero .hero-inner{
+ height:auto!important;min-height:0!important;margin:0 auto!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #workspaceHomeActions{
+ display:none!important;
+}
+/* Real counts, minimalist separators rather than chunky dashboard cards. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] main #crimsonLiveSummary {
+ order:1!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ width:min(calc(100% - 64px),1050px)!important;max-width:1050px!important;
+ margin:0 auto 65px!important;padding:15px 0!important;gap:0!important;
+ border-top:1px solid rgba(239,35,60,.26)!important;
+ border-bottom:1px solid rgba(255,255,255,.13)!important;
+ background:transparent!important;box-shadow:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:12px!important;min-width:0!important;min-height:64px!important;
+ padding:10px 12px!important;border:0!important;
+ border-right:1px solid rgba(255,255,255,.13)!important;
+ border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;color:var(--text)!important;
+ cursor:pointer!important;text-align:left!important;
+ transition:background .3s,color .3s,transform .3s!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat:last-child{border-right:0!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat:hover{
+ background:rgba(239,35,60,.075)!important;color:#fb526d!important;transform:translateY(-2px)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-icon{
+ display:grid!important;place-items:center!important;flex:0 0 39px!important;
+ width:39px!important;height:39px!important;border-radius:12px!important;
+ background:rgba(239,35,60,.095)!important;color:#ff4d6c!important;
+ border:1px solid rgba(239,35,60,.19)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-icon svg{
+ width:20px!important;height:20px!important;stroke:currentColor;
+ fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-text{
+ display:flex!important;align-items:baseline!important;gap:7px!important;min-width:0!important;flex-wrap:wrap!important;
+ font:550 12px Inter,Arial,sans-serif!important;color:var(--text-soft)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-count{
+ font:800 clamp(23px,2vw,32px)/1.1 Manrope,Inter,sans-serif!important;
+ letter-spacing:-.055em!important;color:var(--text)!important;
+ min-width:1ch!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-label{
+ font-size:11px!important;font-weight:650!important;white-space:normal!important;color:var(--muted)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] main #crimsonLiveSummary {
+ border-top-color:rgba(198,36,75,.20)!important;border-bottom-color:rgba(129,47,76,.17)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #crimsonLiveSummary .crimson-live-stat{
+ border-right-color:rgba(129,47,76,.14)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #crimsonLiveSummary .crimson-live-icon{
+ background:#fdf0f4!important;border-color:rgba(204,58,89,.2)!important;color:#c3264b!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #crimsonLiveSummary .crimson-live-count{
+ color:#321b27!important;
+}
+/* All sections are hidden on first visit; Edit Home Widgets remains available via the sidebar.
+   A user enabling a widget gets it back immediately and permanently. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection,#experienceHub):not([data-widgets-visible="yes"]){
+ display:none!important;visibility:hidden!important;max-height:0!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] body main section#dashboardWidgets[data-widgets-visible="yes"],
+html[data-crimson-ui="on"][data-ui-mode="studio"] body main section#newSchoolPlanner[data-widgets-visible="yes"],
+html[data-crimson-ui="on"][data-ui-mode="studio"] body main section#premiumRecentSection[data-widgets-visible="yes"] {
+ display:grid!important;visibility:visible!important;max-height:none!important;
+ width:min(calc(100% - 64px),1380px)!important;
+ margin:16px auto 34px!important;padding:10px 0!important;overflow:visible!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] body main section#experienceHub[data-widgets-visible="yes"]{
+ display:block!important;visibility:visible!important;max-height:none!important;
+ width:min(calc(100% - 64px),1380px)!important;
+ margin:20px auto 34px!important;padding:10px 0!important;overflow:visible!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection) .ws-hidden-widget{
+ display:none!important;
+}
+/* Remove the bright/white hot-spot gradients from the 3D card effect. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card){
+ background:linear-gradient(153deg,#1b1117,#100a0f 64%,#080609)!important;
+ border:1px solid rgba(182,79,106,.24)!important;
+ box-shadow:0 11px 30px rgba(5,2,7,.23),inset 0 1px rgba(204,114,143,.04)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card)::before{
+ background:radial-gradient(circle at var(--crimson-pointer-x,50%) var(--crimson-pointer-y,34%),
+ rgba(181,43,78,.095),transparent 62%)!important;
+ opacity:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card):hover::before{opacity:1!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card)::after{
+ background:radial-gradient(circle at var(--crimson-pointer-x,50%) var(--crimson-pointer-y,35%),
+ rgba(188,34,72,.085),transparent 55%)!important;
+ opacity:0!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card):hover::after{
+ opacity:1!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card):hover{
+ border-color:rgba(233,49,91,.6)!important;
+ box-shadow:0 18px 46px rgba(67,9,30,.16),0 8px 24px rgba(0,0,0,.25)!important;
+}
+/* Premium white mode should stay white, but never show a glaring white hover spot. */
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card){
+ background:linear-gradient(155deg,#fffefd,#fff8fa)!important;
+ border-color:rgba(130,53,80,.17)!important;
+ box-shadow:0 9px 26px rgba(129,65,85,.08)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card)::before,
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card)::after{
+ background:radial-gradient(circle at var(--crimson-pointer-x,50%) var(--crimson-pointer-y,35%),
+ rgba(209,50,88,.055),transparent 60%)!important;
+}
+/* Restore the legacy welcome screen visual rather than applying the red hero branding to it. */
+html[data-crimson-ui="on"][data-ui-mode="studio"] #welcomeScreen{
+ background:
+ radial-gradient(circle at top left,rgba(129,140,248,.22),transparent 34rem),
+ radial-gradient(circle at bottom right,rgba(99,102,241,.16),transparent 32rem),
+ rgba(2,6,23,.96)!important;
+ backdrop-filter:blur(22px) saturate(170%)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen{
+ background:
+ radial-gradient(circle at top left,rgba(79,70,229,.22),transparent 34rem),
+ radial-gradient(circle at bottom right,rgba(124,58,237,.18),transparent 32rem),
+ rgba(248,250,252,.96)!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #welcomeScreen .welcome-title{
+ color:#f7f9ff!important;text-shadow:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen .welcome-title{
+ color:#181c32!important;text-shadow:none!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"] #welcomeScreen .welcome-subtitle{
+ color:#c9cce4!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen .welcome-subtitle{
+ color:#566078!important;
+}
+/* Wide mobile PDF cards across the available device width. */
+@media(max-width:810px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero{
+  padding-bottom:22px!important;min-height:0!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main>.hero .premium-hero-scene{
+  padding:clamp(70px,10vh,112px) 6px 9px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main #crimsonLiveSummary{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:calc(100% - 28px)!important;max-width:none!important;
+  padding:8px 0!important;margin:5px auto 34px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat{
+  min-height:67px!important;justify-content:flex-start!important;
+  padding:12px 10px!important;gap:10px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat:nth-child(2){border-right:0!important}
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-stat:nth-child(-n+2){
+  border-bottom:1px solid rgba(255,255,255,.12)!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-icon{
+  width:35px!important;height:35px!important;flex-basis:35px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-count{font-size:24px!important}
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #crimsonLiveSummary .crimson-live-label{font-size:10px!important}
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #library>.shell,
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #announcements>.shell{
+  width:calc(100% - 24px)!important;max-width:none!important;
+  margin-inline:12px!important;min-width:0!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:16px!important;width:100%!important;max-width:none!important;
+  padding:0!important;margin:0!important;overflow:visible!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid>.pdf-card{
+  width:100%!important;max-width:none!important;min-width:0!important;
+  margin:0!important;box-sizing:border-box!important;padding:20px!important;
+  transform:none!important;min-height:0!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid>.pdf-card .card-actions{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:9px!important;width:100%!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid>.pdf-card .card-actions .action{
+  min-width:0!important;min-height:43px!important;font-size:12px!important;
+  padding:10px 8px!important;white-space:normal!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid>.pdf-card .card-actions .pdf-summary-utility{
+  grid-column:1/-1!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] body main :is(#dashboardWidgets,#newSchoolPlanner,#premiumRecentSection)[data-widgets-visible="yes"]{
+  width:calc(100% - 24px)!important;grid-template-columns:minmax(0,1fr)!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] body main section#experienceHub[data-widgets-visible="yes"]{
+  width:calc(100% - 24px)!important;
+ }
+}
+@media(max-width:550px){
+ html[data-crimson-ui="on"][data-ui-mode="studio"] #pdfGrid>.pdf-card{
+  border-radius:18px!important;padding:18px!important;
+ }
+ html[data-crimson-ui="on"][data-ui-mode="studio"] main #crimsonLiveSummary{
+  margin-bottom:28px!important;
+ }
+}

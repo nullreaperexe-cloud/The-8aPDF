@@ -88,7 +88,7 @@ function mount(){
  });
  $('dmVolume').addEventListener('input',e=>{state.volume=Number(e.target.value);audio.volume=state.volume/100;persist()});
  $('dmSeek').addEventListener('change',e=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(e.target.value)/100});
- audio.addEventListener('play',()=>{state.playing=true;setPlayerVisible(true);window.__8apdfBackgroundAudio?.pause?.();renderPlayer();setMediaState('playing')});
+ audio.addEventListener('play',()=>{state.playing=true;setPlayerVisible(true);window.__8apdfBackgroundAudio?.pause?.();document.dispatchEvent(new Event('8apdf:music-library-playing'));renderPlayer();setMediaState('playing')});
  audio.addEventListener('pause',()=>{state.playing=false;renderPlayer();setMediaState('paused')});
  audio.addEventListener('ended',()=>next(false));
  audio.addEventListener('timeupdate',renderProgress);
