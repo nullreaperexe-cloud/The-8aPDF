@@ -607,3 +607,15 @@ html[data-entry-pending]{background:#F8FAFC!important}
 html[data-ultra-low="on"] *,html[data-motion="off"] *{
  animation:none!important;transition-duration:0ms!important;
 }
+
+/* CSS-only stacked page, no screenshots or images. */
+html[data-ui-mode="studio"] .pdf-card .doc-tile,.explorer-card .explorer-file-icon{position:relative;isolation:isolate;transform-style:preserve-3d}
+html[data-ui-mode="studio"] .pdf-card .doc-tile::after,.explorer-card .explorer-file-icon::after{
+ content:"";position:absolute;inset:5px -5px -5px 5px;border:1px solid #C7D2FE;border-radius:inherit;z-index:-1;
+ background:#F8FAFF;transform:translateZ(-8px) rotate(5deg);box-shadow:0 4px 12px rgba(79,70,229,.07);
+ transition:transform .42s var(--daylight-ease)
+}
+html[data-ui-mode="studio"] .pdf-card:hover .doc-tile::after,.explorer-card:hover .explorer-file-icon::after{transform:translateZ(-7px) rotate(11deg)}
+html[data-ui-mode="studio"] #siteAmbientGlow{display:none!important}
+.alabaster-enter{animation:alabaster-rise .5s var(--daylight-ease) both!important;animation-delay:var(--stagger-delay,0ms)!important}
+@media(prefers-reduced-motion:reduce){.alabaster-enter{animation:none!important}}
