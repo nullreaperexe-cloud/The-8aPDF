@@ -68,7 +68,13 @@ function sync(){
   if(solo)solo.disabled=!prefs.enabled||(prefs.selectedTracks.length===1&&active===t.id);
  });
 }
+function libraryPlaying(){
+ const library=byId('dmAudio');
+ return !!(library&&!library.paused&&!library.ended);
+}
 function play(){
+ // Never let background playback compete with the Music Library's audio element.
+ if(libraryPlaying()){if(audio&&!audio.paused)pause();return}
  if(!audio||consent()!=='with'||!prefs.enabled||pausedByUser||playing||pending||error)return;
  const id=generation;
  pending=true;blocked=false;status('Starting '+track().title+'…');
@@ -192,11 +198,17 @@ function mount(){
 }
 function init(){
  mount();audio=document.createElement('audio');audio.id='eightapdfBgmEngine';audio.style.display='none';audio.preload='metadata';audio.volume=audioLevel(prefs.volume);audio.setAttribute('playsinline','');
- audio.addEventListener('playing',()=>{playing=true;pending=false;blocked=false;error=false;status('Playing '+track().title+' ✓');sync()});
+ audio.addEventListener('playing',()=>{if(libraryPlaying()){pause();return}playing=true;pending=false;blocked=false;error=false;status('Playing '+track().title+' ✓');sync()});
  audio.addEventListener('pause',()=>{playing=false;pending=false;sync()});
  audio.addEventListener('ended',()=>{playing=false;pending=false;next()});
  audio.addEventListener('error',()=>{playing=false;pending=false;error=true;status('Failed to load '+track().title+'. Check the MP3 file.');sync()});
- document.body.appendChild(audio);load(active);
+ document.body.appendChild(audio);
+ // HTMLMediaElement play does not bubble, so capture it at the document level.
+ document.addEventListener('play',event=>{
+  if(event.target?.id==='dmAudio')pause();
+ },true);
+ document.addEventListener('8apdf:music-library-playing',()=>pause());
+ load(active);
  for(const name of ['pointerdown','keydown','touchstart'])document.addEventListener(name,e=>{
   if(!e.isTrusted||!prefs.enabled||pausedByUser||playing||pending||!blocked||error)return;
   if(e.target?.closest?.('#eightapdfBgmTest,#eightapdfBgmToggle,#eightapdfBgmPlayAll,.eightapdf-bgm-item'))return;
