@@ -446,3 +446,26 @@ body:has(.app #menuToggle) #scrim.open{
 }
 .alabaster-deck{scrollbar-width:none!important}
 .alabaster-deck::-webkit-scrollbar{display:none!important}
+
+
+/* High-specificity safety net for older 'not(nova)' desktop display:none rules. */
+html[data-ui-mode="studio"] body > .top-shell .top-nav #studioSidebarToggle{
+ display:grid!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+}
+html[data-ui-mode="studio"][data-tone] body > .top-shell,
+html[data-ui-mode="studio"][data-tone] body > main,
+html[data-ui-mode="studio"][data-tone] body > footer{
+ margin-left:auto!important;margin-right:auto!important;
+ width:calc(100% - 32px)!important;max-width:1580px!important;
+}
+@media(max-width:810px){
+ html[data-ui-mode="studio"][data-tone] body > .top-shell,
+ html[data-ui-mode="studio"][data-tone] body > main,
+ html[data-ui-mode="studio"][data-tone] body > footer{
+  width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important;
+ }
+}
+/* In older premium CSS this button disappears while the sidebar is open. */
+html[data-ui-mode="studio"][data-studio-nav="open"] body > .top-shell .top-nav #studioSidebarToggle{
+ display:grid!important;
+}
