@@ -17,6 +17,13 @@ function show(title,html){lastFocus=document.activeElement;if(!modal){modal=docu
 function close(){if(!modal||modal.hidden)return;modal.hidden=true;modalBody.replaceChildren();document.body.classList.remove('no-scroll');latestSummaryController?.abort();lastFocus?.focus?.({preventScroll:true})}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal&&!modal.hidden){e.preventDefault();close()}});
 function syncDeviceTheme(){if(!STUDIO())return;if(pref.theme==='original'){document.documentElement.dataset.glass='off';document.documentElement.dataset.fluid='off';document.documentElement.dataset.wsBoost=pref.boost?'on':'off';return;}const value=pref.theme==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'pure-black'):pref.theme;const root=document.documentElement,tone=value==='light'?'light':'dark';if(root.dataset.theme!==value)root.dataset.theme=value;if(root.dataset.tone!==tone)root.dataset.tone=tone;if(root.dataset.glass!=='off')root.dataset.glass='off';if(root.dataset.fluid!=='off')root.dataset.fluid='off';const boost=pref.boost?'on':'off';if(root.dataset.wsBoost!==boost)root.dataset.wsBoost=boost;const meta=document.querySelector('meta[name="theme-color"]'),color=value==='light'?'#f7f7f7':'#000000';if(meta&&meta.content!==color)meta.content=color}
+window.__8apdfSetWorkspaceTheme=(value)=>{
+ if(value!=='light'&&value!=='pure-black')return false;
+ pref.theme=value;
+ savePref();
+ syncDeviceTheme();
+ return true;
+};
 matchMedia('(prefers-color-scheme: light)').addEventListener?.('change',()=>{if(STUDIO())syncDeviceTheme()});
 document.addEventListener('8apdf:palette-customized',()=>{pref.theme='original';savePref();syncDeviceTheme()});
 const NOVA_KEY='8apdf_optional_novaos_v1';
