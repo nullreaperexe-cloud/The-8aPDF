@@ -1,6 +1,6 @@
 /* 8aPDF name-only onboarding; no login, signup, or account prompt. */
 (() => {
-  const NAME_MARKER='8apdf_premium_name_onboarding_v1';
+  const NAME_MARKER='8apdf_crimson_fresh_name_v20261115';
   const nameKeys=['eightapdf_user_name_v2','eightapdf_user_name'];
   const read=key=>{for(const kind of ['localStorage','sessionStorage']){try{const v=window[kind].getItem(key);if(v)return v}catch{}}return ''};
   const write=(key,value)=>{try{localStorage.setItem(key,value);return true}catch{}try{sessionStorage.setItem(key,value)}catch{}return false};
@@ -53,7 +53,7 @@
     }
     document.body.classList.add('locked');
     modal.classList.add('show');modal.setAttribute('aria-hidden','false');delete document.documentElement.dataset.entryPending;
-    input.value=nameKeys.map(read).find(x=>x.trim())||'';
+    input.value=''; // Require an actual fresh name entry once, but preserve all previous user data.
     const update=()=>{button.disabled=submitting||!input.value.trim();input.removeAttribute('aria-invalid');feedback.textContent='Just your name. Make yourself at home.'};
     input.addEventListener('input',update);update();input.focus({preventScroll:true});
     form.addEventListener('submit',e=>{
