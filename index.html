@@ -3,6 +3,7 @@
 <html data-ui-mode="studio" data-density="comfortable" data-fluid="on" data-glass="on" data-layout="grid" data-motion="on" data-onboard="complete" data-theme="pure-black" data-tone="dark" lang="en">
 <head>
 <script id="8apdf-ui-early">
+document.documentElement.dataset.crimsonUi='on';
 /* ULTRA LOW BOOT START */
 (function(){
  var root=document.documentElement,mobile=!!(navigator.userAgentData&&navigator.userAgentData.mobile)||/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent||'');
@@ -13,7 +14,7 @@
  root.dataset.ultraLow=choice==='on'?'on':'off';
 })();
 /* ULTRA LOW BOOT END */
-try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='false'?'closed':'open'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='open'}
+try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav=localStorage.getItem('8apdf_studio_nav_open_v1')==='true'?'open':'closed'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='closed'}
 /* Before first paint, pick the exact existing overlay; do not show the hero underneath. */
 try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_premium_name_onboarding_v1')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
 setTimeout(()=>{if(!document.documentElement.dataset.entryPending)return;document.getElementById('welcomeScreen')?.classList.remove('show');delete document.documentElement.dataset.entryPending},12000);
@@ -1280,5 +1281,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
 
 
+<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style">
+<script defer src="/crimson-redesign.js?v=crimson-feature-preserve-20261115-2"></script>
 </body>
 </html>
