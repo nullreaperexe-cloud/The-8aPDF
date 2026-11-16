@@ -1,54 +1,88 @@
 <div align="center">
 
-  <img src="./anime-logo.webp" alt="8aPDF official website logo" width="122" height="122" />
+  <a href="https://8apdf.me">
+    <img src="./assets/app-icon-512.png" alt="8aPDF Crimson — official red app icon" width="124" height="124" />
+  </a>
 
   # 8aPDF
 
-  ### Your school life. One smarter workspace.
+  ### STUDY INTELLIGENCE FOR THE FUTURE.
 
-  **Study materials · Teacher updates · AI assistance · Timetable · To-dos · Friends Chat**
-
-  A beautifully designed, mobile-friendly study workspace built for Class 8 students — bringing school resources, conversations, and everyday study tools together in one place.
+  <p><strong>Not another PDF folder. Your entire school day, reimagined.</strong></p>
 
   <p>
-    <a href="https://the-8apdf.vercel.app/"><img alt="Visit 8aPDF" src="https://img.shields.io/badge/OPEN%20LIVE%20WEBSITE-101010?style=for-the-badge&logo=vercel&logoColor=white" /></a>
-    <a href="https://github.com/nullreaperexe-cloud/The-8aPDF"><img alt="GitHub source" src="https://img.shields.io/badge/VIEW%20SOURCE-222222?style=for-the-badge&logo=github&logoColor=white" /></a>
-  </p>
-  <p>
-    <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES%20Modules-e5c65c?style=flat-square&labelColor=191919" />
-    <img alt="Supabase" src="https://img.shields.io/badge/Backend-Supabase-3ecf8e?style=flat-square&labelColor=191919" />
-    <img alt="Vercel" src="https://img.shields.io/badge/Deployment-Vercel-white?style=flat-square&labelColor=191919" />
-    <img alt="PWA" src="https://img.shields.io/badge/Experience-PWA-a6a6a6?style=flat-square&labelColor=191919" />
+    <a href="https://8apdf.me"><img alt="Open 8aPDF" src="https://img.shields.io/badge/ENTER%20THE%20WORKSPACE-EF2345?style=for-the-badge&logoColor=white" /></a>
+    <a href="https://github.com/nullreaperexe-cloud/The-8aPDF"><img alt="Explore source" src="https://img.shields.io/badge/EXPLORE%20THE%20CODE-0D090D?style=for-the-badge&logo=github&logoColor=white" /></a>
   </p>
 
-  **[Launch Workspace](https://the-8apdf.vercel.app/)** · **[Browse PDFs](https://the-8apdf.vercel.app/pdfs)** · **[Friends Chat](https://the-8apdf.vercel.app/chat)** · **[Live Database](https://the-8apdf.vercel.app/live-database)**
+  <a href="https://8apdf.me" title="Open the live 8aPDF workspace">
+    <img src="./assets/8apdf-crimson-trailer.gif" alt="8aPDF cinematic animated trailer: The school day reinvented, one search for every answer, PDF library, teacher updates, Next Day timetable and study tools, ending with the Crimson 8aPDF experience" width="800" />
+  </a>
+
+  <sub>🎬 <strong>THE CRIMSON ERA</strong> — a looping, soundless four-scene README trailer. No player or sign-in required.</sub>
+
+  <p>
+    <img alt="Crimson dark and light themes" src="https://img.shields.io/badge/THEME-CRIMSON%20%2B%20LIGHT-ef2345?style=flat-square&labelColor=1c0b12" />
+    <img alt="Installable web app" src="https://img.shields.io/badge/EXPERIENCE-PWA-ef2345?style=flat-square&labelColor=1c0b12" />
+    <img alt="JavaScript" src="https://img.shields.io/badge/BUILT%20WITH-JAVASCRIPT-ffcf72?style=flat-square&labelColor=1c0b12" />
+    <img alt="Supabase" src="https://img.shields.io/badge/DATA-SUPABASE-3ecf8e?style=flat-square&labelColor=1c0b12" />
+    <img alt="Vercel" src="https://img.shields.io/badge/LIVE%20ON-VERCEL-f5f5f5?style=flat-square&labelColor=1c0b12" />
+  </p>
+
+  **[Launch 8aPDF](https://8apdf.me/)** · **[Study Materials](https://8apdf.me/pdfs)** · **[Friends Chat](https://8apdf.me/chat)** · **[Live Database](https://8apdf.me/live-database)**
 
 </div>
 
 ---
 
-## ✨ What is 8aPDF?
+## 🎬 ABOUT 8aPDF — THE STORY BEHIND THE SCREEN
 
-**8aPDF is more than a PDF website.** It's a complete student workspace that makes it easier to find the right school material, stay on top of teacher announcements, prepare for tests, and collaborate with classmates.
+**Imagine this.** The bell rings. Teacher messages are scattered, tomorrow's work is easy to forget, your PDFs live in different places, and finding *that one chapter* somehow takes longer than studying it.
 
-It combines a polished, responsive interface with useful study utilities, document-aware AI assistance, personal organization tools, and a separate administrative content-management system.
+**Now imagine opening one page.**
 
-> **Find it. Study it. Save it. Share it.** All from one workspace.
+A deep-black, crimson-lit study space comes alive. One search finds what matters. Each card lifts into focus. School updates turn into something you can actually follow. Your next timetable day is right there. Your notes, music, study tools, and classmates feel connected.
 
-## 🧭 Explore the experience
+**That's 8aPDF.** Built as a real study workspace for students, not just a directory of downloadable files.
 
-| Workspace | What you can do |
+### THE FOUR SCENES
+
+| In the frame | What's really inside |
 | :-- | :-- |
-| 📚 **PDF Library** | Explore subject-wise resources, search, filter, preview, download, save, and share PDFs. |
-| 📢 **Teacher Messages** | Read school announcements, notices, assignments, and attachments. |
-| ✅ **To-Do & Tests** | Track teacher-suggested work, personal tasks, tests, and submissions. |
-| 🤖 **AI Study Assistant** | Ask questions about available study materials and announcements, or summarize readable PDFs. |
-| 🗓️ **Timetable & Calendar** | Follow the rotating school-day timetable and keep track of dates and holidays. |
-| 💬 **Friends Chat** | Talk with classmates in group rooms and private conversations. |
-| 🎯 **Focus Studio** | Use a focus timer and review your study sessions. |
-| 🎨 **Customization** | Personalize themes, layouts, widgets, motion, and other preferences. |
-| 🔔 **Notifications** | Opt into supported-device updates for new materials and school announcements. |
-| 🛠️ **Admin Command Center** | Manage school content, hosted files, short links, duplicates, and access. |
+| **01 / THE SCHOOL DAY, REINVENTED** | School resources, teacher announcements, timetable, reminders and everyday study essentials in one place. |
+| **02 / ONE SEARCH. EVERY ANSWER.** | Search subject-wise PDFs and announcements; preview, download, bookmark, share or summarize supported documents. |
+| **03 / LESS CHAOS. MORE CLARITY.** | Upcoming tests, rotating school days, personal tasks, quick notes and optional focus widgets — without crowding the homepage. |
+| **04 / YOUR STUDY UNIVERSE.** | Friends Chat, a music library, name-based welcomes, responsive navigation and a black/crimson or light/crimson experience you can make your own. |
+
+> **THE IDEA:** Less hunting. More learning. Less noise. More momentum.
+>
+> **THE MISSION:** Turn a normal school day into a beautifully organized one.
+
+<div align="center">
+  <strong>🔴 THIS ISN'T THE END OF THE TRAILER. IT'S THE START OF YOUR NEXT CHAPTER.</strong>
+  <br />
+  <sub>The animated sequence above is an illustrated product teaser, not a recording of the actual interface.</sub>
+  <br /><br />
+  <a href="https://8apdf.me"><strong>▶ ENTER 8aPDF — 8apdf.me</strong></a>
+</div>
+
+---
+
+## 🧭 THE EXPERIENCE — MORE THAN A PDF LIBRARY
+
+| Your space | What it does |
+| :-- | :-- |
+| 📚 **Crimson PDF Library** | Explore study materials by subject; search, preview, download, bookmark and share PDFs. |
+| 📢 **Teacher Announcements** | Keep school notices, assignments and available attachments within reach. |
+| 🗓️ **Timetable & Calendar** | Follow the rotating school-day timetable and check school dates and holidays. |
+| 📝 **Quick Notes, Tasks & Tests** | Keep personal to-dos and look up test/submission references from school updates. |
+| 🤖 **AI Study Features** | Ask school-content questions and generate summaries where source PDFs are readable and AI services are configured. |
+| 💬 **Friends Chat** | Talk in rooms and private conversations with supported replies, reactions and file sharing. |
+| 🎵 **Music Library** | Play tracks in the study workspace and choose whether you want background music. |
+| 🎯 **Focus Studio** | Study with focus and break timers, plus optional session history. |
+| 🎨 **Your Workspace, Your Rules** | Crimson dark/light themes, a personal welcome, a collapsible sidebar, mobile controls and optional widgets. |
+| 📲 **Installable PWA** | Add 8aPDF to an iPhone Home Screen or install it on a supported Android/desktop browser with its red app icon. |
+| 🛠️ **Admin Command Center** | Maintain PDFs, notices, duplicate checks, short links and managed school content with appropriate permissions. |
 
 ## 📚 Study materials, without the clutter
 
@@ -105,17 +139,17 @@ A student social space built into the same website:
 
 ## 🎨 A workspace that feels personal
 
-- **Responsive layouts:** Desktop workspace navigation and phone-friendly controls.
-- **Personal welcome:** A name-based greeting and animated motivational study headlines.
-- **Appearance choices:** Dark/light presentation, palette customization, interface styling, and optional Liquid Glass-style effects.
-- **Editable dashboard:** Show or hide available home widgets to focus on what matters.
+- **Responsive layouts:** A focused top-left sidebar button on desktop, a compact phone navigation experience, and roomy reading cards.
+- **Personal welcome:** A custom red name-entry, welcome and music-choice flow with a greeting personalized for the student.
+- **Crimson appearance:** Matching dark-crimson and light-crimson themes, smooth card motion, a live search bar and motion preferences.
+- **Optional widgets:** Home widgets start hidden and can be enabled individually when needed.
 - **Accessibility & performance:** Motion preferences, layout-density choices, and a performance-conscious mode for lower-powered devices.
 - **Installable experience:** A web app manifest, application icons, service worker, and Home Screen support on compatible devices.
 
 <div align="center">
-  <img src="./assets/study-landscape.webp" alt="8aPDF study-themed workspace artwork" width="760" />
+  <img src="./assets/app-icon-512.png" alt="Official red Crimson 8aPDF app icon" width="144" />
   <br />
-  <sub>Study-themed artwork included in this repository.</sub>
+  <sub>One recognizable identity from your browser tab to your phone's Home Screen.</sub>
 </div>
 
 ## 🔔 Device notifications
@@ -124,7 +158,7 @@ A student social space built into the same website:
 
 Notification availability depends on browser/OS permissions and backend deployment. On iPhone and iPad, supported web push requires adding the site to the Home Screen and enabling permissions from the installed web app.
 
-Open **[Notification Settings](https://the-8apdf.vercel.app/notification-settings)** to enable, test, repair, or disable delivery on a supported device.
+Open **[Notification Settings](https://8apdf.me/notification-settings)** to enable, test, repair, or disable delivery on a supported device.
 
 ## 🛠️ Admin Command Center
 
@@ -140,7 +174,7 @@ The public student workspace and administrative experience are separate. The adm
 | **Roles & approvals** | Verified-account access with read-only Viewer and privileged Super Admin flows, access requests, and bans. |
 | **Data integrity** | Version checks, transaction-backed mutations, retained original metadata, audit records, and guarded deletion workflows. |
 
-**[Open Admin](https://the-8apdf.vercel.app/admin)** · [Detailed admin architecture](./docs/ADMIN_COMMAND_CENTER.md)
+**[Open Admin](https://8apdf.me/admin)** · [Detailed admin architecture](./docs/ADMIN_COMMAND_CENTER.md)
 
 Administrative functionality requires configured Supabase services and appropriate account permissions.
 
@@ -166,7 +200,8 @@ The-8aPDF/
 ├── tests/                          # Automated validation and browser tests
 ├── docs/                           # Technical implementation notes
 ├── vercel.json                      # Routes and deployment headers
-└── anime-logo.webp                  # Official website logo
+├── assets/app-icon-512.png          # Official Crimson website / install icon
+└── assets/8apdf-crimson-trailer.gif  # Animated README intro
 ```
 
 ### Technology overview
@@ -188,9 +223,9 @@ The Vercel routes expose paginated published records in JSON:
 
 | Endpoint | Purpose |
 | :-- | :-- |
-| [`GET /api/materials`](https://the-8apdf.vercel.app/api/materials) | Published school PDFs |
-| [`GET /api/announcements`](https://the-8apdf.vercel.app/api/announcements) | Published teacher announcements |
-| [`/live-database`](https://the-8apdf.vercel.app/live-database) | Human-friendly database explorer |
+| [`GET /api/materials`](https://8apdf.me/api/materials) | Published school PDFs |
+| [`GET /api/announcements`](https://8apdf.me/api/announcements) | Published teacher announcements |
+| [`/live-database`](https://8apdf.me/live-database) | Human-friendly database explorer |
 
 Pagination uses a cursor/limit query pattern, with a maximum page size of **200** records. Admin mutations require separate authentication; public catalogue requests do not grant write access.
 
@@ -259,11 +294,11 @@ Live backend and browser tests have additional setup requirements; consult the i
 
   <img src="./assets/app-icon-192.png" alt="8aPDF app icon" width="52" />
 
-  ### Made for better school days. ✨
+  ### Study intelligence for the future. 🔴
 
-  **One place to learn, organize, focus, and stay connected.**
+  **A sharper way to study. A bolder way to stay connected.**
 
-  [**Open 8aPDF ↗**](https://the-8apdf.vercel.app/) · [**Explore the code ↗**](https://github.com/nullreaperexe-cloud/The-8aPDF) · [**Report an issue ↗**](https://github.com/nullreaperexe-cloud/The-8aPDF/issues)
+  [**Open 8aPDF ↗**](https://8apdf.me/) · [**Explore the code ↗**](https://github.com/nullreaperexe-cloud/The-8aPDF) · [**Report an issue ↗**](https://github.com/nullreaperexe-cloud/The-8aPDF/issues)
 
   <sub>8aPDF · The-8aPDF repository</sub>
 
