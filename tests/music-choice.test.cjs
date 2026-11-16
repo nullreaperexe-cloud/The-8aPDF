@@ -16,7 +16,7 @@ function consentFixture(store=new Map(),nameVisible=false,welcomeVisible=false){
  };
  const simple=visible=>({classList:{contains:k=>k==='show'&&visible}});
  let overlay=null,activated=null;
- for(const value of ['with','without'])buttons[value]={
+ for(const value of ['with','without','skip'])buttons[value]={
   dataset:{musicChoice:value},handlers:{},focus(){},
   addEventListener(n,f){this.handlers[n]=f}
  };
@@ -26,14 +26,15 @@ function consentFixture(store=new Map(),nameVisible=false,welcomeVisible=false){
   getElementById:id=>id==='nameModal'?simple(nameVisible):id==='welcomeScreen'?simple(welcomeVisible):null,
   createElement(){return{
    isConnected:false,innerHTML:'',setAttribute(){},remove(){this.isConnected=false;overlay=null},
-   querySelectorAll:k=>k==='[data-music-choice]'?Object.values(buttons):[],
-   querySelector:()=>buttons.with,contains:t=>Object.values(buttons).includes(t),
+   querySelectorAll:k=>k.includes('[data-music-choice]')?Object.values(buttons):[],
+   querySelector:k=>k==='[data-music-skip]'?buttons.skip:buttons.with,contains:t=>Object.values(buttons).includes(t),
    focus(){}
   }},
   addEventListener(n,f){listeners[n]=f},removeEventListener(n){delete listeners[n]},
   dispatchEvent(e){activated=e.detail}
  };
- const window={addEventListener(){},__8apdfBackgroundAudio:{acceptChoice(v){activated={enabled:v}}}};
+ const window={addEventListener(){},localStorage,sessionStorage:{getItem(){return null},setItem(){},removeItem(){}},
+  __8apdfBackgroundAudio:{acceptChoice(v){activated={enabled:v}},pause(){activated={paused:true}}}};
  const ctx={document,window,localStorage,sessionStorage:{getItem(){return null},setItem(){}},
   MutationObserver:class{observe(){} disconnect(){}},CustomEvent:class{constructor(n,o){this.detail=o.detail}}};
  vm.runInNewContext(source,ctx);
@@ -62,6 +63,14 @@ f=consentFixture(store);f.api.request();f.buttons.without.handlers.click();
 assert.equal(store.get('8apdf_music_choice_v1'),'without');
 assert.equal(f.activated.enabled,false);
 f=consentFixture(store);assert.equal(f.api.request(),false,'No Music persists over reload');
+store.clear();
+f=consentFixture(store);f.api.request();f.buttons.skip.handlers.click();
+assert.equal(store.get('8apdf_music_choice_v1'),undefined,'Skipping must NOT invent No Music consent');
+assert.equal(store.get('8apdf_music_deferred_v1'),'1');
+assert.equal(f.activated.deferred,true);
+f=consentFixture(store);assert.equal(f.api.request(),false,'Deferred consent persists on reload');
+assert.equal(f.api.request({force:true}),true,'Explicit settings can reopen consent');
+store.clear();
 
 function bgFixture(store){
  const elements=new Map(),audio={src:'',volume:0,loop:false,style:{},listeners:{},plays:0,paused:true,
@@ -120,7 +129,7 @@ assert.equal(store.get('8apdf_music_choice_v1'),'with');
 assert.equal(b.api.getState().enabled,true);
 for(const file of ['index.html','classic.html']){
  const html=fs.readFileSync(file,'utf8');
- assert.match(html,/src="\/music-choice\.js\?v=1"/);
+ assert.match(html,/src="\/music-choice\.js\?v=optional-guest-20261116"/);
  assert(file==='classic.html' ? /href="\/music-choice\.css\?v=1"/.test(html) : (html.includes('performance-home.css') && fs.readFileSync('performance-home.css','utf8').includes('music-choice.css')), 'Music-choice stylesheet must remain available in both interfaces');
  assert.match(file==='index.html'?fs.readFileSync('features/app-core.js','utf8'):html,/window\.__8apdfMusicConsent\?\.request/);
 }
