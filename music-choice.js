@@ -5,6 +5,27 @@
 (()=>{
  'use strict';
  const KEY='8apdf_music_choice_v1';
+ const DEFER='8apdf_music_deferred_v1';
+ let deferredInMemory=false;
+ const deferred=()=>{
+  if(deferredInMemory)return true;
+  for(const kind of ['localStorage','sessionStorage']){
+   try{if(window[kind].getItem(DEFER)==='1')return true}catch{}
+  }
+  return false;
+ };
+ const setDeferred=()=>{
+  deferredInMemory=true;
+  for(const kind of ['localStorage','sessionStorage']){
+   try{window[kind].setItem(DEFER,'1');return}catch{}
+  }
+ };
+ const clearDeferred=()=>{
+  deferredInMemory=false;
+  for(const kind of ['localStorage','sessionStorage']){
+   try{window[kind].removeItem(DEFER)}catch{}
+  }
+ };
  const $=id=>document.getElementById(id);
  const valid=v=>v==='with'||v==='without'?v:null;
  function getChoice(){
@@ -30,9 +51,17 @@
  function choose(value){
   if(!valid(value)||!screen)return;
   storeChoice(value);
+  clearDeferred();
   release();
   window.__8apdfBackgroundAudio?.acceptChoice?.(value==='with');
   document.dispatchEvent(new CustomEvent('8apdf:music-choice',{detail:{enabled:value==='with'}}));
+ }
+ function skip(){
+  if(!screen)return;
+  setDeferred();release();
+  // Do not call acceptChoice(false): that would fabricate an explicit No Music choice.
+  window.__8apdfBackgroundAudio?.pause?.();
+  document.dispatchEvent(new CustomEvent('8apdf:music-choice',{detail:{enabled:false,deferred:true}}));
  }
  function lockSite(){
   siblings=new Map();
@@ -51,7 +80,7 @@
    if(!screen)return;
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();return}
    if(e.key!=='Tab')return;
-   const controls=[...screen.querySelectorAll('[data-music-choice]')];
+   const controls=[...screen.querySelectorAll('[data-music-choice], [data-music-skip]')];
    if(!controls.length){e.preventDefault();return}
    const first=controls[0],last=controls[controls.length-1];
    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
@@ -61,8 +90,10 @@
   document.addEventListener('keydown',keyGuard,true);
   document.body.classList.add('music-choice-locked');
  }
- function request(){
+ function request(options={}){
+  const force=options===true||options?.force===true;
   if(getChoice())return false;
+  if(!force&&(deferred()||window.__8apdfGuest?.isGuest?.()))return false;
   if(!document.body){document.addEventListener('DOMContentLoaded',request,{once:true});return false}
   // Name screen always comes first. Returning-user welcome must finish too.
   if($('nameModal')?.classList.contains('show')||$('welcomeScreen')?.classList.contains('show'))return false;
@@ -76,16 +107,18 @@
   screen.setAttribute('aria-labelledby','musicChoiceTitle');
   screen.setAttribute('aria-describedby','musicChoiceDescription');
   screen.tabIndex=-1;
-  screen.innerHTML="<div class=\"mc-stage\">\n  <header class=\"mc-masthead\">\n    <span class=\"mc-wordmark\"><span class=\"mc-logo\" aria-hidden=\"true\">8</span>8aPDF</span>\n    <span class=\"mc-edition\">YOUR SPACE · YOUR RULES</span>\n  </header>\n  <div class=\"mc-composition\">\n    <div class=\"mc-intro\">\n      <p class=\"mc-kicker\"><span></span>02 / SET THE MOOD</p>\n      <h2 id=\"musicChoiceTitle\">Your space.<span>Your sound.</span></h2>\n      <p id=\"musicChoiceDescription\">Would you like to enable background music while you study?</p>\n      <div class=\"mc-equalizer\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>\n      <p class=\"mc-track-note\">TUM HI HO &nbsp;·&nbsp; KHAIRIYAT &nbsp;·&nbsp; SAIYAARA</p>\n    </div>\n    <div class=\"mc-decisions\" role=\"group\" aria-label=\"Choose your background music preference\">\n      <p class=\"mc-decisions-label\">MAKE IT YOURS <span>CHOOSE ONE TO CONTINUE</span></p>\n      <button type=\"button\" class=\"mc-option mc-on\" data-music-choice=\"with\">\n        <span class=\"mc-option-icon\" aria-hidden=\"true\">♫</span>\n        <span class=\"mc-option-copy\"><strong>With Music</strong><small>Study with three soft background tracks.</small></span>\n        <span class=\"mc-option-arrow\" aria-hidden=\"true\">↗</span>\n      </button>\n      <button type=\"button\" class=\"mc-option mc-off\" data-music-choice=\"without\">\n        <span class=\"mc-option-icon\" aria-hidden=\"true\">◌</span>\n        <span class=\"mc-option-copy\"><strong>No Music</strong><small>A quiet workspace, with no background music.</small></span>\n        <span class=\"mc-option-arrow\" aria-hidden=\"true\">↗</span>\n      </button>\n      <p class=\"mc-saved-note\">Your choice is saved on this device. You can change it anytime in Settings.</p>\n    </div>\n  </div>\n  <footer class=\"mc-footer\"><span>ONE SIMPLE CHOICE</span><span>MADE FOR YOUR FOCUS</span></footer>\n</div>";
+  screen.innerHTML="<div class=\"mc-stage\">\n  <header class=\"mc-masthead\">\n    <span class=\"mc-wordmark\"><span class=\"mc-logo\" aria-hidden=\"true\">8</span>8aPDF</span>\n    <span class=\"mc-edition\">YOUR SPACE · YOUR RULES</span>\n  </header>\n  <div class=\"mc-composition\">\n    <div class=\"mc-intro\">\n      <p class=\"mc-kicker\"><span></span>02 / SET THE MOOD</p>\n      <h2 id=\"musicChoiceTitle\">Your space.<span>Your sound.</span></h2>\n      <p id=\"musicChoiceDescription\">Would you like to enable background music while you study?</p>\n      <div class=\"mc-equalizer\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>\n      <p class=\"mc-track-note\">TUM HI HO &nbsp;·&nbsp; KHAIRIYAT &nbsp;·&nbsp; SAIYAARA</p>\n    </div>\n    <div class=\"mc-decisions\" role=\"group\" aria-label=\"Choose your background music preference\">\n      <p class=\"mc-decisions-label\">MAKE IT YOURS <span>CHOOSE ONE TO CONTINUE</span></p>\n      <button type=\"button\" class=\"mc-option mc-on\" data-music-choice=\"with\">\n        <span class=\"mc-option-icon\" aria-hidden=\"true\">♫</span>\n        <span class=\"mc-option-copy\"><strong>With Music</strong><small>Study with three soft background tracks.</small></span>\n        <span class=\"mc-option-arrow\" aria-hidden=\"true\">↗</span>\n      </button>\n      <button type=\"button\" class=\"mc-option mc-off\" data-music-choice=\"without\">\n        <span class=\"mc-option-icon\" aria-hidden=\"true\">◌</span>\n        <span class=\"mc-option-copy\"><strong>No Music</strong><small>A quiet workspace, with no background music.</small></span>\n        <span class=\"mc-option-arrow\" aria-hidden=\"true\">↗</span>\n      </button>\n      <button class=\"mc-skip\" type=\"button\" data-music-skip>Skip for now · Browse PDFs</button>
+      <p class=\"mc-saved-note\">Your choice is saved on this device. You can change it anytime in Settings.</p>\n    </div>\n  </div>\n  <footer class=\"mc-footer\"><span>ONE SIMPLE CHOICE</span><span>MADE FOR YOUR FOCUS</span></footer>\n</div>";
   document.body.appendChild(screen);
   screen.querySelectorAll('[data-music-choice]').forEach(button=>{
    button.addEventListener('click',()=>choose(button.dataset.musicChoice));
   });
+  screen.querySelector('[data-music-skip]')?.addEventListener('click',skip);
   lockSite();
   screen.querySelector('[data-music-choice]')?.focus({preventScroll:true});
   return true;
  }
- window.__8apdfMusicConsent={request,getChoice,isComplete:()=>Boolean(getChoice())};
+ window.__8apdfMusicConsent={request,getChoice,isComplete:()=>Boolean(getChoice()),isDeferred:deferred,skip};
  // The full-page step is shown after either the explicit name callback or
  // a returning-user welcome. The guard is a fallback for deep-link entries.
  document.addEventListener('DOMContentLoaded',request,{once:true});
