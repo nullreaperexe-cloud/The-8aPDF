@@ -1,0 +1,46 @@
+/* 8aPDF optional onboarding: visually obvious, keyboard-focusable and touch friendly. */
+#nameModal #skipNameOnboarding {
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;min-height:48px!important;margin:13px 0 0!important;
+ padding:12px 14px!important;border-radius:13px!important;
+ border:1px solid rgba(255,89,123,.43)!important;
+ background:rgba(239,35,69,.11)!important;color:#ffdce5!important;
+ font:650 13px/1.35 Inter,Arial,sans-serif!important;cursor:pointer!important;
+ transition:background .2s,border-color .2s!important;
+}
+#nameModal #skipNameOnboarding:hover {
+ background:rgba(239,35,69,.22)!important;border-color:#ff4d76!important;
+}
+#nameModal #skipNameOnboarding:focus-visible,
+#eightapdfMusicChoice .mc-skip:focus-visible {
+ outline:3px solid #ff557a!important;outline-offset:3px!important;
+}
+#eightapdfMusicChoice .mc-skip {
+ display:block!important;width:100%!important;min-height:48px!important;
+ padding:12px 10px!important;border-radius:12px!important;
+ border:1px solid rgba(255,105,139,.37)!important;
+ background:rgba(239,35,69,.12)!important;
+ color:#ffe0e8!important;font:700 13px/1.4 Inter,Arial,sans-serif!important;
+ text-align:center!important;cursor:pointer!important;
+}
+#eightapdfMusicChoice .mc-skip:hover {
+ border-color:#f65276!important;background:rgba(239,35,69,.25)!important;
+}
+html[data-tone="light"] #nameModal #skipNameOnboarding,
+html[data-tone="light"] #eightapdfMusicChoice .mc-skip{
+ color:#9d2546!important;background:#ffedf3!important;border-color:#d7496d6b!important;
+}
+html[data-tone="light"] #nameModal #skipNameOnboarding:hover,
+html[data-tone="light"] #eightapdfMusicChoice .mc-skip:hover {
+ background:#ffdee9!important;border-color:#ca234c!important;
+}
+@media(max-width:550px){
+ #nameModal #skipNameOnboarding,#eightapdfMusicChoice .mc-skip{
+  min-height:51px!important;font-size:13px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #nameModal #skipNameOnboarding,#eightapdfMusicChoice .mc-skip{
+  transition:none!important;
+ }
+}
