@@ -25,8 +25,8 @@ html[data-ultra-low="on"] #welcomeScreen.show .welcome-content,html[data-ultra-l
 <link rel="preload" as="style" href="/performance-home.css?v=20261030-announcement-fit-v3" fetchpriority="high">
 <link rel="preload" as="style" href="/premium-workspace.css?v=20261017-chat-fullbleed">
 <style id="8apdf-first-paint-guard">
-html[data-entry-pending] {background:#000}
-html[data-entry-pending] body {background:#000!important}
+html[data-entry-pending] {background:#0b0407}
+html[data-entry-pending] body {background:#0b0407!important}
 html[data-entry-pending] body > :not(#welcomeScreen):not(#nameModal){visibility:hidden!important}
 html[data-entry-pending="welcome"] #welcomeScreen,
 html[data-entry-pending="name"] #nameModal{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
@@ -594,9 +594,12 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 
 <script src="/announcement-format.js?v=20261030"></script>
 <link rel="stylesheet" href="/site-unified-font.css?v=unified-20261030-v1">
+<link rel="preload" as="style" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116">
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
+<div class="crimson-welcome-mark" aria-hidden="true"><img src="/assets/app-icon-192.png?v=red-logo-20261116" width="100" height="100" alt=""/></div>
+<span class="crimson-welcome-label">8aPDF · Your Study Workspace</span>
 <h2 class="welcome-title" id="welcomeTitle">Welcome to 8aPDF</h2>
 <p class="welcome-subtitle">Opening your PDF study library...</p>
 </div>
@@ -616,7 +619,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 </div>
 </form>
 </div>
-<div class="name-welcome" role="status" aria-live="polite" aria-atomic="true"><div><span class="name-kicker" style="justify-content:center">Make room for what's next</span><h2 id="nameWelcomeTitle"></h2><p id="nameWelcomeDetail"></p></div></div>
+<div class="name-welcome" role="status" aria-live="polite" aria-atomic="true"><div><div class="crimson-welcome-mark" aria-hidden="true"><img src="/assets/app-icon-192.png?v=red-logo-20261116" width="100" height="100" alt=""/></div><span class="crimson-welcome-label">8aPDF · Your Study Workspace</span><h2 id="nameWelcomeTitle"></h2><p id="nameWelcomeDetail"></p></div></div>
 <div class="name-footer"><span>Your name stays in this browser.</span><span>Your space to move forward.</span></div>
 </div>
 </section>
@@ -694,7 +697,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
   <button type="button" data-open-friends-chat>Chat with Your Friends</button><button type="button" data-go="tasks">Study To-Do</button><button type="button" data-go="saved">Saved PDFs</button><button type="button" data-go="timetable">Timetable</button><button type="button" id="studioMobileDriveMusic">♫ Music Library</button><button type="button" id="studioMoreFocus">Focus Studio</button><button type="button" id="studioMoreLinks">My Short Links</button><a href="/database" style="display:block;padding:12px;color:inherit;text-decoration:none" aria-label="Live Database">Live Database</a><button type="button" data-go="settings">Customize & UI styles</button><button type="button" data-go="about">About 8aPDF & Automation</button>
 </div>
 <main>
-<section class="hero" id="home"><div class="shell hero-inner"><div class="premium-hero-scene"><div class="premium-hero-copy"><span class="eyebrow-pill">8aPDF Study Intelligence is now live</span><div class="crimson-hero-display" role="heading" aria-level="1"><span class="crimson-title-top">Study Intelligence</span><span class="crimson-title-bottom">for the <span class="crimson-future">Future<svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 Q50 11 100 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></span></span></div><div id="studyTypingHeadline" class="premium-welcome study-typing-heading crimson-inline-typing" aria-label="Live study updates"><span id="premiumWelcome"><span id="studyTypingText" aria-hidden="true">Welcome</span><span class="study-typing-caret" aria-hidden="true"></span></span></div><p class="hero-description">Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p><form class="big-search" id="searchForm" role="search"><svg><use href="#i-search"></use></svg><input aria-label="Search study materials" autocomplete="off" id="searchInput" placeholder="Search PDFs, notes, subjects or announcements..." type="search"/><span class="shortcut">⌘ K</span><button aria-label="Search" class="search-submit" type="submit"><svg><use href="#i-arrow"></use></svg></button></form></div><span class="premium-hero-note" aria-hidden="true">A BRIGHTER<br/>TOMORROW<br/>BUILDS TODAY.</span></div>
+<section class="hero" id="home"><div class="shell hero-inner"><div class="premium-hero-scene"><div class="premium-hero-copy"><div class="crimson-hero-display" role="heading" aria-level="1"><span class="crimson-title-top">Study Intelligence</span><span class="crimson-title-bottom">for the <span class="crimson-future">Future<svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 6 Q50 11 100 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></span></span></div><div id="studyTypingHeadline" class="premium-welcome study-typing-heading crimson-inline-typing" aria-label="Live study updates"><span id="premiumWelcome"><span id="studyTypingText" aria-hidden="true">Welcome</span><span class="study-typing-caret" aria-hidden="true"></span></span></div><p class="hero-description">Access high-quality PDFs, notes, circulars and announcements —<br class="desktop-only"/> all in one place. Simple. Organized. Always Updated.</p><form class="big-search" id="searchForm" role="search"><svg><use href="#i-search"></use></svg><input aria-label="Search study materials" autocomplete="off" id="searchInput" placeholder="Search PDFs, notes, subjects or announcements..." type="search"/><span class="shortcut">⌘ K</span><button aria-label="Search" class="search-submit" type="submit"><svg><use href="#i-arrow"></use></svg></button></form></div><span class="premium-hero-note" aria-hidden="true">A BRIGHTER<br/>TOMORROW<br/>BUILDS TODAY.</span></div>
 
 
 <div class="feature-strip">
@@ -1288,7 +1291,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
 
 
-<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion"><link rel="stylesheet" href="/crimson-v7-search.css?v=20261115-search-desktop"><link rel="stylesheet" href="/crimson-v8-home.css?v=20261115-v8-stats-widgets"><link rel="stylesheet" href="/crimson-v9-logo-motion.css?v=red-smooth-20261116">
+<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion"><link rel="stylesheet" href="/crimson-v7-search.css?v=20261115-search-desktop"><link rel="stylesheet" href="/crimson-v8-home.css?v=20261115-v8-stats-widgets"><link rel="stylesheet" href="/crimson-v9-logo-motion.css?v=red-smooth-20261116"><link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116">
 <script defer src="/crimson-v6-motion.js?v=red-smooth-20261116"></script><script defer src="/crimson-v8-overview.js?v=red-nextday-20261116"></script>
 </body>
 </html>
