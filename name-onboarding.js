@@ -64,8 +64,8 @@
       button.querySelector('span').textContent='Opening your workspace';
       nameKeys.forEach(k=>write(k,name));
       onConfirm(name);write(NAME_MARKER,'complete');
-      document.getElementById('nameWelcomeTitle').textContent='Welcome, '+name+'.';
-      document.getElementById('nameWelcomeDetail').textContent='Your next chapter begins here.';
+      document.getElementById('nameWelcomeTitle').textContent='Welcome, '+name;
+      document.getElementById('nameWelcomeDetail').textContent='Opening your PDF study library...';
       modal.dataset.phase='welcome';form.inert=true;modal.focus({preventScroll:true});
       setTimeout(finish,reduced()?160:1050);
     });
