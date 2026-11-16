@@ -1,24 +1,37 @@
-/* 8aPDF title clarity: present source-backed, complete labels; never fabricate a school fact. */
-(function(root){'use strict';
-const clean=value=>String(value??'').replace(/\s+/g,' ').trim();
-const dangling=/\s+(?:find|and|or|of|for|to|in|with|from|the|a|an|&|\+)\s*$/i;
-function display(record){
- const raw=clean(typeof record==='string'?record:record?.title);
- const detail=clean(typeof record==='string'?'':(record?.description||record?.message||record?.fullMessage||''));
- if(!raw)return 'Untitled school material';
- let title=raw.replace(/\s*(?:\.{3}|…)$/,'').trim();
- // A preview ending in an action word was cut by EduSecure; do not print the dangling fragment.
- title=title.replace(/\s+\bfind\s*$/i,'').replace(/\s*[&+]\s*$/,'').replace(dangling,'').trim();
- // A school lesson number is verifiable in both source and title. Prefer a clear topic.
- const chapter=title.match(/^(?:ch\.?|chapter)\s*(\d+(?:\.\d+)?)(?:\s+was completed in the book)?$/i)
-   || raw.match(/^(?:ch\.?|chapter)\s*(\d+(?:\.\d+)?)\s+was completed in the book(?:\s*&)?$/i);
- if(chapter){
-   title='Chapter '+chapter[1]+' Completed';
-   if(/\bantonyms\b/i.test(detail))title+=' · Antonyms';
-   const mod=detail.match(/\bmodule\s*(\d{1,3})\b/i);
-   if(mod)title+=' (Module '+mod[1]+')';
+/* Shared, deterministic display-only normalization. Never changes a Supabase record. */
+(function(root){
+ 'use strict';
+ const clean=value=>String(value??'').replace(/\u00a0/g,' ').replace(/[\t\r\n ]+/g,' ').trim();
+ const invalidTitle=/^(?:MM\s*\/\s*\/\s*01\s*\/|MM\s*\/\s*\/\s*\d{1,2}\s*\/|\/?\s*\/?\s*\d{1,2}\s*\/)$/i;
+ const bareJunk=/^(?:(?:attachment|pay now|read more|view more|download pdf|click here)\s*)+$/i;
+ // Remove only a clearly identified portal-control cluster, never a school topic.
+ function removePortalJunk(value){
+  let text=clean(value);
+  text=text.replace(/\s+Attachment\s+Pay\s+Now(?=\s|$)/gi,' ');
+  text=text.replace(/\s+(?:(?:Pay\s+Now|Read\s+More|View\s+More|Download\s+PDF|Click\s+Here)(?:\s+Attachment)?)(?=\s|$)/gi,' ');
+  text=text.replace(/(?:\s+(?:Attachment|Pay\s+Now|Read\s+More|View\s+More|Download\s+PDF|Click\s+Here))+\s*$/gi,'');
+  return clean(text);
  }
- return title||raw;
-}
-root.__8apdfTitleClarity={display,clean};
+ function display(record){
+  const value=typeof record==='string'?record:(record?.rawTitle??record?.title);
+  const raw=clean(value);
+  if(!raw||invalidTitle.test(raw)||bareJunk.test(raw))return 'School Material';
+  const result=removePortalJunk(raw);
+  return result&&!invalidTitle.test(result)?result:'School Material';
+ }
+ function description(record){
+  const value=typeof record==='string'?record:(record?.rawDescription??record?.description);
+  return removePortalJunk(value);
+ }
+ function normalize(record){
+  if(!record||typeof record!=='object')return record;
+  const rawTitle=record.rawTitle??record.title??'';
+  const rawDescription=record.rawDescription??record.description??'';
+  return {...record,rawTitle,rawDescription,title:display({rawTitle}),description:description({rawDescription})};
+ }
+ function filename(record){
+  return display(record).replace(/[\\\/:*?"<>|\x00-\x1f]/g,'-').replace(/[. ]+$/g,'').trim()+'.pdf';
+ }
+ root.__8apdfTitleClarity={clean,display,description,normalize,filename,removePortalJunk};
+ if(typeof module!=='undefined'&&module.exports)module.exports=root.__8apdfTitleClarity;
 })(typeof window!=='undefined'?window:globalThis);
