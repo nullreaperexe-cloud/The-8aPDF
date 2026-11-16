@@ -44,7 +44,7 @@ function brokenTitle(value){
  if(/^(?:(?:mm|ref|id|no|doc|scan|img|image|page)[-\/\s.:_\d]*)+$/i.test(s))return true;
  if(/^[\d\s\/.:#_-]+$/.test(s))return true;
  if(/^[a-z]{1,3}(?:[-_\/\s]?\d{1,5})+[-_\/\s\d]*$/i.test(s))return true;
- return !/[\p{L}]{3}/u.test(s);
+ return !/[\p{L}\p{M}]{2,}/u.test(s);
 }
 function filename(record){
  const source=record?.file_name||record?.filename||record?.original_filename||
