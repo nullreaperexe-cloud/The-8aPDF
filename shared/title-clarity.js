@@ -41,7 +41,7 @@ function cleanSource(value){
 function brokenTitle(value){
  const s=cleanSource(value);
  if(!s||/^(?:untitled(?: school)?(?: material)?|pdf|document|material|attachment|file|school material)$/i.test(s))return true;
- if(/^(?:(?:mm|ref|id|no|doc)[-\/\s.:_\d]*)+$/i.test(s))return true;
+ if(/^(?:(?:mm|ref|id|no|doc|scan|img|image|page)[-\/\s.:_\d]*)+$/i.test(s))return true;
  if(/^[\d\s\/.:#_-]+$/.test(s))return true;
  if(/^[a-z]{1,3}(?:[-_\/\s]?\d{1,5})+[-_\/\s\d]*$/i.test(s))return true;
  return !/[\p{L}]{3}/u.test(s);
