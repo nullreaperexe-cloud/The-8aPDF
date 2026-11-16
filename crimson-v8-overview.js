@@ -14,7 +14,9 @@ function update(){
  const docs=typeof b?.documents==='function'?b.documents():null;
  const messages=typeof b?.announcements==='function'?b.announcements():null;
  const pdfs=loaded&&Array.isArray(docs)?docs.length:readCount('premiumSavedCount');
- const notices=loaded&&Array.isArray(messages)?messages.length:readCount('premiumMessageCount');
+ // Announcements fetch independently of the PDF catalogue; never gate on PDF isLive().
+ const notices=b?.areAnnouncementsReady?.()===true&&Array.isArray(messages)
+  ?messages.length:readCount('premiumMessageCount');
  let tests=null;
  if(typeof window.__8apdfStudyIntel?.upcoming==='function'){
   const events=window.__8apdfStudyIntel.upcoming();
