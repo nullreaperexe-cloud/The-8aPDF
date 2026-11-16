@@ -15,6 +15,15 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
+      - name: Verify metadata normalization + optional onboarding
+        run: |
+          node tests/title-clarity.test.cjs
+          node tests/metadata-clarity-v2.test.cjs
+          node tests/name-onboarding.test.cjs
+          node tests/music-choice.test.cjs
+          node --check api/pdf-metadata-suggest.js
+          node --check shared/pdf-evidence.js
+          node --check scripts/metadata-dry-run.mjs
       - name: Verify Super Ultra Low Mode
         run: node tests/ultra-low-mode.test.cjs
       - name: Verify unified font and PDF action design
