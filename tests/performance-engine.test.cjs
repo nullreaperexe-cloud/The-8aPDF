@@ -81,7 +81,7 @@ const core=fs.readFileSync('features/app-core.js','utf8');
 assert(core.includes('pendingFirstPdfRender=true;else renderMaterials()'),'PDF data should load without competing with welcome render');
 assert(core.includes('pendingFirstAnnouncementsRender=true;else renderAnnouncements()'),'Announcement cards should wait until welcome closes');
 assert(core.includes('scheduleFirstCatalogRender()'),'Deferred cards must be rendered after onboarding finishes');
-assert(html.includes('/features/app-core.js?v=title-clarity-20261101-v1'),'Core cache version must match deployed code');
+assert(html.includes('/features/app-core.js?v=metadata-guest-20261116'),'Core cache version must match deployed code');
 assert(html.includes('features/static-cache-register.js'),'Idle cache registration missing');
 assert(!fs.readFileSync('features/static-cache-register.js','utf8').includes('Notification.requestPermission'),'Static cache must not request push notifications');
 console.log('PASS modular scripts, CSS parity, instant onboarding cover, adaptive animation and safe static cache');
