@@ -12,7 +12,7 @@ new vm.Script(launch);new vm.Script(choice);
 assert.match(launch,/hiddenForever=\(\)=>true/);
 for(const html of [index,classic]){
  assert.match(html,/src="\/music-launch\.js\?v=1"/);
- assert.match(html,/src="\/music-choice\.js\?v=1"/);
+ assert.match(html,/src="\/music-choice\.js\?v=optional-guest-20261116"/);
 }
 let removed=0;
 const popup={remove(){removed++}};
@@ -27,4 +27,4 @@ assert.equal(removed,1,'Old popup should be removed, not shown');
 api.dismissForever();
 assert.equal(removed,2);
 assert.match(choice,/Choose your background music preference/);
-console.log('PASS retired music-catalog popup; separate mandatory one-time music choice');
+console.log('PASS retired music-catalog popup; optional music consent step');
