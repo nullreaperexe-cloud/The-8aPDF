@@ -294,7 +294,7 @@ function setSettings(){
  applySitePalette();setLiquidExperience();setPersonalization();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
  if($('#settingsPanel').classList.contains('open'))renderPalette();$('[data-density-choice]').forEach(el=>el.classList.toggle('active',el.dataset.densityChoice===settings.density));$$('[data-card-choice]').forEach(el=>el.classList.toggle('active',el.dataset.cardChoice===settings.layout));$('#compactToggle').checked=settings.density==='compact';$('#sidebarToggle').checked=settings.sidebar;$('#readingToggle').checked=settings.reading;$('#motionToggle').checked=settings.motion;$('#largeTextToggle').checked=settings.large;$('#contrastToggle').checked=settings.contrast;$('#fontRange').value=settings.fontSize;$('#gridBtn').classList.toggle('active',settings.layout==='grid');$('#listBtn').classList.toggle('active',settings.layout==='list');store.set('8apdf_classic_glass_settings_v2',settings)
 }
-try{setSettings()}catch(error){console.error('8aPDF appearance setup failed; study library will still start',error)}$('#profileBtn').textContent=state.name[0].toUpperCase();
+try{setSettings()}catch(error){console.error('8aPDF appearance setup failed; study library will still start',error)}$('#profileBtn').textContent=window.__8apdfGuest?.isGuest?.()?'G':state.name[0].toUpperCase();
 function openSettings(){closeCommand();$('#settingsPanel').classList.add('open');renderPalette();$('#settingsPanel').setAttribute('aria-hidden','false');$('#drawerMask').classList.add('open')}
 function closeSettings(){ $('#settingsPanel').classList.remove('open');$('#settingsPanel').setAttribute('aria-hidden','true');$('#drawerMask').classList.remove('open') }
 $('#settingsBtn').onclick=openSettings;$('#closeSettings').onclick=closeSettings;$('#saveSettings').onclick=()=>{closeSettings();toast('Appearance saved on this device')};$('#drawerMask').onclick=closeSettings;$('#resetSettings').onclick=()=>{settings={...defaults};setSettings();window.__8apdfUltraLow?.setMode('auto');toast('Default appearance restored')};
@@ -525,7 +525,7 @@ function renderNotes(){$('#notesList').innerHTML=state.tasks.length?state.tasks.
 function saveTasks(){store.set('8apdf_tasks_v1',state.tasks);renderNotes()}
 $('#noteForm').onsubmit=e=>{e.preventDefault();const v=$('#newNote').value.trim();if(!v)return;state.tasks.unshift({id:String(Date.now())+Math.random().toString(16).slice(2,6),text:v.slice(0,170),done:false});$('#newNote').value='';saveTasks()};
 $('#notesList').onchange=e=>{let id=e.target.dataset.taskCheck;if(!id)return;let t=state.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;saveTasks()}};$('#notesList').onclick=e=>{let id=e.target.dataset.taskDelete;if(!id)return;state.tasks=state.tasks.filter(t=>t.id!==id);saveTasks()};$('#clearCompleted').onclick=()=>{state.tasks=state.tasks.filter(x=>!x.done);saveTasks()};
-function openProfile(){showModal('Your 8aPDF Profile',`<p>Your name is saved privately on this device.</p><input id="editName" maxlength="40" value="${safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n)}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();document.dispatchEvent(new Event('8apdf:profile-changed'));toast('Profile updated')}}
+function openProfile(){showModal('Your 8aPDF Profile',`<p>${window.__8apdfGuest?.isGuest?.()?'Browsing as a guest. Add a name whenever you like.':'Your name is saved privately on this device.'}</p><input id="editName" maxlength="40" value="${window.__8apdfGuest?.isGuest?.()?'':safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;window.__8apdfGuest?.leave?.();try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n);localStorage.setItem('8apdf_crimson_fresh_name_v20261115','complete')}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();document.dispatchEvent(new Event('8apdf:profile-changed'));toast('Profile updated')}}
 $('#profileBtn').onclick=openProfile;
 function askNotification(){if(window.__8apdfPush){window.__8apdfOpenPage?.('/notification-settings');return;}if(!('Notification' in window)){toast('Notifications are not supported by this browser');return}if(Notification.permission==='granted'){toast('Open notification settings to enable background updates.');return}if(Notification.permission==='denied'){toast('Notifications are blocked. Enable them in browser site settings.');return}if(!window.isSecureContext){toast('Notification permission needs HTTPS or localhost.');return}Notification.requestPermission().then(x=>toast(x==='granted'?'Notifications enabled for this browser':'Notifications not enabled'))}
 $('#notificationsBtn').onclick=askNotification;$('#footerBell').onclick=askNotification;
@@ -566,6 +566,7 @@ function closeOriginalWelcome(){
   window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
+  if(window.__8apdfGuest?.isGuest?.()||window.__8apdfMusicConsent?.isDeferred?.())return;
   try {
     const seen=localStorage.getItem('8apdf-classic-notification-choice');
     if(seen || !('Notification' in window) || Notification.permission!=='default')return;
@@ -588,12 +589,15 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
-  onFinish(){
+  onFinish({skipped=false}={}){
     scheduleFirstCatalogRender();
+    if(skipped||window.__8apdfGuest?.isGuest?.())return;
     const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
     if(showingMusicChoice){
-      document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
-    }else offerNotificationAfterWelcome();
+      document.addEventListener('8apdf:music-choice',event=>{
+        if(!event.detail?.deferred)offerNotificationAfterWelcome();
+      },{once:true});
+    }else if(!window.__8apdfMusicConsent?.isDeferred?.())offerNotificationAfterWelcome();
   }
 });
 // Same welcome animation on every reload and every new website open.
@@ -607,6 +611,11 @@ try{
 }catch{}
 if(premiumOnboardingOpen){
   // The versioned name experience owns this visit's welcome transition.
+}else if(window.__8apdfGuest?.isGuest?.()){
+  closeOriginalWelcome();
+  originalNameModal.classList.remove('show');
+  originalNameModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('locked');
 }else if((skipWelcome||comingBackFromChat) && previousName && previousName!=='Student'){
   closeOriginalWelcome();
   originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
