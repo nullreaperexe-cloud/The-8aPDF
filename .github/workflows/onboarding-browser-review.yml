@@ -1,0 +1,38 @@
+name: Guest Onboarding Browser Review
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'name-onboarding.js'
+      - 'music-choice.js'
+      - 'index.html'
+      - 'classic.html'
+      - 'onboarding-optional.css'
+      - 'tests/name-onboarding-browser.mjs'
+      - '.github/workflows/onboarding-browser-review.yml'
+permissions:
+  contents: read
+jobs:
+  chromium-guest-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Test guest, name and optional music flows
+        env:
+          ONBOARDING_ARTIFACT_DIR: artifacts/guest-onboarding
+        run: npm run test:onboarding:browser
+      - name: Save preview screenshots if available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guest-onboarding-screenshots
+          path: artifacts/guest-onboarding
+          if-no-files-found: ignore
