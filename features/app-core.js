@@ -381,9 +381,10 @@ function normalizeDoc(d){
  const uploadedAt=[d.inserted_at,d.uploaded_at,d.uploadedAt,d.uploadDate,
   d.created_at,d.createdAt,d.raw?.uploadedAt,d.raw?.createdAt]
   .find(value=>dateMs(value)>0)||schoolDate;
- return{id:String(d.id??''),title:String(d.title||d.name||'Untitled Material'),
+ const display=window.__8apdfTitleClarity?.normalize({title:String(d.title||d.name||''),description:String(d.description||d.summary||'')})||{title:String(d.title||d.name||'School Material'),description:String(d.description||d.summary||'')};
+ return{id:String(d.id??''),title:display.title,rawTitle:display.rawTitle||String(d.title||d.name||''),rawDescription:display.rawDescription||String(d.description||d.summary||''),
   subject:String(d.subject||d.subject_name||'Other'),
-  description:String(d.description||d.summary||''),
+  description:display.description,
   pdfUrl:String(d.pdf_url||d.pdfUrl||d.file_url||d.fileUrl||''),
   className:String(d.class_name||d.className||''),chapter:String(d.chapter||d.chapter_name||''),
   language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],
@@ -392,7 +393,7 @@ function normalizeDoc(d){
 }
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
-async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Supabase data is required.');return}if(what==='summary'){await summarizePdf(x);return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=(x.title||'study-material').replace(/[\\/:*?"<>|]/g,'-').trim().slice(0,125)+'.pdf';const url='/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks(x);return;}if(what==='share'){const txt=x.title+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
+async function pdfAction(x,what){if(!validURL(x.pdfUrl)){toast('This screenshot-only preview has no PDF link yet. Live Supabase data is required.');return}if(what==='summary'){await summarizePdf(x);return}if(what==='preview'){rememberRecent(x);const w=window.open(x.pdfUrl,'_blank','noopener,noreferrer');if(!w)toast('Allow pop-ups to preview the PDF');return}if(what==='download'){rememberRecent(x);const fname=window.__8apdfTitleClarity?.filename(x)||(x.title||'School Material').replace(/[\\/:*?"<>|]/g,'-').trim()+'.pdf';const url='/api/download?url='+encodeURIComponent(x.pdfUrl)+'&filename='+encodeURIComponent(fname);const w=window.open(url,'_blank','noopener,noreferrer');if(!w)toast('Please allow downloads and pop-ups for this site');return}if(what==='share' && typeof window.__8aPDFShortLinks==='function'){window.__8aPDFShortLinks({...x,title:window.__8apdfTitleClarity?.display(x)||x.title});return;}if(what==='share'){const txt=(window.__8apdfTitleClarity?.display(x)||x.title)+'\n'+x.pdfUrl+'\nby 8aPDF';try{if(navigator.share)await navigator.share({title:x.title,text:txt,url:x.pdfUrl});else if(navigator.clipboard){await navigator.clipboard.writeText(txt);toast('PDF link copied to clipboard')}else window.prompt('Copy this link',txt)}catch(e){if(e.name!=='AbortError')toast('Unable to share right now')}}}
 
 async function createPdfZip(selectedIds,onReady){
  if(!Array.isArray(selectedIds)){window.__8apdfOpenPage?.('/pdf-explorer?select=zip');return;}
@@ -559,9 +560,10 @@ function closeOriginalWelcome(){
   scheduleFirstCatalogRender();
   document.body.classList.remove('locked');
   clearTimeout(welcomeTimer);
-  window.__8apdfMusicConsent?.request?.();
+  if(!guestDeferred())window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
+  if(guestDeferred())return;
   try {
     const seen=localStorage.getItem('8apdf-classic-notification-choice');
     if(seen || !('Notification' in window) || Notification.permission!=='default')return;
@@ -570,6 +572,7 @@ function offerNotificationAfterWelcome(){
   window.__8apdfNotices?.publish({source:'permission',id:'allow-browser-notifications',title:'Stay updated',body:'Tap to enable optional browser alerts',open:askNotification});
 }
 function originalShowWelcome(name,notifyAfter=false){
+  if(guestDeferred()){closeOriginalWelcome();return;}
   $('#welcomeTitle').textContent='Welcome, '+name;
   document.body.classList.add('locked');
   originalWelcome.classList.add('show');originalWelcome.setAttribute('aria-hidden','false');delete document.documentElement.dataset.entryPending;
@@ -584,8 +587,9 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
-  onFinish(){
+  onFinish({skipped=false}={}){
     scheduleFirstCatalogRender();
+    if(skipped||guestDeferred())return;
     const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
     if(showingMusicChoice){
       document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
@@ -593,6 +597,7 @@ const premiumOnboardingOpen=window.initNameOnboarding({
   }
 });
 // Same welcome animation on every reload and every new website open.
+const guestDeferred=()=>Boolean(window.__8apdfGuestDeferred)||document.documentElement.dataset.onboard==='deferred'||(()=>{try{return localStorage.getItem('8apdf_onboarding_deferred_v1')==='1'||sessionStorage.getItem('8apdf_onboarding_deferred_v1')==='1'}catch{return false}})();
 const previousName=existingUserName().trim();
 let skipWelcome=false;
 let comingBackFromChat=false;
@@ -603,7 +608,7 @@ try{
 }catch{}
 if(premiumOnboardingOpen){
   // The versioned name experience owns this visit's welcome transition.
-}else if((skipWelcome||comingBackFromChat) && previousName && previousName!=='Student'){
+}else if(guestDeferred()||(skipWelcome||comingBackFromChat) && previousName && previousName!=='Student'){
   closeOriginalWelcome();
   originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
   document.body.classList.remove('locked');
@@ -612,8 +617,8 @@ else closeOriginalWelcome();
 
 renderTimetable();renderNotes();if(previewMode){renderMaterials();renderAnnouncements()};
 window.__8apdfStudyBridge={
- documents:()=>state.materials.map(x=>({id:x.id,title:window.__8apdfTitleClarity?.display(x)||x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,tags:Array.isArray(x.tags)?x.tags:[],createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),uploadedAtMs:pdfUploadMs(x),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
- announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:window.__8apdfTitleClarity?.display(a)||String(a.title||''),description:String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
+ documents:()=>state.materials.map(x=>({id:x.id,title:window.__8apdfTitleClarity?.display(x)||x.title,subject:x.subject,description:window.__8apdfTitleClarity?.description(x)||x.description,chapter:x.chapter,className:x.className,tags:Array.isArray(x.tags)?x.tags:[],createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),uploadedAtMs:pdfUploadMs(x),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
+ announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:window.__8apdfTitleClarity?.display(a)||String(a.title||''),description:window.__8apdfTitleClarity?.description(a)||String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
  recents:()=>[...state.recent],bookmarks:()=>[...state.saved],toggleBookmark:(id)=>{state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();document.dispatchEvent(new Event('8apdf:bookmarks-changed'));},
  openAnnouncement:(id)=>{const n=state.announcements.find(n=>String(n.id)===String(id));if(n)openAnnouncement(n);},
  openDocument:(id,action='preview')=>{const x=state.materials.find(x=>x.id===id);if(x)pdfAction(x,['preview','download','share'].includes(action)?action:'preview')},
@@ -720,6 +725,7 @@ async function refreshSupabaseAnnouncements(){
   const rows=await fetchAllSupabaseAnnouncements();
   state.announcements=rows.filter(x=>x&&x.published===true)
    .map(normalizeSupabaseAnnouncement)
+   .map(x=>window.__8apdfTitleClarity?.normalize(x)||x)
    .filter(x=>!AFormat.blocked(x))
    .sort((a,b)=>announcementTime(b)-announcementTime(a)||
      String(a.title||'').localeCompare(String(b.title||'')));
@@ -730,7 +736,7 @@ async function refreshSupabaseAnnouncements(){
   if(!state.annReady){
    try{
     const cached=JSON.parse(localStorage.getItem('8a_cache_messages')||'[]');
-    if(Array.isArray(cached))state.announcements=cached.filter(x=>x?.published===true&&!AFormat.blocked(x));
+    if(Array.isArray(cached))state.announcements=cached.filter(x=>x?.published===true&&!AFormat.blocked(x)).map(x=>window.__8apdfTitleClarity?.normalize(x)||x);
    }catch{}
    state.annReady=true;
    renderAnnouncements();
