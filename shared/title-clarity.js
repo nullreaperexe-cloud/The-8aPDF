@@ -125,6 +125,7 @@ function validateSuggestion(suggestion,record){
  return {valid:true,title,description:description||unavailable};
 }
 function normalizeMaterial(record){
+ if(record&&typeof record==='object'&&record._sourceMetadata&&record._metadataQuality?.version===VERSION)return {...record};
  const original=(record&&typeof record==='object')?record:{title:String(record||'')};
  const result=inspect(original);
  // Keep the original backend source and identity, with an explicit audit snapshot.
