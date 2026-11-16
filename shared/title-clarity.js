@@ -31,7 +31,7 @@ function clean(value){
   .trim();
 }
 // Only exact, multi-item portal chrome is removed, not meaningful "Class Test Circular".
-const portalTail=/(?:\s*[|·.,;:-]\s*)?(?:Attachment\s+Pay\s+Now\s+Class\s+Test\s+Circular|Pay\s+Now\s+Class\s+Test\s+Circular|Attachment\s+Pay\s+Now)\s*[|·.,;:-]*$/i;
+const portalTail=/(?:\s*[|·,;:-]\s*)?(?:Attachment\s+Pay\s+Now\s+Class\s+Test\s+Circular|Pay\s+Now\s+Class\s+Test\s+Circular|Attachment\s+Pay\s+Now)\s*[|·.,;:-]*$/i;
 const truncated=/\s+(?:find|and|or|of|for|to|in|with|from|the|a|an|&|\+)\s*$/i;
 function cleanSource(value){
  let s=clean(value);
