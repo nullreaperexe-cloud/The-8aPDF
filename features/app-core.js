@@ -376,7 +376,7 @@ function renderSubjectFilters(){const subs=['All Subjects',...new Set(state.mate
 function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);renderTermSwitch();$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No PDFs match '+termTitle()+' in this '+(state.live?'library':'local preview')+'. '+(state.live?'Try another subject or check Undated PDFs.':'The downloaded preview contains archived October samples; live PDFs sync when hosted.')+'</div>';$('#pdfCount').textContent=state.live?`${termDocuments().length} PDFs · ${termTitle()}`:previewMode?`${termDocuments().length} archived PDFs · ${termTitle()}`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' '+termTitle()+' matches':previewMode?'Local HTML preview · Real PDFs sync on the hosted website':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
 function normalizeDoc(d){
  // Defensive display metadata: backend record untouched, original source retained for audit.
- const metadata=window.__8apdfTitleClarity?.normalizeMaterial?.(d)||d;
+ const metadata=(typeof window!=='undefined'?window.__8apdfTitleClarity:null)?.normalizeMaterial?.(d)||d;
  const schoolDate=d.source_date||d.date_iso||d.date_display||
   d.raw?.source_date||d.raw?.date_iso||d.raw?.createdAt||d.raw?.date||
   d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null;
