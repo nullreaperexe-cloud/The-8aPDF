@@ -6,7 +6,7 @@ export async function extractPdfEvidence({
 }={}){
  if(!pdfUrl||typeof pdfUrl!=='string')throw new TypeError('PDF URL is required');
  const limit=Math.min(maxBytes,8*1024*1024),pages=Math.min(maxPages,3),chars=Math.min(maxChars,4500);
- const parsed=new URL(pdfUrl,location?.origin||'https://www.8apdf.me');
+ const parsed=new URL(pdfUrl,typeof location!=='undefined'?location.origin:'https://www.8apdf.me');
  if(!['https:','http:'].includes(parsed.protocol))throw new TypeError('Only HTTP(S) PDF URLs are supported');
  const controller=new AbortController();
  const abort=()=>controller.abort();
