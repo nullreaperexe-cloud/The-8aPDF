@@ -563,7 +563,7 @@ function closeOriginalWelcome(){
   if(!guestDeferred())window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
-  if(guestDeferred())return;
+  if(guestDeferred()||window.__8apdfMusicDeferred===true||(()=>{try{return localStorage.getItem('8apdf_music_deferred_v1')==='1'||sessionStorage.getItem('8apdf_music_deferred_v1')==='1'}catch{return false}})())return;
   try {
     const seen=localStorage.getItem('8apdf-classic-notification-choice');
     if(seen || !('Notification' in window) || Notification.permission!=='default')return;
@@ -592,7 +592,7 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     if(skipped||guestDeferred())return;
     const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
     if(showingMusicChoice){
-      document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
+      document.addEventListener('8apdf:music-choice',event=>{if(!event.detail?.skipped)offerNotificationAfterWelcome()},{once:true});
     }else offerNotificationAfterWelcome();
   }
 });
