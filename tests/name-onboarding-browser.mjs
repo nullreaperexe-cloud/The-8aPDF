@@ -16,9 +16,10 @@ if(!base){
    const path=new URL(req.url,'http://localhost').pathname;
    const file=resolve(root,'.'+(path==='/'?'/index.html':path));
    if(!file.startsWith(root+sep))throw Error('Unsafe file');
+   const body=await readFile(file);
    res.writeHead(200,{'Content-Type':mime[extname(file)]||'application/octet-stream'});
-   res.end(await readFile(file));
-  }catch{res.writeHead(404);res.end()}
+   res.end(body);
+  }catch{if(!res.headersSent)res.writeHead(404);res.end()}
  });
  await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
  base='http://127.0.0.1:'+server.address().port;
