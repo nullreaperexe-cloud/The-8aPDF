@@ -94,8 +94,8 @@ function animateVisible(el){
  const index=order(el),base=card?Math.min(index%3,2)*135:button?Math.min(index%7,6)*65:0;
  const delay=card?base:button?base:70;
  const frames=card?[
-   {opacity:0,transform:'perspective(1250px) translate3d(0,60px,-85px) rotateX(15deg) rotateY(-5deg) scale(.94)',filter:'blur(5px)'},
-   {opacity:1,transform:'perspective(1250px) translate3d(0,0,0) rotateX(0deg) rotateY(0deg) scale(1)',filter:'blur(0px)'}
+   {opacity:0,translate:'0 24px'},
+   {opacity:1,translate:'0 0'}
  ]:button?[
    {opacity:0,transform:'translate3d(0,20px,0) scale(.94)',filter:'blur(2px)'},
    {opacity:1,transform:'translate3d(0,0,0) scale(1)',filter:'blur(0px)'}
@@ -105,7 +105,7 @@ function animateVisible(el){
  ];
  try{
   const animation=el.animate(frames,{
-    duration:card?850:button?510:720,
+    duration:card?620:button?510:720,
     delay,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'
   });
   // Prevent invisible nodes if animations are cancelled by a low-power setting.
@@ -148,33 +148,11 @@ addEventListener('pageshow',scheduleScan,{passive:true});
 addEventListener('resize',scheduleScan,{passive:true});
 document.addEventListener('8apdf:library-updated',scheduleScan);
 document.addEventListener('8apdf:teacher-data',scheduleScan);
-/* Hardware-accelerated cursor-tracked tilt + soft crimson glare. */
+/* CSS owns the transform transition on both themes; no inline transform jumps. */
 let current=null,last=null,frame=0;
-function settle(){
- if(current){current.style.removeProperty('transform');current.style.removeProperty('will-change')}
- current=null;
-}
-function paint(){
- frame=0;if(!current||!last||!current.isConnected)return;
- const b=current.getBoundingClientRect();if(b.width<20||b.height<20)return;
- const x=Math.max(-.5,Math.min(.5,(last.x-b.left)/b.width-.5));
- const y=Math.max(-.5,Math.min(.5,(last.y-b.top)/b.height-.5));
- current.style.setProperty('--crimson-pointer-x',((x+.5)*100).toFixed(2)+'%');
- current.style.setProperty('--crimson-pointer-y',((y+.5)*100).toFixed(2)+'%');
- current.style.setProperty('will-change','transform');
- current.style.setProperty('transform','perspective(1250px) rotateX('+(-y*12).toFixed(2)+'deg) rotateY('+(x*12).toFixed(2)+'deg) translate3d(0,-8px,16px)','important');
-}
-document.addEventListener('pointermove',event=>{
- if(!finePointer()){settle();return}
- const card=event.target.closest('#pdfGrid>.pdf-card,#announcementGrid>.notice-card');
- if(card&&!visible.has(card))return;
- if(current!==card){settle();current=card}
- if(!current)return;
- last={x:event.clientX,y:event.clientY};
- if(!frame)frame=requestAnimationFrame(paint);
-},{passive:true});
-document.addEventListener('pointerout',event=>{
- if(current&&!current.contains(event.relatedTarget))settle();
-},{passive:true});
+function settle(){if(!current)return;for(const key of ['--crimson-rotate-x','--crimson-rotate-y','--crimson-pointer-x','--crimson-pointer-y'])current.style.removeProperty(key);current=null;}
+function paint(){frame=0;if(!current||!last||!current.isConnected)return;const b=current.getBoundingClientRect();if(b.width<20||b.height<20)return;const x=Math.max(-.5,Math.min(.5,(last.x-b.left)/b.width-.5)),y=Math.max(-.5,Math.min(.5,(last.y-b.top)/b.height-.5));current.style.setProperty('--crimson-pointer-x',((x+.5)*100).toFixed(2)+'%');current.style.setProperty('--crimson-pointer-y',((y+.5)*100).toFixed(2)+'%');current.style.setProperty('--crimson-rotate-x',(-y*5).toFixed(2)+'deg');current.style.setProperty('--crimson-rotate-y',(x*5).toFixed(2)+'deg');}
+document.addEventListener('pointermove',event=>{if(!finePointer()){settle();return}const card=event.target.closest('#pdfGrid>.pdf-card,#announcementGrid>.notice-card');if(current!==card){settle();current=card}if(!current)return;last={x:event.clientX,y:event.clientY};if(!frame)frame=requestAnimationFrame(paint);},{passive:true});
+document.addEventListener('pointerout',event=>{if(current&&!current.contains(event.relatedTarget))settle();},{passive:true});
 addEventListener('blur',settle);
 })();

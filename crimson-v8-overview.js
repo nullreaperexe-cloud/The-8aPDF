@@ -15,13 +15,12 @@ function update(){
  const messages=typeof b?.announcements==='function'?b.announcements():null;
  const pdfs=loaded&&Array.isArray(docs)?docs.length:readCount('premiumSavedCount');
  const notices=loaded&&Array.isArray(messages)?messages.length:readCount('premiumMessageCount');
- const unread=Number.isFinite(window.__8apdfUnreadCount)?Number(window.__8apdfUnreadCount):readCount('premiumSubjectCount');
  let tests=null;
  if(typeof window.__8apdfStudyIntel?.upcoming==='function'){
   const events=window.__8apdfStudyIntel.upcoming();
   if(Array.isArray(events))tests=events.filter(e=>e?.kind==='test').length;
  }
- const values={crimsonStatPdfs:pdfs,crimsonStatAnnouncements:notices,crimsonStatTests:tests,crimsonStatChats:unread};
+ const values={crimsonStatPdfs:pdfs,crimsonStatAnnouncements:notices,crimsonStatTests:tests};
  for(const [id,v]of Object.entries(values)){
   const target=$(id),label=number(v);
   if(target&&target.textContent!==label)target.textContent=label;
