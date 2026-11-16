@@ -1,0 +1,39 @@
+/* 8aPDF V11 — clean welcome: crimson-only backdrop, original brand mark retained.
+   Higher specificity than V8's legacy blue/purple welcome backgrounds. */
+html[data-crimson-ui="on"][data-tone="dark"] #welcomeScreen,
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #welcomeScreen {
+ background:
+  radial-gradient(ellipse 65% 52% at 50% 24%,rgba(164,13,50,.30) 0%,transparent 78%),
+  radial-gradient(ellipse 42% 42% at 8% 78%,rgba(129,9,36,.16) 0%,transparent 90%),
+  radial-gradient(ellipse 41% 40% at 95% 91%,rgba(136,10,43,.15) 0%,transparent 91%),
+  linear-gradient(165deg,#17060b 0%,#0b0407 53%,#030203 100%)!important;
+ background-color:#090305!important;
+ color:#fff2f5!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #welcomeScreen .welcome-title {
+ color:#fff4f7!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #welcomeScreen .welcome-subtitle {
+ color:#d2b4c0!important;
+}
+html[data-crimson-ui="on"][data-tone="light"] #welcomeScreen,
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen {
+ background:
+  radial-gradient(ellipse 65% 60% at 50% 19%,rgba(238,80,115,.16),transparent 80%),
+  radial-gradient(ellipse 44% 40% at 92% 91%,rgba(209,47,84,.08),transparent 90%),
+  linear-gradient(145deg,#fff9fb 0%,#fff4f7 59%,#f9edf1 100%)!important;
+ background-color:#fff7fa!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen .welcome-title{
+ color:#321b26!important;
+}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="light"] #welcomeScreen .welcome-subtitle{
+ color:#735262!important;
+}
+/* Do not show the secondary crimson slogan under the logo.
+   Actual personalized Welcome and loading subtitle remain unchanged. */
+html[data-crimson-ui="on"] #welcomeScreen .crimson-welcome-label,
+html[data-crimson-ui="on"] #nameModal .name-welcome .crimson-welcome-label {display:none!important}
+html[data-crimson-ui="on"] #welcomeScreen .crimson-welcome-mark{
+ margin-bottom:30px!important;
+}
