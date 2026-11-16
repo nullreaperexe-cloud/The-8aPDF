@@ -59,7 +59,7 @@ for(const selector of ['.premium-hero-scene','.premium-hero-actions','.premium-s
 assert(!screenStyles.some(x=>/this\.media=.*all/.test(x)),'Never reintroduce deferred print media hack');
 assert(html.includes('window.__8apdfHomeStyleReady=true'),'Premium layout may safely display without CSS load timer');
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
-assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
+assert(html.includes("dataset.entryPending=named?'welcome':'name'")&&html.includes("const guest=read('8apdf_guest_browse_v1')==='1'"),'First paint must distinguish guest, named visitor and name entry');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
 assert(html.indexOf('id="8apdf-welcome-first-paint"')<html.indexOf('id="nameModal"'),'Welcome must be initialized before name onboarding markup');
 assert(fs.readFileSync('features/app-core.js','utf8').includes('delete document.documentElement.dataset.entryPending;'),'Early screen must release after startup');
