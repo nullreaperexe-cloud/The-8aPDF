@@ -99,7 +99,7 @@ function inspect(record,options={}){
 }
 function display(record){
  // Do not run filename inference for announcements. Their formatting has its own source logic.
- if(typeof record==='object'&&record!==null&&!record.pdfUrl&&!record.pdf_url&&!record._sourceMetadata&&!record.file_name&&!record.filename){
+ if(typeof record==='object'&&record!==null&&(record.category||record.messageDate||record.eventDate||record.kind==='announcement')){
   const x=naturalTitle(record.title||'');
   return x||'School announcement';
  }
