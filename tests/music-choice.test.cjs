@@ -85,7 +85,7 @@ function bgFixture(store){
    listeners:{},addEventListener(n,f){this.listeners[n]=f}
   });return elements.get(id)
  };
- const doc={readyState:'complete',getElementById:elem,
+ const doc={readyState:'complete',getElementById:id=>id==='dmAudio'?null:elem(id),
   createElement:name=>name==='audio'?audio:elem('style'),head:{appendChild(){}},
   body:{appendChild(){}},addEventListener(){}};
  const window={addEventListener(){}};
