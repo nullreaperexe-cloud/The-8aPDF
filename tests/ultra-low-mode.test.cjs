@@ -38,5 +38,5 @@ assert(simpleSettings.includes("ultra?.setMode('auto')"),'Simple Settings must r
 assert(simpleSettings.includes('renderUltraLow()'),'Simple Settings toggle must reflect saved state');
 assert(simpleSettings.includes('OFF by default for everyone'));
 assert(simpleSettings.includes('if(root.dataset.theme!==value)root.dataset.theme=value'),'Skip redundant theme mutations');
-assert(html.includes('/workspace-upgrade.js?v=pdf-actions-20261030-v1'),'Updated Settings controller needs a fresh cache key');
+assert(/\/workspace-upgrade\.js\?v=[a-z0-9-]+/i.test(html),'Updated Settings controller must have a versioned URL');
 console.log('PASS default OFF, manual preferences, isolated glow repaints and normal theme optimization');

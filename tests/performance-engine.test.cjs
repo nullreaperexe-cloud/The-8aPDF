@@ -59,7 +59,7 @@ for(const selector of ['.premium-hero-scene','.premium-hero-actions','.premium-s
 assert(!screenStyles.some(x=>/this\.media=.*all/.test(x)),'Never reintroduce deferred print media hack');
 assert(html.includes('window.__8apdfHomeStyleReady=true'),'Premium layout may safely display without CSS load timer');
 assert(html.includes('id="8apdf-first-paint-guard"'),'First-paint cover missing');
-assert(html.includes("dataset.entryPending=known?'welcome':'name'"),'Welcome vs name must be decided before paint');
+assert(html.includes("dataset.entryPending=named?'welcome':'name'")&&html.includes("const guest=read('8apdf_guest_browse_v1')==='1'"),'First paint must distinguish guest, named visitor and name entry');
 assert(html.indexOf('id="8apdf-ui-early"')<html.indexOf('<body>'),'Startup guard must be in document head');
 assert(html.indexOf('id="8apdf-welcome-first-paint"')<html.indexOf('id="nameModal"'),'Welcome must be initialized before name onboarding markup');
 assert(fs.readFileSync('features/app-core.js','utf8').includes('delete document.documentElement.dataset.entryPending;'),'Early screen must release after startup');
@@ -81,7 +81,7 @@ const core=fs.readFileSync('features/app-core.js','utf8');
 assert(core.includes('pendingFirstPdfRender=true;else renderMaterials()'),'PDF data should load without competing with welcome render');
 assert(core.includes('pendingFirstAnnouncementsRender=true;else renderAnnouncements()'),'Announcement cards should wait until welcome closes');
 assert(core.includes('scheduleFirstCatalogRender()'),'Deferred cards must be rendered after onboarding finishes');
-assert(html.includes('/features/app-core.js?v=title-clarity-20261101-v1'),'Core cache version must match deployed code');
+assert(html.includes('/features/app-core.js?v=metadata-guest-20261116'),'Core cache version must match deployed code');
 assert(html.includes('features/static-cache-register.js'),'Idle cache registration missing');
 assert(!fs.readFileSync('features/static-cache-register.js','utf8').includes('Notification.requestPermission'),'Static cache must not request push notifications');
 console.log('PASS modular scripts, CSS parity, instant onboarding cover, adaptive animation and safe static cache');
