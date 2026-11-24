@@ -1,7 +1,5 @@
 /* 8aPDF unified text typography — keeps icon glyphs and code editors functional.
    All normal text adopts the exact Space Grotesk family of Preview/Download/Share. */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
 :root{
   --8apdf-text-font:'Space Grotesk','Noto Sans Devanagari','Noto Sans Gurmukhi',system-ui,sans-serif;
   --ui-font:var(--8apdf-text-font)!important;
