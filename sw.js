@@ -34,8 +34,10 @@ self.addEventListener('fetch',event=>{
  if(request.method!=='GET'||request.mode==='navigate')return;
  let url;
  try{url=new URL(request.url)}catch{return}
- if(url.origin!==self.location.origin||url.pathname.startsWith('/api/')||
-    !/\.(?:js|css)$/i.test(url.pathname)||!url.searchParams.has('v'))return;
+ if(url.origin!==self.location.origin||url.pathname.startsWith('/api/'))return;
+ const cacheableCode=/\.(?:js|css)$/i.test(url.pathname)&&url.searchParams.has('v');
+ const cacheableImage=/^\/assets\//.test(url.pathname)&&/\.(?:webp|png|jpg|jpeg|svg|ico)$/i.test(url.pathname)&&url.searchParams.has('v');
+ if(!cacheableCode&&!cacheableImage)return;
  event.respondWith((async()=>{
   if(typeof caches==='undefined')return fetch(request);
   try{
