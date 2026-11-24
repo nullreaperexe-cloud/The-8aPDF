@@ -42,3 +42,12 @@ html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] :is(#pdfGrid
 html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] :is(#pdfGrid>.pdf-card,#announcementGrid>.notice-card){
   box-shadow:0 12px 32px rgba(0,0,0,.46)!important;
 }
+
+/* Restore the signature crimson grid and fire aura at a restrained opacity. */
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #crimsonSky .crimson-grid{opacity:.42!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #crimsonSky .crimson-star{opacity:.14!important}
+html[data-crimson-ui="on"][data-ui-mode="studio"][data-tone="dark"] #crimsonSky .crimson-orb{
+  display:block!important;opacity:1!important;filter:blur(110px)!important;
+  background:radial-gradient(circle,rgba(239,35,60,.12),transparent 68%)!important;
+  animation:crimson-aura 12s ease-in-out infinite alternate!important;
+}
