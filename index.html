@@ -2,6 +2,7 @@
 
 <html data-ui-mode="studio" data-density="comfortable" data-fluid="on" data-glass="on" data-layout="grid" data-motion="on" data-onboard="complete" data-theme="pure-black" data-tone="dark" lang="en">
 <head>
+<script src="/features/performance-flags.js?v=20261124-perf-flags"></script>
 <script id="8apdf-ui-early">
 document.documentElement.dataset.crimsonUi='on';
 /* ULTRA LOW BOOT START */
@@ -594,6 +595,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 
 <script src="/announcement-format.js?v=20261030"></script>
 <link rel="stylesheet" href="/site-unified-font.css?v=unified-20261030-v1">
+<link rel="stylesheet" href="/features/performance-styles.css?v=20261124-card-containment">
 <link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116" fetchpriority="high" id="8apdf-crimson-entry-first-paint"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116" fetchpriority="high">
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
@@ -858,7 +860,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <div aria-live="polite" class="toast-area" id="toastArea"></div>
 <script defer src="/features/ultra-low-mode.js?v=default-off-20261030"></script>
 <script defer src="/shared/title-clarity.js?v=20261101-complete-v1"></script>
-<script defer src="/features/app-core.js?v=calendar-day1-20261104"></script>
+<script defer src="/features/app-core.js?v=title-clarity-20261101-v1"></script>
 
 <script id="8apdf-experience-script" defer src="/features/study-experience.js?v=performance-20261030"></script>
 <script id="8apdf-studio-ui-controller" defer src="/features/studio-controls.js?v=performance-20261030"></script>
@@ -1274,7 +1276,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
   html[data-ui-mode="studio"] #newSchoolPlanner :is(.widget,.planner-task){transition:none!important}
 }
 </style>
-<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=crimson-theme-20261115"></script>
+<script id="8apdf-school-planner" defer src="/features/school-planner.js?v=performance-20261030"></script><script defer src="/timetable-tracker.js?v=approved-20261011v1"></script><script defer src="/compact-notices.js?v=20261013-cycle"></script><script defer src="/study-typing.js?v=daily-intro-20261030-v1"></script><script defer src="/study-intelligence.js?v=compact-20261013"></script><script defer src="/workspace-upgrade.js?v=pdf-actions-20261030-v1"></script>
 
 <script id="8apdf-friends-launch">document.addEventListener('click',function(event){if(event.target.closest('[data-open-friends-chat]'))location.assign('/chat')});</script>
 
@@ -1285,10 +1287,11 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/school-calendar-client.js?v=calendar-day1-20261104"></script>
 <!-- Native MP3 background player: saved song selection and ordered three-track playlist. -->
 <script defer src="/bgm-howler.js?v=20261115-exclusive-audio-v8"></script>
-<script defer src="/drive-music.js?v=20261115-exclusive-audio-v8"></script>
+<script defer src="/drive-music.js?v=5"></script>
 <link rel="stylesheet" href="/music-launch.css?v=1">
 <script defer src="/music-launch.js?v=1"></script>
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
+<script defer src="/features/idle-loader.js?v=20261124-idle-loader"></script>
 
 
 <link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion"><link rel="stylesheet" href="/crimson-v7-search.css?v=20261115-search-desktop"><link rel="stylesheet" href="/crimson-v8-home.css?v=20261115-v8-stats-widgets"><link rel="stylesheet" href="/crimson-v9-logo-motion.css?v=red-smooth-20261116"><link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116">
