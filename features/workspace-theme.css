@@ -1,0 +1,22 @@
+/* Shared shell for every routed workspace page. */
+html[data-ui-mode="studio"] #workspacePage{
+  background:var(--bg)!important;color:var(--text)!important;
+  isolation:isolate;overflow:hidden;
+}
+html[data-ui-mode="studio"] #workspacePage::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 72% 48% at 50% 0%,rgba(124,11,28,.20),transparent 78%),var(--bg);
+}
+html[data-ui-mode="studio"] .workspace-page-header{
+  background:color-mix(in srgb,var(--surface) 88%,transparent)!important;
+  border-color:var(--line-bold)!important;color:var(--text)!important;
+  box-shadow:0 12px 38px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+html[data-ui-mode="studio"] .workspace-page-header button{
+  border:1px solid var(--line-bold)!important;background:var(--surface-high)!important;
+  color:var(--text)!important;border-radius:11px!important;transition:transform .22s ease,background .22s ease;
+}
+html[data-ui-mode="studio"] .workspace-page-header button:hover{transform:translateY(-2px);background:var(--hover)!important}
+html[data-ui-mode="studio"] #workspacePageFrames{background:transparent!important}
+html[data-ui-mode="studio"] #workspacePageFrames iframe{background:transparent!important}
