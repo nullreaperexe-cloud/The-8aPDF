@@ -1,0 +1,3 @@
+/* Safe layout containment preserves existing geometry, shadows and animation keyframes. */
+#pdfGrid>.pdf-card,#announcementGrid>.notice-card{contain:layout style;}
+@media (max-width:810px){#pdfGrid,#announcementGrid{contain:layout style;}}
