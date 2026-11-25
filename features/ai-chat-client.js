@@ -123,9 +123,9 @@ function rank(q,docs,kind='pdf'){
 function makeMessage(text,type='ai'){const initial=el('pdfAiWelcome');if(initial)initial.hidden=true;const p=document.createElement('div');p.className='pdf-ai-message '+(type==='user'?'user':'ai');const z=document.createElement('p');z.textContent=text;p.append(z);feed.append(p);feed.scrollTop=feed.scrollHeight;return p}
 function showResults(text,docs){const node=makeMessage(text);if(!docs.length)return;const grid=document.createElement('div');grid.className='pdf-ai-results';for(const doc of docs.slice(0,50)){const card=document.createElement('article');card.className='pdf-ai-result';const h=document.createElement('h3');h.textContent=doc.title;const small=document.createElement('small');small.textContent=[doc.subject,doc.term==='term1'?'Term 1':doc.term==='term2'?'Term 2':'Date unavailable',doc.chapter].filter(Boolean).join(' · ');card.append(h,small);const actions=document.createElement('div');actions.className='pdf-ai-result-actions';for(const [label,action] of [['Preview','preview'],['Download','download'],['Share','share']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',()=>{if(!bridge()?.openDocument)return;bridge().openDocument(doc.id,action)});actions.append(b)}card.append(actions);grid.append(card)}node.append(grid);feed.scrollTop=feed.scrollHeight}
 let configured=false,checked=false,busy=false,lastFocus=null,seq=0;const memory=new Map();
-async function checkAI(){if(checked)return configured;checked=true;try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Instant answers · Groq available when needed':'Local-first search · no AI credits';return configured}
+async function checkAI(){if(checked&&configured)return true;checked=true;try{const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1800);try{const r=await fetch('/api/pdf-chat',{signal:controller.signal});const j=await r.json();configured=!!j.aiConfigured}catch{configured=false}finally{clearTimeout(timer)}}catch{configured=false}status.textContent=configured?'Thinking ON · Groq ready':'Thinking ON · Groq not configured';return configured}
 
-async function open(){lastFocus=document.activeElement;layer.hidden=false;document.body.classList.add('pdf-ai-open');if(document.documentElement.dataset.studioMobileMenu==='open')el('studioSidebarClose')?.click();input.focus({preventScroll:true});checkAI();}
+async function open(){lastFocus=document.activeElement;layer.hidden=false;document.body.classList.add('pdf-ai-open');if(document.documentElement.dataset.studioMobileMenu==='open')el('studioSidebarClose')?.click();input.focus({preventScroll:true});}
 function close(){layer.hidden=true;document.body.classList.remove('pdf-ai-open');lastFocus?.focus?.({preventScroll:true})}
 el('studioAssistantLink')?.addEventListener('click',open);el('pdfAiClose').addEventListener('click',close);el('pdfAiShade').addEventListener('click',close);
 const morePanel=el('studioMorePanel');if(morePanel){const btn=document.createElement('button');btn.type='button';btn.id='studioMoreAssistant';btn.textContent='✦ AI PDF Finder';btn.addEventListener('click',()=>{morePanel.hidden=true;open()});morePanel.append(btn)}
@@ -188,9 +188,9 @@ async function answerAI(question,docs){
  const catalog=shortlist(docs,'pdf',24).map(d=>({id:d.id,title:d.title,subject:d.subject,description:String(d.description||'').slice(0,400),chapter:d.chapter,term:d.term}));
  const dateText=v=>{if(typeof v==='string')return v.slice(0,55);try{if(v?.toDate)return v.toDate().toISOString().slice(0,10);if(typeof v?.seconds==='number')return new Date(v.seconds*1000).toISOString().slice(0,10)}catch{}return''};
  const announcements=shortlist(anns,'announcement',24).map(a=>({id:a.id,title:a.title,subject:a.subject,category:a.category,description:String(a.description||a.fullMessage||a.message||'').slice(0,500),eventDate:dateText(a.eventDate),messageDate:dateText(a.messageDate)}));
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),22000);
  try{
-  const response=await fetch('/api/pdf-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,catalog,announcements}),signal:controller.signal});
+  const response=await fetch('/api/pdf-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'finder',thinking:true,question,catalog,announcements}),signal:controller.signal});
   const data=await response.json().catch(()=>({}));
   if(!response.ok)throw Error(data.error||'AI unavailable');
   const ids=new Set(Array.isArray(data.ids)?data.ids:[]),annIds=new Set(Array.isArray(data.announcementIds)?data.announcementIds:[]);
@@ -208,12 +208,12 @@ async function send(){
  const teacherAnswer=wantsDate?window.__8apdfStudyIntel?.answer?.(question):null;
  if(teacherAnswer&&teacherAnswer.announcements?.length&&teacherAnswer.message?.includes('Confirmed from dated teacher messages')){showNoticeResults(teacherAnswer);return}
  const result=answerLocal(question,docs);
- const complex=/\b(why|how|explain|compare|difference|summarize|summary|based on|according to|what should|which chapter was|how many|tell me about|give an answer)\b/i.test(normalize(question));
- if(result&&!complex){showNoticeResults(result);return}
+ const thinking=el('pdfAiThinking')?.getAttribute('aria-pressed')==='true';
+ if(!thinking){if(result)showNoticeResults(result);else showResults('No reliable local match. Try a subject, chapter or topic, or enable Thinking for Groq-assisted search.',[]);return}
  busy=true;
  const placeholder=makeMessage('Checking PDFs and teacher announcements…');
  try{
-  await checkAI();const resultAI=await answerAI(question,docs);placeholder.remove();
+  const ready=await checkAI();const resultAI=ready?await answerAI(question,docs):null;placeholder.remove();if(!ready)hint.textContent='Groq is not configured on Vercel. Local results are still available.';
   if(resultAI&&resultAI.results.length+resultAI.announcements.length)showNoticeResults(resultAI);
   else if(result)showNoticeResults(result);
   else showResults('I could not verify an answer from the currently loaded PDFs and teacher messages. Try a subject, chapter, test, or topic; I will not invent school facts.',[]);

@@ -25,7 +25,7 @@ const response=()=>{
  assert(!JSON.stringify(r.value().payload).includes('server-only-secret'));
  const question='When is the Science test?';
  r=response();await handler({method:'POST',headers:{'x-forwarded-for':'127.0.0.20'},
-  body:{question,catalog:[{id:'doc1',title:'Science Chapter 3',subject:'Science'}],
+  body:{mode:'finder',thinking:true,question,catalog:[{id:'doc1',title:'Science Chapter 3',subject:'Science'}],
    announcements:[{id:'notice1',title:'Science Test',description:'Unit test on 14 October',messageDate:'2026-10-13',eventDate:'2026-10-14'}]}
  },r);
  assert.equal(r.value().status,200);
@@ -33,15 +33,16 @@ const response=()=>{
  assert.equal(call.options.headers.Authorization,'Bearer server-only-secret');
  assert(!JSON.stringify(call.options.body).includes('server-only-secret'));
  const sent=JSON.parse(call.options.body);
- assert.equal(sent.model,'llama-3.1-8b-instant');
+ assert.equal(sent.model,'openai/gpt-oss-120b');
  assert.equal(sent.response_format.type,'json_object');
  assert(sent.messages[1].content.includes('Science Test'));
  assert(sent.messages[1].content.includes('2026-10-14'));
  assert.deepEqual(r.value().payload.ids,['doc1']);
  assert.deepEqual(r.value().payload.announcementIds,['notice1']);
- assert.equal(r.value().payload.model,'llama-3.1-8b-instant');
+ assert.equal(r.value().payload.model,'openai/gpt-oss-120b');
+ const blocked=response();const previousCall=call;await handler({method:'POST',headers:{},body:{mode:'finder',thinking:false,question:'Science',catalog:[]}},blocked);assert.equal(blocked.value().status,400);assert.equal(call,previousCall);
  const bad=response();await handler({method:'POST',headers:{'x-forwarded-for':'127.0.0.21'},
-  body:{question:'test',catalog:[],announcements:new Array(46).fill({id:'a',title:'x'})}},bad);
+  body:{mode:'finder',thinking:true,question:'test',catalog:[],announcements:new Array(46).fill({id:'a',title:'x'})}},bad);
  assert.equal(bad.value().status,400);
  const disabled=new Function('process','fetch','AbortController','setTimeout','clearTimeout',src+';return handler;')(
   {env:{}},fetch,AbortController,setTimeout,clearTimeout

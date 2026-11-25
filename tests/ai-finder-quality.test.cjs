@@ -65,7 +65,9 @@ const matches=rank('Science chapter 3',large);
 assert(matches.length>0&&matches.every(d=>d.chapter==='3'),'Large-library matches must remain strictly chapter-specific');
 assert(performance.now()-started<500,'Instant local ranking must stay within a small browser CPU budget');
 
-assert(client.includes("Groq available when needed"));
+assert(client.includes("if(!thinking)"));
+assert(client.includes("thinking:true,question,catalog,announcements"));
+assert(fs.readFileSync("features/study-chat.js","utf8").includes("Thinking: Off"));
 assert(!html.includes('x-8apdf-gemini-key'));
 assert(!html.includes('Gemini only when needed'));
 assert(fs.existsSync('data/ai-finder-training.json'));

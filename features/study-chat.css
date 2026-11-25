@@ -1,7 +1,7 @@
 
 .study-chat-modes{display:flex;gap:7px;flex:0 0 auto;padding:8px 14px;border-bottom:1px solid var(--line,rgba(128,128,128,.2));overflow-x:auto}
 .study-chat-modes button{white-space:nowrap;flex:1;border:1px solid var(--line,rgba(128,128,128,.25));background:transparent;color:inherit;border-radius:10px;padding:9px 12px;font:inherit;font-size:.82rem;font-weight:650;cursor:pointer}
-.study-chat-modes button[aria-pressed=true]{background:#f8d84b;color:#191919;border-color:#f8d84b}
+.study-chat-modes button[aria-pressed=true]{background:#dc2626;color:#fff;border-color:#dc2626}
 .study-chat-modes button:disabled{opacity:.55;cursor:wait}
 .study-chat-feed[hidden],#pdfAiFeed[hidden],.study-chat-tray[hidden],.study-chat-attach[hidden]{display:none!important}
 .study-chat-feed{flex:1;min-height:0;overflow-y:auto}
@@ -13,3 +13,5 @@
 .study-chat-attach{flex:0 0 auto;align-self:center;font-size:1.25rem;padding:5px 9px}
 .study-chat-copy{margin-top:8px;font-size:.75rem}
 @media(max-width:540px){.study-chat-modes{padding:6px 8px;gap:5px}.study-chat-modes button{padding:8px 6px;font-size:.72rem}}
+
+.study-chat-thinking{align-self:flex-start;margin:6px 14px 3px;padding:6px 11px;border-radius:999px;border:1px solid #b91c1c;background:transparent;color:inherit;font:inherit;font-size:.78rem;font-weight:650;cursor:pointer;flex:0 0 auto}.study-chat-thinking[aria-pressed=true]{background:#dc2626;color:white;border-color:#dc2626}.study-chat-thinking[hidden]{display:none!important}.study-chat-attach,.study-chat-copy{border-color:#b91c1c}.study-chat-attach:hover,.study-chat-copy:hover{background:#dc2626;color:white}.pdf-ai-main .pdf-ai-submit{background:#dc2626!important;color:#fff!important;border-color:#dc2626!important}.study-chat-modes button:focus-visible,.study-chat-thinking:focus-visible{outline:2px solid #ef4444;outline-offset:2px}

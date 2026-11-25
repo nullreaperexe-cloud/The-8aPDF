@@ -2,7 +2,7 @@
  * GROQ_API_KEY stays server side (Vercel environment variable).
  * Search context is shortlisted by the client; this endpoint never searches the web.
  */
-const MODEL='llama-3.1-8b-instant';
+const MODEL='openai/gpt-oss-120b';
 const recentRequests=new Map();
 const cleanText=(value,n=500)=>String(value??'').replace(/\s+/g,' ').trim().slice(0,n);
 function json(res,status,value){
@@ -32,6 +32,7 @@ export default async function handler(req,res){
  if(typeof body==='string'){if(body.length>3200000)return json(res,413,{error:'Context too large'});try{body=JSON.parse(body)}catch{return json(res,400,{error:'Invalid JSON'});}}
  if(!body||typeof body!=='object'||Array.isArray(body))return json(res,400,{error:'Invalid request'});
  if(body.mode==='chat'||body.mode==='study')return studyConversation(req,res,body,key);
+ if(body.mode!=='finder'||body.thinking!==true)return json(res,400,{error:'Enable Thinking to use Groq-assisted Finder.'});
  const question=typeof body.question==='string'?body.question.trim():'';
  if(question.length<2||question.length>400)return json(res,400,{error:'Question must be between 2 and 400 characters'});
  if(!Array.isArray(body.catalog)||body.catalog.length>45||!Array.isArray(body.announcements||[])||(body.announcements||[]).length>45)return json(res,400,{error:'Too many context entries'});
@@ -56,12 +57,12 @@ export default async function handler(req,res){
  'Use at most four IDs of each type and only exact IDs supplied. Include the source title(s) in the answer; maximum 100 words.'
  ].join(' ');
  const controller=new AbortController();
- const timer=setTimeout(()=>controller.abort(),7000);
+ const timer=setTimeout(()=>controller.abort(),18000);
  try{
   const response=await fetch('https://api.groq.com/openai/v1/chat/completions',{
    method:'POST',
    headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},
-   body:JSON.stringify({model:MODEL,temperature:0,response_format:{type:'json_object'},max_tokens:300,
+   body:JSON.stringify({model:MODEL,temperature:0.5,response_format:{type:'json_object'},max_completion_tokens:1500,reasoning_effort:'low',
     messages:[{role:'system',content:system},{role:'user',content:JSON.stringify({question,sources})}]}),
    signal:controller.signal
   });
