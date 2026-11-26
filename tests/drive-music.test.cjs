@@ -25,7 +25,7 @@ const {resolve}=require('node:path');
  assert.match(player,/matchMedia\?\.\('\(min-width:661px\)'\)/,'No keyboard focus on phones');
  assert.match(home,/id="studioDriveMusic"/);
  assert.match(home,/id="studioMobileDriveMusic"/);
- assert.match(home,/src="\/drive-music\.js\?v=5"/);
+ assert.match(home,/src="\/drive-music\.js\?v=20261115-exclusive-audio-v8"/);
  assert.doesNotMatch(home,/href="\/drive-music\.css/);
  assert.match(src,/import\('\/music-library\/player-core\.js/,'Core is lazy imported');
  assert.doesNotMatch(player,/Opening the Music Library.*pause\(\)/,'Opening should not pause background');

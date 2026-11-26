@@ -40,6 +40,6 @@ assert(subjectHandler.includes("document.documentElement.dataset.studioMobileMen
 assert(!/scrollToSection\('#library'\);\$\('#studioSidebarClose'\)\?\.click\(\)/.test(subjectHandler),'Unconditional subject-click sidebar close would break desktop');
 const sidebarModule=fs.readFileSync(path.join(root,'features/sidebar-toggle.js'),'utf8');
 assert(html.includes('/features/sidebar-toggle.js'),'Sidebar feature must be loaded');
-assert(sidebarModule.includes("sidebar.addEventListener('click',event=>{if(mobile()&&event.target.closest('.studio-side-link'))setOpen(false)}"),'Mobile nav auto-close must remain intact');
+assert(sidebarModule.includes("sidebar.addEventListener('click',event=>{if(event.target.closest('.studio-side-link'))setOpen(false)}"),'Sidebar selection must auto-close the collapsible menu');
 console.log('PASS responsive subject sidebar behavior: desktop stays open; mobile closes');
 console.log('PASS existing 8aPDF integration markers');

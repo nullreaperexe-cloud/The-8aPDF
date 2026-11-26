@@ -16,7 +16,14 @@ document.documentElement.dataset.crimsonUi='on';
 /* ULTRA LOW BOOT END */
 try{document.documentElement.dataset.uiMode=localStorage.getItem('8apdf_ui_mode_v1')==='classic'?'classic':'studio';document.documentElement.dataset.studioNav='closed'}catch{document.documentElement.dataset.uiMode='studio';document.documentElement.dataset.studioNav='closed'}
 /* Before first paint, pick the exact existing overlay; do not show the hero underneath. */
-try{const read=k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)||''}catch{return ''}};const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();const known=read('8apdf_crimson_fresh_name_v20261115')==='complete'&&n;document.documentElement.dataset.entryPending=known?'welcome':'name'}catch{document.documentElement.dataset.entryPending='name'}
+try{
+ const read=k=>{let value='';try{value=localStorage.getItem(k)||''}catch{}if(!value)try{value=sessionStorage.getItem(k)||''}catch{}return value};
+ const guest=read('8apdf_guest_browse_v1')==='1';
+ const n=(read('eightapdf_user_name_v2')||read('eightapdf_user_name')).trim();
+ const named=read('8apdf_crimson_fresh_name_v20261115')==='complete'&&n;
+ if(guest){document.documentElement.dataset.guest='on';delete document.documentElement.dataset.entryPending}
+ else document.documentElement.dataset.entryPending=named?'welcome':'name';
+}catch{document.documentElement.dataset.entryPending='name'}
 setTimeout(()=>{if(!document.documentElement.dataset.entryPending)return;document.getElementById('welcomeScreen')?.classList.remove('show');delete document.documentElement.dataset.entryPending},12000);
 </script>
 <style id="8apdf-ultra-low-first-paint">html[data-ultra-low="on"]{--duration:0ms!important;--fluid-speed:0ms!important;scroll-behavior:auto!important}
@@ -588,13 +595,13 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 
-<script src="/name-onboarding.js?v=crimson-name-20261115"></script>
+<script src="/name-onboarding.js?v=optional-guest-20261116"></script>
 
-<script src="/music-choice.js?v=1"></script>
+<script src="/music-choice.js?v=optional-guest-20261116"></script>
 
 <script src="/announcement-format.js?v=20261030"></script>
 <link rel="stylesheet" href="/site-unified-font.css?v=unified-20261030-v1">
-<link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116" fetchpriority="high" id="8apdf-crimson-entry-first-paint"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116" fetchpriority="high">
+<link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116" fetchpriority="high" id="8apdf-crimson-entry-first-paint"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116" fetchpriority="high"><link rel="stylesheet" href="/onboarding-optional.css?v=guest-20261116" fetchpriority="high">
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
 <div class="welcome-content">
@@ -616,6 +623,7 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <input autocomplete="name" class="name-input" id="nameInput" maxlength="80" placeholder="Your name" required type="text" aria-describedby="nameFeedback"/>
 <p class="name-feedback" id="nameFeedback" aria-live="polite">Just your name. Make yourself at home.</p>
 <button class="name-continue" type="submit" disabled><span>Continue</span><svg aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+<button type="button" id="skipNameOnboarding" aria-label="Skip name and browse PDFs anonymously">Skip for now · Browse PDFs</button>
 </div>
 </form>
 </div>
@@ -857,8 +865,8 @@ html[data-motion="off"] #welcomeScreen::after{animation:none!important}/* first-
 <div aria-label="Quick search" aria-modal="true" class="command" id="command" role="dialog"><div class="command-card"><input aria-label="Command search" id="commandInput" placeholder="Search PDFs, subjects or actions..."/><div class="command-results" id="commandResults"></div><div class="command-hint">Enter to select · Esc to close · Search powered by your library</div></div></div>
 <div aria-live="polite" class="toast-area" id="toastArea"></div>
 <script defer src="/features/ultra-low-mode.js?v=default-off-20261030"></script>
-<script defer src="/shared/title-clarity.js?v=20261101-complete-v1"></script>
-<script defer src="/features/app-core.js?v=calendar-day1-20261104"></script>
+<script defer src="/shared/title-clarity.js?v=clarity-v2-20261116"></script>
+<script defer src="/features/app-core.js?v=metadata-guest-20261116"></script>
 
 <script id="8apdf-experience-script" defer src="/features/study-experience.js?v=performance-20261030"></script>
 <script id="8apdf-studio-ui-controller" defer src="/features/studio-controls.js?v=performance-20261030"></script>
@@ -1293,7 +1301,7 @@ html[data-ui-mode="studio"] #newSchoolPlanner :is(.planner-go,input[type="checkb
 <script defer src="/features/static-cache-register.js?v=perf-20261030"></script>
 
 
-<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion"><link rel="stylesheet" href="/crimson-v7-search.css?v=20261115-search-desktop"><link rel="stylesheet" href="/crimson-v8-home.css?v=20261115-v8-stats-widgets"><link rel="stylesheet" href="/crimson-v9-logo-motion.css?v=red-smooth-20261116"><link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116">
+<link rel="stylesheet" href="/crimson-redesign.css?v=crimson-feature-preserve-20261115-2" id="crimson-ui-style"><link rel="stylesheet" href="/crimson-redesign-v3.css?v=20261115-superdesign-reference" id="crimson-ui-reference-style"><link rel="stylesheet" href="/crimson-v3-finishing.css?v=20261115-single-line-hero"><link rel="stylesheet" href="/crimson-v4-no-topbar.css?v=20261115-no-header"><link rel="stylesheet" href="/crimson-v5-hero-first.css?v=20261115-live-release"><link rel="stylesheet" href="/crimson-v6-polish.css?v=20261115-light-motion"><link rel="stylesheet" href="/crimson-v7-search.css?v=20261115-search-desktop"><link rel="stylesheet" href="/crimson-v8-home.css?v=20261115-v8-stats-widgets"><link rel="stylesheet" href="/crimson-v9-logo-motion.css?v=red-smooth-20261116"><link rel="stylesheet" href="/crimson-v10-onboarding.css?v=red-onboarding-20261116"><link rel="stylesheet" href="/crimson-v11-welcome.css?v=red-welcome-20261116"><link rel="stylesheet" href="/onboarding-optional.css?v=guest-20261116">
 <script defer src="/crimson-v6-motion.js?v=red-smooth-20261116"></script><script defer src="/crimson-v8-overview.js?v=red-nextday-20261116"></script>
 </body>
 </html>

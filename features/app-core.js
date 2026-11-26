@@ -294,7 +294,8 @@ function setSettings(){
  applySitePalette();setLiquidExperience();setPersonalization();document.documentElement.dataset.density=settings.density;document.documentElement.dataset.layout=settings.layout;document.documentElement.dataset.motion=settings.motion?'off':'on';document.documentElement.dataset.sidebar=settings.sidebar?'on':'off';document.documentElement.dataset.reading=settings.reading?'on':'off';document.documentElement.dataset.contrast=settings.contrast?'high':'normal';document.documentElement.dataset.font=settings.large?'large':'normal';document.documentElement.style.setProperty('--scale',String((settings.fontSize||100)/100*(settings.large?1.05:1)));
  if($('#settingsPanel').classList.contains('open'))renderPalette();$('[data-density-choice]').forEach(el=>el.classList.toggle('active',el.dataset.densityChoice===settings.density));$$('[data-card-choice]').forEach(el=>el.classList.toggle('active',el.dataset.cardChoice===settings.layout));$('#compactToggle').checked=settings.density==='compact';$('#sidebarToggle').checked=settings.sidebar;$('#readingToggle').checked=settings.reading;$('#motionToggle').checked=settings.motion;$('#largeTextToggle').checked=settings.large;$('#contrastToggle').checked=settings.contrast;$('#fontRange').value=settings.fontSize;$('#gridBtn').classList.toggle('active',settings.layout==='grid');$('#listBtn').classList.toggle('active',settings.layout==='list');store.set('8apdf_classic_glass_settings_v2',settings)
 }
-try{setSettings()}catch(error){console.error('8aPDF appearance setup failed; study library will still start',error)}$('#profileBtn').textContent=state.name[0].toUpperCase();
+try{setSettings()}catch(error){console.error('8aPDF appearance setup failed; study library will still start',error)}$('#profileBtn').textContent=window.__8apdfGuest?.isGuest?.()?'G':state.name[0].toUpperCase();
+document.addEventListener('8apdf:guest-browse',()=>{const avatar=$('#profileBtn');if(avatar)avatar.textContent='G'});
 function openSettings(){closeCommand();$('#settingsPanel').classList.add('open');renderPalette();$('#settingsPanel').setAttribute('aria-hidden','false');$('#drawerMask').classList.add('open')}
 function closeSettings(){ $('#settingsPanel').classList.remove('open');$('#settingsPanel').setAttribute('aria-hidden','true');$('#drawerMask').classList.remove('open') }
 $('#settingsBtn').onclick=openSettings;$('#closeSettings').onclick=closeSettings;$('#saveSettings').onclick=()=>{closeSettings();toast('Appearance saved on this device')};$('#drawerMask').onclick=closeSettings;$('#resetSettings').onclick=()=>{settings={...defaults};setSettings();window.__8apdfUltraLow?.setMode('auto');toast('Default appearance restored')};
@@ -371,24 +372,28 @@ $('#schoolTermBar').addEventListener('click',event=>{
  const newTerm=button.dataset.schoolTerm;if(!['all','term1','term2','undated'].includes(newTerm)||newTerm===state.term)return;
  state.term=newTerm;store.set('8apdf_term_choice_v3',state.term);state.visible=12;state.filter='All Subjects';renderMaterials();
 });
-function card(x){const saved=state.saved.includes(x.id);const displayTitle=window.__8apdfTitleClarity?.display(x)||x.title;return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(displayTitle)}">${safe(displayTitle)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button><button class="action wide pdf-summary-utility" data-pdf="summary" data-id="${safe(x.id)}" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2.5 14.4 9.6 21.5 12l-7.1 2.4L12 21.5l-2.4-7.1L2.5 12l7.1-2.4Z"/></svg> Summarize PDF</button></div></article>`}
+function card(x){const saved=state.saved.includes(x.id);const displayTitle=x.title;return `<article class="pdf-card"><div class="pdf-top"><span class="doc-tile">${ico('file')}</span><span class="tag">${safe(x.subject)}</span><button class="bookmark ${saved?'saved':''}" data-bookmark="${safe(x.id)}" aria-label="${saved?'Remove bookmark':'Save bookmark'}" title="${saved?'Remove bookmark':'Save bookmark'}">${ico('bookmark')}</button></div><h3 title="${safe(displayTitle)}">${safe(displayTitle)}</h3><p class="description">${safe(x.description||'Study material from your school library.')}</p><div class="meta-line">${ico('calendar')} ${safe(fmtDate(x.createdAt)||'Date unavailable')}${x.className?' · '+safe(x.className):''}${x.chapter?' · '+safe(x.chapter):''}</div><div class="card-actions"><button class="action" data-pdf="preview" data-id="${safe(x.id)}">${ico('eye')} Preview</button><button class="action primary" data-pdf="download" data-id="${safe(x.id)}">${ico('download')} Download</button><button class="action wide" data-pdf="share" data-id="${safe(x.id)}">${ico('share')} Share</button><button class="action wide pdf-summary-utility" data-pdf="summary" data-id="${safe(x.id)}" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2.5 14.4 9.6 21.5 12l-7.1 2.4L12 21.5l-2.4-7.1L2.5 12l7.1-2.4Z"/></svg> Summarize PDF</button></div></article>`}
 function renderSubjectFilters(){const subs=['All Subjects',...new Set(state.materials.map(x=>x.subject).filter(Boolean))].sort((a,b)=>a==='All Subjects'?-1:b==='All Subjects'?1:a.localeCompare(b));$('#subjectFilters').innerHTML=subs.map(v=>'<button class="chip '+(v===state.filter?'active':'')+'" data-subject="'+safe(v)+'">'+safe(v)+'</button>').join('');const sidebar=$('#studioSubjects');if(sidebar)sidebar.innerHTML=subs.map(v=>'<button type="button" class="studio-side-link '+(v===state.filter?'active':'')+'" data-sidebar-subject="'+safe(v)+'"><svg><use href="#i-file"/></svg><span>'+safe(v)+'</span></button>').join('');}
 function renderMaterials(){const a=sortedDocs(),shown=a.slice(0,state.visible);renderTermSwitch();$('#pdfGrid').innerHTML=shown.length?shown.map(card).join(''):'<div class="empty">No PDFs match '+termTitle()+' in this '+(state.live?'library':'local preview')+'. '+(state.live?'Try another subject or check Undated PDFs.':'The downloaded preview contains archived October samples; live PDFs sync when hosted.')+'</div>';$('#pdfCount').textContent=state.live?`${termDocuments().length} PDFs · ${termTitle()}`:previewMode?`${termDocuments().length} archived PDFs · ${termTitle()}`:state.error?'Library unavailable':'Loading PDFs…';$('#libraryStatus').innerHTML=`<span class="dot"></span> ${state.live?'Live school library · '+a.length+' '+termTitle()+' matches':previewMode?'Local HTML preview · Real PDFs sync on the hosted website':state.error?'Could not connect to school PDFs. Please refresh.':'Connecting to real school PDFs…'}`;$('#moreWrap').style.display=a.length>state.visible?'block':'none';renderSubjectFilters();renderRecent()}
 function normalizeDoc(d){
+ // Defensive display metadata: backend record untouched, original source retained for audit.
+ const metadata=(typeof window!=='undefined'?window.__8apdfTitleClarity:null)?.normalizeMaterial?.(d)||d;
  const schoolDate=d.source_date||d.date_iso||d.date_display||
   d.raw?.source_date||d.raw?.date_iso||d.raw?.createdAt||d.raw?.date||
   d.created_at||d.createdAt||d.uploaded_at||d.uploadDate||null;
  const uploadedAt=[d.inserted_at,d.uploaded_at,d.uploadedAt,d.uploadDate,
   d.created_at,d.createdAt,d.raw?.uploadedAt,d.raw?.createdAt]
   .find(value=>dateMs(value)>0)||schoolDate;
- return{id:String(d.id??''),title:String(d.title||d.name||'Untitled Material'),
+ return{id:String(d.id??''),title:String(metadata.title||'School Material'),
   subject:String(d.subject||d.subject_name||'Other'),
-  description:String(d.description||d.summary||''),
+  description:String(metadata.description||'Document details are not available.'),
   pdfUrl:String(d.pdf_url||d.pdfUrl||d.file_url||d.fileUrl||''),
   className:String(d.class_name||d.className||''),chapter:String(d.chapter||d.chapter_name||''),
   language:String(d.language||''),tags:Array.isArray(d.tags)?d.tags:[],
   order:d.order!=null&&Number.isFinite(Number(d.order))?Number(d.order):Number.MAX_SAFE_INTEGER,
-  createdAt:schoolDate,uploadedAt};
+  createdAt:schoolDate,uploadedAt,rawSource:d,
+  originalTitle:String(d.title||d.name||''),originalDescription:String(d.description||d.summary||''),
+  metadataQuality:metadata._metadataQuality||null};
 }
 $('#pdfGrid').onclick=e=>{const bm=e.target.closest('[data-bookmark]');if(bm){let id=bm.dataset.bookmark;state.saved=state.saved.includes(id)?state.saved.filter(v=>v!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();toast(state.saved.includes(id)?'Saved to bookmarks':'Removed from bookmarks');return}let btn=e.target.closest('[data-pdf]');if(!btn)return;const x=state.materials.find(i=>i.id===btn.dataset.id);if(!x)return;pdfAction(x,btn.dataset.pdf)};
 function rememberRecent(x){state.recent=[x.id,...state.recent.filter(id=>id!==x.id)].slice(0,20);store.set('8apdf_recent_v1',state.recent);renderRecent();document.dispatchEvent(new Event('8apdf:document-opened'))}
@@ -521,7 +526,7 @@ function renderNotes(){$('#notesList').innerHTML=state.tasks.length?state.tasks.
 function saveTasks(){store.set('8apdf_tasks_v1',state.tasks);renderNotes()}
 $('#noteForm').onsubmit=e=>{e.preventDefault();const v=$('#newNote').value.trim();if(!v)return;state.tasks.unshift({id:String(Date.now())+Math.random().toString(16).slice(2,6),text:v.slice(0,170),done:false});$('#newNote').value='';saveTasks()};
 $('#notesList').onchange=e=>{let id=e.target.dataset.taskCheck;if(!id)return;let t=state.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;saveTasks()}};$('#notesList').onclick=e=>{let id=e.target.dataset.taskDelete;if(!id)return;state.tasks=state.tasks.filter(t=>t.id!==id);saveTasks()};$('#clearCompleted').onclick=()=>{state.tasks=state.tasks.filter(x=>!x.done);saveTasks()};
-function openProfile(){showModal('Your 8aPDF Profile',`<p>Your name is saved privately on this device.</p><input id="editName" maxlength="40" value="${safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n)}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();document.dispatchEvent(new Event('8apdf:profile-changed'));toast('Profile updated')}}
+function openProfile(){showModal('Your 8aPDF Profile',`<p>${window.__8apdfGuest?.isGuest?.()?'Browsing as a guest. Add a name whenever you like.':'Your name is saved privately on this device.'}</p><input id="editName" maxlength="40" value="${window.__8apdfGuest?.isGuest?.()?'':safe(state.name)}" placeholder="Your name">`,`<button class="solid" id="saveProfile">Save Profile</button>`);$('#saveProfile').onclick=()=>{const n=$('#editName').value.replace(/[<>]/g,'').trim().slice(0,40);if(!n){toast('Please enter a name');return}state.name=n;window.__8apdfGuest?.leave?.();try{localStorage.setItem('eightapdf_user_name_v2',n);localStorage.setItem('eightapdf_user_name',n);localStorage.setItem('8apdf_crimson_fresh_name_v20261115','complete')}catch{}$('#profileBtn').textContent=n[0].toUpperCase();closeModal();document.dispatchEvent(new Event('8apdf:profile-changed'));toast('Profile updated')}}
 $('#profileBtn').onclick=openProfile;
 function askNotification(){if(window.__8apdfPush){window.__8apdfOpenPage?.('/notification-settings');return;}if(!('Notification' in window)){toast('Notifications are not supported by this browser');return}if(Notification.permission==='granted'){toast('Open notification settings to enable background updates.');return}if(Notification.permission==='denied'){toast('Notifications are blocked. Enable them in browser site settings.');return}if(!window.isSecureContext){toast('Notification permission needs HTTPS or localhost.');return}Notification.requestPermission().then(x=>toast(x==='granted'?'Notifications enabled for this browser':'Notifications not enabled'))}
 $('#notificationsBtn').onclick=askNotification;$('#footerBell').onclick=askNotification;
@@ -562,6 +567,7 @@ function closeOriginalWelcome(){
   window.__8apdfMusicConsent?.request?.();
 }
 function offerNotificationAfterWelcome(){
+  if(window.__8apdfGuest?.isGuest?.()||window.__8apdfMusicConsent?.isDeferred?.())return;
   try {
     const seen=localStorage.getItem('8apdf-classic-notification-choice');
     if(seen || !('Notification' in window) || Notification.permission!=='default')return;
@@ -584,12 +590,15 @@ const premiumOnboardingOpen=window.initNameOnboarding({
     $('#profileBtn').textContent=Array.from(name)[0].toUpperCase();
     document.dispatchEvent(new Event('8apdf:profile-changed'));
   },
-  onFinish(){
+  onFinish({skipped=false}={}){
     scheduleFirstCatalogRender();
+    if(skipped||window.__8apdfGuest?.isGuest?.())return;
     const showingMusicChoice=window.__8apdfMusicConsent?.request?.();
     if(showingMusicChoice){
-      document.addEventListener('8apdf:music-choice',offerNotificationAfterWelcome,{once:true});
-    }else offerNotificationAfterWelcome();
+      document.addEventListener('8apdf:music-choice',event=>{
+        if(!event.detail?.deferred)offerNotificationAfterWelcome();
+      },{once:true});
+    }else if(!window.__8apdfMusicConsent?.isDeferred?.())offerNotificationAfterWelcome();
   }
 });
 // Same welcome animation on every reload and every new website open.
@@ -603,6 +612,11 @@ try{
 }catch{}
 if(premiumOnboardingOpen){
   // The versioned name experience owns this visit's welcome transition.
+}else if(window.__8apdfGuest?.isGuest?.()){
+  closeOriginalWelcome();
+  originalNameModal.classList.remove('show');
+  originalNameModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('locked');
 }else if((skipWelcome||comingBackFromChat) && previousName && previousName!=='Student'){
   closeOriginalWelcome();
   originalNameModal.classList.remove('show');originalNameModal.setAttribute('aria-hidden','true');
@@ -612,7 +626,7 @@ else closeOriginalWelcome();
 
 renderTimetable();renderNotes();if(previewMode){renderMaterials();renderAnnouncements()};
 window.__8apdfStudyBridge={
- documents:()=>state.materials.map(x=>({id:x.id,title:window.__8apdfTitleClarity?.display(x)||x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,tags:Array.isArray(x.tags)?x.tags:[],createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),uploadedAtMs:pdfUploadMs(x),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
+ documents:()=>state.materials.map(x=>({id:x.id,title:x.title,subject:x.subject,description:x.description,chapter:x.chapter,className:x.className,tags:Array.isArray(x.tags)?x.tags:[],createdAt:fmtDate(x.createdAt),dateMs:dateMs(x.createdAt),uploadedAtMs:pdfUploadMs(x),term:termOfPdf(x),pdfUrl:x.pdfUrl,available:validURL(x.pdfUrl)})),
  announcements:()=>state.announcements.map(a=>({id:String(a.id||''),title:window.__8apdfTitleClarity?.display(a)||String(a.title||''),description:String(a.description||''),message:String(a.message||''),fullMessage:String(a.fullMessage||''),subject:String(a.subject||''),category:String(a.category||''),eventDate:a.eventDate||null,messageDate:a.messageDate||null,createdAt:a.createdAt||null})),
  recents:()=>[...state.recent],bookmarks:()=>[...state.saved],toggleBookmark:(id)=>{state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];store.set('8apdf_saved_v1',state.saved);renderMaterials();document.dispatchEvent(new Event('8apdf:bookmarks-changed'));},
  openAnnouncement:(id)=>{const n=state.announcements.find(n=>String(n.id)===String(id));if(n)openAnnouncement(n);},

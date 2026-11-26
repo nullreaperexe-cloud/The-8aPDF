@@ -1325,9 +1325,9 @@ html[data-ui-mode="studio"] .pdf-card {
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
 
-<script src="/name-onboarding.js?v=2"></script>
-<link rel="stylesheet" href="/music-choice.css?v=1"/>
-<script src="/music-choice.js?v=1"></script>
+<script src="/name-onboarding.js?v=optional-guest-20261116"></script>
+<link rel="stylesheet" href="/music-choice.css?v=1"/><link rel="stylesheet" href="/onboarding-optional.css?v=guest-20261116"/>
+<script src="/music-choice.js?v=optional-guest-20261116"></script>
 <link rel="stylesheet" href="/site-unified-font.css?v=unified-20261030-v1">
 </head>
 <body><div aria-hidden="true" id="siteAmbientGlow"></div><section aria-hidden="true" aria-live="polite" class="welcome-screen" id="welcomeScreen">
@@ -1348,6 +1348,7 @@ html[data-ui-mode="studio"] .pdf-card {
 <input autocomplete="name" class="name-input" id="nameInput" maxlength="80" placeholder="Your name" required type="text" aria-describedby="nameFeedback"/>
 <p class="name-feedback" id="nameFeedback" aria-live="polite">Just your name. Make yourself at home.</p>
 <button class="name-continue" type="submit" disabled><span>Continue</span><svg aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+<button type="button" id="skipNameOnboarding" aria-label="Skip name and browse PDFs anonymously">Skip for now · Browse PDFs</button>
 </div>
 </form>
 </div>
